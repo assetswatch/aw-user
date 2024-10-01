@@ -1,0 +1,410 @@
+import { ValidationMessages } from "./constants";
+
+/*Validation constraints*/
+const length3 = 3;
+const length5 = 5;
+const length6 = 6;
+const length10 = 10;
+const length15 = 15;
+const length20 = 20;
+const length30 = 30;
+const length50 = 50;
+const length100 = 100;
+const length250 = 250;
+const length300 = 300;
+const length400 = 400;
+const length500 = 500;
+const length1000 = 1000;
+const length2000 = 2000;
+const phonevalidvalues = [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "+",
+  "-",
+];
+const allowedFileTypes = ["image/jpeg", "image/png", "application/pdf"];
+const uploadFileMaxSize = 10 * 1024 * 1024; //10mb
+const uploadFileMaxSizeMB = 10; //10mb
+
+/* Regex patterns */
+const RegexPattern = {
+  numonly: /[0-9]/,
+  phone: /^(?:\+[0-9])?\s?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/,
+  email: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,})+$/,
+  url: /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?(\?[^\s]*)?$/,
+  date: /^(?:(0[1-9]|1[012])[\/.](0[1-9]|[12][0-9]|3[01])[\/.][0-9]{4})$/,
+};
+
+/*Regex */
+export const Regex = {
+  name: { max: length50, required: ValidationMessages.NameReq },
+  fname: { max: length50, required: ValidationMessages.FNameReq },
+  lname: {
+    max: length50,
+    required: ValidationMessages.LNameReq,
+  },
+  email: {
+    max: length100,
+    pattern: RegexPattern.email,
+    required: ValidationMessages.EmailReq,
+    invalid: ValidationMessages.EmailInvalid,
+  },
+  pwd: {
+    min: length6,
+    max: length30,
+    required: ValidationMessages.PwdReq,
+    invalid: ValidationMessages.PwdInvalid,
+  },
+  confirmpwd: {
+    min: length6,
+    max: length30,
+    required: ValidationMessages.CpwdReq,
+    invalid: ValidationMessages.CpwdInvalid,
+    match: ValidationMessages.CpwdMatch,
+  },
+  phone: {
+    pattern: RegexPattern.phone,
+    min: length10,
+    max: length20,
+    required: ValidationMessages.PhoneReq,
+    invalid: ValidationMessages.PhoneInvalid,
+  },
+  mobile: {
+    pattern: RegexPattern.phone,
+    min: length10,
+    max: length20,
+    required: ValidationMessages.MobileReq,
+    invalid: ValidationMessages.MobileInvalid,
+  },
+  landline: {
+    pattern: RegexPattern.phone,
+    min: length10,
+    max: length20,
+    required: ValidationMessages.LandlineReq,
+    invalid: ValidationMessages.LandlineInvalid,
+  },
+  companyname: {
+    max: length100,
+    required: ValidationMessages.CompanynameReq,
+  },
+  website: {
+    max: length250,
+    pattern: RegexPattern.url,
+    required: ValidationMessages.WebsiteReq,
+    invalid: ValidationMessages.WebsiteInvalid,
+  },
+  zip: {
+    min: length5,
+    max: length30,
+    pattern: RegexPattern.numonly,
+    required: ValidationMessages.ZipReq,
+    invalid: ValidationMessages.ZipInvalid,
+  },
+  subject: { max: length100, required: ValidationMessages.SubjectReq },
+  message: {
+    max: length500,
+    required: ValidationMessages.MessageReq,
+  },
+  searchkeyword: {
+    max: length50,
+    required: ValidationMessages.SearchKeywordReq,
+  },
+  date: {
+    max: length10,
+    required: ValidationMessages.DateReq,
+    invalid: ValidationMessages.DateInvalid,
+    pattern: RegexPattern.date,
+  },
+  propertytitle: {
+    max: length100,
+    required: ValidationMessages.PropertyTitleReq,
+    invalid: ValidationMessages.PropertyTitleInvalid,
+  },
+  addressone: {
+    max: length100,
+    required: ValidationMessages.Address1Req,
+    invalid: ValidationMessages.Address1Invalid,
+  },
+  addresstwo: {
+    max: length100,
+    required: ValidationMessages.Address2Req,
+    invalid: ValidationMessages.Address2Invalid,
+  },
+  description: {
+    max: length2000,
+    required: ValidationMessages.DescriptionReq,
+    invalid: ValidationMessages.DescriptionInvalid,
+  },
+  file: {
+    max: length250,
+    required: ValidationMessages.FileReq,
+    formatinvalid: ValidationMessages.FileFormatInvalid,
+    sizeinvalid: `${ValidationMessages.FileSizeInvalid} ${uploadFileMaxSizeMB}mb.`,
+  },
+};
+/*Regex */
+
+/*control types*/
+export const formCtrlTypes = {
+  name: {
+    lbl: "Name:",
+    input: {
+      type: "text",
+      max: length50,
+    },
+  },
+  fname: {
+    lbl: "First name:",
+    input: {
+      type: "text",
+      max: length50,
+    },
+  },
+  lname: {
+    lbl: "Last name:",
+    input: {
+      type: "text",
+      max: length50,
+    },
+  },
+  email: {
+    lbl: "Email Id:",
+    input: {
+      type: "text",
+      max: length100,
+    },
+  },
+  pwd: {
+    lbl: "Password:",
+    input: {
+      type: "password",
+      min: length6,
+      max: length30,
+    },
+  },
+  confirmpwd: {
+    lbl: "Confirm Password:",
+    input: {
+      type: "password",
+      min: length6,
+      max: length30,
+    },
+  },
+  phone: {
+    lbl: "Phone number:",
+    input: {
+      type: "text",
+      min: length10,
+      max: length20,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!phonevalidvalues.includes(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
+  },
+  mobile: {
+    lbl: "Mobile number:",
+    input: {
+      type: "text",
+      min: length10,
+      max: length20,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!phonevalidvalues.includes(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
+  },
+  landline: {
+    lbl: "Landline number:",
+    input: {
+      type: "text",
+      min: length10,
+      max: length20,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!phonevalidvalues.includes(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
+  },
+  companyname: {
+    lbl: "Company name:",
+    input: {
+      type: "text",
+      max: length100,
+    },
+  },
+  website: {
+    lbl: "Website:",
+    input: {
+      type: "text",
+      max: length250,
+    },
+  },
+  zip: {
+    lbl: "Zip code:",
+    input: {
+      type: "text",
+      min: length5,
+      max: length10,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!RegexPattern.numonly.test(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
+  },
+  category: {
+    lbl: "Category:",
+  },
+  country: {
+    lbl: "Country:",
+  },
+  state: {
+    lbl: "State:",
+  },
+  city: {
+    lbl: "City:",
+  },
+  contactfor: {
+    lbl: "Contact for:",
+  },
+  subject: {
+    lbl: "Subject:",
+    input: {
+      type: "text",
+      max: length100,
+    },
+  },
+  message: {
+    lbl: "Message:",
+    input: {
+      type: "text",
+      max: length500,
+    },
+  },
+  searchkeyword: {
+    lbl: "Keyword:",
+    input: {
+      type: "text",
+      max: length50,
+    },
+  },
+  date: {
+    lbl: "Date:",
+    input: {
+      type: "text",
+      max: length10,
+    },
+  },
+  propertytitle: {
+    lbl: "Property Title:",
+    input: {
+      type: "text",
+      max: length100,
+    },
+  },
+  addressone: {
+    lbl: "Address 1:",
+    input: {
+      type: "text",
+      max: length400,
+    },
+  },
+  addresstwo: {
+    lbl: "Address 2:",
+    input: {
+      type: "text",
+      max: length400,
+    },
+  },
+  description: {
+    lbl: "Description :",
+    input: {
+      type: "text",
+      max: length2000,
+    },
+  },
+  assettype: {
+    lbl: "Property type:",
+  },
+  assetcontracttype: {
+    lbl: "Contract type:",
+  },
+  assetaccesstype: {
+    lbl: "Property access:",
+  },
+  bedrooms: {
+    lbl: "Bedrooms :",
+  },
+  bathrooms: {
+    lbl: "Bathrooms :",
+  },
+  rent: {
+    lbl: "Rent amount ($):",
+    input: {
+      type: "text",
+      max: length15,
+    },
+  },
+  amount: {
+    lbl: "Total amount ($):",
+    input: {
+      type: "text",
+      max: length15,
+    },
+  },
+  advance: {
+    lbl: "Advance amount ($):",
+    input: {
+      type: "text",
+      max: length15,
+    },
+  },
+  sqfeet: {
+    lbl: "Square feet:",
+    input: {
+      type: "text",
+      max: length15,
+    },
+  },
+  brokerpercentage: {
+    lbl: "Agent (%):",
+    input: {
+      type: "text",
+      max: length3,
+    },
+  },
+  file: {
+    lbl: "Upload image:",
+    input: {
+      type: "file",
+      max: length250,
+      validateFileType: (file) => {
+        return file && allowedFileTypes.includes(file.type);
+      },
+      validateFileSize: (file) => {
+        return file && file.size > uploadFileMaxSize;
+      },
+    },
+  },
+};
+/*control types*/

@@ -1,0 +1,156 @@
+import { lazy } from "react";
+
+export const routeNames = {
+  home: { name: "Home", path: "/" },
+  index: { name: "Index", path: "/Home" },
+  aboutUs: { name: "AboutUs", path: "/AboutUs" },
+  howItWorks: { name: "HowItWorks", path: "/HowItWorks" },
+  plans: { name: "Plans", path: "/Plans" },
+  blog: { name: "Blog", path: "/Blog" },
+  privacyPolicy: { name: "PrivacyPolicy", path: "/PrivacyPolicy" },
+  terms: { name: "Terms", path: "/Terms" },
+  contactUs: { name: "ContactUs", path: "/ContactUs" },
+  login: { name: "Login", path: "/Login" },
+  register: { name: "Register", path: "/Register" },
+  forgotPwd: { name: "ForgotPwd", path: "/ForgotPassword" },
+  properties: { name: "Properties", path: "/Properties" },
+  propertyDetails: { name: "PropertyDetails", path: "/PropertyDetails" },
+  dashboard: { name: "Dashboard", path: "/User/Dashboard" },
+  profiles: { name: "Profiles", path: "/User/Profiles" },
+  upgradeplan: { name: "Profiles", path: "/User/UpgradePlan" },
+  userproperties: { name: "UserProperties", path: "/User/Properties/View" },
+  addproperty: {
+    name: "AddProperty",
+    path: "/User/Properties/Add",
+  },
+  notFound: { name: "NotFound", path: "/*" },
+};
+
+const routes = [
+  {
+    path: routeNames.home.path,
+    name: routeNames.home.name,
+    element: lazy(() => import("../pages/Home")),
+    isexact: true,
+  },
+  {
+    path: routeNames.index.path,
+    name: routeNames.index.name,
+    element: lazy(() => import("../pages/Home")),
+    isexact: true,
+  },
+  {
+    path: routeNames.aboutUs.path,
+    name: routeNames.aboutUs.name,
+    element: lazy(() => import("../pages/AboutUs")),
+    isexact: true,
+  },
+  {
+    path: routeNames.howItWorks.path,
+    name: routeNames.howItWorks.name,
+    element: lazy(() => import("../pages/HowItWorks")),
+    isexact: true,
+  },
+  {
+    path: routeNames.privacyPolicy.path,
+    name: routeNames.privacyPolicy.name,
+    element: lazy(() => import("../pages/PrivacyPolicy")),
+    isexact: true,
+  },
+  {
+    path: routeNames.terms.path,
+    name: routeNames.terms.name,
+    element: lazy(() => import("../pages/Terms")),
+    isexact: true,
+  },
+  {
+    path: routeNames.plans.path,
+    name: routeNames.plans.name,
+    element: lazy(() => import("../pages/Plans")),
+    isexact: true,
+  },
+  {
+    path: routeNames.blog.path,
+    name: routeNames.blog.name,
+    element: lazy(() => import("../pages/Blog")),
+    isexact: true,
+  },
+  {
+    path: routeNames.contactUs.path,
+    name: routeNames.contactUs.name,
+    element: lazy(() => import("../pages/ContactUs")),
+    isexact: true,
+  },
+  {
+    path: routeNames.login.path,
+    name: routeNames.login.name,
+    element: lazy(() => import("../pages/Login")),
+    isexact: true,
+  },
+  {
+    path: routeNames.register.path,
+    name: routeNames.register.name,
+    element: lazy(() => import("../pages/Register")),
+    isexact: true,
+  },
+  {
+    path: routeNames.forgotPwd.path,
+    name: routeNames.forgotPwd.name,
+    element: lazy(() => import("../pages/ForgotPassword")),
+    isexact: true,
+  },
+  {
+    path: routeNames.properties.path,
+    name: routeNames.properties.name,
+    element: lazy(() => import("../pages/Properties")),
+    isexact: true,
+  },
+  {
+    path: routeNames.propertyDetails.path,
+    name: routeNames.propertyDetails.name,
+    element: lazy(() => import("../pages/PropertyDetails")),
+    isexact: true,
+  },
+  {
+    path: routeNames.dashboard.path,
+    name: routeNames.dashboard.name,
+    element: lazy(() => import("../pages/User/Dashboard")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.profiles.path,
+    name: routeNames.profiles.name,
+    element: lazy(() => import("../pages/User/Profiles")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.upgradeplan.path,
+    name: routeNames.upgradeplan.name,
+    element: lazy(() => import("../pages/User/UpgradePlan")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.userproperties.path,
+    name: routeNames.userproperties.name,
+    element: lazy(() => import("../pages/User/Properties/View")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.addproperty.path,
+    name: routeNames.addproperty.name,
+    element: lazy(() => import("../pages/User/Properties/Add")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.notFound.path,
+    name: routeNames.notFound.name,
+    element: lazy(() => import("../pages/NotFound")),
+  },
+];
+
+export default routes;

@@ -1,0 +1,159 @@
+import React from "react";
+import { formCtrlTypes, Regex } from "../../utils/formvalidation";
+import { checkEmptyVal, checkObjNullorEmpty } from "../../utils/common";
+
+const InputControl = ({
+  lblClass,
+  lblText,
+  name,
+  ctlType = formCtrlTypes.text,
+  value,
+  isFocus,
+  tabIndex,
+  required,
+  onChange,
+  objProps, //define any control specific props.
+  ctlicon,
+  onIconClick,
+  errors,
+  formErrors = {},
+}) => {
+  let ctl = ctlType;
+
+  let rex = "";
+  switch (ctl) {
+    case formCtrlTypes.email:
+      rex = Regex.email;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.pwd:
+      rex = Regex.pwd;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (!(value.length >= rex.min && value.length <= rex.max)) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.confirmpwd:
+      rex = Regex.confirmpwd;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (!(value.length >= rex.min && value.length <= rex.max)) {
+        formErrors[name] = rex.invalid;
+      } else if (!checkObjNullorEmpty(objProps) && value != objProps.pwdVal) {
+        formErrors[name] = rex.match;
+      }
+      break;
+    case formCtrlTypes.fname:
+      rex = Regex.fname;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      break;
+    case formCtrlTypes.lname:
+      rex = Regex.lname;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      break;
+    case formCtrlTypes.name:
+      rex = Regex.name;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      break;
+    case formCtrlTypes.subject:
+      rex = Regex.subject;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      break;
+    case formCtrlTypes.mobile:
+      rex = Regex.mobile;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.landline:
+      rex = Regex.landline;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.phone:
+      rex = Regex.phone;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.website:
+      rex = Regex.website;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.zip:
+      rex = Regex.zip;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (
+        !checkEmptyVal(value) &&
+        !(value?.length >= rex.min && value?.length <= rex.max)
+      ) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.searchkeyword:
+      rex = Regex.searchkeyword;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      break;
+  }
+
+  return (
+    <>
+      <label className={lblClass}>
+        {checkEmptyVal(lblText) ? ctl.lbl : lblText}
+      </label>
+      <div className={`${ctlicon && "input-group"}`}>
+        {ctlicon && (
+          <span className="input-group-text" onClick={onIconClick}>
+            {ctlicon}
+          </span>
+        )}
+        <input
+          type={ctl.input.type}
+          className={`form-control bg-white ${
+            errors?.[`${name}`] && "invalid box-shadow"
+          }`}
+          name={name}
+          autoComplete="off"
+          autoFocus={isFocus ?? false}
+          tabIndex={tabIndex}
+          value={value}
+          onChange={onChange}
+          maxLength={ctl.input.max}
+          {...ctl.input.keyEvents}
+        />
+      </div>
+      {errors?.[`${name}`] && (
+        <div className="err-invalid">{errors?.[`${name}`]}</div>
+      )}
+    </>
+  );
+};
+
+export default InputControl;
