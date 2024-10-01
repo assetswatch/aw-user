@@ -297,7 +297,7 @@ const Home = () => {
                               className="filter_price"
                               type="text"
                               name="price"
-                              defaultValue="0;10000000"
+                              defaultValue="0;10000"
                             />
                           </span>
                         </div>
