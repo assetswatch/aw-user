@@ -1,7 +1,11 @@
 import React, { useCallback, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { routeNames } from "../../../routes/routes";
-import { Grid, ModalView } from "../../../components/common/LazyComponents";
+import {
+  Grid,
+  LazyImage,
+  ModalView,
+} from "../../../components/common/LazyComponents";
 import InputControl from "../../../components/common/InputControl";
 import { formCtrlTypes } from "../../../utils/formvalidation";
 import {
@@ -213,12 +217,11 @@ const View = () => {
           if (isapimethoderr === true) {
             $(errctl).html(AppMessages.SomeProblem);
           }
+          if (isSearch || isShowall) {
+            apiReqResLoader("x", "", "completed");
+          }
           setIsDataLoading(false);
         });
-
-      if (isSearch || isShowall) {
-        apiReqResLoader("x", "", "completed");
-      }
     }
   };
 
@@ -233,14 +236,15 @@ const View = () => {
         disableSortBy: true,
         Cell: ({ row }) => (
           <>
-            <img
+            <LazyImage
               className="rounded box-shadow cur-pointer"
               onClick={(e) => {
                 onEdit(e, row);
               }}
               src={row.original.Images[0]?.ImagePath}
               alt={row.original.Title}
-            ></img>
+              placeHolderClass="pos-absolute w-140px min-h-100 fl-l"
+            ></LazyImage>
             <div className="property-info d-table">
               <a
                 href="#"
@@ -331,7 +335,7 @@ const View = () => {
   const onEdit = (e, row) => {
     e.preventDefault();
     addSessionStorageItem(SessionStorageKeys.EditAssetId, row.original.AssetId);
-    navigate(routeNames.addproperty.path);
+    navigate(routeNames.editproperty.path);
   };
 
   const onAdd = () => {

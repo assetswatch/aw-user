@@ -4,15 +4,37 @@ import { loadFile, unloadFile, getArrLoadFiles } from "../utils/loadFiles";
 import PageTitle from "../components/layouts/PageTitle";
 import { routeNames } from "../routes/routes";
 import { apiReqResLoader, checkObjNullorEmpty } from "../utils/common";
-import { API_ACTION_STATUS, ApiUrls, AppMessages } from "../utils/constants";
+import {
+  API_ACTION_STATUS,
+  ApiUrls,
+  AppMessages,
+  SessionStorageKeys,
+} from "../utils/constants";
 import config from "../config.json";
 import { axiosPost } from "../helpers/axiosHelper";
 import { useGetTopAssetsGateWay } from "../hooks/useGetTopAssetsGateWay";
-import { Link } from "react-router-dom";
-import { DataLoader, NoData } from "../components/common/LazyComponents";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  DataLoader,
+  LazyImage,
+  NoData,
+} from "../components/common/LazyComponents";
+import {
+  addSessionStorageItem,
+  getsessionStorageItem,
+} from "../helpers/sessionStorageHelper";
+import PropertySearch from "../components/layouts/PropertySearch";
+import { deleteLocalStorageItem } from "../helpers/localStorageHelper";
 
 const PropertyDetails = () => {
   let $ = window.$;
+
+  const navigate = useNavigate();
+  const [rerouteKey, setRerouteKey] = useState(0);
+
+  let assetDetailId = parseInt(
+    getsessionStorageItem(SessionStorageKeys.AssetDetailsId, 0)
+  );
 
   //list of js/css dependencies.
   let arrJsCssFiles = [
@@ -35,7 +57,7 @@ const PropertyDetails = () => {
     return () => {
       unloadFile(arrJsCssFiles); //unload files.
     };
-  }, []);
+  }, [rerouteKey]);
 
   const { topAssetsList } = useGetTopAssetsGateWay("recent", 3);
 
@@ -49,15 +71,16 @@ const PropertyDetails = () => {
         type: "popup",
         pauseOnHover: "disabled",
         skin: "photogallery",
-        globalBGSize: "cover",
+        fullSizeMode: "fitheight",
+        globalBGSize: "contain",
         navStartStop: false,
         hoverBottomNav: true,
-        showCircleTimer: false,
+        showCircleTimer: true,
         thumbnailNavigation: "always",
         tnContainerWidth: "100%",
         tnHeight: 70,
         popupShowOnTimeout: 1,
-        popupShowOnce: false,
+        popupShowOnce: true,
         popupCloseButtonStyle:
           "background: rgba(0,0,0,.5); border-radius: 2px; border: 0; left: auto; right: 10px;",
         popupResetOnClose: "disabled",
@@ -69,6 +92,7 @@ const PropertyDetails = () => {
         popupDelayIn: 500,
         popupTransitionIn: "scalefromtop",
         popupTransitionOut: "scaletobottom",
+        height: 700,
         skinsPath: "/assets/skins/",
       });
     } catch (e) {
@@ -81,33 +105,47 @@ const PropertyDetails = () => {
     setIsDataLoading(true);
     let isapimethoderr = false;
     let objParams = {
-      AssetId: 1,
+      AssetId: assetDetailId,
     };
-    setTimeout(() => {
-      axiosPost(`${config.apiBaseUrl}${ApiUrls.getAssetDetails}`, objParams)
-        .then((response) => {
-          let objResponse = response.data;
-          if (objResponse.StatusCode === 200) {
-            setAssetDetails(objResponse.Data);
-          } else {
-            isapimethoderr = true;
-          }
-        })
-        .catch((err) => {
+
+    axiosPost(`${config.apiBaseUrl}${ApiUrls.getAssetDetails}`, objParams)
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode === 200) {
+          setAssetDetails(objResponse.Data);
+        } else {
           isapimethoderr = true;
-          console.error(`"API :: ${ApiUrls.getAssets}, Error ::" ${err}`);
-        })
-        .finally(() => {
-          if (isapimethoderr === true) {
-            setAssetDetails(null);
-          }
-          setIsDataLoading(false);
-        });
-    }, 1000);
+        }
+      })
+      .catch((err) => {
+        isapimethoderr = true;
+        console.error(`"API :: ${ApiUrls.getAssets}, Error ::" ${err}`);
+      })
+      .finally(() => {
+        if (isapimethoderr === true) {
+          setAssetDetails(null);
+        }
+        setIsDataLoading(false);
+      });
+  };
+
+  const onPropertyDetails = (e, assetId) => {
+    e.preventDefault();
+    setRerouteKey(rerouteKey + 1);
+    addSessionStorageItem(SessionStorageKeys.AssetDetailsId, assetId);
+    navigate(routeNames.propertyDetails.path, {
+      state: { timestamp: Date.now() },
+      replace: true,
+    });
+    window.scrollTo(0, 0);
   };
 
   return (
-    <>
+    <div key={rerouteKey}>
+      {parseInt(getsessionStorageItem(SessionStorageKeys.AssetDetailsId, 0)) ==
+      0
+        ? navigate(routeNames.properties.path)
+        : ""}
       {/*============== Page title Start ==============*/}
       <PageTitle
         title="Property Details"
@@ -128,10 +166,11 @@ const PropertyDetails = () => {
                 <h5 className="mb-4 down-line">Listed By</h5>
                 {assetDetails && (
                   <div className="media mb-3">
-                    <img
+                    <LazyImage
                       className="rounded-circle me-3 shadow img-border-white w-80px"
                       src={assetDetails.PicPath}
                       alt={assetDetails.FirstName}
+                      placeHolderClass="min-h-80 w-80px"
                     />
                     <div className="media-body">
                       <div className="h6 mt-0 mb-1 text-primary">
@@ -196,14 +235,13 @@ const PropertyDetails = () => {
                           className="form-control"
                           name="message"
                           placeholder="Message"
-                          rows={5}
-                          defaultValue={""}
+                          rows={4}
                         />
                       </div>
                     </div>
                     <div className="col-12">
                       <div className="form-group mb-0">
-                        <button className="btn btn-primary w-100">
+                        <button className="btn btn-primary w-100 btn-glow box-shadow rounded">
                           Send Message
                         </button>
                       </div>
@@ -212,127 +250,7 @@ const PropertyDetails = () => {
                 </form>
               </div>
               {/* Property Search */}
-              <div className="widget advance_search_widget rounded box-shadow">
-                <h5 className="mb-30 down-line">Search Property</h5>
-                <form
-                  className="rounded quick-search form-icon-right"
-                  action="#"
-                  method="post"
-                >
-                  <div className="row g-3">
-                    <div className="col-12">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="keyword"
-                        placeholder="Enter Keyword..."
-                      />
-                    </div>
-                    <div className="col-12">
-                      <select className="form-control">
-                        <option>Property Types</option>
-                        <option>House</option>
-                        <option>Office</option>
-                        <option>Appartment</option>
-                        <option>Condos</option>
-                        <option>Villa</option>
-                        <option>Small Family</option>
-                        <option>Single Room</option>
-                      </select>
-                    </div>
-                    <div className="col-12">
-                      <select className="form-control">
-                        <option>Property Status</option>
-                        <option>For Rent</option>
-                        <option>For Sale</option>
-                      </select>
-                    </div>
-                    <div className="col-12">
-                      <div className="position-relative">
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="location"
-                          placeholder="Location"
-                        />
-                        <i className="flaticon-placeholder flat-mini icon-font y-center text-dark" />
-                      </div>
-                    </div>
-                    <div className="col-12">
-                      <div className="position-relative">
-                        <button
-                          className="form-control price-toggle toggle-btn"
-                          data-target="#data-range-price"
-                        >
-                          Price{" "}
-                          <i className="fas fa-angle-down font-mini icon-font y-center text-dark" />
-                        </button>
-                        <div
-                          id="data-range-price"
-                          className="price_range price-range-toggle w-100"
-                        >
-                          <div className="area-filter price-filter">
-                            <span className="price-slider">
-                              <input
-                                className="filter_price"
-                                type="text"
-                                name="price"
-                                defaultValue="0;10000000"
-                              />
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-12">
-                      <select className="form-control">
-                        <option>Bedrooms</option>
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
-                        <option>5</option>
-                        <option>6</option>
-                        <option>7</option>
-                        <option>8</option>
-                      </select>
-                    </div>
-                    <div className="col-12">
-                      <select className="form-control">
-                        <option>Bathrooms</option>
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
-                        <option>5</option>
-                        <option>6</option>
-                        <option>7</option>
-                        <option>8</option>
-                      </select>
-                    </div>
-                    <div className="col-6">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="keyword"
-                        placeholder="Min Area"
-                      />
-                    </div>
-                    <div className="col-6">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="keyword"
-                        placeholder="Max Area"
-                      />
-                    </div>
-
-                    <div className="col-12">
-                      <button className="btn btn-primary w-100">Search</button>
-                    </div>
-                  </div>
-                </form>
-              </div>
+              <PropertySearch />
               {/*============== Recent Property Widget Start ==============*/}
               <div className="widget widget_recent_property rounded box-shadow pb-20">
                 <h5 className="text-secondary mb-4 down-line">
@@ -349,20 +267,25 @@ const PropertyDetails = () => {
                             }`}
                             key={`tassets-key-${i}`}
                           >
-                            <Link to={routeNames.propertyDetails.path}>
-                              <img
+                            <Link
+                              onClick={(e) => onPropertyDetails(e, a.AssetId)}
+                            >
+                              <LazyImage
                                 src={a.Images?.[0]?.ImagePath}
                                 className="img-fit-grid"
+                                placeHolderClass="min-h-80 w-80px"
                               />
                             </Link>
                             <div className="thumb-body">
                               <h5 className="listing-title mb-0">
-                                <a
-                                  href="property-single-v1.html"
+                                <Link
+                                  onClick={(e) =>
+                                    onPropertyDetails(e, a.AssetId)
+                                  }
                                   className="text-primary font-general font-500"
                                 >
                                   {a.Title}
-                                </a>
+                                </Link>
                               </h5>
                               <div className="listing-location mb-0 font-general">
                                 <i className="fas fa-map-marker-alt" />{" "}
@@ -396,12 +319,12 @@ const PropertyDetails = () => {
                         );
                       })}
                       <li className="flex-end m-0 p-0">
-                        <a
-                          href="#"
+                        <Link
+                          to={routeNames.properties.path}
                           className="btn-link font-small text-primary"
                         >
                           View more...
-                        </a>
+                        </Link>
                       </li>
                     </>
                   )}
@@ -529,7 +452,7 @@ const PropertyDetails = () => {
                     </div>
                   </div>
 
-                  <div className="property-overview border rounded bg-white p-30 mb-30 box-shadow">
+                  {/* <div className="property-overview border rounded bg-white p-30 mb-30 box-shadow">
                     <div className="row row-cols-1">
                       <div className="col">
                         <div id="comments" className="comments">
@@ -755,7 +678,7 @@ const PropertyDetails = () => {
                         </form>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </>
               )}
             </div>
@@ -763,7 +686,7 @@ const PropertyDetails = () => {
         </div>
       </div>
       {/*============== Property Details End ==============*/}
-    </>
+    </div>
   );
 };
 

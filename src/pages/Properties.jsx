@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { loadFile, unloadFile, getArrLoadFiles } from "../utils/loadFiles";
 import PageTitle from "../components/layouts/PageTitle";
 import { routeNames } from "../routes/routes";
@@ -8,22 +8,39 @@ import {
   ApiUrls,
   AppMessages,
   GridDefaultValues,
+  SessionStorageKeys,
 } from "../utils/constants";
 import {
   apiReqResLoader,
   checkEmptyVal,
+  checkObjNullorEmpty,
   checkStartEndDateGreater,
   setSelectDefaultVal,
 } from "../utils/common";
 import { axiosPost } from "../helpers/axiosHelper";
 import config from "../config.json";
-import { GridList } from "../components/common/LazyComponents";
+import { GridList, LazyImage } from "../components/common/LazyComponents";
 import { useGetTopAssetsGateWay } from "../hooks/useGetTopAssetsGateWay";
 import { useGetTopAgentsGateWay } from "../hooks/useGetTopAgentsGateWay";
 import Rating from "../components/common/Rating";
+import {
+  addSessionStorageItem,
+  getsessionStorageItem,
+} from "../helpers/sessionStorageHelper";
+import PropertySearch from "../components/layouts/PropertySearch";
 
 const Properties = () => {
   let $ = window.$;
+
+  const navigate = useNavigate();
+
+  /*check page search from properties page*/
+  const location = useLocation();
+  let showLoader = location?.state?.["search"];
+  delete location?.state?.["search"];
+  /*check page search from properties page*/
+
+  const [rerouteKey, setRerouteKey] = useState(0);
 
   //list of js/css dependencies.
   let arrJsCssFiles = [
@@ -62,7 +79,7 @@ const Properties = () => {
         $(topAssetsRef.current).trigger("destroy.owl.carousel");
       }
     };
-  }, [topAssetsList]);
+  }, [topAssetsList, rerouteKey]);
 
   //set carousel
   function setCarousel(elem) {
@@ -100,8 +117,6 @@ const Properties = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [pageCount, setPageCount] = useState(0);
   const [isDataLoading, setIsDataLoading] = useState(false);
-  const [selectedGridRow, setSelectedGridRow] = useState(null);
-  const assetsRef = useRef(null);
 
   useEffect(() => {
     if (assetsList.length > 0) {
@@ -142,56 +157,48 @@ const Properties = () => {
     };
   }, [assetsList]);
 
-  //Set search form intial data
-  const setSearchInitialFormData = () => {
-    return {
-      txtkeyword: "",
-      txtfromdate: null,
-      txttodate: null,
-      ddlassettype: null,
-      ddlcontracttype: null,
-    };
-  };
-
-  const [searchFormData, setSearchFormData] = useState(
-    setSearchInitialFormData
-  );
-
   const getAssets = ({
     pi = GridDefaultValues.pi,
     ps = GridDefaultValues.ps,
-    isSearch = false,
-    isShowall = false,
+    showPageLoader = false,
   }) => {
     //show loader if search actions.
-    if (isSearch || isShowall) {
+    if (showPageLoader) {
       apiReqResLoader("x");
     }
     setIsDataLoading(true);
     let isapimethoderr = false;
     let objParams = {};
+    let propfilters = JSON.parse(
+      getsessionStorageItem(SessionStorageKeys.ObjAssetfilters, "{}")
+    );
+
     objParams = {
-      keyword: "",
-      contracttypeid: 0,
-      assettypeid: 0,
-      fromdate: setSearchInitialFormData.txtfromdate,
-      todate: setSearchInitialFormData.txttodate,
+      keyword: !checkEmptyVal(propfilters?.["key"]) ? propfilters?.["key"] : "",
+      location: !checkEmptyVal(propfilters?.["loc"])
+        ? propfilters?.["loc"]
+        : "",
+      contracttypeid: !checkEmptyVal(propfilters?.["ctid"])
+        ? propfilters?.["ctid"]
+        : 0,
+      assettypeid: !checkEmptyVal(propfilters?.["atid"])
+        ? propfilters?.["atid"]
+        : 0,
+      bedrooms: !checkEmptyVal(propfilters?.["bed"])
+        ? propfilters?.["bed"]
+        : "",
+      bathrooms: !checkEmptyVal(propfilters?.["bath"])
+        ? propfilters?.["bath"]
+        : "",
+      minsqfeet: !checkEmptyVal(propfilters?.["misq"])
+        ? propfilters?.["misq"]
+        : 0,
+      maxsqfeet: !checkEmptyVal(propfilters?.["masq"])
+        ? propfilters?.["masq"]
+        : 0,
       pi: parseInt(pi),
       ps: parseInt(ps),
     };
-
-    if (!isShowall) {
-      objParams = {
-        ...objParams,
-        keyword: searchFormData.txtkeyword,
-        contracttypeid: parseInt(
-          setSelectDefaultVal(searchFormData.ddlcontracttype)
-        ),
-        assettypeid: parseInt(setSelectDefaultVal(searchFormData.ddlassettype)),
-        fromdate: searchFormData.txtfromdate,
-        todate: searchFormData.txttodate,
-      };
-    }
 
     return axiosPost(`${config.apiBaseUrl}${ApiUrls.getAssets}`, objParams)
       .then((response) => {
@@ -215,11 +222,11 @@ const Properties = () => {
       .finally(() => {
         if (isapimethoderr === true) {
         }
+        if (showPageLoader) {
+          apiReqResLoader("x", "x", API_ACTION_STATUS.COMPLETED);
+        }
         setIsDataLoading(false);
       });
-    if (isSearch || isShowall) {
-      apiReqResLoader("x", "", API_ACTION_STATUS.COMPLETED);
-    }
   };
 
   //Setup Grid.
@@ -238,7 +245,7 @@ const Properties = () => {
               d-assetid={row.original.AssetId}
             >
               <div className="property-grid-1 property-block bg-white box-shadow transation-this rounded">
-                <div className="overflow-hidden position-relative transation thumbnail-img bg-secondary hover-img-zoom rounded">
+                <div className="overflow-hidden position-relative transation thumbnail-img hover-img-zoom box-shadow rounded">
                   <div className="catart position-absolute">
                     <span className="sale bg-secondary text-white">
                       For {row.original.ContractType}
@@ -248,25 +255,37 @@ const Properties = () => {
                     {row.original.Images?.map((i, idx) => {
                       return (
                         <div className="item" key={`pimg-key-${idx}`}>
-                          <Link to={routeNames.propertyDetails.path}>
-                            <img src={i?.ImagePath} className="img-fit-grid" />
+                          <Link
+                            onClick={(e) =>
+                              onPropertyDetails(e, row.original.AssetId)
+                            }
+                          >
+                            <LazyImage
+                              src={i?.ImagePath}
+                              className="img-fit-grid"
+                              placeHolderClass="min-h-200"
+                            />
                           </Link>
                         </div>
                       );
                     })}
                   </div>
                   <Link
-                    to={routeNames.propertyDetails.path}
-                    className="listing-ctg text-white"
+                    onClick={(e) => onPropertyDetails(e, row.original.AssetId)}
+                    className="listing-ctg"
                   >
                     <i className="fa-solid fa-building" />
-                    <span>{row.original.AssetType}</span>
+                    <span className="text-primary">
+                      {row.original.AssetType}
+                    </span>
                   </Link>
                 </div>
                 <div className="property_text p-3 pb-0">
                   <h5 className="listing-title">
                     <Link
-                      to={routeNames.propertyDetails.path}
+                      onClick={(e) =>
+                        onPropertyDetails(e, row.original.AssetId)
+                      }
                       className="text-primary font-16"
                     >
                       {row.original.Title}
@@ -334,17 +353,40 @@ const Properties = () => {
 
   const fetchIdRef = useRef(0);
 
-  const fetchData = useCallback(({ pageIndex, pageSize }) => {
-    const fetchId = ++fetchIdRef.current;
-    if (fetchId === fetchIdRef.current) {
-      getAssets({ pi: pageIndex, ps: pageSize });
-    }
-  }, []);
+  const fetchData = useCallback(
+    ({ pageIndex, pageSize }) => {
+      const fetchId = ++fetchIdRef.current;
+      if (fetchId === fetchIdRef.current) {
+        getAssets({
+          pi: pageIndex,
+          ps: pageSize,
+          showPageLoader: showLoader || pageIndex > 0,
+        });
+      }
+    },
+    [location.state] //check page search from properties page
+  );
 
   //Setup Grid.
 
+  const onPropertyDetails = (e, assetId) => {
+    e.preventDefault();
+    addSessionStorageItem(SessionStorageKeys.AssetDetailsId, assetId);
+    navigate(routeNames.propertyDetails.path);
+  };
+
+  const onProperties = (e) => {
+    e.preventDefault();
+    setRerouteKey(rerouteKey + 1);
+    navigate(routeNames.properties.path, {
+      state: { timestamp: Date.now() },
+      replace: true,
+    });
+    window.scrollTo(0, 0);
+  };
+
   return (
-    <>
+    <div key={rerouteKey}>
       {/*============== Page title Start ==============*/}
       <PageTitle
         title="Properties"
@@ -358,312 +400,7 @@ const Properties = () => {
           <div className="row">
             <div className="col-xl-3 col-lg-4">
               <div className="listing-sidebar">
-                <div className="widget advance_search_widget box-shadow rounded">
-                  <h5 className="mb-30 down-line">Search Property</h5>
-                  <form
-                    className="rounded quick-search form-icon-right"
-                    action="#"
-                    method="post"
-                  >
-                    <div className="row g-3">
-                      <div className="col-12">
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="keyword"
-                          placeholder="Enter Keyword..."
-                        />
-                      </div>
-                      <div className="col-12">
-                        <select className="form-control">
-                          <option>Property Types</option>
-                          <option>House</option>
-                          <option>Office</option>
-                          <option>Appartment</option>
-                          <option>Condos</option>
-                          <option>Villa</option>
-                          <option>Small Family</option>
-                          <option>Single Room</option>
-                        </select>
-                      </div>
-                      <div className="col-12">
-                        <select className="form-control">
-                          <option>Property Status</option>
-                          <option>For Rent</option>
-                          <option>For Sale</option>
-                        </select>
-                      </div>
-                      <div className="col-12">
-                        <div className="position-relative">
-                          <input
-                            type="text"
-                            className="form-control"
-                            name="location"
-                            placeholder="Location"
-                          />
-                          <i className="flaticon-placeholder flat-mini icon-font y-center text-dark" />
-                        </div>
-                      </div>
-                      <div className="col-12">
-                        <div className="position-relative">
-                          <button
-                            className="form-control price-toggle toggle-btn"
-                            data-target="#data-range-price"
-                          >
-                            Price{" "}
-                            <i className="fas fa-angle-down font-mini icon-font y-center text-dark" />
-                          </button>
-                          <div
-                            id="data-range-price"
-                            className="price_range price-range-toggle w-100"
-                          >
-                            <div className="area-filter price-filter">
-                              <span className="price-slider">
-                                <input
-                                  className="filter_price"
-                                  type="text"
-                                  name="price"
-                                  defaultValue="0;10000000"
-                                />
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-12">
-                        <select className="form-control">
-                          <option>Bedrooms</option>
-                          <option>1</option>
-                          <option>2</option>
-                          <option>3</option>
-                          <option>4</option>
-                          <option>5</option>
-                          <option>6</option>
-                          <option>7</option>
-                          <option>8</option>
-                        </select>
-                      </div>
-                      <div className="col-12">
-                        <select className="form-control">
-                          <option>Bathrooms</option>
-                          <option>1</option>
-                          <option>2</option>
-                          <option>3</option>
-                          <option>4</option>
-                          <option>5</option>
-                          <option>6</option>
-                          <option>7</option>
-                          <option>8</option>
-                        </select>
-                      </div>
-                      <div className="col-12">
-                        <select className="form-control">
-                          <option>Garage</option>
-                          <option>Yes</option>
-                          <option>No</option>
-                        </select>
-                      </div>
-                      <div className="col-6">
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="keyword"
-                          placeholder="Min Area"
-                        />
-                      </div>
-                      <div className="col-6">
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="keyword"
-                          placeholder="Max Area"
-                        />
-                      </div>
-                      <div className="col-12">
-                        <div className="position-relative">
-                          <button
-                            className="form-control text-start toggle-btn"
-                            data-target="#aditional-features"
-                          >
-                            Advanced{" "}
-                            <i className="fas fa-ellipsis-v font-mini icon-font y-center text-dark" />
-                          </button>
-                        </div>
-                      </div>
-                      <div className="col-12 position-relative">
-                        <div
-                          id="aditional-features"
-                          className="aditional-features visible-static p-5"
-                        >
-                          <h5 className="mb-3">Aditional Options</h5>
-                          <ul className="row row-cols-1 custom-check-box mb-4">
-                            <li className="col">
-                              <input
-                                type="checkbox"
-                                className="custom-control-input hide"
-                                id="customCheck1"
-                              />
-                              <label
-                                className="custom-control-label"
-                                htmlFor="customCheck1"
-                              >
-                                Air Conditioning
-                              </label>
-                            </li>
-                            <li className="col">
-                              <input
-                                type="checkbox"
-                                className="custom-control-input hide"
-                                id="customCheck2"
-                              />
-                              <label
-                                className="custom-control-label"
-                                htmlFor="customCheck2"
-                              >
-                                Garage Facility
-                              </label>
-                            </li>
-                            <li className="col">
-                              <input
-                                type="checkbox"
-                                className="custom-control-input hide"
-                                id="customCheck3"
-                              />
-                              <label
-                                className="custom-control-label"
-                                htmlFor="customCheck3"
-                              >
-                                Swiming Pool
-                              </label>
-                            </li>
-                            <li className="col">
-                              <input
-                                type="checkbox"
-                                className="custom-control-input hide"
-                                id="customCheck4"
-                              />
-                              <label
-                                className="custom-control-label"
-                                htmlFor="customCheck4"
-                              >
-                                Fire Security
-                              </label>
-                            </li>
-                            <li className="col">
-                              <input
-                                type="checkbox"
-                                className="custom-control-input hide"
-                                id="customCheck5"
-                              />
-                              <label
-                                className="custom-control-label"
-                                htmlFor="customCheck5"
-                              >
-                                Fire Place Facility
-                              </label>
-                            </li>
-                            <li className="col">
-                              <input
-                                type="checkbox"
-                                className="custom-control-input hide"
-                                id="customCheck6"
-                              />
-                              <label
-                                className="custom-control-label"
-                                htmlFor="customCheck6"
-                              >
-                                Play Ground
-                              </label>
-                            </li>
-                            <li className="col">
-                              <input
-                                type="checkbox"
-                                className="custom-control-input hide"
-                                id="customCheck7"
-                              />
-                              <label
-                                className="custom-control-label"
-                                htmlFor="customCheck7"
-                              >
-                                Ferniture Include
-                              </label>
-                            </li>
-                            <li className="col">
-                              <input
-                                type="checkbox"
-                                className="custom-control-input hide"
-                                id="customCheck8"
-                              />
-                              <label
-                                className="custom-control-label"
-                                htmlFor="customCheck8"
-                              >
-                                Marbel Floor
-                              </label>
-                            </li>
-                            <li className="col">
-                              <input
-                                type="checkbox"
-                                className="custom-control-input hide"
-                                id="customCheck9"
-                              />
-                              <label
-                                className="custom-control-label"
-                                htmlFor="customCheck9"
-                              >
-                                Store Room
-                              </label>
-                            </li>
-                            <li className="col">
-                              <input
-                                type="checkbox"
-                                className="custom-control-input hide"
-                                id="customCheck10"
-                              />
-                              <label
-                                className="custom-control-label"
-                                htmlFor="customCheck10"
-                              >
-                                Hight Class Door
-                              </label>
-                            </li>
-                            <li className="col">
-                              <input
-                                type="checkbox"
-                                className="custom-control-input hide"
-                                id="customCheck11"
-                              />
-                              <label
-                                className="custom-control-label"
-                                htmlFor="customCheck11"
-                              >
-                                Floor Heating System
-                              </label>
-                            </li>
-                            <li className="col">
-                              <input
-                                type="checkbox"
-                                className="custom-control-input hide"
-                                id="customCheck12"
-                              />
-                              <label
-                                className="custom-control-label"
-                                htmlFor="customCheck12"
-                              >
-                                Garden Include
-                              </label>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                      <div className="col-12">
-                        <button className="btn btn-primary w-100">
-                          Search
-                        </button>
-                      </div>
-                    </div>
-                  </form>
-                </div>
+                <PropertySearch></PropertySearch>
                 {/*============== Recent Property Widget Start ==============*/}
                 <div className="widget property_carousel_widget box-shadow rounded pb-20">
                   <h5 className="mb-30 down-line">Recent Properties</h5>
@@ -677,34 +414,43 @@ const Properties = () => {
                           return (
                             <div className="item" key={`rprop-key-${i}`}>
                               <div className="property-grid-2 property-block transation mb-1">
-                                <div className="overflow-hidden position-relative transation thumbnail-img rounded bg-secondary hover-img-zoom">
+                                <div className="overflow-hidden position-relative transation thumbnail-img rounded hover-img-zoom">
                                   <div className="cata position-absolute">
                                     <span className="sale bg-secondary text-white">
                                       For {a.ContractType}
                                     </span>
                                   </div>
-                                  <Link to={routeNames.propertyDetails.path}>
-                                    <img
+                                  <Link
+                                    onClick={(e) =>
+                                      onPropertyDetails(e, a.AssetId)
+                                    }
+                                  >
+                                    <LazyImage
                                       src={a.Images?.[0]?.ImagePath}
                                       className="img-fit-grid"
+                                      placeHolderClass="min-h-150"
                                     />
                                   </Link>
                                 </div>
                                 <div className="post-content py-3 pb-0">
                                   <div className="post-meta font-small text-uppercase list-color-primary">
                                     <Link
-                                      to={routeNames.propertyDetails.path}
+                                      onClick={(e) =>
+                                        onPropertyDetails(e, a.AssetId)
+                                      }
                                       className="listing-ctg text-primary"
                                     >
                                       <i className="fa-solid fa-building" />
-                                      <span className="font-general font-500">
+                                      <span className="font-general font-400 text-primary">
                                         {a.AssetType}
                                       </span>
                                     </Link>
                                   </div>
                                   <h5 className="listing-title">
                                     <Link
-                                      to={routeNames.propertyDetails.path}
+                                      onClick={(e) =>
+                                        onPropertyDetails(e, a.AssetId)
+                                      }
                                       className="text-primary font-15"
                                     >
                                       {a.Title}
@@ -746,9 +492,12 @@ const Properties = () => {
                     )}
                   </div>
                   <div className="d-flex flex-end m-0 p-0 pt-10">
-                    <a href="#" className="btn-link font-small text-primary">
+                    <Link
+                      onClick={onProperties}
+                      className="btn-link font-small text-primary"
+                    >
                       View more...
-                    </a>
+                    </Link>
                   </div>
                 </div>
                 {/*============== Recent Property Widget End ==============*/}
@@ -766,10 +515,11 @@ const Properties = () => {
                               className={`${i == 0 ? "" : "border-top pt-3"}`}
                               key={`tagents-key-${i}`}
                             >
-                              <img
+                              <LazyImage
                                 src={a.PicPath}
                                 alt={a.FirstName}
-                                className="img-fit-grid-contain"
+                                className="img-fit-grid"
+                                placeHolderClass="min-h-80 w-80px"
                               />
                               <div className="thumb-body">
                                 <h5 className="listing-title">
@@ -819,7 +569,8 @@ const Properties = () => {
                   count: totalCount,
                 }}
                 noData={AppMessages.NoProperties}
-                containerClassName="row row-cols-xl-3 row-cols-lg-1 row-cols-md-2 row-cols-1 g-4 min-h-200"
+                containerClassName="row row-cols-xl-3 row-cols-lg-2 row-cols-md-2 row-cols-1 g-4 min-h-200"
+                cellclassName="col-lg-6 col-md-6"
                 defaultPs={12}
               />
             </div>
@@ -827,7 +578,7 @@ const Properties = () => {
         </div>
       </div>
       {/*============== Property Grid View End ==============*/}
-    </>
+    </div>
   );
 };
 

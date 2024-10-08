@@ -42,6 +42,9 @@ export function SetPageLoaderNavLinks() {
           activelink = "myproperties";
           activesublink = "addproperty";
           break;
+        case routeNames.editproperty.path.toLowerCase():
+          activelink = "myproperties";
+          break;
         case routeNames.dashboard.path.toLowerCase():
           activelink = "dashboard";
           break;
@@ -263,17 +266,20 @@ export function apiReqResLoader(
 ) {
   let $ = window.$;
   if (action.toLowerCase() === "start") {
-    $("#" + btnid)
-      .html(text + ' <i class="fa fa-spinner fa-spin"></i>')
-      .attr("disabled", "disabled");
-
+    if (btnid.toLowerCase() != "x") {
+      $("#" + btnid)
+        .html(text + ' <i class="fa fa-spinner fa-spin"></i>')
+        .attr("disabled", "disabled");
+    }
     if (showPageLoader && $(".preloader").length) {
       $(".preloader").fadeIn(0);
     }
   } else {
-    $("#" + btnid)
-      .html(text)
-      .removeAttr("disabled");
+    if (btnid.toLowerCase() != "x") {
+      $("#" + btnid)
+        .html(text)
+        .removeAttr("disabled");
+    }
     if (showPageLoader && $(".preloader").length) {
       $(".preloader").show().delay(500).fadeOut(100);
     }

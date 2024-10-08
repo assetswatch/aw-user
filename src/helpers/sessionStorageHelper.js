@@ -1,10 +1,17 @@
+import { checkEmptyVal, checkObjNullorEmpty } from "../utils/common";
+
 function addSessionStorageItem(key, val) {
   sessionStorage.setItem(key, val);
 }
 
 // Get item
-function getsessionStorageItem(key) {
-  return sessionStorage.getItem(key);
+function getsessionStorageItem(key, defaultVal = "") {
+  let item = sessionStorage.getItem(key);
+  if (checkEmptyVal(item) && checkObjNullorEmpty(item)) {
+    return defaultVal;
+  } else {
+    return item;
+  }
 }
 
 // Remove item

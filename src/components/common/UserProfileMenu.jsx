@@ -124,12 +124,17 @@ const UserProfileMenu = (styleprops) => {
           </div>
           <li className="dropdown-item">
             <Link id="nav-user-info-dashboard" to={routeNames.dashboard.path}>
-              <i className="fa fa-user pe-1"></i> Profile
+              <i className="fa fa-user pe-1"></i> My Profile
             </Link>
           </li>
           <li className="dropdown-item">
             <a href="#!">
               <i className="fa fa-gear pe-1"></i> Settings
+            </a>
+          </li>
+          <li className="dropdown-item">
+            <a href="#!">
+              <i className="fa fa-exchange pe-1"></i> Change Profile
             </a>
           </li>
           <div className="dropdown-divider" />
@@ -150,20 +155,6 @@ const UserProfileMenu = (styleprops) => {
               <span className="badge badge-pill badge-danger mt-1 fl-r bg-primary">
                 4
               </span>
-            </a>
-          </li>
-          <div className="dropdown-divider" />
-          <div className="font-500 font-general px-10 py-10 text-gray">
-            Profiles
-          </div>
-          <li className="dropdown-item">
-            <a href="#!">
-              <i className="fa fa-user pe-1"></i> Owner
-            </a>
-          </li>
-          <li className="dropdown-item">
-            <a href="#!">
-              <i className="fa fa-user pe-1"></i> Agent
             </a>
           </li>
           <div className="dropdown-divider" />
