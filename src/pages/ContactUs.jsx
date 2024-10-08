@@ -57,42 +57,41 @@ const ContactUs = () => {
 
     if (Object.keys(formErrors).length === 0) {
       apiReqResLoader("btnsendmessage", "Sending Message");
-      setTimeout(() => {
-        setErrors({});
-        let objBodyParams = {
-          // email: formData.txtemail,
-          // pwd: formData.txtpassword,
-          // firstName: formData.txtfirstname,
-          // lastName: formData.txtlastname,
-          // mobile: formData.txtmobile,
-          // landLine: formData.txtlandline,
-          // countryId: parseInt(setSelectDefaultVal(countrySelected)),
-          // stateId: parseInt(setSelectDefaultVal(stateSelected)),
-          // cityId: parseInt(setSelectDefaultVal(citySelected)),
-          // zip: formData.txtzip,
-          // profileTypeId: parseInt(formData.rblprofiletype),
-          // profileCategoryId: parseInt(
-          //   setSelectDefaultVal(selectedProfileCatId)
-          // ),
-          // planId: 1,
-          // CompanyName: formData.txtcompanyname,
-          // Website: formData.txtwebsite,
-        };
 
-        axiosPost(`${config.apiBaseUrl}${ApiUrls.registerUser}`, objBodyParams)
-          .then((response) => {
-            let objResponse = response.data;
-            if (objResponse.StatusCode === 200) {
-            } else {
-            }
-          })
-          .catch((err) => {
-            console.error(`"API :: ${ApiUrls.registerUser}, Error ::" ${err}`);
-          })
-          .finally(() => {
-            apiReqResLoader("btnsendmessage", "Send Message", "completed");
-          });
-      }, 1000);
+      setErrors({});
+      let objBodyParams = {
+        // email: formData.txtemail,
+        // pwd: formData.txtpassword,
+        // firstName: formData.txtfirstname,
+        // lastName: formData.txtlastname,
+        // mobile: formData.txtmobile,
+        // landLine: formData.txtlandline,
+        // countryId: parseInt(setSelectDefaultVal(countrySelected)),
+        // stateId: parseInt(setSelectDefaultVal(stateSelected)),
+        // cityId: parseInt(setSelectDefaultVal(citySelected)),
+        // zip: formData.txtzip,
+        // profileTypeId: parseInt(formData.rblprofiletype),
+        // profileCategoryId: parseInt(
+        //   setSelectDefaultVal(selectedProfileCatId)
+        // ),
+        // planId: 1,
+        // CompanyName: formData.txtcompanyname,
+        // Website: formData.txtwebsite,
+      };
+
+      axiosPost(`${config.apiBaseUrl}${ApiUrls.registerUser}`, objBodyParams)
+        .then((response) => {
+          let objResponse = response.data;
+          if (objResponse.StatusCode === 200) {
+          } else {
+          }
+        })
+        .catch((err) => {
+          console.error(`"API :: ${ApiUrls.registerUser}, Error ::" ${err}`);
+        })
+        .finally(() => {
+          apiReqResLoader("btnsendmessage", "Send Message", "completed");
+        });
     } else {
       $(`[name=${Object.keys(formErrors)[0]}]`).focus();
       setErrors(formErrors);

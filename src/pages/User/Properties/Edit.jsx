@@ -19,6 +19,7 @@ import {
   API_ACTION_STATUS,
   ApiUrls,
   AppMessages,
+  SessionStorageKeys,
   UserCookie,
   ValidationMessages,
 } from "../../../utils/constants";
@@ -29,9 +30,10 @@ import { useAssetsAppConfigGateway } from "../../../hooks/useAssetsAppConfigGate
 import SelectControl from "../../../components/common/SelectControl";
 import { routeNames } from "../../../routes/routes";
 import { useAuth } from "../../../contexts/AuthContext";
+import { getsessionStorageItem } from "../../../helpers/sessionStorageHelper";
 import { Toast } from "../../../components/common/ToastView";
 
-const Add = () => {
+const Edit = () => {
   let $ = window.$;
   let formErrors = {};
 
@@ -39,18 +41,7 @@ const Add = () => {
   const navigate = useNavigate();
 
   const [errors, setErrors] = useState({});
-  const [formData, setFormData] = useState({
-    txtpropertytitle: "",
-    txtdescription: "",
-    txtaddressone: "",
-    txtaddresstwo: "",
-    txtzip: "",
-    txtprice: "",
-    txtadvance: "",
-    txtsqfeet: "",
-    txtbrokerpercentage: "0",
-    owners: [],
-  });
+  const [formData, setFormData] = useState(setInitFormData());
 
   const [countriesData, setCountriesData] = useState([]);
   const [countrySelected, setCountrySelected] = useState(null);
@@ -75,18 +66,162 @@ const Add = () => {
   const [selectedBathRooms, setSelectedBathRooms] = useState(null);
 
   const [ownerdivs, setOwnerDivs] = useState([]);
-  const [ownerFormData, setOwnerFormData] = useState({});
+  const [ownerFormData, setOwnerFormData] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
 
   const [initApisLoaded, setinitApisLoaded] = useState(false);
 
+  let editAssetId = parseInt(
+    getsessionStorageItem(SessionStorageKeys.EditAssetId, 0)
+  );
+  let accountId = parseInt(
+    GetUserCookieValues(UserCookie.AccountId, loggedinUser)
+  );
+  let profileId = parseInt(
+    GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
+  );
+
+  function setInitFormData(asssetDetails) {
+    let initFormData = {
+      txtpropertytitle: asssetDetails ? asssetDetails.Title : "",
+      txtdescription: asssetDetails ? asssetDetails.Description : "",
+      txtaddressone: asssetDetails ? asssetDetails.AddressOne : "",
+      txtaddresstwo: asssetDetails ? asssetDetails.AddressTwo : "",
+      txtzip: asssetDetails ? asssetDetails.Zip : "",
+      txtprice: asssetDetails ? asssetDetails.Price : "0",
+      txtadvance: asssetDetails ? asssetDetails.Advance : "0",
+      txtsqfeet: asssetDetails ? asssetDetails.Sqfeet : "0",
+      txtbrokerpercentage: asssetDetails ? asssetDetails.BrokerPercentage : "0",
+      owners: [],
+    };
+
+    if (!checkObjNullorEmpty(asssetDetails)) {
+      if (asssetDetails.hasOwnProperty("Owners")) {
+        if (asssetDetails["Owners"].length > 0) {
+          let ownerDetails = [];
+
+          asssetDetails["Owners"]?.forEach((a, idx) => {
+            ownerDetails.push({ id: Date.now() + idx, ownerId: a.OwnerId });
+          });
+
+          setOwnerDivs([...ownerdivs, ...ownerDetails]);
+
+          let ownerData = {};
+          asssetDetails["Owners"]?.forEach((a, idx) => {
+            let i = idx + 1;
+
+            let curretOwnerFormData = {
+              [`ownerid${i}`]: a.OwnerId,
+              [`txtname${i}`]: a.Name,
+              [`txtemail${i}`]: a.Email,
+              [`txtmobile${i}`]: a.MobileNo,
+              [`txtaddressone${i}`]: a.AddressOne,
+              [`txtaddresstwo${i}`]: a.AddressTwo,
+              [`txtzip${i}`]: a.Zip,
+              [`ddlcountry${i}`]: 0,
+              [`ddlstate${i}`]: 0,
+              [`ddlcity${i}`]: 0,
+            };
+            const promise = new Promise((resolve, reject) => {
+              getStatesForOwner(a.CountryId, i);
+              getCitiesForOwner(a.StateId, i);
+              resolve();
+              reject();
+            });
+            promise.then(() => {
+              curretOwnerFormData = {
+                ...curretOwnerFormData,
+                [`ddlcountry${i}`]: a.CountryId,
+                [`ddlstate${i}`]: a.StateId,
+                [`ddlcity${i}`]: a.CityId,
+              };
+              ownerData = { ...ownerData, ...curretOwnerFormData };
+              setOwnerFormData({ ...ownerFormData, ...ownerData });
+            });
+          });
+        }
+      }
+    }
+
+    if (!checkObjNullorEmpty(asssetDetails)) {
+      if (asssetDetails.hasOwnProperty("Images")) {
+        if (asssetDetails["Images"].length > 0) {
+          let imageFiles = [];
+          asssetDetails["Images"]?.forEach((i) => {
+            imageFiles.push({
+              id: i.Id,
+              imgPath: i.ImagePath,
+              assetId: i.AssetId,
+            });
+          });
+          setSelectedFiles(imageFiles);
+        }
+      }
+    }
+
+    return initFormData;
+  }
+
   //Load
   useEffect(() => {
+    getAssetDetails();
     Promise.allSettled([getCountries()]).then(() => {
       setinitApisLoaded(true);
     });
-    return () => {};
+    return () => {
+      //deletesessionStorageItem(SessionStorageKeys.EditAssetId);
+    };
   }, []);
+
+  const getAssetDetails = () => {
+    if (editAssetId > 0) {
+      let objParams = {
+        AccountId: accountId,
+        ProfileId: profileId,
+        AssetId: editAssetId,
+      };
+      axiosPost(`${config.apiBaseUrl}${ApiUrls.getUserAssetDetails}`, objParams)
+        .then((response) => {
+          let objResponse = response.data;
+          if (objResponse.StatusCode === 200) {
+            let details = objResponse.Data;
+            setFormData(setInitFormData(details));
+            handleCountryChange(
+              { value: details.CountryId, label: details.Country },
+              { value: details.StateId, label: details.State },
+              { value: details.CityId, label: details.City }
+            );
+            setSelectedBedRooms({
+              value: details.Bedrooms,
+              label: details.Bedrooms,
+            });
+            setSelectedBathRooms({
+              value: details.Bathrooms,
+              label: details.Bathrooms,
+            });
+            setSelectedAssetType({
+              value: details.AssetTypeId,
+              label: details.AssetType,
+            });
+            setSelectedContractType({
+              value: details.ContractTypeId,
+              label: details.ContractType,
+            });
+            setSelectedAccessType({
+              value: details.AccessTypeId,
+              label: details.AccessType,
+            });
+          } else {
+          }
+        })
+        .catch((err) => {
+          console.error(
+            `"API :: ${ApiUrls.getUserAssetDetails}, Error ::" ${err}`
+          );
+        })
+        .finally(() => {});
+    }
+  };
 
   //Get countries.
   const getCountries = () => {
@@ -109,7 +244,7 @@ const Add = () => {
   };
 
   //Get States.
-  const getStates = (countryid) => {
+  const getStates = (countryid, selState, selCity) => {
     axiosPost(`${config.apiBaseUrl}${ApiUrls.getDdlStates}`, {
       CountryId: parseInt(countryid),
     })
@@ -126,12 +261,16 @@ const Add = () => {
         setStatesData([]);
       })
       .finally(() => {
-        setStateSelected({});
+        if (!checkObjNullorEmpty(selState)) {
+          handleStateChange(selState, selCity);
+        } else {
+          setStateSelected({});
+        }
       });
   };
 
   //Get cities.
-  const getCities = (stateid) => {
+  const getCities = (stateid, selCity) => {
     axiosPost(`${config.apiBaseUrl}${ApiUrls.getDdlCities}`, {
       StateId: parseInt(stateid),
     })
@@ -148,11 +287,15 @@ const Add = () => {
         setCitiesData([]);
       })
       .finally(() => {
-        setCitySelected({});
+        if (!checkObjNullorEmpty(selCity)) {
+          handleCityChange(selCity);
+        } else {
+          setCitySelected({});
+        }
       });
   };
 
-  const handleCountryChange = (selItem) => {
+  const handleCountryChange = (selItem, selState, selCity) => {
     setStateSelected(null);
     setStatesData([]);
     setCitySelected(null);
@@ -164,10 +307,10 @@ const Add = () => {
       return;
     }
 
-    getStates(selItem?.value);
+    getStates(selItem?.value, selState, selCity);
   };
 
-  const handleStateChange = (selItem) => {
+  const handleStateChange = (selItem, selCity) => {
     setCitySelected(null);
     setCitiesData([]);
 
@@ -176,8 +319,7 @@ const Add = () => {
     if (selItem == null || selItem == undefined || selItem == "") {
       return;
     }
-
-    getCities(selItem?.value);
+    getCities(selItem?.value, selCity);
   };
 
   const handleCityChange = (selItem) => {
@@ -206,9 +348,10 @@ const Add = () => {
 
   const addOwnersDiv = () => {
     let ownerdivscount = ownerdivs.length + 1;
-    setOwnerDivs([...ownerdivs, { id: Date.now() + 1 }]);
+    setOwnerDivs([...ownerdivs, { id: Date.now() }]);
 
     const curretOwnerFormData = {
+      [`ownerid${ownerdivscount}`]: 0,
       [`txtname${ownerdivscount}`]: "",
       [`txtemail${ownerdivscount}`]: "",
       [`txtmobile${ownerdivscount}`]: "",
@@ -226,29 +369,84 @@ const Add = () => {
     });
   };
 
-  const removeOwnersDiv = (id, idx) => {
+  const removeOwnersDiv = (o, idx) => {
     let idxnext = idx + 1;
-    const curretOwnerFormData = {
-      [`txtname${idx}`]: ownerFormData[`txtname${idxnext}`],
-      [`txtemail${idx}`]: ownerFormData[`txtemail${idxnext}`],
-      [`txtmobile${idx}`]: ownerFormData[`txtmobile${idxnext}`],
-      [`txtaddressone${idx}`]: ownerFormData[`txtaddressone${idxnext}`],
-      [`txtaddresstwo${idx}`]: ownerFormData[`txtaddresstwo${idxnext}`],
-      [`txtzip${idx}`]: ownerFormData[`txtzip${idxnext}`],
-      [`ddlcountry${idx}`]: 0, //ownerFormData[`ddlcountry${idxnext}`],
-      [`ddlstate${idx}`]: 0,
-      [`ddlcity${idx}`]: 0,
-    };
+    if (!checkObjNullorEmpty(o) && o.ownerId > 0) {
+      apiReqResLoader("x");
+      let isapimethoderr = false;
+      let objBodyParams = {
+        OwnerId: parseInt(o.ownerId),
+        AssetId: parseInt(editAssetId),
+      };
+      axiosPost(
+        `${config.apiBaseUrl}${ApiUrls.deleteAssetOwner}`,
+        objBodyParams
+      )
+        .then((response) => {
+          let objResponse = response.data;
+          if (objResponse.StatusCode === 200) {
+            if (objResponse.Data.Status == 1) {
+              Toast.success(AppMessages.DeleteAssetOwnerSuccess);
+            } else {
+              Toast.error(objResponse.Data.Message);
+            }
+          } else {
+            isapimethoderr = true;
+          }
+        })
+        .catch((err) => {
+          isapimethoderr = true;
+          console.error(
+            `"API :: ${ApiUrls.deleteAssetOwner}, Error ::" ${err}`
+          );
+        })
+        .finally(() => {
+          if (isapimethoderr == true) {
+            Toast.error(AppMessages.SomeProblem);
+          } else {
+            setOwnerDivs(ownerdivs.filter((div) => div.id !== o.id));
 
-    setOwnerDivs(ownerdivs.filter((div) => div.id !== id));
+            let curretOwnerFormData = {
+              [`txtname${o.id}`]: ownerFormData[`txtname${idxnext}`],
+              [`txtemail${o.id}`]: ownerFormData[`txtemail${idxnext}`],
+              [`txtmobile${o.id}`]: ownerFormData[`txtmobile${idxnext}`],
+              [`txtaddressone${o.id}`]:
+                ownerFormData[`txtaddressone${idxnext}`],
+              [`txtaddresstwo${o.id}`]:
+                ownerFormData[`txtaddresstwo${idxnext}`],
+              [`txtzip${o.id}`]: ownerFormData[`txtzip${idxnext}`],
+              [`ddlcountry${o.id}`]: 0, //ownerFormData[`ddlcountry${idxnext}`],
+              [`ddlstate${o.id}`]: 0,
+              [`ddlcity${o.id}`]: 0,
+            };
 
-    setOwnerFormData({
-      ...ownerFormData,
-      ...curretOwnerFormData,
-    });
-    // setOwnerFormData({
-    //   ...ownerFormData,
-    // });
+            setOwnerFormData({
+              ...ownerFormData,
+              ...curretOwnerFormData,
+            });
+          }
+          apiReqResLoader("x", "x", API_ACTION_STATUS.COMPLETED);
+        });
+    } else {
+      let curretOwnerFormData = {
+        [`txtname${idx}`]: ownerFormData[`txtname${idxnext}`],
+        [`txtemail${idx}`]: ownerFormData[`txtemail${idxnext}`],
+        [`txtmobile${idx}`]: ownerFormData[`txtmobile${idxnext}`],
+        [`txtaddressone${idx}`]: ownerFormData[`txtaddressone${idxnext}`],
+        [`txtaddresstwo${idx}`]: ownerFormData[`txtaddresstwo${idxnext}`],
+        [`txtzip${idx}`]: ownerFormData[`txtzip${idxnext}`],
+        [`ddlcountry${idx}`]: 0, //ownerFormData[`ddlcountry${idxnext}`],
+        [`ddlstate${idx}`]: 0,
+        [`ddlcity${idx}`]: 0,
+      };
+
+      setOwnerDivs(ownerdivs.filter((div) => div.id !== o.id));
+
+      setOwnerFormData({
+        ...ownerFormData,
+        ...curretOwnerFormData,
+      });
+    }
   };
 
   const handleChange = (e) => {
@@ -267,20 +465,7 @@ const Add = () => {
     });
   };
 
-  const handleOwnerCountryChange = (selItem, ctlidx) => {
-    setDdlOptions(`ddlstate${ctlidx}`, "loading");
-    let selCountryId = parseInt(selItem?.target?.value);
-    setOwnerFormData({
-      ...ownerFormData,
-      [`ddlcountry${ctlidx}`]: selCountryId,
-      [`ddlstate${ctlidx}`]: 0,
-      [`ddlcity${ctlidx}`]: 0,
-    });
-
-    if (selItem == null || selItem == undefined || selItem == "") {
-      return;
-    }
-
+  function getStatesForOwner(selCountryId, ctlidx) {
     axiosPost(`${config.apiBaseUrl}${ApiUrls.getDdlStates}`, {
       CountryId: parseInt(selCountryId),
     })
@@ -295,14 +480,15 @@ const Add = () => {
         console.error(`"API :: ${ApiUrls.getDdlStates}, Error ::" ${err}`);
       })
       .finally(() => {});
-  };
+  }
 
-  const handleOwnerStateChange = (selItem, ctlidx) => {
-    setDdlOptions(`ddlcity${ctlidx}`, "loading");
-    let selStateId = parseInt(selItem?.target?.value);
+  const handleOwnerCountryChange = (selItem, ctlidx) => {
+    setDdlOptions(`ddlstate${ctlidx}`, "loading");
+    let selCountryId = parseInt(selItem?.target?.value);
     setOwnerFormData({
       ...ownerFormData,
-      [`ddlstate${ctlidx}`]: selStateId,
+      [`ddlcountry${ctlidx}`]: selCountryId,
+      [`ddlstate${ctlidx}`]: 0,
       [`ddlcity${ctlidx}`]: 0,
     });
 
@@ -310,6 +496,10 @@ const Add = () => {
       return;
     }
 
+    getStatesForOwner(selCountryId, ctlidx);
+  };
+
+  function getCitiesForOwner(selStateId, ctlidx) {
     axiosPost(`${config.apiBaseUrl}${ApiUrls.getDdlCities}`, {
       StateId: parseInt(selStateId),
     })
@@ -328,6 +518,22 @@ const Add = () => {
         setDdlOptions(`ddlcity${ctlidx}`, Nodata, "Id", "Text");
       })
       .finally(() => {});
+  }
+
+  const handleOwnerStateChange = (selItem, ctlidx) => {
+    setDdlOptions(`ddlcity${ctlidx}`, "loading");
+    let selStateId = parseInt(selItem?.target?.value);
+    setOwnerFormData({
+      ...ownerFormData,
+      [`ddlstate${ctlidx}`]: selStateId,
+      [`ddlcity${ctlidx}`]: 0,
+    });
+
+    if (selItem == null || selItem == undefined || selItem == "") {
+      return;
+    }
+
+    getCitiesForOwner(selStateId, ctlidx);
   };
 
   const handleOwnerCityChange = (selItem, ctlidx) => {
@@ -347,9 +553,50 @@ const Add = () => {
     setSelectedFiles((prevFiles) => [...prevFiles, ...files]);
   };
 
-  const handleFileRemove = (e, index) => {
+  const handleFileRemove = (e, index, assetImage) => {
     e.preventDefault();
-    setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    if (!checkObjNullorEmpty(assetImage)) {
+      apiReqResLoader("x");
+      let isapimethoderr = false;
+      let objBodyParams = {
+        Id: parseInt(assetImage.id),
+        AssetId: parseInt(assetImage.assetId),
+      };
+      axiosPost(
+        `${config.apiBaseUrl}${ApiUrls.deleteAssetImage}`,
+        objBodyParams
+      )
+        .then((response) => {
+          let objResponse = response.data;
+          if (objResponse.StatusCode === 200) {
+            if (objResponse.Data.Status == 1) {
+              Toast.success(AppMessages.DeleteImageSuccess);
+            } else {
+              Toast.error(objResponse.Data.Message);
+            }
+          } else {
+            isapimethoderr = true;
+          }
+        })
+        .catch((err) => {
+          isapimethoderr = true;
+          console.error(
+            `"API :: ${ApiUrls.deleteAssetImage}, Error ::" ${err}`
+          );
+        })
+        .finally(() => {
+          if (isapimethoderr == true) {
+            Toast.error(AppMessages.SomeProblem);
+          } else {
+            setSelectedFiles((prevFiles) =>
+              prevFiles.filter((_, i) => i !== index)
+            );
+          }
+          apiReqResLoader("x", "x", API_ACTION_STATUS.COMPLETED);
+        });
+    } else {
+      setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    }
   };
 
   const onSave = (e) => {
@@ -397,7 +644,6 @@ const Add = () => {
       let ownerDivsValerror = false;
 
       let objBodyParams = new FormData();
-
       for (let od = 0; od <= ownerdivs.length - 1; od++) {
         let idx = od + 1;
         if (
@@ -413,7 +659,10 @@ const Add = () => {
           !checkEmptyVal(ownerFormData[`ddlcity${idx}`]) &&
           ownerFormData[`ddlcity${idx}`] != "0"
         ) {
-          objBodyParams.append(`Owners[${od}].OwnerId`, 0);
+          objBodyParams.append(
+            `Owners[${od}].OwnerId`,
+            ownerFormData[`ownerid${idx}`]
+          );
           objBodyParams.append(
             `Owners[${od}].Name`,
             ownerFormData[`txtname${idx}`]
@@ -432,7 +681,7 @@ const Add = () => {
           );
           objBodyParams.append(
             `Owners[${od}].AddressTwo`,
-            checkEmptyVal(ownerFormData[`txtaddresstwo${idx}`]) == true
+            checkEmptyVal(ownerFormData[`txtaddresstwo${idx}`])
               ? ""
               : ownerFormData[`txtaddresstwo${idx}`]
           );
@@ -459,7 +708,7 @@ const Add = () => {
         }
       }
       if (ownerDivsValerror == false) {
-        objBodyParams.append("AssetId", 0);
+        objBodyParams.append("AssetId", editAssetId);
         objBodyParams.append(
           "ProfileId",
           parseInt(GetUserCookieValues(UserCookie.ProfileId, loggedinUser))
@@ -498,12 +747,10 @@ const Add = () => {
           parseInt(setSelectDefaultVal(selectedContractType))
         );
         objBodyParams.append("Price", formData.txtprice);
-
         objBodyParams.append(
           "Advance",
           checkEmptyVal(formData.txtadvance) ? 0 : formData.txtadvance
         );
-
         objBodyParams.append(
           "AccessTypeId",
           parseInt(setSelectDefaultVal(selectedAccessType))
@@ -521,12 +768,16 @@ const Add = () => {
             : formData.txtbrokerpercentage
         );
 
-        selectedFiles.forEach((file, idx) => {
+        //Remove already existing images in db.
+        let arrFilterExistingFiles = selectedFiles.filter(
+          (item) => !item.hasOwnProperty("imgPath")
+        );
+
+        arrFilterExistingFiles.forEach((file, idx) => {
           objBodyParams.append(`Images[${idx}].Id`, 0);
           objBodyParams.append(`Images[${idx}].DisplayOrder`, idx + 1);
           objBodyParams.append(`Images[${idx}].File`, file);
         });
-
         axiosPost(`${config.apiBaseUrl}${ApiUrls.addAsset}`, objBodyParams, {
           "Content-Type": "multipart/form-data",
         })
@@ -538,7 +789,7 @@ const Add = () => {
                 objResponse.Data?.StatusCode > 0 &&
                 objResponse.Data?.AssetId > 0
               ) {
-                Toast.success(AppMessages.AddPropertySuccess);
+                Toast.success(AppMessages.UpdatePropertySuccess);
                 navigate(routeNames.userproperties.path);
               } else {
                 Toast.error(objResponse.Data.Message);
@@ -575,11 +826,14 @@ const Add = () => {
   return (
     <>
       {SetPageLoaderNavLinks()}
+      {parseInt(getsessionStorageItem(SessionStorageKeys.EditAssetId, 0)) == 0
+        ? navigate(routeNames.userproperties.path)
+        : ""}
       <div className="full-row bg-light">
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <h5 className="mb-4 down-line">Add Property</h5>
+              <h5 className="mb-4 down-line">Edit Property</h5>
               <div className="row">
                 <div className="col-xl-3 col-lg-4">
                   <div className="widget bg-white box-shadow rounded px-0 mb-20">
@@ -587,7 +841,7 @@ const Add = () => {
                       My Properties
                     </h6>
                     <ul className="nav-page-lnk">
-                      <li className="dropdown-item px-40">
+                      <li className="dropdown-item px-30">
                         <Link
                           id="page-lnk-viewproperties"
                           to={routeNames.userproperties.path}
@@ -597,7 +851,7 @@ const Add = () => {
                         </Link>
                       </li>
 
-                      <li className="dropdown-item px-40">
+                      <li className="dropdown-item px-30">
                         <Link
                           id="page-lnk-addproperty"
                           to={routeNames.addproperty.path}
@@ -1000,13 +1254,12 @@ const Add = () => {
                     {/*============== Propertyinfo End ==============*/}
 
                     {/*============== Add Owners Start ==============*/}
-                    {ownerdivs.map((div, idx) => (
-                      <>
+                    {ownerdivs.map((o, idx) => (
+                      <div key={`ownerinfo-${idx}`} id={o.id}>
                         <span className="d-none">{(idx = idx + 1)}</span>
                         <div
                           className="full-row px-3 py-4 mt-20 bg-white box-shadow rounded"
-                          key={`ownerinfo-${idx}`}
-                          ownerid={0}
+                          ownerid={o.ownerId}
                         >
                           <div className="container-fluid">
                             <div className="row">
@@ -1169,7 +1422,7 @@ const Add = () => {
                                 <button
                                   type="button"
                                   className="btn btn-danger btn-xs btn-glow rounded box-shadow"
-                                  onClick={() => removeOwnersDiv(div.id, idx)}
+                                  onClick={() => removeOwnersDiv(o, idx)}
                                 >
                                   Remove
                                 </button>
@@ -1177,7 +1430,7 @@ const Add = () => {
                             </div>
                           </div>
                         </div>
-                      </>
+                      </div>
                     ))}
 
                     {/*============== Add Owners End ==============*/}
@@ -1189,30 +1442,57 @@ const Add = () => {
                           <div className="col px-0">
                             <h6 className="mb-4 down-line">Property Media</h6>
                             <div className="row">
-                              {selectedFiles.length > 0 && (
-                                <div className="col-md-12 mt-0 mb-20">
-                                  <ul className="row row-cols-xl-6 row-cols-md-3 row-cols-2 media-upload">
-                                    {selectedFiles.map((file, index) => (
-                                      <li className="col bg-light border rounded m-10 p-0">
-                                        <img
-                                          src={URL.createObjectURL(file)}
-                                          className="py-0"
-                                          alt={file.name}
-                                        />
-                                        <a
-                                          href="#"
-                                          title="Remove image"
-                                          onClick={(e) =>
-                                            handleFileRemove(e, index)
-                                          }
-                                        >
-                                          <i className="fas fa-trash btn-danger" />
-                                        </a>
+                              <div className="col-md-12 mt-0 mb-20">
+                                <ul className="row row-cols-xl-6 row-cols-md-3 row-cols-2 media-upload">
+                                  {selectedFiles.length > 0 &&
+                                    selectedFiles.map((file, index) => (
+                                      <li
+                                        className="col bg-light border rounded m-10 p-0"
+                                        key={`if-${index}`}
+                                      >
+                                        {file.hasOwnProperty("imgPath") ? (
+                                          <>
+                                            <img
+                                              src={file.imgPath}
+                                              className="py-0"
+                                              alt={file.ImageName}
+                                            />
+                                            <a
+                                              href="#"
+                                              title="Remove image"
+                                              onClick={(e) =>
+                                                handleFileRemove(e, index, {
+                                                  id: file.id,
+                                                  assetId: file.assetId,
+                                                })
+                                              }
+                                            >
+                                              <i className="fas fa-trash btn-danger" />
+                                            </a>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <img
+                                              src={URL.createObjectURL(file)}
+                                              className="py-0"
+                                              alt={file.name}
+                                            />
+                                            <a
+                                              href="#"
+                                              title="Remove image"
+                                              onClick={(e) =>
+                                                handleFileRemove(e, index)
+                                              }
+                                            >
+                                              <i className="fas fa-trash btn-danger" />
+                                            </a>
+                                          </>
+                                        )}
                                       </li>
                                     ))}
-                                  </ul>
-                                </div>
-                              )}
+                                </ul>
+                              </div>
+
                               <div className="col-md-10 mb-20 mx-auto">
                                 <input
                                   type="file"
@@ -1276,4 +1556,4 @@ const Add = () => {
   );
 };
 
-export default Add;
+export default Edit;

@@ -16,20 +16,9 @@ const length400 = 400;
 const length500 = 500;
 const length1000 = 1000;
 const length2000 = 2000;
-const phonevalidvalues = [
-  "0",
-  "1",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "+",
-  "-",
-];
+const nums = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+const phonevalidvalues = [...nums, "+", "-", "."];
+const pricevalidvalues = [...nums, ".", ","];
 const allowedFileTypes = ["image/jpeg", "image/png", "application/pdf"];
 const uploadFileMaxSize = 10 * 1024 * 1024; //10mb
 const uploadFileMaxSizeMB = 10; //10mb
@@ -41,6 +30,11 @@ const RegexPattern = {
   email: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,})+$/,
   url: /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?(\?[^\s]*)?$/,
   date: /^(?:(0[1-9]|1[012])[\/.](0[1-9]|[12][0-9]|3[01])[\/.][0-9]{4})$/,
+  price: /^(\$|)([0-9]\d{0,2}(\,\d{3})*|([1-9]\d*))(\.\d{1,2})?$/,
+};
+
+const checkPriceValue = (value) => {
+  return value.match(RegexPattern.price)[0];
 };
 
 /*Regex */
@@ -117,6 +111,10 @@ export const Regex = {
     max: length50,
     required: ValidationMessages.SearchKeywordReq,
   },
+  location: {
+    max: length50,
+    required: ValidationMessages.LocationReq,
+  },
   date: {
     max: length10,
     required: ValidationMessages.DateReq,
@@ -124,7 +122,7 @@ export const Regex = {
     pattern: RegexPattern.date,
   },
   propertytitle: {
-    max: length100,
+    max: length50,
     required: ValidationMessages.PropertyTitleReq,
     invalid: ValidationMessages.PropertyTitleInvalid,
   },
@@ -148,6 +146,36 @@ export const Regex = {
     required: ValidationMessages.FileReq,
     formatinvalid: ValidationMessages.FileFormatInvalid,
     sizeinvalid: `${ValidationMessages.FileSizeInvalid} ${uploadFileMaxSizeMB}mb.`,
+  },
+  rent: {
+    max: length15,
+    required: ValidationMessages.RentReq,
+    invalid: ValidationMessages.RentInvalid,
+    pattern: RegexPattern.price,
+  },
+  amount: {
+    max: length15,
+    required: ValidationMessages.AmountReq,
+    invalid: ValidationMessages.AmountInvalid,
+    pattern: RegexPattern.price,
+  },
+  advance: {
+    max: length15,
+    required: ValidationMessages.AdvanceReq,
+    invalid: ValidationMessages.AdvanceInvalid,
+    pattern: RegexPattern.price,
+  },
+  sqfeet: {
+    max: length15,
+    required: ValidationMessages.SqfeetReq,
+    invalid: ValidationMessages.SqfeetInvalid,
+    pattern: RegexPattern.price,
+  },
+  brokerpercentage: {
+    max: length5,
+    required: ValidationMessages.AgentPercentReq,
+    invalid: ValidationMessages.AgentPercentInvalid,
+    pattern: RegexPattern.price,
   },
 };
 /*Regex */
@@ -308,6 +336,13 @@ export const formCtrlTypes = {
       max: length50,
     },
   },
+  location: {
+    lbl: "Location:",
+    input: {
+      type: "text",
+      max: length50,
+    },
+  },
   date: {
     lbl: "Date:",
     input: {
@@ -319,7 +354,7 @@ export const formCtrlTypes = {
     lbl: "Property Title:",
     input: {
       type: "text",
-      max: length100,
+      max: length50,
     },
   },
   addressone: {
@@ -363,6 +398,13 @@ export const formCtrlTypes = {
     input: {
       type: "text",
       max: length15,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!pricevalidvalues.includes(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
     },
   },
   amount: {
@@ -370,6 +412,13 @@ export const formCtrlTypes = {
     input: {
       type: "text",
       max: length15,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!pricevalidvalues.includes(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
     },
   },
   advance: {
@@ -377,6 +426,13 @@ export const formCtrlTypes = {
     input: {
       type: "text",
       max: length15,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!pricevalidvalues.includes(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
     },
   },
   sqfeet: {
@@ -384,13 +440,27 @@ export const formCtrlTypes = {
     input: {
       type: "text",
       max: length15,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!pricevalidvalues.includes(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
     },
   },
   brokerpercentage: {
     lbl: "Agent (%):",
     input: {
       type: "text",
-      max: length3,
+      max: length5,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!pricevalidvalues.includes(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
     },
   },
   file: {

@@ -4,7 +4,7 @@ const ModalView = ({ title, content, onClose, actions }) => {
   return (
     <>
       <Modal show={true} centered animation={true} backdrop="static">
-        <Modal.Header className="bg-light">
+        <Modal.Header>
           <Modal.Title className="">
             {title ? title : "Are you sure?"}
           </Modal.Title>
@@ -23,7 +23,7 @@ const ModalView = ({ title, content, onClose, actions }) => {
         <Modal.Body>{content}</Modal.Body>
 
         {actions?.length > 0 && (
-          <Modal.Footer className="modal-action bg-light">
+          <Modal.Footer className="modal-action">
             {actions
               ?.sort((a, b) => b.displayOrder - a.displayOrder)
               ?.map((a, i) => {

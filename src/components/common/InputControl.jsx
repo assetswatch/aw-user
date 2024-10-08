@@ -17,6 +17,7 @@ const InputControl = ({
   onIconClick,
   errors,
   formErrors = {},
+  placeHolder,
 }) => {
   let ctl = ctlType;
 
@@ -121,6 +122,51 @@ const InputControl = ({
         formErrors[name] = rex.required;
       }
       break;
+    case formCtrlTypes.propertytitle:
+      rex = Regex.propertytitle;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      if (!checkEmptyVal(value) && value?.length > rex.max) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.amount:
+      rex = Regex.amount;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.advance:
+      rex = Regex.advance;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.sqfeet:
+      rex = Regex.sqfeet;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.brokerpercentage:
+      rex = Regex.brokerpercentage;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
   }
 
   return (
@@ -147,6 +193,7 @@ const InputControl = ({
           onChange={onChange}
           maxLength={ctl.input.max}
           {...ctl.input.keyEvents}
+          placeholder={placeHolder}
         />
       </div>
       {errors?.[`${name}`] && (

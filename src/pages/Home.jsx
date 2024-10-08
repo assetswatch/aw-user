@@ -1,14 +1,21 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { loadFile, unloadFile, getArrLoadFiles } from "../utils/loadFiles";
 import { routeNames } from "../routes/routes";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { SetPageLoaderNavLinks } from "../utils/common";
 import { useGetTopAssetsGateWay } from "../hooks/useGetTopAssetsGateWay";
 import { useGetTopAgentsGateWay } from "../hooks/useGetTopAgentsGateWay";
 import Rating from "../components/common/Rating";
+import LazyImage from "../components/common/LazyImage";
+import { SessionStorageKeys } from "../utils/constants";
+import { addSessionStorageItem } from "../helpers/sessionStorageHelper";
+import PropertySearch from "../components/layouts/PropertySearch";
 
 const Home = () => {
   let $ = window.$;
+
+  const navigate = useNavigate();
+
   //list of js/css dependencies.
   let arrJsCssFiles = [
     {
@@ -178,6 +185,12 @@ const Home = () => {
     } catch {}
   }
 
+  const onPropertyDetails = (e, assetId) => {
+    e.preventDefault();
+    addSessionStorageItem(SessionStorageKeys.AssetDetailsId, assetId);
+    navigate(routeNames.propertyDetails.path);
+  };
+
   return (
     <>
       {SetPageLoaderNavLinks()}
@@ -237,7 +250,8 @@ const Home = () => {
       {/*============== Slider Area End ==============*/}
 
       {/*============== Property Search Form Start ==============*/}
-      <div className="full-row p-0" style={{ marginTop: "0px", zIndex: 99 }}>
+      <PropertySearch></PropertySearch>
+      {/* <div className="full-row p-0" style={{ marginTop: "0px", zIndex: 99 }}>
         <div className="container-fluid">
           <div className="row">
             <div className="col px-0">
@@ -307,7 +321,7 @@ const Home = () => {
                   <div className="col">
                     <Link
                       to={routeNames.properties.path}
-                      className="btn btn-primary w-100"
+                      className="btn btn-primary btn-mini w-100 btn-glow shadow rounded"
                     >
                       Search
                     </Link>
@@ -317,7 +331,7 @@ const Home = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
       {/*============== Property Search Form End ==============*/}
 
       {/*============== Recent Property Start ==============*/}
@@ -358,21 +372,24 @@ const Home = () => {
                           d-assetid={a.AssetId}
                         >
                           <div className="property-grid-1 property-block bg-light transation-this rounded">
-                            <div className="overflow-hidden position-relative transation thumbnail-img bg-secondary hover-img-zoom rounded">
+                            <div className="overflow-hidden position-relative transation thumbnail-img hover-img-zoom box-shadow rounded">
                               <div className="catart position-absolute">
                                 <span className="sale bg-secondary text-white">
                                   For {a.ContractType}
                                 </span>
                               </div>
-                              <Link to={routeNames.propertyDetails.path}>
-                                <img
+                              <Link
+                                onClick={(e) => onPropertyDetails(e, a.AssetId)}
+                              >
+                                <LazyImage
                                   src={a.Images?.[0]?.ImagePath}
                                   className="img-fit-grid"
+                                  placeHolderClass="min-h-200"
                                 />
                               </Link>
                               <Link
-                                to={routeNames.propertyDetails.path}
-                                className="listing-ctg text-white"
+                                onClick={(e) => onPropertyDetails(e, a.AssetId)}
+                                className="listing-ctg text-primary"
                               >
                                 <i className="fa-solid fa-building" />
                                 <span>{a.AssetType}</span>
@@ -493,9 +510,13 @@ const Home = () => {
                     500+
                   </a>
                 </h6>
-                <a href="#" className="btn-icon box-shadow">
+                <Link
+                  to={routeNames.properties.path}
+                  className="btn-icon box-shadow"
+                >
+                  {" "}
                   <i className="icon fas fa-long-arrow-alt-right" />
-                </a>
+                </Link>
               </div>
             </div>
             <div className="col">
@@ -513,9 +534,13 @@ const Home = () => {
                     200+
                   </a>
                 </h6>
-                <a href="#" className="btn-icon box-shadow">
+                <Link
+                  to={routeNames.properties.path}
+                  className="btn-icon box-shadow"
+                >
+                  {" "}
                   <i className="icon fas fa-long-arrow-alt-right" />
-                </a>
+                </Link>
               </div>
             </div>
             <div className="col">
@@ -533,9 +558,13 @@ const Home = () => {
                     400+
                   </a>
                 </h6>
-                <a href="#" className="btn-icon box-shadow">
+                <Link
+                  to={routeNames.properties.path}
+                  className="btn-icon box-shadow"
+                >
+                  {" "}
                   <i className="icon fas fa-long-arrow-alt-right" />
-                </a>
+                </Link>
               </div>
             </div>
             <div className="col">
@@ -553,9 +582,13 @@ const Home = () => {
                     300+
                   </a>
                 </h6>
-                <a href="#" className="btn-icon box-shadow">
+                <Link
+                  to={routeNames.properties.path}
+                  className="btn-icon box-shadow"
+                >
+                  {" "}
                   <i className="icon fas fa-long-arrow-alt-right" />
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -599,12 +632,13 @@ const Home = () => {
                       return (
                         <div className="item" key={`ragent-key-${i}`}>
                           <div className="property-grid-1 property-block bg-light transation-this rounded">
-                            <div className="overflow-hidden position-relative transation thumbnail-img bg-secondary rounded">
+                            <div className="overflow-hidden position-relative transation thumbnail-img box-shadow rounded">
                               <a href="property-single-v1.html">
-                                <img
+                                <LazyImage
                                   src={a.PicPath}
                                   alt={a.FirstName}
                                   className="img-fit-grid-contain"
+                                  placeHolderClass="min-h-200"
                                 />
                               </a>
                             </div>
@@ -650,28 +684,30 @@ const Home = () => {
           <div className="fact-counter position-relative z-index-9">
             <div className="row row-cols-lg-4 row-cols-sm-2 row-cols-1">
               <div className="col">
-                <div
-                  className="my-20 text-center count wow fadeIn animate animated"
-                  data-wow-duration="300ms"
-                  style={{
-                    visibility: "visible",
-                    animationDuration: "300ms",
-                    animationName: "fadeIn",
-                  }}
-                >
-                  <i
-                    className="text-white fa fa-building flat-medium"
-                    aria-hidden="true"
-                  ></i>
-                  <h6 className="text-white font-400 pt-2">Properties</h6>
-                  <span
-                    className="count-num text-primary h3"
-                    data-speed={3000}
-                    data-stop={310}
+                <Link to={routeNames.properties.path}>
+                  <div
+                    className="my-20 text-center count wow fadeIn animate animated"
+                    data-wow-duration="300ms"
+                    style={{
+                      visibility: "visible",
+                      animationDuration: "300ms",
+                      animationName: "fadeIn",
+                    }}
                   >
-                    310
-                  </span>
-                </div>
+                    <i
+                      className="text-white fa fa-building flat-medium"
+                      aria-hidden="true"
+                    ></i>
+                    <h6 className="text-white font-400 pt-2">Properties</h6>
+                    <span
+                      className="count-num text-primary h3"
+                      data-speed={3000}
+                      data-stop={310}
+                    >
+                      310
+                    </span>
+                  </div>
+                </Link>
               </div>
               <div className="col">
                 <div

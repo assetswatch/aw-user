@@ -6,3 +6,4 @@ export const NoData = React.lazy(() => import("./NoData"));
 export const Grid = React.lazy(() => import("./GridTable"));
 export const GridList = React.lazy(() => import("./GridList"));
 export const ModalView = React.lazy(() => import("./ModalView"));
+export const LazyImage = React.lazy(() => import("./LazyImage"));

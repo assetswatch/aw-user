@@ -23,6 +23,10 @@ export const routeNames = {
     name: "AddProperty",
     path: "/User/Properties/Add",
   },
+  editproperty: {
+    name: "EditProperty",
+    path: "/User/Properties/Edit",
+  },
   notFound: { name: "NotFound", path: "/*" },
 };
 
@@ -143,6 +147,13 @@ const routes = [
     path: routeNames.addproperty.path,
     name: routeNames.addproperty.name,
     element: lazy(() => import("../pages/User/Properties/Add")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.editproperty.path,
+    name: routeNames.editproperty.name,
+    element: lazy(() => import("../pages/User/Properties/Edit")),
     isexact: true,
     isprotected: true,
   },

@@ -27,6 +27,33 @@ const TextAreaControl = ({
         formErrors[name] = rex.required;
       }
       break;
+    case formCtrlTypes.addressone:
+      rex = Regex.addressone;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      if (!checkEmptyVal(value) && value?.length > rex.max) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.addresstwo:
+      rex = Regex.addresstwo;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      if (!checkEmptyVal(value) && value?.length > rex.max) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.description:
+      rex = Regex.description;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      if (!checkEmptyVal(value) && value?.length > rex.max) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
   }
 
   return (

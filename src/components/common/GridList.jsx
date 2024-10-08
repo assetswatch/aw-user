@@ -16,6 +16,7 @@ const GridList = ({
   noData,
   containerClassName,
   defaultPs,
+  cellclassName,
 }) => {
   const {
     getTableProps,
@@ -102,14 +103,20 @@ const GridList = ({
           <div
             className={`${
               checkEmptyVal(containerClassName)
-                ? "row row-cols-xl-3 row-cols-lg-1 row-cols-md-2 row-cols-1 g-4 min-h-200"
+                ? "row row-cols-xl-3 row-cols-lg-2 row-cols-md-2 row-cols-1 g-4 min-h-200"
                 : containerClassName
             }`}
           >
             {page.map((row, tridx) => {
               prepareRow(row);
               return (
-                <div className="col" {...row.getRowProps()} key={"tr-" + tridx}>
+                <div
+                  className={`${
+                    checkEmptyVal(cellclassName) ? "col" : cellclassName
+                  }`}
+                  {...row.getRowProps()}
+                  key={"tr-" + tridx}
+                >
                   {row.cells.map((cell, tdidx) => (
                     <div
                       {...cell.getCellProps()}

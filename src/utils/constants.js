@@ -15,6 +15,8 @@ export const LSExpiryKey = "expires";
 /*Session storage keys*/
 export const SessionStorageKeys = {
   EditAssetId: "eassetid",
+  AssetDetailsId: "assetid",
+  ObjAssetfilters: "oasf",
 };
 /*Session storage keys*/
 
@@ -67,7 +69,11 @@ export const AppMessages = {
   AsyncSelectDefaultSelect: [{ Id: "", Text: " Select " }],
   DeleteConfirmationTitle: "Are you sure?",
   DeleteAssetConfirmationMessage: "You want to delete {propertyname} property.",
+  AddPropertySuccess: "Property successfully...",
+  UpdatePropertySuccess: "Property details updated successfully...",
   DeleteAssetSuccess: "Property deleted successfully...",
+  DeleteImageSuccess: "Image deleted successfully...",
+  DeleteAssetOwnerSuccess: "Owner removed successfully...",
 };
 /*Common App messages*/
 
@@ -102,6 +108,7 @@ export const ValidationMessages = {
   SubjectReq: "Subject can not be empty.",
   MessageReq: "Message can not be empty.",
   SearchKeywordReq: "Keyword can not be empty.",
+  LocationReq: "Location can not be empty.",
   FileReq: "File can not be empty.",
   FileFormatInvalid: "File format is invalid.",
   FileSizeInvalid: "File size exceeds the limit of",
@@ -116,6 +123,21 @@ export const ValidationMessages = {
   DescriptionReq: "Description can not be empty.",
   DescriptionInvalid: "Description is not valid.",
   StartEndDateGreater: "Start date should be grater than End date.",
+  ContractTypeReq: "Contract type can not be empty.",
+  AssetTypeReq: "Property type can not be empty.",
+  AccessTypeReq: "Access type can not be empty.",
+  BedroomsReq: "Bedrooms can not be empty.",
+  BathroomsReq: "Bathrooms can not be empty.",
+  RentReq: "Rent amount can not be empty.",
+  RentInvalid: "Rent amount is not valid.",
+  AdvanceReq: "Advance amount can not be empty.",
+  AdvanceInvalid: "Advance amount is not valid.",
+  AmountReq: "Amount can not be empty.",
+  AmountInvalid: "Amount is not valid.",
+  SqfeetReq: "Squarefeet can not be empty.",
+  SqfeetInvalid: "Squarefeet is not valid.",
+  AgentPercentReq: "Agent percentage can not be empty.",
+  AgentPercentInvalid: "Agent percentage is not valid.",
 };
 
 /*Api Urls*/
@@ -143,7 +165,10 @@ export let ApiUrls = {
   getUserAssets: `assets/v1/GetUserAssets`,
   getAssets: `assets/v1/GetAssets`,
   getAssetDetails: `assets/v1/GetAssetDetails`,
+  getUserAssetDetails: `assets/v1/GetUserAssetDetails`,
   deleteAsset: `assets/v1/DeleteAsset`,
+  deleteAssetImage: `assets/v1/DeleteAssetImage`,
+  deleteAssetOwner: `assets/v1/DeleteAssetOwner`,
   getTopAssets: `assets/v1/GetTopAssets`,
   getPricingPlans: `plans/v1/GetPricingPlans`,
 };
