@@ -96,7 +96,7 @@ const PropertyDetails = () => {
         skinsPath: "/assets/skins/",
       });
     } catch (e) {
-      console.log(e.message);
+      console.error(e.message);
     }
   }, [assetDetails]);
 

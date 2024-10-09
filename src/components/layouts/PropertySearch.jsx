@@ -247,7 +247,7 @@ const PropertySearch = () => {
                     </div>
                     <div className="col">
                       <button
-                        className="btn btn-primary btn-mini w-100 btn-glow shadow rounded lh-38"
+                        className="btn btn-primary btn-mini w-100 btn-glow sha dow rounded lh-38"
                         onClick={onPropertiesSearch}
                       >
                         Search

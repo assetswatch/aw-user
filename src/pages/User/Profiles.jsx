@@ -4,11 +4,13 @@ import { DataLoader, NoData } from "../../components/common/LazyComponents";
 import { apiReqResLoader, checkObjNullorEmpty } from "../../utils/common";
 import { AppMessages } from "../../utils/constants";
 import { useAuth } from "../../contexts/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { routeNames } from "../../routes/routes";
 
 const Profiles = () => {
   let $ = window.$;
+
+  const location = useLocation();
 
   const { userProfilesList, isDataLoading } = useGetUserProfilesGateway();
   const { updateUserProfile } = useAuth();
@@ -99,6 +101,7 @@ const Profiles = () => {
                                 Skip
                                 <i className="pl-5 fa fa-circle-chevron-right"></i>
                               </u>
+                              <u>Cancel</u>
                             </Link>
                           </div>
                         </>

@@ -35,7 +35,6 @@ export const AuthProvider = ({ children }) => {
 
   // Login function to authenticate the user and set the auth token
   const loginUser = (loginData, isRemember, sessionid) => {
-    console.log(loginData);
     let defaultProfile = loginData.Profiles?.filter(
       (p) => p.ProfileId == loginData.DefaultProfileId
     )?.[0];

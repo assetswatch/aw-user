@@ -72,11 +72,11 @@ export async function getToken() {
           resData["SessionId"] = usessid;
           resData["TransactionId"] = getuuid();
         } else {
-          console.log(res);
+          console.error(res);
         }
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
     return Promise.resolve(resData);
   } else if (
