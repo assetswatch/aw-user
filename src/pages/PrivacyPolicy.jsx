@@ -117,7 +117,7 @@ const PrivacyPolicy = () => {
         });
       }
     } catch (e) {
-      console.log(e.message);
+      console.error(e.message);
     }
   }
 

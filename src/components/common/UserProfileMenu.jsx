@@ -133,9 +133,15 @@ const UserProfileMenu = (styleprops) => {
             </a>
           </li>
           <li className="dropdown-item">
-            <a href="#!">
+            <Link
+              id="nav-user-info-profiles"
+              to={{
+                pathname: routeNames.profiles.path,
+                state: { from: "changeprofile" },
+              }}
+            >
               <i className="fa fa-exchange pe-1"></i> Change Profile
-            </a>
+            </Link>
           </li>
           <div className="dropdown-divider" />
           <div className="font-500 font-general px-10 py-10 text-gray">
@@ -144,17 +150,11 @@ const UserProfileMenu = (styleprops) => {
           <li className="dropdown-item">
             <a href="#!">
               <i className="fa fa-bell pe-1"></i> Notifications
-              <span className="badge badge-pill badge-danger mt-1 fl-r bg-primary">
-                4
-              </span>
             </a>
           </li>
           <li className="dropdown-item">
             <a href="#!">
               <i className="fa fa-envelope pe-1"></i> Messages
-              <span className="badge badge-pill badge-danger mt-1 fl-r bg-primary">
-                4
-              </span>
             </a>
           </li>
           <div className="dropdown-divider" />

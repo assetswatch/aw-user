@@ -25,7 +25,6 @@ const FileControl = ({
   } else if (file && !ctl.input.validateFileType(file)) {
     formErrors[name] = rex.formatinvalid;
   } else if (file && ctl.input.validateFileSize(file) == true) {
-    console.log(file.size);
     formErrors[name] = rex.sizeinvalid;
   }
 

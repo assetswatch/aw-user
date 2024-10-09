@@ -25,7 +25,7 @@ function loadFiles(arrobjfiles) {
       }
     });
   } catch (err) {
-    console.log(err.message);
+    console.error(err.message);
   }
 }
 
@@ -64,7 +64,7 @@ function unloadFile(arrobjfiles) {
       }
     });
   } catch (err) {
-    console.log(err.message);
+    console.error(err.message);
   }
 }
 
@@ -90,7 +90,7 @@ function loadFile(objfile) {
       } else if (objfile.type.toLowerCase() === "css") {
       }
     } catch (err) {
-      console.log(err.message);
+      console.error(err.message);
     }
   });
 }
