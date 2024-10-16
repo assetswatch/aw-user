@@ -520,20 +520,20 @@ const UserHeader = () => {
                   <li className="dropdown-item">
                     <Link
                       id="nav-lnk-myagreement"
-                      to={routeNames.dashboard.path}
+                      to={routeNames.MyAgreement.path}
                     >
                       <i className="fa-regular fa-file pe-1"></i> My Agreement
                     </Link>
                   </li>
                   <li className="dropdown-item">
-                    <Link id="nav-lnk-documents" to={routeNames.dashboard.path}>
+                    <Link id="nav-lnk-documents" to={routeNames.Documents.path}>
                       <i className="fa-regular fa-file pe-1"></i> Documents
                     </Link>
                   </li>
                   <li className="dropdown-item">
                     <Link
                       id="nav-lnk-agreementtemplates"
-                      to={routeNames.dashboard.path}
+                      to={routeNames.AgreementTemplates.path}
                     >
                       <i className="fa-regular fa-file pe-1"></i> Agreement
                       Templates
@@ -569,7 +569,7 @@ const UserHeader = () => {
                 <Link
                   className="nav-link"
                   id="nav-home"
-                  to={routeNames.home.path}
+                  to={routeNames.Services.path}
                 >
                   <i className="fa fa-screwdriver-wrench pe-2"></i>
                   Services
@@ -589,7 +589,7 @@ const UserHeader = () => {
                 <Link
                   className="nav-link"
                   id="nav-home"
-                  to={routeNames.home.path}
+                  to={routeNames.Reports.path}
                 >
                   <i className="fa fa-chart-pie flat-mini pe-2"></i>
                   Reports
@@ -599,7 +599,7 @@ const UserHeader = () => {
                 <Link
                   className="nav-link"
                   id="nav-home"
-                  to={routeNames.home.path}
+                  to={routeNames.Agents.path}
                 >
                   <i className="fa fa-users flat-mini pe-2"></i>
                   Agents
@@ -619,7 +619,7 @@ const UserHeader = () => {
                 <Link
                   className="nav-link"
                   id="nav-home"
-                  to={routeNames.home.path}
+                  to={routeNames.Settings.path}
                 >
                   <i className="fa fa-gear flat-mini pe-2"></i>
                   Settings
