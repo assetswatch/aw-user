@@ -1,6 +1,6 @@
 import { AppMessages, ValidationMessages } from "./constants";
 import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { UserCookie } from "../utils/constants";
 import { routeNames } from "../routes/routes";
@@ -46,6 +46,9 @@ export function SetPageLoaderNavLinks() {
           activelink = "myproperties";
           break;
         case routeNames.dashboard.path.toLowerCase():
+          activelink = "dashboard";
+          break;
+        case routeNames.ownertenants.path.toLowerCase():
           activelink = "dashboard";
           break;
       }
@@ -317,9 +320,13 @@ export function showHideCtrl(ctrlid, ishide = false) {
 }
 
 export function checkStartEndDateGreater(start, end) {
-  return moment(end).isAfter(moment(start)) == false
-    ? ValidationMessages.StartEndDateGreater
-    : "";
+  if (moment(end).isSame(moment(start))) {
+    return "";
+  } else {
+    return moment(end).isAfter(moment(start)) == false
+      ? ValidationMessages.StartEndDateGreater
+      : "";
+  }
 }
 
 /** sconvvert string to bool */
@@ -373,6 +380,9 @@ function readCookieVal(cookiekey, user) {
     case UserCookie.ProfileType:
       retval = user?.[UserCookie.Profile][UserCookie.ProfileType];
       break;
+    case UserCookie.ProfileTypeId:
+      retval = user?.[UserCookie.Profile][UserCookie.ProfileTypeId];
+      break;
     case UserCookie.ProfileId:
       retval = user?.[UserCookie.Profile][UserCookie.ProfileId];
       break;
@@ -423,3 +433,13 @@ export function setDdlOptions(
 export function replacePlaceHolders(template, data) {
   return template.replace(/{(.*?)}/g, (match, key) => data[key.trim()] || "");
 }
+
+export const debounce = (func, delay) => {
+  let timeout;
+  return (...args) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
+};

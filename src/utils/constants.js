@@ -1,3 +1,20 @@
+import config from "../config.json";
+
+/*App Constants*/
+export const AppConstants = {
+  DebounceDelay: 500,
+  DdlSearchMinLength: 2,
+};
+/*App Constants*/
+
+/*Notification Types*/
+export const NotificationTypes = {
+  Invitation: 1,
+  Message: 2,
+  Payment: 3,
+};
+/*Notification Types*/
+
 export const AppDetails = {
   address: "113 State Hwy 121 Coppell, TX 75019",
   phone: "(214) 702-9959",
@@ -17,6 +34,7 @@ export const SessionStorageKeys = {
   EditAssetId: "eassetid",
   AssetDetailsId: "assetid",
   ObjAssetfilters: "oasf",
+  OwnerTenantConnectionTab: "otcontab",
 };
 /*Session storage keys*/
 
@@ -55,6 +73,7 @@ export const GridDefaultValues = {
 /*Common App messages*/
 export const AppMessages = {
   DdlDefaultSelect: " Select ",
+  DdlTypetoSearch: "Type to search ",
   DdlNoData: "No data found.",
   DdLLoading: "Loading...",
   NoCountries: "No countires found.",
@@ -64,16 +83,34 @@ export const AppMessages = {
   NoProfiles: "No profiles found...",
   NoProperties: "No properties found...",
   NoPropertyDetails: "Property details not found...",
+  NoConnection: `No connections found...`,
+  NoTenants: `No ${Object.keys(config.userProfileTypes)
+    .find(
+      (key) => config.userProfileTypes[key] === config.userProfileTypes.Tenant
+    )
+    .toLowerCase()}s found...`,
+  NoTenantRequests: `No ${Object.keys(config.userProfileTypes)
+    .find(
+      (key) => config.userProfileTypes[key] === config.userProfileTypes.Tenant
+    )
+    .toLowerCase()} requests found...`,
   SomeProblem: "Some problem occured, Please try again.",
   AsyncSelectNoData: [{ Id: "", Text: "No data found." }],
   AsyncSelectDefaultSelect: [{ Id: "", Text: " Select " }],
   DeleteConfirmationTitle: "Are you sure?",
   DeleteAssetConfirmationMessage: "You want to delete {propertyname} property.",
+  SendInvitaionModalTitle: "Send Invitation",
   AddPropertySuccess: "Property successfully...",
   UpdatePropertySuccess: "Property details updated successfully...",
   DeleteAssetSuccess: "Property deleted successfully...",
   DeleteImageSuccess: "Image deleted successfully...",
   DeleteAssetOwnerSuccess: "Owner removed successfully...",
+  NoNewNotifications: "No new notifications...",
+  DeleteNotificationConfirmationMessage:
+    "You want to delete '{notificationmessage}' notification.",
+  DeleteNotificationSuccess: "Notification deleted successfully...",
+  NoNotifications: "No notifications found...",
+  SendNotificationModalTitle: "Send Notification",
 };
 /*Common App messages*/
 
@@ -114,6 +151,8 @@ export const ValidationMessages = {
   FileSizeInvalid: "File size exceeds the limit of",
   DateReq: "Date can not be empty.",
   DateInvalid: "Date is not valid.",
+  PropertyReq: "Property can not be empty.",
+  TenantReq: "Tenant can not be empty.",
   PropertyTitleReq: "Property title can not be empty.",
   PropertyTitleInvalid: "Property title is not valid.",
   Address1Req: "Address 1 can not be empty.",
@@ -156,6 +195,12 @@ export let ApiUrls = {
   getUserProfiles: `users/v1/GetUserProfiles`,
   upgradePlan: `users/v1/UpgradePlan`,
   getTopAgents: `users/v1/GetTopAgents`,
+  getDdlUsersProfiles: `users/v1/GetDdlUsersProfiles`,
+  getJoinedUserConnections: `users/v1/GetJoinedUserConnections`,
+  getRequestedUserConnections: `users/v1/getRequestedUserConnections`,
+  getUserConnectionsHistory: `users/v1/getUserConnectionsHistory`,
+  updateUserConnectionStatus: `users/v1/UpdateUserConnectionStatus`,
+  createUserConnection: `users/v1/CreateUserConnection`,
   getAssetTypes: `assets/v1/GetAssetTypes`,
   getAssetContractTypes: `assets/v1/GetAssetContractTypes`,
   getAssetAcccessTypes: `assets/v1/GetAssetAccessTypes`,
@@ -170,6 +215,13 @@ export let ApiUrls = {
   deleteAssetImage: `assets/v1/DeleteAssetImage`,
   deleteAssetOwner: `assets/v1/DeleteAssetOwner`,
   getTopAssets: `assets/v1/GetTopAssets`,
+  getDdlUserAssets: `assets/v1/GetDdlUserAssets`,
   getPricingPlans: `plans/v1/GetPricingPlans`,
+  getTopNotifications: `notifications/v1/GetTopNotifications`,
+  updateNotificationRead: `notifications/v1/UpdateNotificationRead`,
+  getDdlNotificationTypes: `notifications/v1/GetDdlNotificationTypes`,
+  getNotifications: `notifications/v1/GetNotifications`,
+  deleteNotification: `notifications/v1/DeleteNotification`,
+  createNotification: `notifications/v1/CreateNotification`,
 };
 /*Api Urls*/

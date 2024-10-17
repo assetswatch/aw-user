@@ -51,6 +51,10 @@ const UserProfileMenu = (styleprops) => {
     navigate(routeNames.upgradeplan.path);
   };
 
+  const onChangeProfile = () => {
+    navigate(routeNames.profiles.path);
+  };
+
   return (
     <>
       <li
@@ -133,15 +137,9 @@ const UserProfileMenu = (styleprops) => {
             </a>
           </li>
           <li className="dropdown-item">
-            <Link
-              id="nav-user-info-profiles"
-              to={{
-                pathname: routeNames.profiles.path,
-                state: { from: "changeprofile" },
-              }}
-            >
+            <a id="nav-user-info-profiles" onClick={onChangeProfile}>
               <i className="fa fa-exchange pe-1"></i> Change Profile
-            </Link>
+            </a>
           </li>
           <div className="dropdown-divider" />
           <div className="font-500 font-general px-10 py-10 text-gray">

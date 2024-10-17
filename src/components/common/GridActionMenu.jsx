@@ -28,6 +28,18 @@ const GridActionMenu = ({ row, actions }) => {
                       <i className="far fa-edit pe-2 text-general" />
                     ) : a["text"].toLowerCase().indexOf("delete") != -1 ? (
                       <i className="fas fa-trash pe-2 text-general" />
+                    ) : a["text"].toLowerCase().indexOf("terminate") != -1 ? (
+                      a["icon"].toLowerCase() == "userterminate" ? (
+                        <i className="fa fa-user-times pe-2 text-general" />
+                      ) : (
+                        <i className="fas fa-file-excel pe-2 text-general" />
+                      )
+                    ) : a["text"].toLowerCase().indexOf("accept") != -1 ? (
+                      <i className="fa fa-check-circle pe-2 text-general" />
+                    ) : a["text"].toLowerCase().indexOf("reject") != -1 ? (
+                      <i className="fa fa-times-circle pe-2 text-general" />
+                    ) : a["text"].toLowerCase().indexOf("message") != -1 ? (
+                      <i className="fa fa-comment pe-2 text-general" />
                     ) : (
                       ""
                     )}

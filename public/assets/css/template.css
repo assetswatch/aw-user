@@ -1123,6 +1123,9 @@ a.text-dark:focus {
 ===========================================*/
 
 /* Start adding margin */
+.t-1 {
+  top: 1px !important;
+}
 
 .my-0,
 .m-0,
@@ -1141,7 +1144,9 @@ a.text-dark:focus {
 .mt-20 {
   margin-top: 20px !important;
 }
-
+.mt-25 {
+  margin-top: 25px !important;
+}
 .my-30,
 .m-30,
 .mt-30 {
@@ -2332,7 +2337,37 @@ ul.product_list_widget li {
   cursor: pointer;
   padding: 8px 15px;
 }
+.tabw100 .nav-tab-line li:hover {
+  background-color: var(--theme-light-color);
+}
+.tabw100 .nav-tab-line li {
+  font-weight: 500;
+  font-size: 14px;
+  display: inline-block;
+  cursor: pointer;
+  padding: 10px 25px;
+  border: none !important;
+  position: relative;
+  color: var(--theme-footer-color) !important;
+  border-radius: 0.25rem 0.25rem 0 0 !important;
+}
+.tabw100 .nav-tab-line {
+  border-bottom: solid 2px var(--theme-primary-color) !important;
+  width: 100%;
+  overflow: hidden;
+  overflow-x: auto;
+  transition: color 0.3s ease;
+}
 
+.tabw100 .nav-tab-line li.active {
+  /* border-bottom: solid 1px var(--theme-footer-color) !important; */
+  background-color: var(--theme-footer-color) !important;
+  transition: all 0.3s ease-in-out;
+  transform: translateX(0);
+  color: #fff !important;
+}
+
+.tabw100 .nav-tab-line li.active:after,
 .nav-tab-line li.mixitup-control-active:after,
 .nav-tab-line li.active:after {
   content: "";
@@ -2344,6 +2379,23 @@ ul.product_list_widget li {
   background-color: #fff;
   transform: rotate(45deg);
   margin-left: -5px;
+  z-index: 1000;
+}
+
+.tabw100 .nav-tab-line li.active:after {
+  border-bottom: transparent !important;
+  border-right: transparent !important;
+  bottom: -4px;
+}
+
+.tabw100 .tab-element {
+  margin-top: 20px !important;
+  margin-bottom: 20px !important;
+  min-height: 400px !important;
+}
+
+.nav-tab-line li.mixitup-control-active:after,
+.nav-tab-line li.active:after {
   border-top: transparent;
   border-left: transparent;
   bottom: -7px;
@@ -2355,6 +2407,10 @@ ul.nav-tab-border-active li {
   border-color: transparent;
   border-radius: 25px;
   text-align: center;
+}
+
+.rounded-top {
+  border-radius: 0.25rem 0 0 0 !important;
 }
 
 ul.nav-tab-border-active .mixitup-control-active {

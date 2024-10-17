@@ -145,19 +145,21 @@ const AsyncRemoteSelect = (ctlProps) => {
   };
 
   //handle input change
-  const handleInputChange = (keyword) => {
-    if (keyword.trim().length === 0) {
-      return;
-    }
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-  };
+  // const handleInputChange = (keyword) => {
+  //   if (keyword.trim().length === 0) {
+  //     return;
+  //   }
+  //   setIsLoading(true);
+  //   setTimeout(() => {
+  //     setIsLoading(false);
+  //   }, 500);
+  // };
 
   return (
     <>
-      <label className={ctlProps.lblClass}>{ctlProps.lbl?.lbl}</label>
+      <label className={ctlProps.lblClass}>
+        {checkEmptyVal(ctlProps.lblText) ? ctlProps.lbl?.lbl : ctlProps.lblText}
+      </label>
       <AsyncSelect
         className={`react_select_ctrl ${ctlProps.className} ${
           ctlProps.errors?.[`${ctlProps.name}`] && "invalid box-shadow"
@@ -174,13 +176,14 @@ const AsyncRemoteSelect = (ctlProps) => {
         isLoading={isLoading}
         noOptionsMessage={noOptionsMessage}
         isClearable={ctlProps?.isClearable ?? true}
-        onInputChange={handleInputChange}
+        onInputChange={ctlProps.handleInputChange}
         onChange={ctlProps.onChange}
         isDisabled={ctlProps.isDisabled && true}
         defaultValue={ctlProps.placeHolder}
         value={selectedValue}
         tabIndex={ctlProps.tabIndex}
         defaultOptions
+        cacheOptions
       />
       {ctlProps.errors?.[`${ctlProps.name}`] && (
         <div className="err-invalid">
