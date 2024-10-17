@@ -4457,14 +4457,3 @@ Responsive Style Start
     transform: rotate(360deg);
   }
 }
-
-.upcoming {
-  height: 70%;
-}
-
-.comingsoon {
-  font-size: 24px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  text-align: center;
-  color: #27ae60;
-}

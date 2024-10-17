@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { routeNames } from "../routes/routes";
 import { DataLoader, NoData } from "../components/common/LazyComponents";
 import useAppConfigGateway from "../hooks/useAppConfigGateway";
@@ -10,9 +10,10 @@ import TextAreaControl from "../components/common/TextAreaControl";
 import { apiReqResLoader } from "../utils/common";
 import config from "../config.json";
 import { axiosPost } from "../helpers/axiosHelper";
-import { ApiUrls, AppMessages } from "../utils/constants";
+import { ApiUrls, AppMessages, API_ACTION_STATUS } from "../utils/constants";
 import AsyncSelect from "../components/common/AsyncSelect";
 import FileControl from "../components/common/FileControl";
+import { Toast } from "../components/common/ToastView";
 
 const ContactUs = () => {
   let $ = window.$;
@@ -26,8 +27,38 @@ const ContactUs = () => {
   const [selectedContactFor, setSelectedContactFor] = useState(null);
   const [file, setFile] = useState(null);
 
+  const [initApisLoaded, setinitApisLoaded] = useState(false);
+
+  useEffect(() => {
+    Promise.allSettled([geSupportTypes()]).then(() => {
+      setinitApisLoaded(true);
+    });
+    return () => {};
+  }, []);
+
+  const geSupportTypes = () => {
+    return axiosPost(`${config.apiBaseUrl}${ApiUrls.getDdlSupportTypes}`, {})
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode == 200) {
+          setContactForData(objResponse.Data);
+        } else {
+          setContactForData([]);
+        }
+      })
+      .catch((err) => {
+        console.error(
+          `"API :: ${ApiUrls.getDdlSupportTypes}, Error ::" ${err}`
+        );
+        setContactForData([]);
+      })
+      .finally(() => {
+        setSelectedContactFor({});
+      });
+  };
+
   const handleContactforChange = (e) => {
-    selectedContactFor(e?.value);
+    setSelectedContactFor(e?.value);
   };
 
   const [formData, setFormData] = useState({
@@ -55,41 +86,64 @@ const ContactUs = () => {
     e.preventDefault();
     e.stopPropagation();
 
+    apiReqResLoader(
+      "btnsendmessage",
+      "Sending Message",
+      API_ACTION_STATUS.START,
+      false
+    );
+
     if (Object.keys(formErrors).length === 0) {
       apiReqResLoader("btnsendmessage", "Sending Message");
 
       setErrors({});
-      let objBodyParams = {
-        // email: formData.txtemail,
-        // pwd: formData.txtpassword,
-        // firstName: formData.txtfirstname,
-        // lastName: formData.txtlastname,
-        // mobile: formData.txtmobile,
-        // landLine: formData.txtlandline,
-        // countryId: parseInt(setSelectDefaultVal(countrySelected)),
-        // stateId: parseInt(setSelectDefaultVal(stateSelected)),
-        // cityId: parseInt(setSelectDefaultVal(citySelected)),
-        // zip: formData.txtzip,
-        // profileTypeId: parseInt(formData.rblprofiletype),
-        // profileCategoryId: parseInt(
-        //   setSelectDefaultVal(selectedProfileCatId)
-        // ),
-        // planId: 1,
-        // CompanyName: formData.txtcompanyname,
-        // Website: formData.txtwebsite,
-      };
+      let isapimethoderr = false;
+      let objBodyParams = new FormData();
+      objBodyParams.append("ProfileId", 0); // Send 0 if not logged in
+      objBodyParams.append("AccountId", 0); // Send 0 if not logged in
+      objBodyParams.append("Name", formData.txtname);
+      objBodyParams.append("Email", formData.txtemail);
+      objBodyParams.append("Phone", formData.txtphone);
+      objBodyParams.append("Subject", formData.txtsubject);
+      objBodyParams.append("Message", formData.txtmessage);
+      objBodyParams.append("SupportTypeId", selectedContactFor);
+      if (file) objBodyParams.append("Image", file); // Only append if a file is selected
 
-      axiosPost(`${config.apiBaseUrl}${ApiUrls.registerUser}`, objBodyParams)
+      axiosPost(
+        `${config.apiBaseUrl}${ApiUrls.createSupportTicket}`,
+        objBodyParams,
+        {
+          "Content-Type": "multipart/form-data",
+        }
+      )
         .then((response) => {
           let objResponse = response.data;
           if (objResponse.StatusCode === 200) {
+            if (objResponse.Data.Status === 0) {
+              Toast.success(AppMessages.SupportTicketSuccessMessage);
+            } else {
+              Toast.error(objResponse.Data.Message);
+            }
           } else {
+            isapimethoderr = true;
           }
         })
         .catch((err) => {
-          console.error(`"API :: ${ApiUrls.registerUser}, Error ::" ${err}`);
+          isapimethoderr = true;
+          console.error(
+            `"API :: ${ApiUrls.createSupportTicket}, Error ::" ${err}`
+          );
         })
         .finally(() => {
+          if (isapimethoderr === true) {
+            Toast.error(AppMessages.SomeProblem);
+          }
+          apiReqResLoader(
+            "btnsendmessage",
+            "Yes",
+            API_ACTION_STATUS.COMPLETED,
+            false
+          );
           apiReqResLoader("btnsendmessage", "Send Message", "completed");
         });
     } else {
@@ -208,7 +262,7 @@ const ContactUs = () => {
                       placeHolder={
                         contactForData.length <= 0 && selectedContactFor == null
                           ? AppMessages.DdLLoading
-                          : AppMessages.DdlNoData
+                          : AppMessages.DdlDefaultSelect
                       }
                       noData={
                         contactForData.length <= 0 && selectedContactFor == null

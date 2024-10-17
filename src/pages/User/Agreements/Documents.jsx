@@ -31,7 +31,9 @@ const Documents = () => {
                           </div>
                         </div>
                       </form>
-                      <p className="comingsoon">Coming Soon...</p>
+                      <p className="no-data flex flex-center py-50">
+                        Coming Soon...
+                      </p>
                     </div>
                   </div>
                 </div>

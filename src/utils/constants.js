@@ -74,6 +74,8 @@ export const AppMessages = {
   DeleteAssetSuccess: "Property deleted successfully...",
   DeleteImageSuccess: "Image deleted successfully...",
   DeleteAssetOwnerSuccess: "Owner removed successfully...",
+  SupportTicketSuccessMessage:
+    "Success! Your message has been sent. We will get back to you shortly.",
 };
 /*Common App messages*/
 
@@ -147,6 +149,7 @@ export let ApiUrls = {
   getDdlStates: `common/v1/GetDdlStates`,
   getDdlCities: `common/v1/GetDdlCities`,
   getDdlSupportTypes: `common/v1/GetDdlSupportTypes`,
+  createSupportTicket: `common/v1/CreateSupportTicket`,
   getAppConfig: `common/v1/GetAppConfig`,
   getProfileTypes: `users/v1/GetProfileTypes`,
   getProfileCategories: `users/v1/GetProfileCategories`,
