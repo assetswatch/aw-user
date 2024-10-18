@@ -306,6 +306,12 @@ export const formCtrlTypes = {
   country: {
     lbl: "Country:",
   },
+  asset: {
+    lbl: "Property:",
+  },
+  profiletype: {
+    lbl: "Profile type:",
+  },
   state: {
     lbl: "State:",
   },
@@ -392,6 +398,12 @@ export const formCtrlTypes = {
   },
   bathrooms: {
     lbl: "Bathrooms :",
+  },
+  status: {
+    lbl: "Status :",
+  },
+  Notificationtype: {
+    lbl: "Notification type:",
   },
   rent: {
     lbl: "Rent amount ($):",

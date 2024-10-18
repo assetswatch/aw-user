@@ -4,7 +4,7 @@ const ModalView = ({ title, content, onClose, actions }) => {
   return (
     <>
       <Modal show={true} centered animation={true} backdrop="static">
-        <Modal.Header>
+        <Modal.Header className="box-shadow">
           <Modal.Title className="">
             {title ? title : "Are you sure?"}
           </Modal.Title>
@@ -16,7 +16,7 @@ const ModalView = ({ title, content, onClose, actions }) => {
               aria-label="Close"
               onClick={onClose}
             >
-              <i className="fa fa-times-circle font-large text-primary box-shadow lh-1 rounded-circle"></i>
+              <i className="fa fa-times-circle font-large text-primary box-shadow lh-1 rounded-circle text-white"></i>
             </button>
           )}
         </Modal.Header>

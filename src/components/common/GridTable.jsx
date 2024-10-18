@@ -4,6 +4,7 @@ import DataLoader from "./DataLoader";
 import NoData from "./NoData";
 import GridActionMenu from "./GridActionMenu";
 import { GridDefaultValues } from "../../utils/constants";
+import { checkEmptyVal } from "../../utils/common";
 
 const GridTable = ({
   columns,
@@ -143,7 +144,8 @@ const GridTable = ({
                         className={cell.column.className}
                         key={"td-" + tdidx}
                       >
-                        {cell.column.id === "Actions" ? (
+                        {cell.column.id === "Actions" &&
+                        checkEmptyVal(cell.column.showActionMenu) ? (
                           <>
                             <GridActionMenu
                               row={row}

@@ -1,8 +1,14 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ApiUrls, AppDetails, UserCookie } from "../../utils/constants";
+import {
+  ApiUrls,
+  AppConstants,
+  AppDetails,
+  UserCookie,
+} from "../../utils/constants";
 import {
   apiReqResLoader,
   GetCookieValues,
+  getPagesPathByLoggedinUserProfile,
   GetUserCookieValues,
 } from "../../utils/common";
 import routes, { routeNames } from "../../routes/routes";
@@ -14,6 +20,8 @@ const UserProfileMenu = (styleprops) => {
   const { logoutUser, loggedinUser } = useAuth();
   const navigate = useNavigate();
   const path = useLocation();
+
+  let loggedinProfileTypeId = GetCookieValues(UserCookie.ProfileTypeId);
 
   const onLogout = (e) => {
     e.preventDefault();
@@ -49,6 +57,16 @@ const UserProfileMenu = (styleprops) => {
 
   const onUpgradePlan = () => {
     navigate(routeNames.upgradeplan.path);
+  };
+
+  const onChangeProfile = () => {
+    navigate(routeNames.profiles.path);
+  };
+
+  const onNotifications = () => {
+    navigate(
+      getPagesPathByLoggedinUserProfile(loggedinProfileTypeId, "notifications")
+    );
   };
 
   return (
@@ -123,36 +141,30 @@ const UserProfileMenu = (styleprops) => {
             </div>
           </div>
           <li className="dropdown-item">
-            <Link id="nav-user-info-dashboard" to={routeNames.dashboard.path}>
+            <Link id="nav-user-info-dashboard" to={routeNames.comingup.path}>
               <i className="fa fa-user pe-1"></i> My Profile
             </Link>
           </li>
           <li className="dropdown-item">
-            <a href="#!">
+            <Link id="nav-user-info-settings" to={routeNames.comingup.path}>
               <i className="fa fa-gear pe-1"></i> Settings
-            </a>
+            </Link>
           </li>
           <li className="dropdown-item">
-            <Link
-              id="nav-user-info-profiles"
-              to={{
-                pathname: routeNames.profiles.path,
-                state: { from: "changeprofile" },
-              }}
-            >
+            <a id="nav-user-info-profiles" onClick={onChangeProfile}>
               <i className="fa fa-exchange pe-1"></i> Change Profile
-            </Link>
+            </a>
           </li>
           <div className="dropdown-divider" />
           <div className="font-500 font-general px-10 py-10 text-gray">
             Notifications
           </div>
           <li className="dropdown-item">
-            <a href="#!">
+            <a id="nav-user-info-notifications" onClick={onNotifications}>
               <i className="fa fa-bell pe-1"></i> Notifications
             </a>
           </li>
-          <li className="dropdown-item">
+          <li className="dropdown-item d-none">
             <a href="#!">
               <i className="fa fa-envelope pe-1"></i> Messages
             </a>

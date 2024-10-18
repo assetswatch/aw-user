@@ -10,8 +10,6 @@ import { routeNames } from "../../routes/routes";
 const Profiles = () => {
   let $ = window.$;
 
-  const location = useLocation();
-
   const { userProfilesList, isDataLoading } = useGetUserProfilesGateway();
   const { updateUserProfile } = useAuth();
   const navigate = useNavigate();
@@ -101,7 +99,7 @@ const Profiles = () => {
                                 Skip
                                 <i className="pl-5 fa fa-circle-chevron-right"></i>
                               </u>
-                              <u>Cancel</u>
+                              {/* <u>Cancel</u> */}
                             </Link>
                           </div>
                         </>

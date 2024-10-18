@@ -1,3 +1,14 @@
 {
-  "apiBaseUrl": "http://localhost:5198/api/"
+  "apiBaseUrl": "http://localhost:5198/api/",
+  "userProfileTypes": {
+    "Owner": 1,
+    "Agent": 2,
+    "Tenant": 3
+  },
+  "userConnectionStatusTypes": {
+    "Pending": 0,
+    "Accepted": 1,
+    "Rejected": 2,
+    "Terminated": 3
+  }
 }

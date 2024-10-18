@@ -5,6 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { UserCookie } from "../utils/constants";
 import { routeNames } from "../routes/routes";
 import moment from "moment";
+import config from "../config.json";
 
 /** set page loader on mounting and unmounitng and nav links active.inactive */
 export function SetPageLoaderNavLinks() {
@@ -47,6 +48,12 @@ export function SetPageLoaderNavLinks() {
           break;
         case routeNames.dashboard.path.toLowerCase():
           activelink = "dashboard";
+          break;
+        case routeNames.ownertenants.path.toLowerCase():
+          activelink = "owner-tenant";
+          break;
+        case routeNames.tenantowners.path.toLowerCase():
+          activelink = "tenant-owner";
           break;
       }
 
@@ -317,9 +324,13 @@ export function showHideCtrl(ctrlid, ishide = false) {
 }
 
 export function checkStartEndDateGreater(start, end) {
-  return moment(end).isAfter(moment(start)) == false
-    ? ValidationMessages.StartEndDateGreater
-    : "";
+  if (moment(end).isSame(moment(start))) {
+    return "";
+  } else {
+    return moment(end).isAfter(moment(start)) == false
+      ? ValidationMessages.StartEndDateGreater
+      : "";
+  }
 }
 
 /** sconvvert string to bool */
@@ -373,6 +384,9 @@ function readCookieVal(cookiekey, user) {
     case UserCookie.ProfileType:
       retval = user?.[UserCookie.Profile][UserCookie.ProfileType];
       break;
+    case UserCookie.ProfileTypeId:
+      retval = user?.[UserCookie.Profile][UserCookie.ProfileTypeId];
+      break;
     case UserCookie.ProfileId:
       retval = user?.[UserCookie.Profile][UserCookie.ProfileId];
       break;
@@ -422,4 +436,34 @@ export function setDdlOptions(
 
 export function replacePlaceHolders(template, data) {
   return template.replace(/{(.*?)}/g, (match, key) => data[key.trim()] || "");
+}
+
+export const debounce = (func, delay) => {
+  let timeout;
+  return (...args) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
+};
+
+export function getPagesPathByLoggedinUserProfile(
+  loggedinProfileTypeId,
+  page = ""
+) {
+  let path = "#";
+  if (checkEmptyVal(page) == false) {
+    if (page?.toLowerCase() == "notifications") {
+      path =
+        loggedinProfileTypeId == config.userProfileTypes.Owner
+          ? routeNames.ownernotifications.path
+          : loggedinProfileTypeId == config.userProfileTypes.Agent
+          ? routeNames.agentnotifications.path
+          : loggedinProfileTypeId == config.userProfileTypes.Tenant
+          ? routeNames.tenantnotifications.path
+          : path;
+    }
+    return path;
+  }
 }
