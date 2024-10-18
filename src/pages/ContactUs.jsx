@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { routeNames } from "../routes/routes";
 import { DataLoader, NoData } from "../components/common/LazyComponents";
 import useAppConfigGateway from "../hooks/useAppConfigGateway";
@@ -10,9 +10,15 @@ import TextAreaControl from "../components/common/TextAreaControl";
 import { apiReqResLoader } from "../utils/common";
 import config from "../config.json";
 import { axiosPost } from "../helpers/axiosHelper";
-import { ApiUrls, AppMessages } from "../utils/constants";
+import {
+  ApiUrls,
+  AppMessages,
+  API_ACTION_STATUS,
+  ValidationMessages,
+} from "../utils/constants";
 import AsyncSelect from "../components/common/AsyncSelect";
 import FileControl from "../components/common/FileControl";
+import { Toast } from "../components/common/ToastView";
 
 const ContactUs = () => {
   let $ = window.$;
@@ -23,20 +29,53 @@ const ContactUs = () => {
   const { appConfigDetails, isDataLoading } = useAppConfigGateway();
 
   const [contactForData, setContactForData] = useState([]);
-  const [selectedContactFor, setSelectedContactFor] = useState(null);
+  const [selectedContactFor, setSelectedContactFor] = useState(0);
   const [file, setFile] = useState(null);
 
-  const handleContactforChange = (e) => {
-    selectedContactFor(e?.value);
+  const [initApisLoaded, setinitApisLoaded] = useState(false);
+
+  useEffect(() => {
+    Promise.allSettled([geSupportTypes()]).then(() => {
+      setinitApisLoaded(true);
+    });
+    return () => {};
+  }, []);
+
+  const geSupportTypes = () => {
+    return axiosPost(`${config.apiBaseUrl}${ApiUrls.getDdlSupportTypes}`, {})
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode == 200) {
+          setContactForData(objResponse.Data);
+        } else {
+          setContactForData([]);
+        }
+      })
+      .catch((err) => {
+        console.error(
+          `"API :: ${ApiUrls.getDdlSupportTypes}, Error ::" ${err}`
+        );
+        setContactForData([]);
+      })
+      .finally(() => {
+        setSelectedContactFor(0);
+      });
   };
 
-  const [formData, setFormData] = useState({
-    txtemail: "",
-    txtname: "",
-    txtphone: "",
-    txtsubject: "",
-    txtmessage: "",
-  });
+  const handleContactforChange = (e) => {
+    setSelectedContactFor(e?.value);
+  };
+
+  function setInitialFormData() {
+    return {
+      txtemail: "",
+      txtname: "",
+      txtphone: "",
+      txtsubject: "",
+      txtmessage: "",
+    };
+  }
+  const [formData, setFormData] = useState(setInitialFormData());
 
   const handleChange = (e) => {
     const { name, value } = e?.target;
@@ -55,42 +94,76 @@ const ContactUs = () => {
     e.preventDefault();
     e.stopPropagation();
 
+    if (checkEmptyVal(selectedContactFor) || selectedContactFor == 0) {
+      formErrors["ddlcontactfor"] = ValidationMessages.ContactforReq;
+    }
+
     if (Object.keys(formErrors).length === 0) {
-      apiReqResLoader("btnsendmessage", "Sending Message");
+      const contactForType = contactForData?.find(
+        (item) => item.Id == parseInt(selectedContactFor)
+      );
+      apiReqResLoader(
+        "btnsendmessage",
+        "Sending Message",
+        API_ACTION_STATUS.START
+      );
 
       setErrors({});
-      let objBodyParams = {
-        // email: formData.txtemail,
-        // pwd: formData.txtpassword,
-        // firstName: formData.txtfirstname,
-        // lastName: formData.txtlastname,
-        // mobile: formData.txtmobile,
-        // landLine: formData.txtlandline,
-        // countryId: parseInt(setSelectDefaultVal(countrySelected)),
-        // stateId: parseInt(setSelectDefaultVal(stateSelected)),
-        // cityId: parseInt(setSelectDefaultVal(citySelected)),
-        // zip: formData.txtzip,
-        // profileTypeId: parseInt(formData.rblprofiletype),
-        // profileCategoryId: parseInt(
-        //   setSelectDefaultVal(selectedProfileCatId)
-        // ),
-        // planId: 1,
-        // CompanyName: formData.txtcompanyname,
-        // Website: formData.txtwebsite,
-      };
+      let isapimethoderr = false;
+      let objBodyParams = new FormData();
+      objBodyParams.append("ProfileId", 0);
+      objBodyParams.append("AccountId", 0);
+      objBodyParams.append("Name", formData.txtname);
+      objBodyParams.append("Email", formData.txtemail);
+      objBodyParams.append("Phone", formData.txtphone);
+      objBodyParams.append("Subject", formData.txtsubject);
+      objBodyParams.append("Message", formData.txtmessage);
+      objBodyParams.append("SupportTypeId", selectedContactFor);
+      objBodyParams.append("SupportType", contactForType?.Text);
+      if (file) objBodyParams.append("Image", file);
 
-      axiosPost(`${config.apiBaseUrl}${ApiUrls.registerUser}`, objBodyParams)
+      axiosPost(
+        `${config.apiBaseUrl}${ApiUrls.createSupportTicket}`,
+        objBodyParams,
+        {
+          "Content-Type": "multipart/form-data",
+        }
+      )
         .then((response) => {
           let objResponse = response.data;
           if (objResponse.StatusCode === 200) {
+            if (objResponse.Data.Status === 0) {
+              setSelectedContactFor(null);
+              setFormData(setInitialFormData());
+              Toast.success(AppMessages.SupportTicketSuccess);
+            } else {
+              Toast.error(objResponse.Data.Message);
+            }
           } else {
+            isapimethoderr = true;
           }
         })
         .catch((err) => {
-          console.error(`"API :: ${ApiUrls.registerUser}, Error ::" ${err}`);
+          isapimethoderr = true;
+          console.error(
+            `"API :: ${ApiUrls.createSupportTicket}, Error ::" ${err}`
+          );
         })
         .finally(() => {
-          apiReqResLoader("btnsendmessage", "Send Message", "completed");
+          if (isapimethoderr === true) {
+            Toast.error(AppMessages.SomeProblem);
+          }
+          apiReqResLoader(
+            "btnsendmessage",
+            "Yes",
+            API_ACTION_STATUS.COMPLETED,
+            false
+          );
+          apiReqResLoader(
+            "btnsendmessage",
+            "Send Message",
+            API_ACTION_STATUS.COMPLETED
+          );
         });
     } else {
       $(`[name=${Object.keys(formErrors)[0]}]`).focus();
@@ -146,7 +219,7 @@ const ContactUs = () => {
                           title="contactus"
                           src={appConfigDetails.ContactDetails.GeoAddress}
                           width="600"
-                          height="305"
+                          height="335"
                           style={{ border: "0" }}
                           allowFullScreen
                         ></iframe>
@@ -208,7 +281,7 @@ const ContactUs = () => {
                       placeHolder={
                         contactForData.length <= 0 && selectedContactFor == null
                           ? AppMessages.DdLLoading
-                          : AppMessages.DdlNoData
+                          : AppMessages.DdlDefaultSelect
                       }
                       noData={
                         contactForData.length <= 0 && selectedContactFor == null
@@ -227,7 +300,7 @@ const ContactUs = () => {
                       required={true}
                       errors={errors}
                       formErrors={formErrors}
-                      tabIndex={2}
+                      tabIndex={4}
                     ></AsyncSelect>
                   </div>
                   <div className="col-md-12 mb-15">
@@ -239,7 +312,7 @@ const ContactUs = () => {
                       file={file}
                       errors={errors}
                       formErrors={formErrors}
-                      tabIndex={6}
+                      tabIndex={5}
                     />
                   </div>
                   <div className="col-md-12 mb-15">
@@ -265,8 +338,8 @@ const ContactUs = () => {
                       value={formData.txtmessage}
                       errors={errors}
                       formErrors={formErrors}
-                      tabIndex={3}
-                      rows={7}
+                      tabIndex={7}
+                      rows={6}
                     ></TextAreaControl>
                   </div>
                   <div className="col-md-12">
