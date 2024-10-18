@@ -130,9 +130,9 @@ const Footer = () => {
                       <li>
                         <Link to={routeNames.contactUs.path}>Contact Us</Link>
                       </li>
-                      <li>
+                      {/* <li>
                         <Link to={routeNames.blog.path}>Blog</Link>
-                      </li>
+                      </li> */}
                       <li>
                         <Link to={routeNames.privacyPolicy.path}>
                           Privacy Policy
