@@ -105,7 +105,7 @@ const Header = () => {
                           Plans
                         </Link>
                       </li>
-                      <li className="nav-item">
+                      {/* <li className="nav-item">
                         <Link
                           className="nav-link"
                           id="nav-blog"
@@ -113,7 +113,7 @@ const Header = () => {
                         >
                           Blog
                         </Link>
-                      </li>
+                      </li> */}
                       {isAuthenticated() == false ? (
                         <>
                           <li className="nav-item">

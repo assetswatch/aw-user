@@ -3,7 +3,11 @@ import { routeNames } from "../routes/routes";
 import { DataLoader, NoData } from "../components/common/LazyComponents";
 import useAppConfigGateway from "../hooks/useAppConfigGateway";
 import PageTitle from "../components/layouts/PageTitle";
-import { checkEmptyVal, checkObjNullorEmpty } from "../utils/common";
+import {
+  checkEmptyVal,
+  checkObjNullorEmpty,
+  GetUserCookieValues,
+} from "../utils/common";
 import { formCtrlTypes } from "../utils/formvalidation";
 import InputControl from "../components/common/InputControl";
 import TextAreaControl from "../components/common/TextAreaControl";
@@ -15,15 +19,18 @@ import {
   AppMessages,
   API_ACTION_STATUS,
   ValidationMessages,
+  UserCookie,
 } from "../utils/constants";
 import AsyncSelect from "../components/common/AsyncSelect";
 import FileControl from "../components/common/FileControl";
 import { Toast } from "../components/common/ToastView";
+import { useAuth } from "../contexts/AuthContext";
 
 const ContactUs = () => {
   let $ = window.$;
 
   let formErrors = {};
+  const { loggedinUser } = useAuth();
 
   const [errors, setErrors] = useState({});
   const { appConfigDetails, isDataLoading } = useAppConfigGateway();
@@ -108,11 +115,20 @@ const ContactUs = () => {
         API_ACTION_STATUS.START
       );
 
+      let profileid = GetUserCookieValues(UserCookie.ProfileId, loggedinUser);
+      let accountid = GetUserCookieValues(UserCookie.AccountId, loggedinUser);
       setErrors({});
       let isapimethoderr = false;
       let objBodyParams = new FormData();
-      objBodyParams.append("ProfileId", 0);
-      objBodyParams.append("AccountId", 0);
+
+      objBodyParams.append(
+        "ProfileId",
+        checkEmptyVal(profileid) ? 0 : profileid
+      );
+      objBodyParams.append(
+        "AccountId",
+        checkEmptyVal(accountid) ? 0 : accountid
+      );
       objBodyParams.append("Name", formData.txtname);
       objBodyParams.append("Email", formData.txtemail);
       objBodyParams.append("Phone", formData.txtphone);
