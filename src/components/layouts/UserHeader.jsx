@@ -1,5 +1,5 @@
 import { React, startTransition, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   ApiUrls,
   AppDetails,
@@ -10,6 +10,7 @@ import { routeNames } from "../../routes/routes";
 import {
   checkEmptyVal,
   checkObjNullorEmpty,
+  getPagesPathByLoggedinUserProfile,
   GetUserCookieValues,
   SetUserMenu,
 } from "../../utils/common";
@@ -24,9 +25,12 @@ import { DataLoader, NoData } from "../common/LazyComponents";
 const UserHeader = () => {
   let $ = window.$;
 
+  const navigate = useNavigate();
   const { loggedinUser } = useAuth();
+  let loggedinProfileTypeId = GetCookieValues(UserCookie.ProfileTypeId);
+
   const [topNotifications, setTopNotifications] = useState([]);
-  const [topNotificationsLoader, setTopNotificationsLoader] = useState(true);
+  const [topNotificationsLoader, setTopNotificationsLoader] = useState("init");
   const [notificationsIsOpen, setnotificationsIsOpen] = useState(false);
 
   var collapseElement = document.getElementById(
@@ -44,6 +48,8 @@ const UserHeader = () => {
   });
 
   const getTopNotifications = (e, isNotificationDeleted = false) => {
+    e?.preventDefault();
+    e?.stopPropagation();
     startTransition(() => {
       if (
         (!isNotificationDeleted && !notificationsIsOpen) ||
@@ -51,8 +57,6 @@ const UserHeader = () => {
       ) {
         setTopNotificationsLoader(true);
         setTopNotifications([]);
-
-        e?.preventDefault();
         let isapimethoderr = false;
         let objBodyParams = {
           ProfileId: parseInt(
@@ -101,7 +105,6 @@ const UserHeader = () => {
   const updateReadStatus = (e, id) => {
     e.preventDefault();
     e.stopPropagation();
-
     let isapimethoderr = false;
     let objBodyParams = {
       ProfileId: parseInt(
@@ -140,6 +143,12 @@ const UserHeader = () => {
           Toast.error(AppMessages.SomeProblem);
         }
       });
+  };
+
+  const onNotifications = () => {
+    navigate(
+      getPagesPathByLoggedinUserProfile(loggedinProfileTypeId, "notifications")
+    );
   };
 
   return (
@@ -450,14 +459,14 @@ const UserHeader = () => {
                             </div>
 
                             <div className="widget-cnt-body lh-1 cscrollbar">
-                              {topNotificationsLoader && (
-                                <DataLoader></DataLoader>
-                              )}
+                              {topNotificationsLoader != "init" &&
+                                topNotificationsLoader && (
+                                  <DataLoader></DataLoader>
+                                )}
                               {!topNotificationsLoader &&
                                 (topNotifications &&
                                 topNotifications?.length > 0 ? (
                                   <>
-                                    {console.log(topNotifications)}
                                     {topNotifications.map((n, i) => {
                                       return (
                                         <div className="nlist" key={`tno-${i}`}>
@@ -523,9 +532,9 @@ const UserHeader = () => {
                             </div>
                             <div className="widget-footer row">
                               <div className="col">
-                                <Link to={routeNames.ownernotifications.path}>
+                                <a onClick={onNotifications}>
                                   <u>View All ...</u>
-                                </Link>
+                                </a>
                               </div>
                             </div>
                           </div>
@@ -559,7 +568,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-dashboard"
-                      to={routeNames.dashboard.path}
+                      to={routeNames.comingup.path}
                     >
                       <i className="fa fa-user pe-2"></i>
                       My Profile
@@ -574,7 +583,7 @@ const UserHeader = () => {
                       <li className="dropdown-item">
                         <Link
                           id="nav-lnk-myagreement"
-                          to={routeNames.dashboard.path}
+                          to={routeNames.comingup.path}
                         >
                           <i className="fa-regular fa-file-lines pe-1"></i> My
                           Agreement
@@ -583,7 +592,7 @@ const UserHeader = () => {
                       <li className="dropdown-item">
                         <Link
                           id="nav-lnk-documents"
-                          to={routeNames.dashboard.path}
+                          to={routeNames.comingup.path}
                         >
                           <i className="fa-regular fa-file-lines pe-1"></i>{" "}
                           Documents
@@ -592,7 +601,7 @@ const UserHeader = () => {
                       <li className="dropdown-item">
                         <Link
                           id="nav-lnk-agreementtemplates"
-                          to={routeNames.dashboard.path}
+                          to={routeNames.comingup.path}
                         >
                           <i className="fa-regular fa-file-lines pe-1"></i>{" "}
                           Agreement Templates
@@ -632,7 +641,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.home.path}
+                      to={routeNames.comingup.path}
                     >
                       <i className="fa fa-screwdriver-wrench pe-2"></i>
                       Services
@@ -642,7 +651,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.home.path}
+                      to={routeNames.comingup.path}
                     >
                       <i className="fa fa-credit-card flat-mini pe-2"></i>
                       Payments
@@ -652,13 +661,13 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.home.path}
+                      to={routeNames.comingup.path}
                     >
                       <i className="fa fa-chart-pie flat-mini pe-2"></i>
                       Reports
                     </Link>
                   </li>
-                  <li className="nav-item">
+                  <li className="nav-item d-none">
                     <Link
                       className="nav-link"
                       id="nav-home"
@@ -670,8 +679,8 @@ const UserHeader = () => {
                   </li>
                   <li className="nav-item">
                     <Link
-                      className="nav-link"
-                      id="nav-group"
+                      className="nav-link-owner-tenant"
+                      id="nav-owner-tenant"
                       to={routeNames.ownertenants.path}
                     >
                       <i className="fa fa-users flat-mini pe-2"></i>
@@ -682,7 +691,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.home.path}
+                      to={routeNames.comingup.path}
                     >
                       <i className="fa fa-gear flat-mini pe-2"></i>
                       Settings
@@ -700,7 +709,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-dashboard"
-                      to={routeNames.dashboard.path}
+                      to={routeNames.comingup.path}
                     >
                       <i className="fa fa-user pe-2"></i>
                       My Profile
@@ -715,7 +724,7 @@ const UserHeader = () => {
                       <li className="dropdown-item">
                         <Link
                           id="nav-lnk-myagreement"
-                          to={routeNames.dashboard.path}
+                          to={routeNames.comingup.path}
                         >
                           <i className="fa-regular fa-file-lines pe-1"></i> My
                           Agreement
@@ -724,7 +733,7 @@ const UserHeader = () => {
                       <li className="dropdown-item">
                         <Link
                           id="nav-lnk-documents"
-                          to={routeNames.dashboard.path}
+                          to={routeNames.comingup.path}
                         >
                           <i className="fa-regular fa-file-lines pe-1"></i>{" "}
                           Documents
@@ -733,7 +742,7 @@ const UserHeader = () => {
                       <li className="dropdown-item">
                         <Link
                           id="nav-lnk-agreementtemplates"
-                          to={routeNames.dashboard.path}
+                          to={routeNames.comingup.path}
                         >
                           <i className="fa-regular fa-file-lines pe-1"></i>{" "}
                           Agreement Templates
@@ -741,7 +750,7 @@ const UserHeader = () => {
                       </li>
                     </ul>
                   </li>
-                  <li className="nav-item dropdown">
+                  <li className="nav-item dropdown d-none">
                     <a
                       className="nav-link dropdown-toggle"
                       id="nav-myproperties"
@@ -753,7 +762,7 @@ const UserHeader = () => {
                       <li className="dropdown-item">
                         <Link
                           id="nav-lnk-viewproperties"
-                          to={routeNames.userproperties.path}
+                          to={routeNames.comingup.path}
                         >
                           <i className="fa fa-house-medical pe-1"></i> Assigned
                           Property
@@ -762,7 +771,7 @@ const UserHeader = () => {
                       <li className="dropdown-item">
                         <Link
                           id="nav-lnk-addproperty"
-                          to={routeNames.addproperty.path}
+                          to={routeNames.comingup.path}
                         >
                           <i className="fa fa-house-circle-check pe-1"></i>{" "}
                           Joined Owner's Property
@@ -774,7 +783,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.home.path}
+                      to={routeNames.comingup.path}
                     >
                       <i className="fa fa-screwdriver-wrench pe-2"></i>
                       Services
@@ -784,7 +793,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.home.path}
+                      to={routeNames.comingup.path}
                     >
                       <i className="fa fa-credit-card flat-mini pe-2"></i>
                       Payments
@@ -794,7 +803,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.home.path}
+                      to={routeNames.comingup.path}
                     >
                       <i className="fa fa-chart-pie flat-mini pe-2"></i>
                       Reports
@@ -804,7 +813,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.home.path}
+                      to={routeNames.comingup.path}
                     >
                       <i className="fa fa-users flat-mini pe-2"></i>
                       Owners
@@ -814,7 +823,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-group"
-                      to={routeNames.home.path}
+                      to={routeNames.comingup.path}
                     >
                       <i className="fa fa-users flat-mini pe-2"></i>
                       Tenants
@@ -824,7 +833,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.home.path}
+                      to={routeNames.comingup.path}
                     >
                       <i className="fa fa-gear flat-mini pe-2"></i>
                       Settings
@@ -842,7 +851,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-dashboard"
-                      to={routeNames.dashboard.path}
+                      to={routeNames.comingup.path}
                     >
                       <i className="fa fa-user pe-2"></i>
                       My Profile
@@ -854,7 +863,7 @@ const UserHeader = () => {
                       Agreements
                     </a>
                   </li>
-                  <li className="nav-item">
+                  <li className="nav-item d-none">
                     <a className="nav-link" id="nav-myproperties">
                       <i className="fa fa-home pe-2"></i>
                       My Properties
@@ -864,7 +873,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.home.path}
+                      to={routeNames.comingup.path}
                     >
                       <i className="fa fa-screwdriver-wrench pe-2"></i>
                       Services
@@ -874,7 +883,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.home.path}
+                      to={routeNames.comingup.path}
                     >
                       <i className="fa fa-credit-card flat-mini pe-2"></i>
                       Payments
@@ -884,7 +893,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.home.path}
+                      to={routeNames.comingup.path}
                     >
                       <i className="fa fa-chart-pie flat-mini pe-2"></i>
                       Reports
@@ -892,19 +901,19 @@ const UserHeader = () => {
                   </li>
                   <li className="nav-item">
                     <Link
-                      className="nav-link"
-                      id="nav-home"
-                      to={routeNames.home.path}
+                      className="nav-link-tenant-owner"
+                      id="nav-tenant-owner"
+                      to={routeNames.tenantowners.path}
                     >
                       <i className="fa fa-users flat-mini pe-2"></i>
                       Owners
                     </Link>
                   </li>
-                  <li className="nav-item">
+                  <li className="nav-item d-none">
                     <Link
                       className="nav-link"
                       id="nav-group"
-                      to={routeNames.home.path}
+                      to={routeNames.comingup.path}
                     >
                       <i className="fa fa-users flat-mini pe-2"></i>
                       Agents
@@ -914,7 +923,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.home.path}
+                      to={routeNames.comingup.path}
                     >
                       <i className="fa fa-gear flat-mini pe-2"></i>
                       Settings

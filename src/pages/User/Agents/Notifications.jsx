@@ -12,7 +12,6 @@ import {
   apiReqResLoader,
   checkEmptyVal,
   checkStartEndDateGreater,
-  debounce,
   GetUserCookieValues,
   replacePlaceHolders,
   SetPageLoaderNavLinks,
@@ -23,28 +22,26 @@ import moment from "moment";
 import {
   ApiUrls,
   AppMessages,
+  SessionStorageKeys,
   UserCookie,
   API_ACTION_STATUS,
   GridDefaultValues,
-  AppConstants,
-  NotificationTypes,
-  ValidationMessages,
 } from "../../../utils/constants";
 import { useAuth } from "../../../contexts/AuthContext";
 import { axiosPost } from "../../../helpers/axiosHelper";
 import config from "../../../config.json";
+import {
+  addSessionStorageItem,
+  deletesessionStorageItem,
+} from "../../../helpers/sessionStorageHelper";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 import { Toast } from "../../../components/common/ToastView";
 import { useGetNotificationTypesGateway } from "../../../hooks/useGetNotificationTypesGateway";
-import AsyncRemoteSelect from "../../../components/common/AsyncRemoteSelect";
-import TextAreaControl from "../../../components/common/TextAreaControl";
-import { useProfileTypesGateway } from "../../../hooks/useProfileTypesGateway";
 
 const Notifications = () => {
   let $ = window.$;
 
   let formErrors = {};
-
   const { loggedinUser } = useAuth();
 
   //Search data.
@@ -62,6 +59,8 @@ const Notifications = () => {
   const [modalDeleteConfirmContent, setModalDeleteConfirmContent] = useState(
     AppMessages.DeleteNotificationConfirmationMessage
   );
+  const [sendNotificationModalState, setSendNotificationModalState] =
+    useState(false);
 
   const navigate = useNavigate();
 
@@ -384,175 +383,14 @@ const Notifications = () => {
 
   // Send notification modal
 
-  let formSendNotificationErrors = {};
-  const [sendNotificationErrors, setSendNotificationErrors] = useState({});
-  const [sendNotificationModalState, setSendNotificationModalState] =
-    useState(false);
-  let { profileTypesList } = useProfileTypesGateway();
-  profileTypesList = profileTypesList?.filter(
-    (item) =>
-      item.ProfileTypeId !==
-      parseInt(GetUserCookieValues(UserCookie.ProfileTypeId, loggedinUser))
-  );
-  const [selectedProfileType, setSelectedProfileType] = useState(null);
-  const [selectedJoinedUser, setSelectedJoinedUser] = useState(null);
-  function setInitialSendNotificationFormData() {
-    return {
-      txtmessage: "",
-    };
-  }
-  const [sendNotificationFormData, setSendNotificationFormData] = useState(
-    setInitialSendNotificationFormData()
-  );
-
-  const joinedUserOptions = useCallback(
-    debounce((inputval, callback) => {
-      if (inputval?.length >= AppConstants.DdlSearchMinLength) {
-        getJoinedUsers(inputval).then((options) => {
-          callback && callback(options);
-        });
-      } else {
-        callback && callback([]);
-      }
-    }, AppConstants.DebounceDelay), // 500ms debounce delay
-    [selectedProfileType]
-  );
-
-  //Get joined users.
-  const getJoinedUsers = async (searchValue) => {
-    if (checkEmptyVal(searchValue)) return [];
-
-    let objParams = {
-      keyword: searchValue,
-      inviterid: parseInt(
-        GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
-      ),
-      InviterProfileTypeId: config.userProfileTypes.Owner,
-      InviteeProfileTypeId: parseInt(selectedProfileType),
-    };
-
-    return axiosPost(
-      `${config.apiBaseUrl}${ApiUrls.getDdlJoinedUserConnections}`,
-      objParams
-    )
-      .then((response) => {
-        let objResponse = response.data;
-        if (objResponse.StatusCode == 200) {
-          return objResponse.Data.map((item) => ({
-            label: item.FirstName + " " + item.LastName,
-            value: item.ProfileId,
-          }));
-        } else {
-          return [];
-        }
-      })
-      .catch((err) => {
-        console.error(
-          `"API :: ${ApiUrls.getDdlJoinedUserConnections}, Error ::" ${err}`
-        );
-        return [];
-      });
-  };
-
-  const handleProfileTypeChange = (e) => {
-    setSelectedProfileType(e?.value);
-    setSelectedJoinedUser(null);
-  };
-
-  const handleDdlJoinedUsersChange = () => {
-    joinedUserOptions();
-  };
-
-  const handleSendNotificationInputChange = (e) => {
-    const { name, value } = e?.target;
-    setSendNotificationFormData({
-      ...sendNotificationFormData,
-      [name]: value,
-    });
-  };
-
   const onSendNotificationModalShow = (e) => {
-    e?.preventDefault();
+    e.preventDefault();
     setSendNotificationModalState(true);
   };
 
   const onSendNotificationModalHide = (e) => {
-    e?.preventDefault();
-    setSendNotificationModalState(false);
-    setSelectedProfileType(null);
-    setSelectedJoinedUser(null);
-    setSendNotificationErrors({});
-    setSendNotificationFormData(setInitialSendNotificationFormData());
-  };
-
-  const onSendNotification = (e) => {
     e.preventDefault();
-    e.stopPropagation();
-
-    if (checkEmptyVal(selectedJoinedUser)) {
-      formSendNotificationErrors["ddljoinedusers"] = ValidationMessages.UserReq;
-    }
-
-    if (checkEmptyVal(selectedProfileType)) {
-      formSendNotificationErrors["ddlprofiletype"] =
-        ValidationMessages.ProfiletypeReq;
-    }
-
-    if (Object.keys(formSendNotificationErrors).length === 0) {
-      setSendNotificationErrors({});
-      apiReqResLoader(
-        "btnsendnotification",
-        "Sending",
-        API_ACTION_STATUS.START,
-        false
-      );
-
-      let isapimethoderr = false;
-      let objBodyParams = {
-        FromId: parseInt(
-          GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
-        ),
-        ToId: parseInt(setSelectDefaultVal(selectedJoinedUser)),
-        NotificationTypeId: NotificationTypes.Notification,
-        Message: sendNotificationFormData.txtmessage,
-      };
-
-      axiosPost(
-        `${config.apiBaseUrl}${ApiUrls.createNotification}`,
-        objBodyParams
-      )
-        .then((response) => {
-          let objResponse = response.data;
-          if (objResponse.StatusCode === 200) {
-            if (objResponse.Data.Id > 0) {
-              Toast.success(objResponse.Data.Message);
-              onSendNotificationModalHide();
-            }
-          } else {
-            isapimethoderr = true;
-          }
-        })
-        .catch((err) => {
-          isapimethoderr = true;
-          console.error(
-            `"API :: ${ApiUrls.createNotification}, Error ::" ${err}`
-          );
-        })
-        .finally(() => {
-          if (isapimethoderr == true) {
-            Toast.error(AppMessages.SomeProblem);
-          }
-          apiReqResLoader(
-            "btnsendnotification",
-            "Send",
-            API_ACTION_STATUS.COMPLETED,
-            false
-          );
-        });
-    } else {
-      $(`[name=${Object.keys(formSendNotificationErrors)[0]}]`).focus();
-      setSendNotificationErrors(formSendNotificationErrors);
-    }
+    setSendNotificationModalState(false);
   };
 
   // Send notification modal
@@ -571,8 +409,8 @@ const Notifications = () => {
                 <div className="col-6 d-flex justify-content-end align-items-end pb-10">
                   <button
                     className="btn btn-primary btn-mini btn-glow shadow rounded"
-                    name="btnsendnotificationmodal"
-                    id="btnsendnotificationmodal"
+                    name="btnsendnotification"
+                    id="btnsendnotification"
                     type="button"
                     onClick={onSendNotificationModalShow}
                   >
@@ -747,84 +585,28 @@ const Notifications = () => {
             title={AppMessages.SendNotificationModalTitle}
             content={
               <>
-                <div className="row">
-                  <div className="col-12 mb-15">
-                    <AsyncSelect
-                      placeHolder={
-                        profileTypesList.length <= 0 &&
-                        selectedProfileType == null
-                          ? AppMessages.DdLLoading
-                          : AppMessages.DdlDefaultSelect
-                      }
-                      noData={
-                        profileTypesList.length <= 0 &&
-                        selectedProfileType == null
-                          ? AppMessages.DdLLoading
-                          : AppMessages.NoProfileTypes
-                      }
-                      options={profileTypesList}
-                      onChange={(e) => {
-                        handleProfileTypeChange(e);
-                      }}
-                      dataKey="ProfileTypeId"
-                      dataVal="ProfileType"
-                      value={selectedProfileType}
-                      name="ddlprofiletype"
-                      lbl={formCtrlTypes.profiletype}
-                      lblText="Profile type"
-                      lblClass="mb-0 lbl-req-field"
-                      required={true}
-                      errors={sendNotificationErrors}
-                      formErrors={formSendNotificationErrors}
-                      tabIndex={1}
-                    ></AsyncSelect>
-                  </div>
-                  <div className="col-12 mb-15">
-                    <AsyncRemoteSelect
-                      placeHolder={AppMessages.DdlTypetoSearch}
-                      noData={AppMessages.NoUsers}
-                      loadOptions={joinedUserOptions}
-                      handleInputChange={(e, val) => {
-                        handleDdlJoinedUsersChange(e, val.prevInputValue);
-                      }}
-                      onChange={(option) => setSelectedJoinedUser(option)}
-                      value={selectedJoinedUser}
-                      name="ddljoinedusers"
-                      lblText="User"
-                      lblClass="mb-0 lbl-req-field"
-                      required={true}
-                      errors={sendNotificationErrors}
-                      formErrors={formSendNotificationErrors}
-                      isClearable={true}
-                      cacheOptions={false}
-                      tabIndex={2}
-                    ></AsyncRemoteSelect>
-                  </div>
-                  <div className="col-12 mb-0">
-                    <TextAreaControl
-                      lblClass="mb-0 lbl-req-field"
-                      name={`txtmessage`}
-                      ctlType={formCtrlTypes.message}
-                      onChange={handleSendNotificationInputChange}
-                      value={sendNotificationFormData.txtmessage}
-                      required={true}
-                      errors={sendNotificationErrors}
-                      formErrors={formSendNotificationErrors}
-                      rows={3}
-                      tabIndex={3}
-                    ></TextAreaControl>
-                  </div>
-                </div>
+                {/* <AsyncRemoteSelect></AsyncRemoteSelect> */}
+                {/* <AsyncRemoteSelect
+                  loadOptions={debouncedFetchOptions}
+                  onChange={(e, val) => {
+                    handleInputChange(e, val);
+                  }}
+                  value={selectedUsersProfile}
+                  name="ddlusersprofiles"
+                  lblText="Tenant"
+                  className="ddlborder"
+                  isClearable={true}
+                ></AsyncRemoteSelect> */}
               </>
             }
             onClose={onSendNotificationModalHide}
             actions={[
               {
-                id: "btnsendnotification",
+                id: "btnsend",
                 text: "Send",
                 displayOrder: 1,
                 btnClass: "btn-primary",
-                onClick: (e) => onSendNotification(e),
+                onClick: (e) => onSendNotificationModalHide(e),
               },
               {
                 text: "Cancel",

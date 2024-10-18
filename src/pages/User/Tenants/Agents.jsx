@@ -28,11 +28,11 @@ import { useGetDdlUserAssetsGateway } from "../../../hooks/useGetDdlUserAssetsGa
 import AsyncSelect from "../../../components/common/AsyncSelect";
 import { Toast } from "../../../components/common/ToastView";
 
-const Joined = lazy(() => import("./JoinedTenants"));
-const Requested = lazy(() => import("./TenantsRequested"));
+const Joined = lazy(() => import("./JoinedOwners"));
+const Requested = lazy(() => import("./OwnersRequested"));
 const ConnectionHistory = lazy(() => import("./ConnectionHistory"));
 
-const Tenants = () => {
+const Agents = () => {
   let $ = window.$;
 
   let formSendInvitaionErrors = {};
@@ -441,4 +441,4 @@ const Tenants = () => {
   );
 };
 
-export default Tenants;
+export default Agents;

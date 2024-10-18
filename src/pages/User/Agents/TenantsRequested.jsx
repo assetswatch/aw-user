@@ -1,9 +1,5 @@
 import React, { memo, useCallback, useRef, useState } from "react";
-import {
-  Grid,
-  LazyImage,
-  ModalView,
-} from "../../../components/common/LazyComponents";
+import { Grid, LazyImage } from "../../../components/common/LazyComponents";
 import InputControl from "../../../components/common/InputControl";
 import { formCtrlTypes } from "../../../utils/formvalidation";
 import {
@@ -20,15 +16,13 @@ import {
   UserCookie,
   API_ACTION_STATUS,
   GridDefaultValues,
-  NotificationTypes,
 } from "../../../utils/constants";
 import { useAuth } from "../../../contexts/AuthContext";
 import { axiosPost } from "../../../helpers/axiosHelper";
 import config from "../../../config.json";
 import { Toast } from "../../../components/common/ToastView";
-import TextAreaControl from "../../../components/common/TextAreaControl";
 
-const JoinedTenants = memo(() => {
+const TenantsRequested = memo(() => {
   let $ = window.$;
 
   let formErrors = {};
@@ -125,11 +119,11 @@ const JoinedTenants = memo(() => {
       let objParams = {};
       objParams = {
         keyword: "",
-        inviterid: parseInt(
+        inviteeid: parseInt(
           GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
         ),
-        InviterProfileTypeId: config.userProfileTypes.Owner,
-        InviteeProfileTypeId: config.userProfileTypes.Tenant,
+        InviteeProfileTypeId: config.userProfileTypes.Owner,
+        InviterProfileTypeId: config.userProfileTypes.Tenant,
         fromdate: setSearchInitialFormData.txtfromdate,
         todate: setSearchInitialFormData.txttodate,
         pi: parseInt(pi),
@@ -146,7 +140,7 @@ const JoinedTenants = memo(() => {
       }
 
       return axiosPost(
-        `${config.apiBaseUrl}${ApiUrls.getJoinedUserConnections}`,
+        `${config.apiBaseUrl}${ApiUrls.getRequestedUserConnections}`,
         objParams
       )
         .then((response) => {
@@ -237,19 +231,22 @@ const JoinedTenants = memo(() => {
         className: "w-150px",
         actions: [
           {
-            text: "Send Message",
-            onclick: (e, row) => {
-              onSendMessageModalShow(e, row.original);
-            },
-          },
-          {
-            text: "Terminate",
-            icon: "userterminate",
+            text: "Accept",
             onclick: (e, row) => {
               onStatusChange(
                 e,
                 row.original,
-                config.userConnectionStatusTypes.Terminated
+                config.userConnectionStatusTypes.Accepted
+              );
+            },
+          },
+          {
+            text: "Reject",
+            onclick: (e, row) => {
+              onStatusChange(
+                e,
+                row.original,
+                config.userConnectionStatusTypes.Rejected
               );
             },
           },
@@ -319,118 +316,6 @@ const JoinedTenants = memo(() => {
 
   //Grid actions
 
-  // Send message modal
-
-  let formSendMessageErrors = {};
-  const [sendMessageErrors, setSendMessageErrors] = useState({});
-  const [sendMessageModalState, setSendMessageModalState] = useState(false);
-  function setInitialSendMessageFormData() {
-    return {
-      txtmessage: "",
-      toid: 0,
-      lbltoname: "",
-    };
-  }
-
-  const [sendMessageFormData, setSendMessageFormData] = useState(
-    setInitialSendMessageFormData()
-  );
-
-  const onSendMessageModalShow = (e, row) => {
-    e?.preventDefault();
-    setSendMessageFormData({
-      ...sendMessageFormData,
-      lbltoname: `Tenant: ${row.FirstName} ${row.LastName}`,
-      toid:
-        parseInt(row.InviterId) ==
-        parseInt(GetUserCookieValues(UserCookie.ProfileId, loggedinUser))
-          ? row.InviteeId
-          : parseInt(row.InviteeId) ==
-            parseInt(GetUserCookieValues(UserCookie.ProfileId, loggedinUser))
-          ? row.InviterId
-          : 0,
-    });
-    setSendMessageModalState(true);
-  };
-
-  const onSendMessageModalHide = (e) => {
-    e?.preventDefault();
-    setSendMessageModalState(false);
-    setSendMessageErrors({});
-    setSendMessageFormData(setInitialSendMessageFormData());
-  };
-
-  const handleSendMessageInputChange = (e) => {
-    const { name, value } = e?.target;
-    setSendMessageFormData({
-      ...sendMessageFormData,
-      [name]: value,
-    });
-  };
-
-  const onSendMessage = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (Object.keys(formSendMessageErrors).length === 0) {
-      setSendMessageErrors({});
-      apiReqResLoader(
-        "btnsendmessage",
-        "Sending",
-        API_ACTION_STATUS.START,
-        false
-      );
-
-      let isapimethoderr = false;
-      let objBodyParams = {
-        FromId: parseInt(
-          GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
-        ),
-        ToId: parseInt(sendMessageFormData.toid),
-        NotificationTypeId: NotificationTypes.Message,
-        Message: sendMessageFormData.txtmessage,
-      };
-
-      axiosPost(
-        `${config.apiBaseUrl}${ApiUrls.createNotification}`,
-        objBodyParams
-      )
-        .then((response) => {
-          let objResponse = response.data;
-          if (objResponse.StatusCode === 200) {
-            if (objResponse.Data.Id > 0) {
-              Toast.success(objResponse.Data.Message);
-              onSendMessageModalHide();
-            }
-          } else {
-            isapimethoderr = true;
-          }
-        })
-        .catch((err) => {
-          isapimethoderr = true;
-          console.error(
-            `"API :: ${ApiUrls.createNotification}, Error ::" ${err}`
-          );
-        })
-        .finally(() => {
-          if (isapimethoderr == true) {
-            Toast.error(AppMessages.SomeProblem);
-          }
-          apiReqResLoader(
-            "btnsendmessage",
-            "Send",
-            API_ACTION_STATUS.COMPLETED,
-            false
-          );
-        });
-    } else {
-      $(`[name=${Object.keys(formSendMessageErrors)[0]}]`).focus();
-      setSendMessageErrors(formSendMessageErrors);
-    }
-  };
-
-  // Send message modal
-
   return (
     <>
       <div className="woo-filter-bar full-row p-3 grid-search bo-0">
@@ -453,7 +338,7 @@ const JoinedTenants = memo(() => {
                   <div className="col-lg-3 col-xl-2 col-md-4">
                     <DateControl
                       lblClass="mb-0"
-                      lblText="Joined On : Start date"
+                      lblText="Start date"
                       name="txtfromdate"
                       required={false}
                       onChange={(dt) => onDateChange(dt, "txtfromdate")}
@@ -464,7 +349,7 @@ const JoinedTenants = memo(() => {
                   <div className="col-lg-3 col-xl-2 col-md-4">
                     <DateControl
                       lblClass="mb-0"
-                      lblText="Joined On : End date"
+                      lblText="End date"
                       name="txttodate"
                       required={false}
                       onChange={(dt) => onDateChange(dt, "txttodate")}
@@ -520,65 +405,14 @@ const JoinedTenants = memo(() => {
                 text: "Joined Tenants",
                 count: totalCount,
               }}
-              noData={AppMessages.NoTenants}
+              noData={AppMessages.NoTenantRequests}
             />
           </div>
         </div>
       </div>
       {/*============== Grid End ==============*/}
-
-      {/*============== Send Message Modal Start ==============*/}
-      {sendMessageModalState && (
-        <>
-          <ModalView
-            title={AppMessages.SendMessageModalTitle}
-            content={
-              <>
-                <div className="row">
-                  <div className="col-12 mb-10">
-                    <span name="lbltoname" className="font-general font-500">
-                      {sendMessageFormData.lbltoname}
-                    </span>
-                  </div>
-                  <div className="col-12 mb-0">
-                    <TextAreaControl
-                      lblClass="mb-0 lbl-req-field"
-                      name={`txtmessage`}
-                      ctlType={formCtrlTypes.message}
-                      onChange={handleSendMessageInputChange}
-                      value={sendMessageFormData.txtmessage}
-                      required={true}
-                      errors={sendMessageErrors}
-                      formErrors={formSendMessageErrors}
-                      rows={3}
-                      tabIndex={1}
-                    ></TextAreaControl>
-                  </div>
-                </div>
-              </>
-            }
-            onClose={onSendMessageModalHide}
-            actions={[
-              {
-                id: "btnsendmessage",
-                text: "Send",
-                displayOrder: 1,
-                btnClass: "btn-primary",
-                onClick: (e) => onSendMessage(e),
-              },
-              {
-                text: "Cancel",
-                displayOrder: 2,
-                btnClass: "btn-secondary",
-                onClick: (e) => onSendMessageModalHide(e),
-              },
-            ]}
-          ></ModalView>
-        </>
-      )}
-      {/*============== Send Message Modal End ==============*/}
     </>
   );
 });
 
-export default JoinedTenants;
+export default TenantsRequested;

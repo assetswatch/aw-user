@@ -183,7 +183,7 @@ const AsyncRemoteSelect = (ctlProps) => {
         value={selectedValue}
         tabIndex={ctlProps.tabIndex}
         defaultOptions
-        cacheOptions
+        cacheOptions={ctlProps.cacheOptions ?? true}
       />
       {ctlProps.errors?.[`${ctlProps.name}`] && (
         <div className="err-invalid">

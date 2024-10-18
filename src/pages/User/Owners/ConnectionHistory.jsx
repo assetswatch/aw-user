@@ -38,7 +38,6 @@ const ConnectionHistory = memo(() => {
   const [totalCount, setTotalCount] = useState(0);
   const [pageCount, setPageCount] = useState(0);
   const [isDataLoading, setIsDataLoading] = useState(false);
-  const [selectedGridRow, setSelectedGridRow] = useState(null);
 
   //Set search form intial data
   const setSearchInitialFormData = () => {
@@ -397,10 +396,10 @@ const ConnectionHistory = memo(() => {
               fetchData={fetchData}
               pageCount={pageCount}
               totalInfo={{
-                text: "Joined Tenants",
+                text: "Total Records",
                 count: totalCount,
               }}
-              noData={AppMessages.NoConnection}
+              noData={AppMessages.NoHistory}
             />
           </div>
         </div>

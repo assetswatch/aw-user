@@ -1,10 +1,11 @@
 import { AppMessages, ValidationMessages } from "./constants";
 import { useLocation } from "react-router-dom";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { UserCookie } from "../utils/constants";
 import { routeNames } from "../routes/routes";
 import moment from "moment";
+import config from "../config.json";
 
 /** set page loader on mounting and unmounitng and nav links active.inactive */
 export function SetPageLoaderNavLinks() {
@@ -49,7 +50,10 @@ export function SetPageLoaderNavLinks() {
           activelink = "dashboard";
           break;
         case routeNames.ownertenants.path.toLowerCase():
-          activelink = "dashboard";
+          activelink = "owner-tenant";
+          break;
+        case routeNames.tenantowners.path.toLowerCase():
+          activelink = "tenant-owner";
           break;
       }
 
@@ -443,3 +447,23 @@ export const debounce = (func, delay) => {
     }, delay);
   };
 };
+
+export function getPagesPathByLoggedinUserProfile(
+  loggedinProfileTypeId,
+  page = ""
+) {
+  let path = "#";
+  if (checkEmptyVal(page) == false) {
+    if (page?.toLowerCase() == "notifications") {
+      path =
+        loggedinProfileTypeId == config.userProfileTypes.Owner
+          ? routeNames.ownernotifications.path
+          : loggedinProfileTypeId == config.userProfileTypes.Agent
+          ? routeNames.agentnotifications.path
+          : loggedinProfileTypeId == config.userProfileTypes.Tenant
+          ? routeNames.tenantnotifications.path
+          : path;
+    }
+    return path;
+  }
+}

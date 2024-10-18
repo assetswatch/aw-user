@@ -28,7 +28,7 @@ import config from "../../../config.json";
 import { Toast } from "../../../components/common/ToastView";
 import TextAreaControl from "../../../components/common/TextAreaControl";
 
-const JoinedTenants = memo(() => {
+const JoinedOwners = memo(() => {
   let $ = window.$;
 
   let formErrors = {};
@@ -128,8 +128,8 @@ const JoinedTenants = memo(() => {
         inviterid: parseInt(
           GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
         ),
-        InviterProfileTypeId: config.userProfileTypes.Owner,
-        InviteeProfileTypeId: config.userProfileTypes.Tenant,
+        InviterProfileTypeId: config.userProfileTypes.Tenant,
+        InviteeProfileTypeId: config.userProfileTypes.Owner,
         fromdate: setSearchInitialFormData.txtfromdate,
         todate: setSearchInitialFormData.txttodate,
         pi: parseInt(pi),
@@ -517,10 +517,10 @@ const JoinedTenants = memo(() => {
               fetchData={fetchData}
               pageCount={pageCount}
               totalInfo={{
-                text: "Joined Tenants",
+                text: "Joined Owners",
                 count: totalCount,
               }}
-              noData={AppMessages.NoTenants}
+              noData={AppMessages.NoOwners}
             />
           </div>
         </div>
@@ -581,4 +581,4 @@ const JoinedTenants = memo(() => {
   );
 });
 
-export default JoinedTenants;
+export default JoinedOwners;

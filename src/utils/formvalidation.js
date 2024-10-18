@@ -309,6 +309,9 @@ export const formCtrlTypes = {
   asset: {
     lbl: "Property:",
   },
+  profiletype: {
+    lbl: "Profile type:",
+  },
   state: {
     lbl: "State:",
   },

@@ -32,7 +32,7 @@ const Joined = lazy(() => import("./JoinedTenants"));
 const Requested = lazy(() => import("./TenantsRequested"));
 const ConnectionHistory = lazy(() => import("./ConnectionHistory"));
 
-const Tenants = () => {
+const Owners = () => {
   let $ = window.$;
 
   let formSendInvitaionErrors = {};
@@ -441,4 +441,4 @@ const Tenants = () => {
   );
 };
 
-export default Tenants;
+export default Owners;

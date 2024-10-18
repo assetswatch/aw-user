@@ -427,7 +427,7 @@ const Notifications = () => {
       inviterid: parseInt(
         GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
       ),
-      InviterProfileTypeId: config.userProfileTypes.Owner,
+      InviterProfileTypeId: config.userProfileTypes.Tenant,
       InviteeProfileTypeId: parseInt(selectedProfileType),
     };
 

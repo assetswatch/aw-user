@@ -1,9 +1,5 @@
 import React, { memo, useCallback, useRef, useState } from "react";
-import {
-  Grid,
-  LazyImage,
-  ModalView,
-} from "../../../components/common/LazyComponents";
+import { Grid, LazyImage } from "../../../components/common/LazyComponents";
 import InputControl from "../../../components/common/InputControl";
 import { formCtrlTypes } from "../../../utils/formvalidation";
 import {
@@ -11,6 +7,7 @@ import {
   checkEmptyVal,
   checkStartEndDateGreater,
   GetUserCookieValues,
+  setSelectDefaultVal,
 } from "../../../utils/common";
 import DateControl from "../../../components/common/DateControl";
 import moment from "moment";
@@ -20,25 +17,28 @@ import {
   UserCookie,
   API_ACTION_STATUS,
   GridDefaultValues,
-  NotificationTypes,
 } from "../../../utils/constants";
 import { useAuth } from "../../../contexts/AuthContext";
 import { axiosPost } from "../../../helpers/axiosHelper";
 import config from "../../../config.json";
 import { Toast } from "../../../components/common/ToastView";
-import TextAreaControl from "../../../components/common/TextAreaControl";
+import { useUserConnectionStatusTypesGateway } from "../../../hooks/useUserConnectionStatusTypesGateway";
+import AsyncSelect from "../../../components/common/AsyncSelect";
 
-const JoinedTenants = memo(() => {
+const ConnectionHistory = memo(() => {
   let $ = window.$;
 
   let formErrors = {};
   const { loggedinUser } = useAuth();
+
+  const { userConnectionStatusTypes } = useUserConnectionStatusTypesGateway();
 
   //Grid
   const [usersData, setUsersData] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [pageCount, setPageCount] = useState(0);
   const [isDataLoading, setIsDataLoading] = useState(false);
+  const [selectedGridRow, setSelectedGridRow] = useState(null);
 
   //Set search form intial data
   const setSearchInitialFormData = () => {
@@ -46,14 +46,22 @@ const JoinedTenants = memo(() => {
       txtkeyword: "",
       txtfromdate: moment().subtract(3, "month"),
       txttodate: moment(),
+      ddlstatus: userConnectionStatusTypes?.[0]?.["Id"],
     };
   };
 
   const [searchFormData, setSearchFormData] = useState(
     setSearchInitialFormData
   );
-
   //Set search formdata
+
+  //Search ddl controls changes
+  const ddlChange = (e, name) => {
+    setSearchFormData({
+      ...searchFormData,
+      [name]: e?.value,
+    });
+  };
 
   //Search Date control change
   const onDateChange = (newDate, name) => {
@@ -132,6 +140,7 @@ const JoinedTenants = memo(() => {
         InviteeProfileTypeId: config.userProfileTypes.Tenant,
         fromdate: setSearchInitialFormData.txtfromdate,
         todate: setSearchInitialFormData.txttodate,
+        status: setSearchInitialFormData.ddlstatus,
         pi: parseInt(pi),
         ps: parseInt(ps),
       };
@@ -142,11 +151,12 @@ const JoinedTenants = memo(() => {
           keyword: searchFormData.txtkeyword,
           fromdate: searchFormData.txtfromdate,
           todate: searchFormData.txttodate,
+          status: parseInt(setSelectDefaultVal(searchFormData.ddlstatus, -1)),
         };
       }
 
       return axiosPost(
-        `${config.apiBaseUrl}${ApiUrls.getJoinedUserConnections}`,
+        `${config.apiBaseUrl}${ApiUrls.getUserConnectionsHistory}`,
         objParams
       )
         .then((response) => {
@@ -166,7 +176,7 @@ const JoinedTenants = memo(() => {
           setUsersData([]);
           setPageCount(0);
           console.error(
-            `"API :: ${ApiUrls.getJoinedUserConnections}, Error ::" ${err}`
+            `"API :: ${ApiUrls.getUserConnectionsHistory}, Error ::" ${err}`
           );
         })
         .finally(() => {
@@ -194,66 +204,67 @@ const JoinedTenants = memo(() => {
           <>
             <LazyImage
               className="rounded cur-pointer w-80px"
-              onClick={(e) => {}}
               src={row.original.PicPath}
               alt={row.original.FirstName + " " + row.original.LastName}
               placeHolderClass="pos-absolute w-80px min-h-80 fl-l"
             ></LazyImage>
             <div className="property-info d-table">
-              <a href="#" onClick={(e) => {}}>
-                <h5 className="text-secondary">
-                  {row.original.FirstName + " " + row.original.LastName}
-                </h5>
-              </a>
-              <div>
-                <i className="fas fa-map-marker-alt text-primary font-13 p-r-5" />
-                {row.original.City}, {row.original.State},{" "}
-                {row.original.Country}
+              <h5 className="text-secondary">
+                {row.original.FirstName + " " + row.original.LastName}
+              </h5>
+              <div className="py-1">
+                <i className="far fa-envelope font-13 p-r-5" />
+                {row.original.Email}
+              </div>
+              <div className="py-1">
+                <i className="flat-mini flaticon-phone-call font-13 p-r-5" />
+                {row.original.MobileNo}
               </div>
             </div>
           </>
         ),
       },
       {
-        Header: "Email Id",
-        accessor: "Email",
+        Header: "Status",
+        accessor: "StatusDisplay",
         disableSortBy: true,
-        className: "w-250px",
+        className: "w-180px",
+        Cell: ({ row }) => (
+          <>
+            <span
+              className={`badge badge-pill gr-badge-pill ${
+                row.original.Status == config.userConnectionStatusTypes.Accepted
+                  ? "gr-badge-pill-suc"
+                  : row.original.Status ==
+                    config.userConnectionStatusTypes.Pending
+                  ? "gr-badge-pill-warning"
+                  : row.original.Status ==
+                      config.userConnectionStatusTypes.Rejected ||
+                    row.original.Status ==
+                      config.userConnectionStatusTypes.Terminated
+                  ? "gr-badge-pill-error"
+                  : ""
+              }`}
+            >
+              {row.original.StatusDisplay}
+            </span>
+          </>
+        ),
       },
       {
-        Header: "Phone Number",
-        accessor: "MobileNo",
-        disableSortBy: true,
-        className: "w-200px",
+        Header: "Invited On",
+        accessor: "InvitedDateDisplay",
+        className: "w-180px",
       },
-
       {
-        Header: "Joined On",
+        Header: "Replied On",
         accessor: "RepliedDateDisplay",
         className: "w-180px",
       },
       {
-        Header: "Actions",
-        className: "w-150px",
-        actions: [
-          {
-            text: "Send Message",
-            onclick: (e, row) => {
-              onSendMessageModalShow(e, row.original);
-            },
-          },
-          {
-            text: "Terminate",
-            icon: "userterminate",
-            onclick: (e, row) => {
-              onStatusChange(
-                e,
-                row.original,
-                config.userConnectionStatusTypes.Terminated
-              );
-            },
-          },
-        ],
+        Header: "Terminated On",
+        accessor: "TerminatedDateDisplay",
+        className: "w-180px text-left",
       },
     ],
     []
@@ -270,167 +281,6 @@ const JoinedTenants = memo(() => {
 
   //Setup Grid.
 
-  //Grid actions
-
-  const onStatusChange = (e, selectedRow, statusId) => {
-    e.preventDefault();
-    apiReqResLoader("x", "", API_ACTION_STATUS.START);
-
-    let isapimethoderr = false;
-    let objBodyParams = {
-      ProfileId: parseInt(
-        GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
-      ),
-      AccountId: parseInt(
-        GetUserCookieValues(UserCookie.AccountId, loggedinUser)
-      ),
-      Id: parseInt(selectedRow?.Id),
-      Status: statusId,
-    };
-
-    axiosPost(
-      `${config.apiBaseUrl}${ApiUrls.updateUserConnectionStatus}`,
-      objBodyParams
-    )
-      .then((response) => {
-        let objResponse = response.data;
-        if (objResponse.StatusCode === 200) {
-          Toast.success(objResponse.Data.Message);
-          if (objResponse.Data.Id > 0) {
-            getUsers({});
-          }
-        } else {
-          isapimethoderr = true;
-        }
-      })
-      .catch((err) => {
-        isapimethoderr = true;
-        console.error(
-          `"API :: ${ApiUrls.updateUserConnectionStatus}, Error ::" ${err}`
-        );
-      })
-      .finally(() => {
-        if (isapimethoderr == true) {
-          Toast.error(AppMessages.SomeProblem);
-        }
-        apiReqResLoader("x", "", API_ACTION_STATUS.COMPLETED);
-      });
-  };
-
-  //Grid actions
-
-  // Send message modal
-
-  let formSendMessageErrors = {};
-  const [sendMessageErrors, setSendMessageErrors] = useState({});
-  const [sendMessageModalState, setSendMessageModalState] = useState(false);
-  function setInitialSendMessageFormData() {
-    return {
-      txtmessage: "",
-      toid: 0,
-      lbltoname: "",
-    };
-  }
-
-  const [sendMessageFormData, setSendMessageFormData] = useState(
-    setInitialSendMessageFormData()
-  );
-
-  const onSendMessageModalShow = (e, row) => {
-    e?.preventDefault();
-    setSendMessageFormData({
-      ...sendMessageFormData,
-      lbltoname: `Tenant: ${row.FirstName} ${row.LastName}`,
-      toid:
-        parseInt(row.InviterId) ==
-        parseInt(GetUserCookieValues(UserCookie.ProfileId, loggedinUser))
-          ? row.InviteeId
-          : parseInt(row.InviteeId) ==
-            parseInt(GetUserCookieValues(UserCookie.ProfileId, loggedinUser))
-          ? row.InviterId
-          : 0,
-    });
-    setSendMessageModalState(true);
-  };
-
-  const onSendMessageModalHide = (e) => {
-    e?.preventDefault();
-    setSendMessageModalState(false);
-    setSendMessageErrors({});
-    setSendMessageFormData(setInitialSendMessageFormData());
-  };
-
-  const handleSendMessageInputChange = (e) => {
-    const { name, value } = e?.target;
-    setSendMessageFormData({
-      ...sendMessageFormData,
-      [name]: value,
-    });
-  };
-
-  const onSendMessage = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (Object.keys(formSendMessageErrors).length === 0) {
-      setSendMessageErrors({});
-      apiReqResLoader(
-        "btnsendmessage",
-        "Sending",
-        API_ACTION_STATUS.START,
-        false
-      );
-
-      let isapimethoderr = false;
-      let objBodyParams = {
-        FromId: parseInt(
-          GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
-        ),
-        ToId: parseInt(sendMessageFormData.toid),
-        NotificationTypeId: NotificationTypes.Message,
-        Message: sendMessageFormData.txtmessage,
-      };
-
-      axiosPost(
-        `${config.apiBaseUrl}${ApiUrls.createNotification}`,
-        objBodyParams
-      )
-        .then((response) => {
-          let objResponse = response.data;
-          if (objResponse.StatusCode === 200) {
-            if (objResponse.Data.Id > 0) {
-              Toast.success(objResponse.Data.Message);
-              onSendMessageModalHide();
-            }
-          } else {
-            isapimethoderr = true;
-          }
-        })
-        .catch((err) => {
-          isapimethoderr = true;
-          console.error(
-            `"API :: ${ApiUrls.createNotification}, Error ::" ${err}`
-          );
-        })
-        .finally(() => {
-          if (isapimethoderr == true) {
-            Toast.error(AppMessages.SomeProblem);
-          }
-          apiReqResLoader(
-            "btnsendmessage",
-            "Send",
-            API_ACTION_STATUS.COMPLETED,
-            false
-          );
-        });
-    } else {
-      $(`[name=${Object.keys(formSendMessageErrors)[0]}]`).focus();
-      setSendMessageErrors(formSendMessageErrors);
-    }
-  };
-
-  // Send message modal
-
   return (
     <>
       <div className="woo-filter-bar full-row p-3 grid-search bo-0">
@@ -439,7 +289,7 @@ const JoinedTenants = memo(() => {
             <div className="col px-0">
               <form noValidate>
                 <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
-                  <div className="col-lg-3 col-xl-4 col-md-4">
+                  <div className="col-lg-3 col-xl-3 col-md-6">
                     <InputControl
                       lblClass="mb-0"
                       lblText="Search by Name/ Email / Phone"
@@ -450,10 +300,40 @@ const JoinedTenants = memo(() => {
                       formErrors={formErrors}
                     ></InputControl>
                   </div>
+                  <div className="col-lg-3 col-xl-2 col-md-6">
+                    <AsyncSelect
+                      placeHolder={
+                        userConnectionStatusTypes.length <= 0 &&
+                        searchFormData.ddlstatus == null
+                          ? AppMessages.DdLLoading
+                          : AppMessages.DdlDefaultSelect
+                      }
+                      noData={
+                        userConnectionStatusTypes.length <= 0 &&
+                        searchFormData.ddlstatus == null
+                          ? AppMessages.DdLLoading
+                          : AppMessages.DdlNoData
+                      }
+                      options={userConnectionStatusTypes}
+                      dataKey="Id"
+                      dataVal="Type"
+                      onChange={(e) => ddlChange(e, "ddlstatus")}
+                      value={searchFormData.ddlstatus}
+                      defualtselected={searchFormData.ddlstatus}
+                      name="ddlstatus"
+                      lbl={formCtrlTypes.status}
+                      lblClass="mb-0"
+                      lblText="Status"
+                      className="ddlborder"
+                      isClearable={false}
+                      isSearchCtl={true}
+                      formErrors={formErrors}
+                    ></AsyncSelect>
+                  </div>
                   <div className="col-lg-3 col-xl-2 col-md-4">
                     <DateControl
                       lblClass="mb-0"
-                      lblText="Joined On : Start date"
+                      lblText="Start date"
                       name="txtfromdate"
                       required={false}
                       onChange={(dt) => onDateChange(dt, "txtfromdate")}
@@ -464,7 +344,7 @@ const JoinedTenants = memo(() => {
                   <div className="col-lg-3 col-xl-2 col-md-4">
                     <DateControl
                       lblClass="mb-0"
-                      lblText="Joined On : End date"
+                      lblText="End date"
                       name="txttodate"
                       required={false}
                       onChange={(dt) => onDateChange(dt, "txttodate")}
@@ -475,7 +355,7 @@ const JoinedTenants = memo(() => {
                       }}
                     ></DateControl>
                   </div>
-                  <div className="col-lg-3 col-xl-4 col-md-4 grid-search-action">
+                  <div className="col-lg-3 col-xl-3 col-md-4 grid-search-action">
                     <label
                       className="mb-0 form-error w-100"
                       id="search-val-err-message"
@@ -520,65 +400,14 @@ const JoinedTenants = memo(() => {
                 text: "Joined Tenants",
                 count: totalCount,
               }}
-              noData={AppMessages.NoTenants}
+              noData={AppMessages.NoConnection}
             />
           </div>
         </div>
       </div>
       {/*============== Grid End ==============*/}
-
-      {/*============== Send Message Modal Start ==============*/}
-      {sendMessageModalState && (
-        <>
-          <ModalView
-            title={AppMessages.SendMessageModalTitle}
-            content={
-              <>
-                <div className="row">
-                  <div className="col-12 mb-10">
-                    <span name="lbltoname" className="font-general font-500">
-                      {sendMessageFormData.lbltoname}
-                    </span>
-                  </div>
-                  <div className="col-12 mb-0">
-                    <TextAreaControl
-                      lblClass="mb-0 lbl-req-field"
-                      name={`txtmessage`}
-                      ctlType={formCtrlTypes.message}
-                      onChange={handleSendMessageInputChange}
-                      value={sendMessageFormData.txtmessage}
-                      required={true}
-                      errors={sendMessageErrors}
-                      formErrors={formSendMessageErrors}
-                      rows={3}
-                      tabIndex={1}
-                    ></TextAreaControl>
-                  </div>
-                </div>
-              </>
-            }
-            onClose={onSendMessageModalHide}
-            actions={[
-              {
-                id: "btnsendmessage",
-                text: "Send",
-                displayOrder: 1,
-                btnClass: "btn-primary",
-                onClick: (e) => onSendMessage(e),
-              },
-              {
-                text: "Cancel",
-                displayOrder: 2,
-                btnClass: "btn-secondary",
-                onClick: (e) => onSendMessageModalHide(e),
-              },
-            ]}
-          ></ModalView>
-        </>
-      )}
-      {/*============== Send Message Modal End ==============*/}
     </>
   );
 });
 
-export default JoinedTenants;
+export default ConnectionHistory;

@@ -160,7 +160,7 @@ const TenantsRequested = memo(() => {
           setUsersData([]);
           setPageCount(0);
           console.error(
-            `"API :: ${ApiUrls.getJoinedUserConnections}, Error ::" ${err}`
+            `"API :: ${ApiUrls.getRequestedUserConnections}, Error ::" ${err}`
           );
         })
         .finally(() => {
@@ -402,7 +402,7 @@ const TenantsRequested = memo(() => {
               fetchData={fetchData}
               pageCount={pageCount}
               totalInfo={{
-                text: "Joined Tenants",
+                text: "Tenant Requests",
                 count: totalCount,
               }}
               noData={AppMessages.NoTenantRequests}

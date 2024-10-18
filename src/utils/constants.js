@@ -9,7 +9,7 @@ export const AppConstants = {
 
 /*Notification Types*/
 export const NotificationTypes = {
-  Invitation: 1,
+  Notification: 1,
   Message: 2,
   Payment: 3,
 };
@@ -80,7 +80,10 @@ export const AppMessages = {
   NoStates: "No states found.",
   NoCities: "No cities found.",
   NoData: "No data found...",
+  NoUsers: "No users found...",
+  NoHistory: "No history found...",
   NoProfiles: "No profiles found...",
+  NoProfileTypes: "No profile types found...",
   NoProperties: "No properties found...",
   NoPropertyDetails: "Property details not found...",
   NoConnection: `No connections found...`,
@@ -94,12 +97,23 @@ export const AppMessages = {
       (key) => config.userProfileTypes[key] === config.userProfileTypes.Tenant
     )
     .toLowerCase()} requests found...`,
+  NoOwners: `No ${Object.keys(config.userProfileTypes)
+    .find(
+      (key) => config.userProfileTypes[key] === config.userProfileTypes.Owner
+    )
+    .toLowerCase()}s found...`,
+  NoOwnerRequests: `No ${Object.keys(config.userProfileTypes)
+    .find(
+      (key) => config.userProfileTypes[key] === config.userProfileTypes.Owner
+    )
+    .toLowerCase()} requests found...`,
   SomeProblem: "Some problem occured, Please try again.",
   AsyncSelectNoData: [{ Id: "", Text: "No data found." }],
   AsyncSelectDefaultSelect: [{ Id: "", Text: " Select " }],
   DeleteConfirmationTitle: "Are you sure?",
   DeleteAssetConfirmationMessage: "You want to delete {propertyname} property.",
   SendInvitaionModalTitle: "Send Invitation",
+  SendMessageModalTitle: "Send Message",
   AddPropertySuccess: "Property successfully...",
   UpdatePropertySuccess: "Property details updated successfully...",
   DeleteAssetSuccess: "Property deleted successfully...",
@@ -153,6 +167,8 @@ export const ValidationMessages = {
   DateInvalid: "Date is not valid.",
   PropertyReq: "Property can not be empty.",
   TenantReq: "Tenant can not be empty.",
+  OwnerReq: "Owner can not be empty.",
+  UserReq: "User can not be empty.",
   PropertyTitleReq: "Property title can not be empty.",
   PropertyTitleInvalid: "Property title is not valid.",
   Address1Req: "Address 1 can not be empty.",
@@ -196,6 +212,7 @@ export let ApiUrls = {
   upgradePlan: `users/v1/UpgradePlan`,
   getTopAgents: `users/v1/GetTopAgents`,
   getDdlUsersProfiles: `users/v1/GetDdlUsersProfiles`,
+  getDdlJoinedUserConnections: `users/v1/GetDdlJoinedUserConnections`,
   getJoinedUserConnections: `users/v1/GetJoinedUserConnections`,
   getRequestedUserConnections: `users/v1/getRequestedUserConnections`,
   getUserConnectionsHistory: `users/v1/getUserConnectionsHistory`,
