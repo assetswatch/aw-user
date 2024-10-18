@@ -125,6 +125,8 @@ export const AppMessages = {
   DeleteNotificationSuccess: "Notification deleted successfully...",
   NoNotifications: "No notifications found...",
   SendNotificationModalTitle: "Send Notification",
+  SupportTicketSuccess:
+    "Your message has been sent. We will get back to you shortly.",
 };
 /*Common App messages*/
 
@@ -153,6 +155,7 @@ export const ValidationMessages = {
   ProfiletypeReq: "Profile type can not be empty.",
   CategoryReq: "Category can not be empty.",
   CountryReq: "Country can not be empty.",
+  ContactforReq: "Contact for can not be empty.",
   StateReq: "State can not be empty.",
   CityReq: "City can not be empty.",
   TermsReq: "Please check the terms.",
@@ -203,6 +206,7 @@ export let ApiUrls = {
   getDdlCities: `common/v1/GetDdlCities`,
   getDdlSupportTypes: `common/v1/GetDdlSupportTypes`,
   getAppConfig: `common/v1/GetAppConfig`,
+  createSupportTicket: `common/v1/CreateSupportTicket`,
   getProfileTypes: `users/v1/GetProfileTypes`,
   getProfileCategories: `users/v1/GetProfileCategories`,
   registerUser: `users/v1/RegisterUser`,
