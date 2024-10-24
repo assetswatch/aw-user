@@ -25,10 +25,17 @@ const AsyncSelect = (ctlProps) => {
     });
   } else {
     mapOptions = ctlProps.options.map((option) => {
-      return {
+      let opt = {
         value: option[ctlProps.dataKey] || option.Id,
         label: option[ctlProps.dataVal] || option.Text,
       };
+
+      //add extrapotions
+      if (ctlProps.extraOptions) {
+        opt[ctlProps.extraOptions.key] = option[ctlProps.extraOptions.dataVal];
+      }
+
+      return opt;
     });
   }
 

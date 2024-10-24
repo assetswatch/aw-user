@@ -167,6 +167,41 @@ const InputControl = ({
         formErrors[name] = rex.invalid;
       }
       break;
+    case formCtrlTypes.cardnumber:
+      rex = Regex.cardnumber;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (
+        !checkEmptyVal(value) &&
+        !(value?.length >= rex.min && value?.length <= rex.max)
+      ) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.cardexpirydate:
+      rex = Regex.cardexpirydate;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      } else if (
+        !checkEmptyVal(value) &&
+        !(value?.length >= rex.min && value?.length <= rex.max)
+      ) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.cvv:
+      rex = Regex.cvv;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (
+        !checkEmptyVal(value) &&
+        !(value?.length >= rex.min && value?.length <= rex.max)
+      ) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
   }
 
   return (

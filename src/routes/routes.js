@@ -39,6 +39,14 @@ export const routeNames = {
     name: "TenantNotifications",
     path: "/User/Tenant-Notifications",
   },
+  tenantpayments: {
+    name: "TenantPayments",
+    path: "/User/Tenant-Payments",
+  },
+  tenantcheckout: {
+    name: "TenantCheckout",
+    path: "/User/Tenant-Checkout",
+  },
   agentowners: { name: "TenantOwners", path: "/User/Agent-Owner" },
   agenttenants: { name: "TenantAgents", path: "/User/Agent-Tenant" },
   agentnotifications: {
@@ -215,6 +223,20 @@ const routes = [
     path: routeNames.tenantnotifications.path,
     name: routeNames.tenantnotifications.name,
     element: lazy(() => import("../pages/User/Tenants/Notifications")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.tenantpayments.path,
+    name: routeNames.tenantpayments.name,
+    element: lazy(() => import("../pages/User/Tenants/Payments")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.tenantcheckout.path,
+    name: routeNames.tenantcheckout.name,
+    element: lazy(() => import("../pages/User/Tenants/Checkout")),
     isexact: true,
     isprotected: true,
   },

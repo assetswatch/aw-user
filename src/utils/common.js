@@ -6,6 +6,8 @@ import { UserCookie } from "../utils/constants";
 import { routeNames } from "../routes/routes";
 import moment from "moment";
 import config from "../config.json";
+import CryptoJS from "crypto-js";
+import { axiosPost } from "../helpers/axiosHelper";
 
 /** set page loader on mounting and unmounitng and nav links active.inactive */
 export function SetPageLoaderNavLinks() {
@@ -54,6 +56,10 @@ export function SetPageLoaderNavLinks() {
           break;
         case routeNames.tenantowners.path.toLowerCase():
           activelink = "tenant-owner";
+          break;
+        case routeNames.tenantpayments.path.toLowerCase():
+        case routeNames.tenantcheckout.path.toLowerCase():
+          activelink = "tenant-payments";
           break;
       }
 
@@ -463,7 +469,44 @@ export function getPagesPathByLoggedinUserProfile(
           : loggedinProfileTypeId == config.userProfileTypes.Tenant
           ? routeNames.tenantnotifications.path
           : path;
+    } else if (page?.toLowerCase() == "payments") {
+      path =
+        loggedinProfileTypeId == config.userProfileTypes.Owner
+          ? routeNames.ownerpayments.path
+          : loggedinProfileTypeId == config.userProfileTypes.Agent
+          ? routeNames.agentpayments.path
+          : loggedinProfileTypeId == config.userProfileTypes.Tenant
+          ? routeNames.tenantpayments.path
+          : path;
     }
     return path;
   }
 }
+
+export const usioGetToken = (objCard) => {
+  return new Promise((resolve, reject) => {
+    let objParams = {
+      MerchantKey:
+        objCard.ProfileId == 8
+          ? "2CE3513A-085E-4DC1-8D78-84E79F85DC6D"
+          : config.usioPaymentConfig.merchantAPIKey,
+    };
+    objParams = { ...objParams, ...objCard };
+
+    axiosPost(`${config.usioPaymentConfig.getTokenUrl}`, objParams)
+      .then((response) => {
+        resolve(response.data);
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
+};
+
+export const Encrypt = (text) => {
+  return CryptoJS.AES.encrypt(text, CryptoJS.enc.Utf8.parse(config.secretKey), {
+    iv: CryptoJS.enc.Utf8.parse(config.secretIV),
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  }).toString();
+};

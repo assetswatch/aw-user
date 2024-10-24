@@ -1183,6 +1183,13 @@ Header Style Start
 .bo-top {
   border-top: 1px solid #dee2e6 !important;
 }
+.fixed-column {
+  position: fixed;
+
+  height: 100%; /* Full height */
+  overflow-y: auto; /* Enable vertical scrolling if needed */
+  z-index: 1000; /* Stay above other content */
+}
 
 /* .navbar-nav .dropdown-menu {
   position: absolute !important;
@@ -1190,14 +1197,26 @@ Header Style Start
 .user-option {
   cursor: pointer;
 }
-.user-info-ddmenu {
+.user-info-ddmenu,
+.ddmenu {
   position: absolute !important;
   border: solid 1px var(--theme-gray-color) !important;
   margin-top: 4px !important;
   right: 0px;
+  z-index: 1000;
+}
+.ddmenu {
+  min-width: 190px;
+}
+.ddmenu li {
+  margin: 4px 0 !important;
+}
+.ddmenu.text-primary li a {
+  color: var(--text-primary-color) !important;
+}
+.user-info-ddmenu {
   min-width: 260px !important;
   max-width: 100% !important;
-  z-index: 1000;
 }
 .user-info-nav-item.publiclayout {
   align-self: center;
@@ -1233,7 +1252,11 @@ Header Style Start
 .dropdown-menu a:hover {
   color: var(--theme-secondary-color);
 }
-.user-info-ddmenu::before {
+.dropdown-toggle.ddmenu-toggle::after {
+  vertical-align: 0.155em !important;
+}
+.user-info-ddmenu::before,
+.ddmenu.arrow::before {
   content: "";
   position: absolute;
   top: -0.25rem;
@@ -4322,6 +4345,7 @@ Responsive Style Start
     margin-top: 70.8px;
   }
 }
+
 @media screen and (min-width: 768px) and (max-width: 992px) {
   .div-paging {
     margin-top: 20px;

@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { routeNames } from "../../../routes/routes";
 import {
@@ -11,6 +11,7 @@ import { formCtrlTypes } from "../../../utils/formvalidation";
 import {
   apiReqResLoader,
   checkEmptyVal,
+  checkObjNullorEmpty,
   checkStartEndDateGreater,
   debounce,
   GetUserCookieValues,
@@ -39,6 +40,7 @@ import { useGetNotificationTypesGateway } from "../../../hooks/useGetNotificatio
 import AsyncRemoteSelect from "../../../components/common/AsyncRemoteSelect";
 import TextAreaControl from "../../../components/common/TextAreaControl";
 import { useProfileTypesGateway } from "../../../hooks/useProfileTypesGateway";
+import { useGetDdlUserAssetsGateway } from "../../../hooks/useGetDdlUserAssetsGateway";
 
 const Notifications = () => {
   let $ = window.$;
@@ -421,7 +423,7 @@ const Notifications = () => {
   //Get joined users.
   const getJoinedUsers = async (searchValue) => {
     if (checkEmptyVal(searchValue)) return [];
-
+    if (checkEmptyVal(selectedProfileType) == true) return [];
     let objParams = {
       keyword: searchValue,
       inviterid: parseInt(
@@ -557,6 +559,162 @@ const Notifications = () => {
 
   // Send notification modal
 
+  // Send payment notification modal
+
+  let formSendPaymentNotificationErrors = {};
+  const [sendPaymentNotificationErrors, setSendPaymentNotificationErrors] =
+    useState({});
+  const [
+    sendPaymentNotificationModalState,
+    setSendPaymentNotificationModalState,
+  ] = useState(false);
+
+  const [selectedAsset, setSelectedAsset] = useState(null);
+
+  function setInitialSendPaymentNotificationFormData() {
+    return {
+      txtpaymentnotificationmessage: "",
+    };
+  }
+  const [sendPaymentNotificationFormData, setSendPaymentNotificationFormData] =
+    useState(setInitialSendPaymentNotificationFormData());
+  const [selectedPaymentJoinedUser, setSelectedPaymentJoinedUser] =
+    useState(null);
+
+  const handleAssetChange = (e) => {
+    setSelectedAsset(e?.value);
+  };
+
+  const handleSendPaymentNotificationInputChange = (e) => {
+    const { name, value } = e?.target;
+    setSendPaymentNotificationFormData({
+      ...sendPaymentNotificationFormData,
+      [name]: value,
+    });
+  };
+
+  const { userAssetsList } = useGetDdlUserAssetsGateway(
+    "",
+    parseInt(GetUserCookieValues(UserCookie.AccountId, loggedinUser)),
+    parseInt(GetUserCookieValues(UserCookie.ProfileId, loggedinUser))
+  );
+
+  const onSendPaymentNotificationModalShow = (e) => {
+    e?.preventDefault();
+    setSelectedProfileType(config.userProfileTypes.Tenant);
+    setSendPaymentNotificationModalState(true);
+  };
+
+  const onSendPaymentNotificationModalHide = (e) => {
+    e?.preventDefault();
+    setSelectedProfileType(null);
+    setSelectedPaymentJoinedUser(null);
+    setSelectedAsset(null);
+    setSendPaymentNotificationModalState(false);
+    setSendPaymentNotificationErrors({});
+    setSendPaymentNotificationFormData(
+      setInitialSendPaymentNotificationFormData()
+    );
+  };
+
+  const onSendPaymentNotification = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (checkEmptyVal(selectedPaymentJoinedUser)) {
+      formSendPaymentNotificationErrors["ddlpaymentjoinedusers"] =
+        ValidationMessages.TenantReq;
+    }
+
+    if (checkEmptyVal(selectedAsset)) {
+      formSendPaymentNotificationErrors["ddlassets"] =
+        ValidationMessages.PropertyReq;
+    }
+
+    if (Object.keys(formSendPaymentNotificationErrors).length === 0) {
+      setSendPaymentNotificationErrors({});
+      apiReqResLoader(
+        "btnsendpaymentnotification",
+        "Sending",
+        API_ACTION_STATUS.START,
+        false
+      );
+
+      let isapimethoderr = false;
+
+      let objCreatePaymentParams = {
+        AssetId: parseInt(selectedAsset),
+        FromId: parseInt(
+          GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
+        ),
+        ToId: parseInt(setSelectDefaultVal(selectedPaymentJoinedUser)),
+      };
+
+      let objBodyParams = {
+        FromId: parseInt(
+          GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
+        ),
+        ToId: parseInt(setSelectDefaultVal(selectedPaymentJoinedUser)),
+        NotificationTypeId: NotificationTypes.Payment,
+        Message:
+          sendPaymentNotificationFormData.txtpaymentnotificationmessage +
+          " - " +
+          userAssetsList.filter((i) => i.AssetId == parseInt(selectedAsset))[0]
+            ?.AddressOne,
+      };
+
+      //create asset payment
+      axiosPost(
+        `${config.apiBaseUrl}${ApiUrls.createAssetPayment}`,
+        objCreatePaymentParams
+      )
+        .then()
+        .catch((err) => {
+          console.error(
+            `"API :: ${ApiUrls.createAssetPayment}, Error ::" ${err}`
+          );
+        });
+
+      axiosPost(
+        `${config.apiBaseUrl}${ApiUrls.createNotification}`,
+        objBodyParams
+      )
+        .then((response) => {
+          let objResponse = response.data;
+          if (objResponse.StatusCode === 200) {
+            if (objResponse.Data.Id > 0) {
+              Toast.success(objResponse.Data.Message);
+              onSendPaymentNotificationModalHide();
+            }
+          } else {
+            isapimethoderr = true;
+          }
+        })
+        .catch((err) => {
+          isapimethoderr = true;
+          console.error(
+            `"API :: ${ApiUrls.createNotification}, Error ::" ${err}`
+          );
+        })
+        .finally(() => {
+          if (isapimethoderr == true) {
+            Toast.error(AppMessages.SomeProblem);
+          }
+          apiReqResLoader(
+            "btnsendpaymentnotification",
+            "Send",
+            API_ACTION_STATUS.COMPLETED,
+            false
+          );
+        });
+    } else {
+      $(`[name=${Object.keys(formSendPaymentNotificationErrors)[0]}]`).focus();
+      setSendPaymentNotificationErrors(formSendPaymentNotificationErrors);
+    }
+  };
+
+  // Send payment notification modal
+
   return (
     <>
       {SetPageLoaderNavLinks()}
@@ -569,7 +727,7 @@ const Notifications = () => {
                   <h5 className="mb-4 down-line">Notifications</h5>
                 </div>
                 <div className="col-6 d-flex justify-content-end align-items-end pb-10">
-                  <button
+                  {/* <button
                     className="btn btn-primary btn-mini btn-glow shadow rounded"
                     name="btnsendnotificationmodal"
                     id="btnsendnotificationmodal"
@@ -578,7 +736,45 @@ const Notifications = () => {
                   >
                     <i className="flaticon-envelope flat-mini position-relative me-1 t-1"></i>{" "}
                     Send Notification
-                  </button>
+                  </button> */}
+
+                  <div className="dropdown">
+                    <div
+                      className="btn btn-primary btn-mini btn-glow shadow rounded dropdown-toggle ddmenu-toggle"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#dropdownMenuButton"
+                      aria-controls="dropdownMenuButton"
+                      aria-expanded="false"
+                    >
+                      <i className="flaticon-envelope flat-mini position-relative me-1 t-1"></i>{" "}
+                      Send Notification
+                    </div>
+                    <ul
+                      className={`ddmenu arrow collapse in bg-white py-0 px-0 lh-1 shadow rounded text-primary`}
+                      id="dropdownMenuButton"
+                    >
+                      <li>
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={onSendNotificationModalShow}
+                        >
+                          <i className="fa fa-paper-plane position-relative me-1 t-1"></i>{" "}
+                          General Notification
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={onSendPaymentNotificationModalShow}
+                        >
+                          <i className="fa fa-credit-card position-relative me-1 t-1"></i>{" "}
+                          Payment Notification
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
               {/*============== Search Start ==============*/}
@@ -837,6 +1033,106 @@ const Notifications = () => {
         </>
       )}
       {/*============== Send Notification Modal End ==============*/}
+
+      {/*============== Send Payment Notification Modal Start ==============*/}
+      {sendPaymentNotificationModalState && (
+        <>
+          <ModalView
+            title={AppMessages.SendPaymentNotificationModalTitle}
+            content={
+              <>
+                <div className="row">
+                  <div className="col-12 mb-15">
+                    <AsyncSelect
+                      placeHolder={
+                        userAssetsList.length <= 0 && selectedAsset == null
+                          ? AppMessages.DdLLoading
+                          : AppMessages.DdlDefaultSelect
+                      }
+                      noData={
+                        userAssetsList.length <= 0 && selectedAsset == null
+                          ? AppMessages.DdLLoading
+                          : AppMessages.NoProperties
+                      }
+                      options={userAssetsList}
+                      onChange={(e) => {
+                        handleAssetChange(e);
+                      }}
+                      dataKey="AssetId"
+                      dataVal="AddressOne"
+                      value={selectedAsset}
+                      name="ddlassets"
+                      lbl={formCtrlTypes.asset}
+                      lblText="Property"
+                      lblClass="mb-0 lbl-req-field"
+                      required={true}
+                      errors={sendPaymentNotificationErrors}
+                      formErrors={formSendPaymentNotificationErrors}
+                      tabIndex={1}
+                    ></AsyncSelect>
+                  </div>
+                  <div className="col-12 mb-15">
+                    <AsyncRemoteSelect
+                      placeHolder={AppMessages.DdlTypetoSearch}
+                      noData={AppMessages.NoUsers}
+                      loadOptions={joinedUserOptions}
+                      handleInputChange={(e, val) => {
+                        handleDdlJoinedUsersChange(e, val.prevInputValue);
+                      }}
+                      onChange={(option) =>
+                        setSelectedPaymentJoinedUser(option)
+                      }
+                      value={selectedPaymentJoinedUser}
+                      name="ddlpaymentjoinedusers"
+                      lblText="Tenant"
+                      lblClass="mb-0 lbl-req-field"
+                      required={true}
+                      errors={sendPaymentNotificationErrors}
+                      formErrors={formSendPaymentNotificationErrors}
+                      isClearable={true}
+                      cacheOptions={false}
+                      tabIndex={2}
+                    ></AsyncRemoteSelect>
+                  </div>
+                  <div className="col-12 mb-0">
+                    <TextAreaControl
+                      lblClass="mb-0 lbl-req-field"
+                      name={`txtpaymentnotificationmessage`}
+                      ctlType={formCtrlTypes.message}
+                      onChange={handleSendPaymentNotificationInputChange}
+                      value={
+                        sendPaymentNotificationFormData.txtpaymentnotificationmessage
+                      }
+                      required={true}
+                      errors={sendPaymentNotificationErrors}
+                      formErrors={formSendPaymentNotificationErrors}
+                      rows={3}
+                      tabIndex={3}
+                    ></TextAreaControl>
+                  </div>
+                </div>
+              </>
+            }
+            onClose={onSendPaymentNotificationModalHide}
+            actions={[
+              {
+                id: "btnsendpaymentnotification",
+                text: "Send",
+                displayOrder: 1,
+                btnClass: "btn-primary",
+                onClick: (e) => onSendPaymentNotification(e),
+              },
+              {
+                text: "Cancel",
+                displayOrder: 2,
+                btnClass: "btn-secondary",
+                onClick: (e) => onSendPaymentNotificationModalHide(e),
+              },
+            ]}
+          ></ModalView>
+        </>
+      )}
+      {/*============== Send Payment Notification Modal End ==============*/}
     </>
   );
 };

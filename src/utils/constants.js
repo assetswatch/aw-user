@@ -35,6 +35,7 @@ export const SessionStorageKeys = {
   AssetDetailsId: "assetid",
   ObjAssetfilters: "oasf",
   OwnerTenantConnectionTab: "otcontab",
+  TenantCheckoutPaymentId: "tcpmid",
 };
 /*Session storage keys*/
 
@@ -85,6 +86,7 @@ export const AppMessages = {
   NoProfiles: "No profiles found...",
   NoProfileTypes: "No profile types found...",
   NoProperties: "No properties found...",
+  NoPayments: "No payments found...",
   NoPropertyDetails: "Property details not found...",
   NoConnection: `No connections found...`,
   NoTenants: `No ${Object.keys(config.userProfileTypes)
@@ -125,6 +127,7 @@ export const AppMessages = {
   DeleteNotificationSuccess: "Notification deleted successfully...",
   NoNotifications: "No notifications found...",
   SendNotificationModalTitle: "Send Notification",
+  SendPaymentNotificationModalTitle: "Send Payment Notification",
   SupportTicketSuccess:
     "Your message has been sent. We will get back to you shortly.",
 };
@@ -152,12 +155,21 @@ export const ValidationMessages = {
   WebsiteInvalid: "Website is not valid.",
   ZipReq: "Zip code can not be empty.",
   ZipInvalid: "Zip code is not valid.",
+  CardNumberReq: "Card number can not be empty.",
+  CardNumberInvalid: "Card number is not valid.",
+  CardExpiryReq: "Card expiry date can not be empty.",
+  CardExpiryInvalid: "Card expiry date is not valid.",
+  CvvReq: "CVV can not be empty.",
+  CvvInvalid: "CVV is not valid.",
   ProfiletypeReq: "Profile type can not be empty.",
   CategoryReq: "Category can not be empty.",
   CountryReq: "Country can not be empty.",
+  CountryInvalid: "Country is not valid.",
   ContactforReq: "Contact for can not be empty.",
   StateReq: "State can not be empty.",
+  StateInvalid: "State is not valid.",
   CityReq: "City can not be empty.",
+  CityInvalid: "City is not valid.",
   TermsReq: "Please check the terms.",
   SubjectReq: "Subject can not be empty.",
   MessageReq: "Message can not be empty.",
@@ -174,6 +186,8 @@ export const ValidationMessages = {
   UserReq: "User can not be empty.",
   PropertyTitleReq: "Property title can not be empty.",
   PropertyTitleInvalid: "Property title is not valid.",
+  AddressReq: "Address can not be empty.",
+  AddressInvalid: "Address is not valid.",
   Address1Req: "Address 1 can not be empty.",
   Address1Invalid: "Address 1 is not valid.",
   Address2Req: "Address 2 can not be empty.",
@@ -244,5 +258,9 @@ export let ApiUrls = {
   getNotifications: `notifications/v1/GetNotifications`,
   deleteNotification: `notifications/v1/DeleteNotification`,
   createNotification: `notifications/v1/CreateNotification`,
+  createAssetPayment: `payments/v1/CreateAssetPayment`,
+  getAssetPayments: `payments/v1/GetAssetPayments`,
+  getAssetPaymentDetails: `payments/v1/GetAssetPaymentDetails`,
+  processAssetPayment: `payments/v1/ProcessAssetPayment`,
 };
 /*Api Urls*/

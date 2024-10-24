@@ -151,6 +151,10 @@ const UserHeader = () => {
     );
   };
 
+  const onPayments = () => {
+    return getPagesPathByLoggedinUserProfile(loggedinProfileTypeId, "payments");
+  };
+
   return (
     <>
       {/*============== Header Section Start ==============*/}
@@ -881,9 +885,9 @@ const UserHeader = () => {
                   </li>
                   <li className="nav-item">
                     <Link
-                      className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      className="nav-link-tenant-payments"
+                      id="nav-tenant-payments"
+                      to={onPayments()}
                     >
                       <i className="fa fa-credit-card flat-mini pe-2"></i>
                       Payments
