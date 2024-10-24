@@ -96,9 +96,9 @@ const GridTable = ({
                     <span>
                       {column.isSorted ? (
                         column.isSortedDesc ? (
-                          <i class="fas fa-arrow-up-short-wide pl-5 text-primary"></i>
+                          <i className="fas fa-arrow-up-short-wide pl-5 text-primary"></i>
                         ) : (
-                          <i class="fas fa-arrow-down-short-wide pl-5 text-primary"></i>
+                          <i className="fas fa-arrow-down-short-wide pl-5 text-primary"></i>
                         )
                       ) : (
                         ""

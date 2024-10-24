@@ -25,6 +25,7 @@ export async function axiosGet(url, headerConfigs) {
   await getToken().then((response) => {
     headers = {
       "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
       ...response,
       ...headerConfigs,
     };
@@ -37,6 +38,7 @@ export async function axiosPost(url, data, headerConfigs) {
   await getToken().then((response) => {
     headers = {
       "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
       ...response,
       ...headerConfigs,
     };

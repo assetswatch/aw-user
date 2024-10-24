@@ -1,5 +1,11 @@
 {
-  "apiBaseUrl": "http://localhost:5198/api/",
+  "apiBaseUrl": "https://assetswatch.com:8000/api/",
+  "usioPaymentConfig": {
+    "getTokenUrl": "https://checkout.usiopay.com/2.0/GenerateToken",
+    "merchantAPIKey": "AEAE82F9-5A34-47C3-A61E-1E8EE37BE3AD"
+  },
+  "secretKey": "AssestsWatch@llc",
+  "secretIV": "AssestsWatch@123",
   "userProfileTypes": {
     "Owner": 1,
     "Agent": 2,
@@ -10,5 +16,9 @@
     "Accepted": 1,
     "Rejected": 2,
     "Terminated": 3
+  },
+  "paymentStatusTypes": {
+    "Pending": 0,
+    "Paid": 1
   }
 }

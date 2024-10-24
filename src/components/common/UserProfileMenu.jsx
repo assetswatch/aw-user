@@ -98,7 +98,7 @@ const UserProfileMenu = (styleprops) => {
           </div>
         </div>
         <ul
-          className={`dropdown-menu-arrow collapse in user-info-ddmenu bg-white position-absolute py-0 px-0 lh-1 shadow`}
+          className={`dropdown-menu-arrow collapse in user-info-ddmenu bg-white position-absolute py-0 px-0 lh-1 shadow rounded`}
           id="collpase-widget-userinfo-menu"
           style={{ zIndex: styleprops?.style?.zIndex }}
         >

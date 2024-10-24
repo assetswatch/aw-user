@@ -2,10 +2,14 @@ import { ValidationMessages } from "./constants";
 
 /*Validation constraints*/
 const length3 = 3;
+const length4 = 4;
 const length5 = 5;
 const length6 = 6;
+const length7 = 7;
 const length10 = 10;
+const length13 = 13;
 const length15 = 15;
+const length16 = 16;
 const length20 = 20;
 const length30 = 30;
 const length50 = 50;
@@ -19,6 +23,7 @@ const length2000 = 2000;
 const nums = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 const phonevalidvalues = [...nums, "+", "-", "."];
 const pricevalidvalues = [...nums, ".", ","];
+const expirydatevalidvalues = [...nums, "/"];
 const allowedFileTypes = ["image/jpeg", "image/png", "application/pdf"];
 const uploadFileMaxSize = 10 * 1024 * 1024; //10mb
 const uploadFileMaxSizeMB = 10; //10mb
@@ -31,6 +36,7 @@ const RegexPattern = {
   url: /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?(\?[^\s]*)?$/,
   date: /^(?:(0[1-9]|1[012])[\/.](0[1-9]|[12][0-9]|3[01])[\/.][0-9]{4})$/,
   price: /^(\$|)([0-9]\d{0,2}(\,\d{3})*|([1-9]\d*))(\.\d{1,2})?$/,
+  cardexpiry: /^(0[1-9]|1[0-2])\/\d{4}$/,
 };
 
 const checkPriceValue = (value) => {
@@ -102,6 +108,27 @@ export const Regex = {
     required: ValidationMessages.ZipReq,
     invalid: ValidationMessages.ZipInvalid,
   },
+  cardnumber: {
+    min: length13,
+    max: length16,
+    pattern: RegexPattern.numonly,
+    required: ValidationMessages.CardNumberReq,
+    invalid: ValidationMessages.CardNumberInvalid,
+  },
+  cardexpirydate: {
+    min: length7,
+    max: length7,
+    pattern: RegexPattern.cardexpiry,
+    required: ValidationMessages.CardExpiryReq,
+    invalid: ValidationMessages.CardExpiryInvalid,
+  },
+  cvv: {
+    min: length3,
+    max: length4,
+    pattern: RegexPattern.numonly,
+    required: ValidationMessages.CvvReq,
+    invalid: ValidationMessages.CvvInvalid,
+  },
   subject: { max: length100, required: ValidationMessages.SubjectReq },
   message: {
     max: length500,
@@ -125,6 +152,11 @@ export const Regex = {
     max: length50,
     required: ValidationMessages.PropertyTitleReq,
     invalid: ValidationMessages.PropertyTitleInvalid,
+  },
+  address: {
+    max: length100,
+    required: ValidationMessages.Address1Req,
+    invalid: ValidationMessages.Address1Invalid,
   },
   addressone: {
     max: length100,
@@ -300,6 +332,51 @@ export const formCtrlTypes = {
       },
     },
   },
+  cardnumber: {
+    lbl: "Card number:",
+    input: {
+      type: "text",
+      min: length13,
+      max: length16,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!RegexPattern.numonly.test(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
+  },
+  cardexpirydate: {
+    lbl: "Expiry date (MM/YYYY):",
+    input: {
+      type: "text",
+      min: length7,
+      max: length7,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!expirydatevalidvalues.includes(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
+  },
+  cvv: {
+    lbl: "CVV:",
+    input: {
+      type: "text",
+      min: length3,
+      max: length4,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!RegexPattern.numonly.test(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
+  },
   category: {
     lbl: "Category:",
   },
@@ -361,6 +438,13 @@ export const formCtrlTypes = {
     input: {
       type: "text",
       max: length50,
+    },
+  },
+  address: {
+    lbl: "Address:",
+    input: {
+      type: "text",
+      max: length400,
     },
   },
   addressone: {
