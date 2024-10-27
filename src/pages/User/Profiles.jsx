@@ -1,8 +1,13 @@
 import React from "react";
 import { useGetUserProfilesGateway } from "../../hooks/useGetUserProfilesGateway";
 import { DataLoader, NoData } from "../../components/common/LazyComponents";
-import { apiReqResLoader, checkObjNullorEmpty } from "../../utils/common";
-import { AppMessages } from "../../utils/constants";
+import {
+  apiReqResLoader,
+  checkObjNullorEmpty,
+  SetPageLoaderNavLinks,
+  GetCookieValues,
+} from "../../utils/common";
+import { AppMessages, UserCookie } from "../../utils/constants";
 import { useAuth } from "../../contexts/AuthContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { routeNames } from "../../routes/routes";
@@ -13,6 +18,8 @@ const Profiles = () => {
   const { userProfilesList, isDataLoading } = useGetUserProfilesGateway();
   const { updateUserProfile } = useAuth();
   const navigate = useNavigate();
+
+  let loggedinProfileTypeId = GetCookieValues(UserCookie.ProfileTypeId);
 
   const onChangeProfile = (e) => {
     apiReqResLoader("x");
@@ -35,77 +42,81 @@ const Profiles = () => {
 
   return (
     <>
-      <div className="full-row  bg-light">
+      {SetPageLoaderNavLinks()}
+      <div className="full-row bg-light">
         <div className="container">
-          <div className="row mx-auto col-lg-8 shadow">
-            <div className="bg-white xs-p-20 p-30 pb-30 border rounded">
-              <h4 className="mb-4 down-line">Profiles</h4>
-              <div className="row row-cols-lg-3 pt-10 pb-0 row-cols-1 g-4 flex-center">
-                {isDataLoading && (
-                  <div className="pb-100">
-                    <DataLoader />
+          <div className="row">
+            <div className="col-12">
+              <h5 className="mb-4 down-line">Profile</h5>
+            </div>
+          </div>
+          <div className="row d-flex">
+            <div className="col-4">
+              <div className="box-shadow rounded p-5">
+                <div className="p-2 d-flex">
+                  {
+                    <img
+                      src={GetCookieValues(UserCookie.ProfilePic)}
+                      alt=""
+                      className=" user-profile-pic img-border-white"
+                    ></img>
+                  }
+                  <div className="p-3 user-info-name">
+                    <h6>{GetCookieValues(UserCookie.Name)}</h6>
+                    <div className="mt-1 small text-dark">
+                      {GetCookieValues(UserCookie.ProfileType)}
+                    </div>
                   </div>
-                )}
-                {!isDataLoading && (
-                  <>
-                    {checkObjNullorEmpty(userProfilesList) ||
-                      (userProfilesList.length == 0 && (
-                        <div className="pb-100">
-                          <NoData message={AppMessages.NoProfiles} />
-                        </div>
-                      ))}
-                    {!checkObjNullorEmpty(userProfilesList) &&
-                      userProfilesList.length > 0 && (
-                        <>
-                          {userProfilesList?.map((p, pidx) => {
-                            return (
-                              <div
-                                className="col"
-                                key={`profile-${pidx}`}
-                                profile-id={p.ProfileId}
-                                profile-type={p.ProfileType}
-                                profile-name={p.Name}
-                                profile-pic={p.PicPath}
-                                profile-typeid={p.ProfileTypeId}
-                                profile-catid={p.ProfileCategoryId}
-                              >
-                                <div className="text-center px-4 py-10">
-                                  <div>
-                                    <a href="#" onClick={onChangeProfile}>
-                                      <img
-                                        src={p.PicPath}
-                                        className="box-100px max-100 rounded-circle shadow"
-                                      ></img>
-                                    </a>
-                                  </div>
-                                  <div className="mt-3">
-                                    <span className="transation font-500">
-                                      <a href="#" onClick={onChangeProfile}>
-                                        {p.ProfileType}
-                                      </a>
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                          <hr className="w-100 text-primary d -none"></hr>
-                          <div className="w-100 pt-10 pr-10 d-flex flex-end mt-0">
-                            <Link
-                              className="font-500 font-general text-primary"
-                              to={routeNames.dashboard.path}
-                            >
-                              <u>
-                                Skip
-                                <i className="pl-5 fa fa-circle-chevron-right"></i>
-                              </u>
-                              {/* <u>Cancel</u> */}
-                            </Link>
-                          </div>
-                        </>
-                      )}
-                  </>
-                )}
+                </div>
+              </div>
+            </div>
+            <div className="col-2">
+              <div className="box-shadow rounded p-5"></div>
+            </div>
+            <div className="col-2">
+              <div className="box-shadow rounded p-5"></div>
+            </div>
+            <div className="col-2">
+              <div className="box-shadow rounded p-5"></div>
+            </div>
+            <div className="col-2">
+              <div className="box-shadow rounded p-5"></div>
+            </div>
+          </div>
+          <div className="row mt-5 d-flex">
+            <div className="col-4">
+              <div className="box-shadow rounded xs-p-20 p-30 pb-30 border">
+                <div>
+                  <h6 className="text-center">Personal Information</h6>
+                  <hr></hr>
+                  <div>
+                    <div>
+                      <span>Full Name :</span>
+                    </div>
+                    <div>
+                      <span>Mobile :</span>
+                    </div>
+                    <div>
+                      <span>Email : </span>
+                    </div>
+                    <div>
+                      <span>Location : </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="col-4">
+              <div className="box-shadow rounded xs-p-20 p-30 pb-30 border"></div>
+            </div>
+            <div className="col-4">
+              <div className="box-shadow rounded xs-p-20 p-30 pb-30 border"></div>
+            </div>
+          </div>
+          <div className="row mt-5">
+            <div className="col-4">
+              <div className="box-shadow rounded xs-p-20 p-30 pb-30 border">
+                <div></div>
               </div>
             </div>
           </div>

@@ -572,7 +572,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-dashboard"
-                      to={routeNames.comingup.path}
+                      to={routeNames.profiles.path}
                     >
                       <i className="fa fa-user pe-2"></i>
                       My Profile
@@ -713,7 +713,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-dashboard"
-                      to={routeNames.comingup.path}
+                      to={routeNames.profiles.path}
                     >
                       <i className="fa fa-user pe-2"></i>
                       My Profile
@@ -855,7 +855,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-dashboard"
-                      to={routeNames.comingup.path}
+                      to={routeNames.profiles.path}
                     >
                       <i className="fa fa-user pe-2"></i>
                       My Profile

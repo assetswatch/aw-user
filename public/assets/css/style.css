@@ -4587,3 +4587,7 @@ Responsive Style Start
     transform: rotate(360deg);
   }
 }
+
+.user-profile-pic {
+  width: 30%;
+}

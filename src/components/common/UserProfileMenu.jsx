@@ -141,7 +141,7 @@ const UserProfileMenu = (styleprops) => {
             </div>
           </div>
           <li className="dropdown-item">
-            <Link id="nav-user-info-dashboard" to={routeNames.comingup.path}>
+            <Link id="nav-user-info-dashboard" to={routeNames.profiles.path}>
               <i className="fa fa-user pe-1"></i> My Profile
             </Link>
           </li>

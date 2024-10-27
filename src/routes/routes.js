@@ -23,7 +23,7 @@ export const routeNames = {
     path: "/User/Owner-Notifications",
   },
   profiles: { name: "Profiles", path: "/User/Profiles" },
-  upgradeplan: { name: "Profiles", path: "/User/UpgradePlan" },
+  upgradeplan: { name: "upgradeplan", path: "/User/UpgradePlan" },
   userproperties: { name: "UserProperties", path: "/User/Properties/View" },
   addproperty: {
     name: "AddProperty",
