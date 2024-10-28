@@ -51,72 +51,106 @@ const Profiles = () => {
             </div>
           </div>
           <div className="row d-flex">
-            <div className="col-4">
-              <div className="box-shadow rounded p-5">
-                <div className="p-2 d-flex">
+            <div className="col-md-4">
+              <div className="card box-shadow-sm profile-card rounded p-4">
+                <div className="d-flex">
                   {
                     <img
                       src={GetCookieValues(UserCookie.ProfilePic)}
                       alt=""
-                      className=" user-profile-pic img-border-white"
+                      className="Profile-Image"
                     ></img>
                   }
-                  <div className="p-3 user-info-name">
+                  <div className="mb-0">
                     <h6>{GetCookieValues(UserCookie.Name)}</h6>
-                    <div className="mt-1 small text-dark">
-                      {GetCookieValues(UserCookie.ProfileType)}
+                    <div className="small text-dark">
+                      <p>{GetCookieValues(UserCookie.ProfileType)}</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="col-2">
-              <div className="box-shadow rounded p-5"></div>
+            <div className="col-md-2">
+              <div className="box-shadow-sm card text-center">
+                <div className="card-body">
+                  <h6>Property</h6>
+                  <p class="display-6 mb-0">0</p>
+                </div>
+              </div>
             </div>
-            <div className="col-2">
-              <div className="box-shadow rounded p-5"></div>
+            <div className="col-md-2">
+              <div className="box-shadow-sm card text-center">
+                <div className="card-body">
+                  <h6>Agent</h6>
+                  <p class="display-6 mb-0">0</p>
+                </div>
+              </div>
             </div>
-            <div className="col-2">
-              <div className="box-shadow rounded p-5"></div>
+            <div className="col-md-2">
+              <div className="box-shadow-sm card text-center">
+                <div className="card-body">
+                  <h6>Tenant</h6>
+                  <p class="display-6 mb-0">0</p>
+                </div>
+              </div>
             </div>
-            <div className="col-2">
-              <div className="box-shadow rounded p-5"></div>
+            <div className="col-md-2">
+              <div className="box-shadow-sm card text-center">
+                <div className="card-body">
+                  <h6>Agreement</h6>
+                  <p class="display-6 mb-0">0</p>
+                </div>
+              </div>
             </div>
           </div>
           <div className="row mt-5 d-flex">
-            <div className="col-4">
-              <div className="box-shadow rounded xs-p-20 p-30 pb-30 border">
+            <div className="col-md-4">
+              <div className="box-shadow rounded card xs-p-20 p-30 pb-30 border">
                 <div>
                   <h6 className="text-center">Personal Information</h6>
                   <hr></hr>
                   <div>
-                    <div>
-                      <span>Full Name :</span>
+                    <div className="d-flex">
+                      <span>Full Name : </span>
+                      <p className="text-dark">
+                        {GetCookieValues(UserCookie.Name)}
+                      </p>
                     </div>
-                    <div>
+                    <div className="d-flex">
                       <span>Mobile :</span>
                     </div>
-                    <div>
+                    <div className="d-flex">
                       <span>Email : </span>
                     </div>
-                    <div>
+                    <div className="d-flex">
                       <span>Location : </span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="col-4">
-              <div className="box-shadow rounded xs-p-20 p-30 pb-30 border"></div>
-            </div>
-            <div className="col-4">
-              <div className="box-shadow rounded xs-p-20 p-30 pb-30 border"></div>
+            <div className="col-md-8">
+              <div>
+                <div className="box-shadow card rounded xs-p-20 p-30 pb-30 border">
+                  <h6>RECENT AGENT CONTACT</h6>
+                  <p class="text-muted mb-0">No Contact Available</p>
+                </div>
+              </div>
+              <div className="mt-3">
+                <div className="box-shadow card rounded xs-p-20 p-30 pb-30 border">
+                  <h6>RECENT AGENT CONTACT</h6>
+                  <p class="text-muted mb-0">No Contact Available</p>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="row mt-5">
+          <div className="row mt-3">
             <div className="col-4">
               <div className="box-shadow rounded xs-p-20 p-30 pb-30 border">
-                <div></div>
+                <div>
+                  <h6>Recent Added Property</h6>
+                  <p class="text-muted mb-0">No Property Added</p>
+                </div>
               </div>
             </div>
           </div>
