@@ -1,13 +1,21 @@
 import React from "react";
 import { SetPageLoaderNavLinks } from "../utils/common";
+import PageTitle from "../components/layouts/PageTitle";
+import { routeNames } from "../routes/routes";
 
 const TermsCondition = () => {
   return (
     <>
       {SetPageLoaderNavLinks()}
+      {/*============== Page title Start ==============*/}
+      <PageTitle
+        title="Terms and Conditions"
+        navLinks={[{ title: "Home", url: routeNames.home.path }]}
+      ></PageTitle>
+      {/*============== Page title End ==============*/}
+
       <div className="full-row">
-        <div class="container m-5">
-          <h3 className="down-line text-center">Terms & Condition</h3>
+        <div class="container">
           <div>
             <p>
               By using or accessing{" "}

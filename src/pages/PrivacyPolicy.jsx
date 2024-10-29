@@ -1,13 +1,21 @@
 import React from "react";
 import { SetPageLoaderNavLinks } from "../utils/common";
+import PageTitle from "../components/layouts/PageTitle";
+import { routeNames } from "../routes/routes";
 
 const PrivacyPolicy = () => {
   return (
     <>
       {SetPageLoaderNavLinks()}
+      {/*============== Page title Start ==============*/}
+      <PageTitle
+        title="Privacy Policy"
+        navLinks={[{ title: "Home", url: routeNames.home.path }]}
+      ></PageTitle>
+      {/*============== Page title End ==============*/}
+
       <div className="full-row">
-        <div class="container m-5">
-          <h3 className="down-line text-center">Privacy Policy</h3>
+        <div class="container">
           <div className="p-5">
             <h6 className="text-light">
               <strong>Last Modified:</strong>
