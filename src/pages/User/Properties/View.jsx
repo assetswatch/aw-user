@@ -68,7 +68,7 @@ const View = () => {
   const setSearchInitialFormData = () => {
     return {
       txtkeyword: "",
-      txtfromdate: moment().subtract(1, "month"),
+      txtfromdate: moment().subtract(3, "month"),
       txttodate: moment(),
       ddlassettype: null,
       ddlcontracttype: null,

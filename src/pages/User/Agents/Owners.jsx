@@ -24,13 +24,11 @@ import { axiosPost } from "../../../helpers/axiosHelper";
 import config from "../../../config.json";
 import TextAreaControl from "../../../components/common/TextAreaControl";
 import { formCtrlTypes } from "../../../utils/formvalidation";
-import { useGetDdlUserAssetsGateway } from "../../../hooks/useGetDdlUserAssetsGateway";
-import AsyncSelect from "../../../components/common/AsyncSelect";
 import { Toast } from "../../../components/common/ToastView";
 
-const Joined = lazy(() => import("./JoinedTenants"));
-const Requested = lazy(() => import("./TenantsRequested"));
-const ConnectionHistory = lazy(() => import("./ConnectionHistory"));
+const Joined = lazy(() => import("./JoinedOwners"));
+const Requested = lazy(() => import("./OwnersRequested"));
+const ConnectionHistory = lazy(() => import("./OwnersConnectionHistory"));
 
 const Owners = () => {
   let $ = window.$;
@@ -42,16 +40,9 @@ const Owners = () => {
   const [activeTab, setActiveTab] = useState(Tabs[0]);
   const [sendInviteModalState, setSendInviteModalState] = useState(false);
   const [selectedUsersProfile, setSelectedUsersProfile] = useState(null);
-  const [selectedAsset, setSelectedAsset] = useState(null);
   const [tabJoinedKey, setTabJoinedKey] = useState(0);
   const [tabRequestedKey, setTabRequestedKey] = useState(0);
   const [tabConnectionKey, setTabConnectionKey] = useState(0);
-
-  const { userAssetsList } = useGetDdlUserAssetsGateway(
-    "",
-    parseInt(GetUserCookieValues(UserCookie.AccountId, loggedinUser)),
-    parseInt(GetUserCookieValues(UserCookie.ProfileId, loggedinUser))
-  );
 
   function setInitialSendInvitationFormData() {
     return {
@@ -128,7 +119,7 @@ const Owners = () => {
       AccountId: parseInt(
         GetUserCookieValues(UserCookie.AccountId, loggedinUser)
       ),
-      ProfileTypeId: config.userProfileTypes.Tenant,
+      ProfileTypeId: config.userProfileTypes.Owner,
       Keyword: searchValue,
     };
 
@@ -155,10 +146,6 @@ const Owners = () => {
       });
   };
 
-  const handleAssetChange = (e) => {
-    setSelectedAsset(e?.value);
-  };
-
   const handleSendInvitationInputChange = (e) => {
     const { name, value } = e?.target;
     setSendInvitationFormData({
@@ -176,7 +163,6 @@ const Owners = () => {
     e?.preventDefault();
     setSendInviteModalState(false);
     setSelectedUsersProfile(null);
-    setSelectedAsset(null);
     setSendInvitationErrors({});
     setSendInvitationFormData(setInitialSendInvitationFormData());
   };
@@ -186,12 +172,7 @@ const Owners = () => {
     e.stopPropagation();
 
     if (checkEmptyVal(selectedUsersProfile)) {
-      formSendInvitaionErrors["ddlusersprofiles"] =
-        ValidationMessages.TenantReq;
-    }
-
-    if (checkEmptyVal(selectedAsset)) {
-      formSendInvitaionErrors["ddlassets"] = ValidationMessages.PropertyReq;
+      formSendInvitaionErrors["ddlusersprofiles"] = ValidationMessages.OwnerReq;
     }
 
     if (Object.keys(formSendInvitaionErrors).length === 0) {
@@ -205,7 +186,7 @@ const Owners = () => {
 
       let isapimethoderr = false;
       let objBodyParams = {
-        AssetId: parseInt(setSelectDefaultVal(selectedAsset)),
+        AssetId: 0,
         InviterId: parseInt(
           GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
         ),
@@ -266,7 +247,7 @@ const Owners = () => {
             <div className="col-12">
               <div className="row">
                 <div className="col-6">
-                  <h5 className="mb-4 down-line">Tenants</h5>
+                  <h5 className="mb-4 down-line">Owners</h5>
                 </div>
                 <div className="col-6 d-flex justify-content-end align-items-end pb-10">
                   <button
@@ -290,7 +271,7 @@ const Owners = () => {
                       handleTabClick(Tabs[0]);
                     }}
                   >
-                    Joined Tenants
+                    Joined Owners
                   </li>
                   <li
                     className=""
@@ -299,7 +280,7 @@ const Owners = () => {
                       handleTabClick(Tabs[1]);
                     }}
                   >
-                    Tenants Requested
+                    Owners Requested
                   </li>
                   <li
                     className=""
@@ -352,38 +333,9 @@ const Owners = () => {
               <>
                 <div className="row">
                   <div className="col-12 mb-15">
-                    <AsyncSelect
-                      placeHolder={
-                        userAssetsList.length <= 0 && selectedAsset == null
-                          ? AppMessages.DdLLoading
-                          : AppMessages.DdlDefaultSelect
-                      }
-                      noData={
-                        userAssetsList.length <= 0 && selectedAsset == null
-                          ? AppMessages.DdLLoading
-                          : AppMessages.NoProperties
-                      }
-                      options={userAssetsList}
-                      onChange={(e) => {
-                        handleAssetChange(e);
-                      }}
-                      dataKey="AssetId"
-                      dataVal="AddressOne"
-                      value={selectedAsset}
-                      name="ddlassets"
-                      lbl={formCtrlTypes.asset}
-                      lblText="Property"
-                      lblClass="mb-0 lbl-req-field"
-                      required={true}
-                      errors={sendInvitationErrors}
-                      formErrors={formSendInvitaionErrors}
-                      tabIndex={1}
-                    ></AsyncSelect>
-                  </div>
-                  <div className="col-12 mb-15">
                     <AsyncRemoteSelect
                       placeHolder={AppMessages.DdlTypetoSearch}
-                      noData={AppMessages.NoTenants}
+                      noData={AppMessages.NoOwners}
                       loadOptions={usersProfilesOptions}
                       handleInputChange={(e, val) => {
                         handleDdlUsersProfilesChange(e, val.prevInputValue);
@@ -391,7 +343,7 @@ const Owners = () => {
                       onChange={(option) => setSelectedUsersProfile(option)}
                       value={selectedUsersProfile}
                       name="ddlusersprofiles"
-                      lblText="Tenant"
+                      lblText="Owner"
                       lblClass="mb-0 lbl-req-field"
                       required={true}
                       errors={sendInvitationErrors}

@@ -22,7 +22,7 @@ import { axiosPost } from "../../../helpers/axiosHelper";
 import config from "../../../config.json";
 import { Toast } from "../../../components/common/ToastView";
 
-const TenantsRequested = memo(() => {
+const AgentsRequested = memo(() => {
   let $ = window.$;
 
   let formErrors = {};
@@ -122,8 +122,8 @@ const TenantsRequested = memo(() => {
         inviteeid: parseInt(
           GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
         ),
-        InviteeProfileTypeId: config.userProfileTypes.Agent,
-        InviterProfileTypeId: config.userProfileTypes.Tenant,
+        InviteeProfileTypeId: config.userProfileTypes.Owner,
+        InviterProfileTypeId: config.userProfileTypes.Agent,
         fromdate: setSearchInitialFormData.txtfromdate,
         todate: setSearchInitialFormData.txttodate,
         pi: parseInt(pi),
@@ -402,10 +402,10 @@ const TenantsRequested = memo(() => {
               fetchData={fetchData}
               pageCount={pageCount}
               totalInfo={{
-                text: "Tenant Requests",
+                text: "Agent Requests",
                 count: totalCount,
               }}
-              noData={AppMessages.NoTenantRequests}
+              noData={AppMessages.NoAgentRequests}
             />
           </div>
         </div>
@@ -415,4 +415,4 @@ const TenantsRequested = memo(() => {
   );
 });
 
-export default TenantsRequested;
+export default AgentsRequested;

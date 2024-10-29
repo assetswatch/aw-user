@@ -23,6 +23,7 @@ import PageTitle from "../components/layouts/PageTitle";
 import InputControl from "../components/common/InputControl";
 import { useAuth } from "../contexts/AuthContext";
 import getuuid from "../helpers/uuidHelper";
+import TextAreaControl from "../components/common/TextAreaControl";
 
 const Register = () => {
   let $ = window.$;
@@ -49,6 +50,7 @@ const Register = () => {
 
   //Load
   useEffect(() => {
+    console.log("l");
     Promise.allSettled([getProfileTypes(), getCountries()]).then(() => {
       setinitApisLoaded(true);
     });
@@ -214,6 +216,8 @@ const Register = () => {
       txtconfirmpassword: "",
       txtcompanyname: "",
       txtwebsite: "",
+      txtaddressone: "",
+      txtaddresstwo: "",
       rblprofiletype: 0,
       cbagreeterms: false,
     };
@@ -299,6 +303,8 @@ const Register = () => {
         lastName: formData.txtlastname,
         mobile: formData.txtmobile,
         landLine: formData.txtlandline,
+        addressOne: formData.txtaddressone,
+        addressTwo: formData.txtaddresstwo,
         countryId: parseInt(setSelectDefaultVal(countrySelected)),
         stateId: parseInt(setSelectDefaultVal(stateSelected)),
         cityId: parseInt(setSelectDefaultVal(citySelected)),
@@ -568,6 +574,32 @@ const Register = () => {
                               tabIndex={10}
                             ></InputControl>
                           </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtaddressone"
+                              ctlType={formCtrlTypes.addressone}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtaddressone}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={11}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0"
+                              name="txtaddresstwo"
+                              ctlType={formCtrlTypes.addresstwo}
+                              required={false}
+                              onChange={handleChange}
+                              value={formData.txtaddresstwo}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={12}
+                            ></InputControl>
+                          </div>
                           {initApisLoaded && (
                             <>
                               <div className="col-md-6 mb-15">
@@ -593,7 +625,7 @@ const Register = () => {
                                   required={true}
                                   errors={errors}
                                   formErrors={formErrors}
-                                  tabIndex={11}
+                                  tabIndex={13}
                                 ></AsyncSelect>
                               </div>
                               <div className="col-md-6 mb-15">
@@ -626,7 +658,7 @@ const Register = () => {
                                   required={true}
                                   errors={errors}
                                   formErrors={formErrors}
-                                  tabIndex={12}
+                                  tabIndex={14}
                                 ></AsyncSelect>
                               </div>
                               <div className="col-md-6 mb-15">
@@ -659,7 +691,7 @@ const Register = () => {
                                   required={true}
                                   errors={errors}
                                   formErrors={formErrors}
-                                  tabIndex={13}
+                                  tabIndex={15}
                                 ></AsyncSelect>
                               </div>
                             </>
@@ -674,7 +706,7 @@ const Register = () => {
                               value={formData.txtzip}
                               errors={errors}
                               formErrors={formErrors}
-                              tabIndex={14}
+                              tabIndex={16}
                             ></InputControl>
                           </div>
                           <div className="col-md-12 mb-20">
@@ -686,7 +718,7 @@ const Register = () => {
                                 name="cbagreeterms"
                                 value={formData.cbagreeterms}
                                 onChange={handleTermsChange}
-                                tabIndex={15}
+                                tabIndex={17}
                               />
                               <label htmlFor="cbagreeterms">
                                 I Agree to AssetsWatch Terms of use i would like

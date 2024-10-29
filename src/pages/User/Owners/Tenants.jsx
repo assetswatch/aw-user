@@ -30,7 +30,7 @@ import { Toast } from "../../../components/common/ToastView";
 
 const Joined = lazy(() => import("./JoinedTenants"));
 const Requested = lazy(() => import("./TenantsRequested"));
-const ConnectionHistory = lazy(() => import("./ConnectionHistory"));
+const ConnectionHistory = lazy(() => import("./TenantsConnectionHistory"));
 
 const Tenants = () => {
   let $ = window.$;

@@ -99,6 +99,16 @@ export const AppMessages = {
       (key) => config.userProfileTypes[key] === config.userProfileTypes.Tenant
     )
     .toLowerCase()} requests found...`,
+  NoAgents: `No ${Object.keys(config.userProfileTypes)
+    .find(
+      (key) => config.userProfileTypes[key] === config.userProfileTypes.Agent
+    )
+    .toLowerCase()}s found...`,
+  NoAgentRequests: `No ${Object.keys(config.userProfileTypes)
+    .find(
+      (key) => config.userProfileTypes[key] === config.userProfileTypes.Agent
+    )
+    .toLowerCase()} requests found...`,
   NoOwners: `No ${Object.keys(config.userProfileTypes)
     .find(
       (key) => config.userProfileTypes[key] === config.userProfileTypes.Owner
@@ -182,6 +192,7 @@ export const ValidationMessages = {
   DateInvalid: "Date is not valid.",
   PropertyReq: "Property can not be empty.",
   TenantReq: "Tenant can not be empty.",
+  AgentReq: "Tenant can not be empty.",
   OwnerReq: "Owner can not be empty.",
   UserReq: "User can not be empty.",
   PropertyTitleReq: "Property title can not be empty.",

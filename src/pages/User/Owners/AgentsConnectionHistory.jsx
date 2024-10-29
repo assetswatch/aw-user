@@ -7,6 +7,7 @@ import {
   checkEmptyVal,
   checkStartEndDateGreater,
   GetUserCookieValues,
+  setSelectDefaultVal,
 } from "../../../utils/common";
 import DateControl from "../../../components/common/DateControl";
 import moment from "moment";
@@ -21,12 +22,16 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { axiosPost } from "../../../helpers/axiosHelper";
 import config from "../../../config.json";
 import { Toast } from "../../../components/common/ToastView";
+import { useUserConnectionStatusTypesGateway } from "../../../hooks/useUserConnectionStatusTypesGateway";
+import AsyncSelect from "../../../components/common/AsyncSelect";
 
-const TenantsRequested = memo(() => {
+const AgentsConnectionHistory = memo(() => {
   let $ = window.$;
 
   let formErrors = {};
   const { loggedinUser } = useAuth();
+
+  const { userConnectionStatusTypes } = useUserConnectionStatusTypesGateway();
 
   //Grid
   const [usersData, setUsersData] = useState([]);
@@ -40,14 +45,22 @@ const TenantsRequested = memo(() => {
       txtkeyword: "",
       txtfromdate: moment().subtract(3, "month"),
       txttodate: moment(),
+      ddlstatus: userConnectionStatusTypes?.[0]?.["Id"],
     };
   };
 
   const [searchFormData, setSearchFormData] = useState(
     setSearchInitialFormData
   );
-
   //Set search formdata
+
+  //Search ddl controls changes
+  const ddlChange = (e, name) => {
+    setSearchFormData({
+      ...searchFormData,
+      [name]: e?.value,
+    });
+  };
 
   //Search Date control change
   const onDateChange = (newDate, name) => {
@@ -119,13 +132,14 @@ const TenantsRequested = memo(() => {
       let objParams = {};
       objParams = {
         keyword: "",
-        inviteeid: parseInt(
+        inviterid: parseInt(
           GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
         ),
+        InviterProfileTypeId: config.userProfileTypes.Owner,
         InviteeProfileTypeId: config.userProfileTypes.Agent,
-        InviterProfileTypeId: config.userProfileTypes.Tenant,
         fromdate: setSearchInitialFormData.txtfromdate,
         todate: setSearchInitialFormData.txttodate,
+        status: setSearchInitialFormData.ddlstatus,
         pi: parseInt(pi),
         ps: parseInt(ps),
       };
@@ -136,11 +150,12 @@ const TenantsRequested = memo(() => {
           keyword: searchFormData.txtkeyword,
           fromdate: searchFormData.txtfromdate,
           todate: searchFormData.txttodate,
+          status: parseInt(setSelectDefaultVal(searchFormData.ddlstatus, -1)),
         };
       }
 
       return axiosPost(
-        `${config.apiBaseUrl}${ApiUrls.getRequestedUserConnections}`,
+        `${config.apiBaseUrl}${ApiUrls.getUserConnectionsHistory}`,
         objParams
       )
         .then((response) => {
@@ -160,7 +175,7 @@ const TenantsRequested = memo(() => {
           setUsersData([]);
           setPageCount(0);
           console.error(
-            `"API :: ${ApiUrls.getRequestedUserConnections}, Error ::" ${err}`
+            `"API :: ${ApiUrls.getUserConnectionsHistory}, Error ::" ${err}`
           );
         })
         .finally(() => {
@@ -188,69 +203,67 @@ const TenantsRequested = memo(() => {
           <>
             <LazyImage
               className="rounded cur-pointer w-80px"
-              onClick={(e) => {}}
               src={row.original.PicPath}
               alt={row.original.FirstName + " " + row.original.LastName}
               placeHolderClass="pos-absolute w-80px min-h-80 fl-l"
             ></LazyImage>
             <div className="property-info d-table">
-              <a href="#" onClick={(e) => {}}>
-                <h5 className="text-secondary">
-                  {row.original.FirstName + " " + row.original.LastName}
-                </h5>
-              </a>
-              <div>
-                <i className="fas fa-map-marker-alt text-primary font-13 p-r-5" />
-                {row.original.City}, {row.original.State},{" "}
-                {row.original.Country}
+              <h5 className="text-secondary">
+                {row.original.FirstName + " " + row.original.LastName}
+              </h5>
+              <div className="py-1">
+                <i className="far fa-envelope font-13 p-r-5" />
+                {row.original.Email}
+              </div>
+              <div className="py-1">
+                <i className="flat-mini flaticon-phone-call font-13 p-r-5" />
+                {row.original.MobileNo}
               </div>
             </div>
           </>
         ),
       },
       {
-        Header: "Email Id",
-        accessor: "Email",
+        Header: "Status",
+        accessor: "StatusDisplay",
         disableSortBy: true,
-        className: "w-250px",
+        className: "w-180px",
+        Cell: ({ row }) => (
+          <>
+            <span
+              className={`badge badge-pill gr-badge-pill ${
+                row.original.Status == config.userConnectionStatusTypes.Accepted
+                  ? "gr-badge-pill-suc"
+                  : row.original.Status ==
+                    config.userConnectionStatusTypes.Pending
+                  ? "gr-badge-pill-warning"
+                  : row.original.Status ==
+                      config.userConnectionStatusTypes.Rejected ||
+                    row.original.Status ==
+                      config.userConnectionStatusTypes.Terminated
+                  ? "gr-badge-pill-error"
+                  : ""
+              }`}
+            >
+              {row.original.StatusDisplay}
+            </span>
+          </>
+        ),
       },
       {
-        Header: "Phone Number",
-        accessor: "MobileNo",
-        disableSortBy: true,
-        className: "w-200px",
+        Header: "Invited On",
+        accessor: "InvitedDateDisplay",
+        className: "w-180px",
       },
-
       {
-        Header: "Joined On",
+        Header: "Replied On",
         accessor: "RepliedDateDisplay",
         className: "w-180px",
       },
       {
-        Header: "Actions",
-        className: "w-150px",
-        actions: [
-          {
-            text: "Accept",
-            onclick: (e, row) => {
-              onStatusChange(
-                e,
-                row.original,
-                config.userConnectionStatusTypes.Accepted
-              );
-            },
-          },
-          {
-            text: "Reject",
-            onclick: (e, row) => {
-              onStatusChange(
-                e,
-                row.original,
-                config.userConnectionStatusTypes.Rejected
-              );
-            },
-          },
-        ],
+        Header: "Terminated On",
+        accessor: "TerminatedDateDisplay",
+        className: "w-180px text-left",
       },
     ],
     []
@@ -267,55 +280,6 @@ const TenantsRequested = memo(() => {
 
   //Setup Grid.
 
-  //Grid actions
-
-  const onStatusChange = (e, selectedRow, statusId) => {
-    e.preventDefault();
-    apiReqResLoader("x", "", API_ACTION_STATUS.START);
-
-    let isapimethoderr = false;
-    let objBodyParams = {
-      ProfileId: parseInt(
-        GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
-      ),
-      AccountId: parseInt(
-        GetUserCookieValues(UserCookie.AccountId, loggedinUser)
-      ),
-      Id: parseInt(selectedRow?.Id),
-      Status: statusId,
-    };
-
-    axiosPost(
-      `${config.apiBaseUrl}${ApiUrls.updateUserConnectionStatus}`,
-      objBodyParams
-    )
-      .then((response) => {
-        let objResponse = response.data;
-        if (objResponse.StatusCode === 200) {
-          Toast.success(objResponse.Data.Message);
-          if (objResponse.Data.Id > 0) {
-            getUsers({});
-          }
-        } else {
-          isapimethoderr = true;
-        }
-      })
-      .catch((err) => {
-        isapimethoderr = true;
-        console.error(
-          `"API :: ${ApiUrls.updateUserConnectionStatus}, Error ::" ${err}`
-        );
-      })
-      .finally(() => {
-        if (isapimethoderr == true) {
-          Toast.error(AppMessages.SomeProblem);
-        }
-        apiReqResLoader("x", "", API_ACTION_STATUS.COMPLETED);
-      });
-  };
-
-  //Grid actions
-
   return (
     <>
       <div className="woo-filter-bar full-row p-3 grid-search bo-0">
@@ -324,7 +288,7 @@ const TenantsRequested = memo(() => {
             <div className="col px-0">
               <form noValidate>
                 <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
-                  <div className="col-lg-3 col-xl-4 col-md-4">
+                  <div className="col-lg-3 col-xl-3 col-md-6">
                     <InputControl
                       lblClass="mb-0"
                       lblText="Search by Name/ Email / Phone"
@@ -334,6 +298,36 @@ const TenantsRequested = memo(() => {
                       onChange={handleChange}
                       formErrors={formErrors}
                     ></InputControl>
+                  </div>
+                  <div className="col-lg-3 col-xl-2 col-md-6">
+                    <AsyncSelect
+                      placeHolder={
+                        userConnectionStatusTypes.length <= 0 &&
+                        searchFormData.ddlstatus == null
+                          ? AppMessages.DdLLoading
+                          : AppMessages.DdlDefaultSelect
+                      }
+                      noData={
+                        userConnectionStatusTypes.length <= 0 &&
+                        searchFormData.ddlstatus == null
+                          ? AppMessages.DdLLoading
+                          : AppMessages.DdlNoData
+                      }
+                      options={userConnectionStatusTypes}
+                      dataKey="Id"
+                      dataVal="Type"
+                      onChange={(e) => ddlChange(e, "ddlstatus")}
+                      value={searchFormData.ddlstatus}
+                      defualtselected={searchFormData.ddlstatus}
+                      name="ddlstatus"
+                      lbl={formCtrlTypes.status}
+                      lblClass="mb-0"
+                      lblText="Status"
+                      className="ddlborder"
+                      isClearable={false}
+                      isSearchCtl={true}
+                      formErrors={formErrors}
+                    ></AsyncSelect>
                   </div>
                   <div className="col-lg-3 col-xl-2 col-md-4">
                     <DateControl
@@ -360,7 +354,7 @@ const TenantsRequested = memo(() => {
                       }}
                     ></DateControl>
                   </div>
-                  <div className="col-lg-3 col-xl-4 col-md-4 grid-search-action">
+                  <div className="col-lg-3 col-xl-3 col-md-4 grid-search-action">
                     <label
                       className="mb-0 form-error w-100"
                       id="search-val-err-message"
@@ -402,10 +396,10 @@ const TenantsRequested = memo(() => {
               fetchData={fetchData}
               pageCount={pageCount}
               totalInfo={{
-                text: "Tenant Requests",
+                text: "Total Records",
                 count: totalCount,
               }}
-              noData={AppMessages.NoTenantRequests}
+              noData={AppMessages.NoHistory}
             />
           </div>
         </div>
@@ -415,4 +409,4 @@ const TenantsRequested = memo(() => {
   );
 });
 
-export default TenantsRequested;
+export default AgentsConnectionHistory;

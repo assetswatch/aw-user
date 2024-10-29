@@ -25,7 +25,7 @@ import { Toast } from "../../../components/common/ToastView";
 import { useUserConnectionStatusTypesGateway } from "../../../hooks/useUserConnectionStatusTypesGateway";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 
-const ConnectionHistory = memo(() => {
+const TenantsConnectionHistory = memo(() => {
   let $ = window.$;
 
   let formErrors = {};
@@ -38,7 +38,6 @@ const ConnectionHistory = memo(() => {
   const [totalCount, setTotalCount] = useState(0);
   const [pageCount, setPageCount] = useState(0);
   const [isDataLoading, setIsDataLoading] = useState(false);
-  const [selectedGridRow, setSelectedGridRow] = useState(null);
 
   //Set search form intial data
   const setSearchInitialFormData = () => {
@@ -136,7 +135,7 @@ const ConnectionHistory = memo(() => {
         inviterid: parseInt(
           GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
         ),
-        InviterProfileTypeId: config.userProfileTypes.Owner,
+        InviterProfileTypeId: config.userProfileTypes.Agent,
         InviteeProfileTypeId: config.userProfileTypes.Tenant,
         fromdate: setSearchInitialFormData.txtfromdate,
         todate: setSearchInitialFormData.txttodate,
@@ -397,10 +396,10 @@ const ConnectionHistory = memo(() => {
               fetchData={fetchData}
               pageCount={pageCount}
               totalInfo={{
-                text: "Joined Tenants",
+                text: "Total Records",
                 count: totalCount,
               }}
-              noData={AppMessages.NoConnection}
+              noData={AppMessages.NoHistory}
             />
           </div>
         </div>
@@ -410,4 +409,4 @@ const ConnectionHistory = memo(() => {
   );
 });
 
-export default ConnectionHistory;
+export default TenantsConnectionHistory;
