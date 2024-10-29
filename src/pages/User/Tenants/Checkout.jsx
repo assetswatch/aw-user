@@ -284,7 +284,7 @@ const Checkout = () => {
             CardType: tokenResponse.cardBrand,
             CardNumberLast4: tokenResponse.last4,
             ExpDate: tokenResponse.expDate,
-            Amount: paymentDetails.TotalPaymentAmount,
+            Amount: paymentDetails.TotalAmount,
             Tax: paymentDetails.Tax,
             CCCharges: paymentDetails.CCCharges,
           };
@@ -523,7 +523,7 @@ const Checkout = () => {
                                 ></InputControl>
                               </div>
                               <div className="col-md-6 mb-15">
-                                <TextAreaControl
+                                <InputControl
                                   lblClass="mb-0 lbl-req-field"
                                   name="txtaddressone"
                                   ctlType={formCtrlTypes.addressone}
@@ -533,11 +533,10 @@ const Checkout = () => {
                                   errors={errors}
                                   formErrors={formErrors}
                                   tabIndex={7}
-                                  rows={2}
-                                ></TextAreaControl>
+                                ></InputControl>
                               </div>
                               <div className="col-md-6 mb-15">
-                                <TextAreaControl
+                                <InputControl
                                   lblClass="mb-0"
                                   name="txtaddresstwo"
                                   ctlType={formCtrlTypes.addresstwo}
@@ -546,8 +545,7 @@ const Checkout = () => {
                                   errors={errors}
                                   formErrors={formErrors}
                                   tabIndex={8}
-                                  rows={2}
-                                ></TextAreaControl>
+                                ></InputControl>
                               </div>
                               {initApisLoaded && (
                                 <>

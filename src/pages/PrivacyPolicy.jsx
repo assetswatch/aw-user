@@ -1,1512 +1,224 @@
-import React, { useEffect } from "react";
-import { loadFile, unloadFile, getArrLoadFiles } from "../utils/loadFiles";
+import React from "react";
 import { SetPageLoaderNavLinks } from "../utils/common";
+import PageTitle from "../components/layouts/PageTitle";
+import { routeNames } from "../routes/routes";
+
 const PrivacyPolicy = () => {
-  let $ = window.$;
-
-  //list of js/css dependencies.
-  let arrJsCssFiles = [
-    {
-      dir: "./assets/js/",
-      pos: "body",
-      type: "js",
-      files: ["layerslider.js", "owl.js"],
-    },
-  ];
-
-  useEffect(() => {
-    //load js/css depedency files.
-    let arrLoadFiles = getArrLoadFiles(arrJsCssFiles);
-    let promiseLoadFiles = arrLoadFiles.map(loadFile);
-    Promise.allSettled(promiseLoadFiles).then(function (responses) {
-      loadSettings();
-    });
-
-    return () => {
-      unloadFile(arrJsCssFiles); //unload files.
-    };
-  }, []);
-
-  //load all jquery dependencies.
-  function loadSettings() {
-    try {
-      //Banner Slider
-      $("#slider")?.layerSlider({
-        sliderVersion: "6.0.0",
-        type: "fullwidth",
-        responsiveUnder: 0,
-        maxRatio: 1,
-        slideBGSize: "auto",
-        hideUnder: 0,
-        hideOver: 100000,
-        skin: "outline",
-        fitScreenWidth: true,
-        //navButtons: false,
-        navStartStop: false,
-        navPrevNext: false,
-        globalBGColor: "#53585f",
-        fullSizeMode: "fitheight",
-        thumbnailNavigation: "disabled",
-        pauseOnHover: "enabled",
-        height: 600,
-        skinsPath: "assets/skins/",
-      });
-
-      // Testimonials carousel
-      if ($(".testimonial-carousel").length) {
-        $(".testimonial-carousel")?.owlCarousel({
-          loop: true,
-          margin: 30,
-          nav: false,
-          dots: true,
-          smartSpeed: 500,
-          autoplay: true,
-          responsive: {
-            0: {
-              items: 1,
-            },
-            480: {
-              items: 1,
-            },
-            600: {
-              items: 1,
-            },
-            800: {
-              items: 1,
-            },
-            1200: {
-              items: 1,
-            },
-          },
-        });
-      }
-
-      if ($(".properties-carousel").length) {
-        setCarousel($(".properties-carousel"));
-      }
-
-      if ($(".agents-carousel").length) {
-        setCarousel($(".agents-carousel"));
-      }
-
-      function setCarousel(elem) {
-        elem.owlCarousel({
-          loop: false,
-          margin: 24,
-          nav: true,
-          dots: true,
-          smartSpeed: 500,
-          autoplay: false,
-          responsive: {
-            0: {
-              items: 1,
-            },
-            576: {
-              items: 2,
-            },
-            992: {
-              items: 2,
-            },
-            1200: {
-              items: 3,
-            },
-            1400: {
-              items: 4,
-            },
-          },
-        });
-      }
-    } catch (e) {
-      console.error(e.message);
-    }
-  }
-
   return (
     <>
-      {SetPageLoaderNavLinks()}
-      {/*============== Slider Area Start ==============*/}
-      <div className="full-row p-0 overflow-hidden">
-        <div
-          id="slider"
-          className="overflow-hidden"
-          style={{
-            width: 1200,
-            height: 660,
-            margin: "0 auto",
-            marginBottom: 0,
-          }}
-        >
-          {/* Slide 1*/}
-          <div
-            className="ls-slide"
-            data-ls="bgsize:cover; bgposition:50% 50%; duration:4000; transition2d: 2,7,9; kenburnsscale:1.00;"
-          >
-            <img
-              width={1920}
-              height={960}
-              src="./assets/images/banner-elc-payment.jpg"
-              className="ls-bg"
-              alt=""
-            />
-          </div>
-          {/* Slide 2 */}
-          <div
-            className="ls-slide"
-            data-ls="bgsize:cover; bgposition:50% 50%; duration:4000; transition2d: 2,7,9; kenburnsscale:1.00;"
-          >
-            <img
-              width={1920}
-              height={960}
-              src="./assets/images/banner-elc-agreement.jpg"
-              className="ls-bg"
-              alt=""
-            />
-          </div>
-          {/* Slide 3 */}
-          <div
-            className="ls-slide"
-            data-ls="bgsize:cover; bgposition:50% 50%; duration:4000; transition2d: 2,7,9; kenburnsscale:1.00;"
-          >
-            <img
-              width={1920}
-              height={960}
-              src="./assets/images/banner-bgv.jpg"
-              className="ls-bg"
-              alt=""
-            />
-          </div>
-        </div>
-      </div>
-      {/*============== Slider Area End ==============*/}
+      {/*============== Page title Start ==============*/}
+      <PageTitle
+        title="Privacy Policy"
+        navLinks={[{ title: "Home", url: routeNames.home.path }]}
+      ></PageTitle>
+      {/*============== Page title End ==============*/}
 
-      {/*============== Property Search Form Start ==============*/}
-      <div className="full-row p-0" style={{ marginTop: "0px", zIndex: 99 }}>
-        <div className="container-fluid">
-          <div className="row">
-            <div className="col px-0">
-              <form
-                className="bg-light shadow-sm quick-search py-4 px-5 form-icon-right position-relative"
-                action="#"
-                method="post"
-              >
-                <div className="row row-cols-lg-6 row-cols-md-3 row-cols-1 g-3">
-                  <div className="col">
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="keyword"
-                      placeholder="Enter Keyword..."
-                    />
-                  </div>
-                  <div className="col">
-                    <select className="form-control">
-                      <option>Property Types</option>
-                      <option>House</option>
-                      <option>Office</option>
-                      <option>Appartment</option>
-                      <option>Condos</option>
-                      <option>Villa</option>
-                      <option>Small Family</option>
-                      <option>Single Room</option>
-                    </select>
-                  </div>
-                  <div className="col">
-                    <div className="position-relative">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="location"
-                        placeholder="Location"
-                      />
-                      <i className="flaticon-placeholder flat-mini icon-font y-center text-dark" />
-                    </div>
-                  </div>
-                  <div className="col">
-                    <div className="position-relative">
-                      <button
-                        className="form-control price-toggle toggle-btn"
-                        data-target="#data-range-price"
-                      >
-                        Price{" "}
-                        <i className="fas fa-angle-down font-mini icon-font y-center text-dark" />
-                      </button>
-                      <div
-                        id="data-range-price"
-                        className="price_range price-range-toggle"
-                      >
-                        <div className="area-filter price-filter">
-                          <span className="price-slider">
-                            <input
-                              className="filter_price"
-                              type="text"
-                              name="price"
-                              defaultValue="0;10000000"
-                            />
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col">
-                    <div className="position-relative">
-                      <button
-                        className="form-control text-start toggle-btn"
-                        data-target="#aditional-check"
-                      >
-                        Advanced{" "}
-                        <i className="fas fa-ellipsis-v font-mini icon-font y-center text-dark" />
-                      </button>
-                    </div>
-                  </div>
-                  <div className="col">
-                    <button className="btn btn-primary w-100">Search</button>
-                  </div>
-                  {/* Advance Features */}
-                  <div id="aditional-check" className="aditional-features p-5">
-                    <h5 className="mb-3">Aditional Options</h5>
-                    <ul className="row row-cols-lg-4 row-cols-md-2 row-cols-1 custom-check-box mb-4">
-                      <li className="col">
-                        <input
-                          type="checkbox"
-                          className="custom-control-input hide"
-                          id="customCheck1"
-                        />
-                        <label
-                          className="custom-control-label"
-                          htmlFor="customCheck1"
-                        >
-                          Air Conditioning
-                        </label>
-                      </li>
-                      <li className="col">
-                        <input
-                          type="checkbox"
-                          className="custom-control-input hide"
-                          id="customCheck2"
-                        />
-                        <label
-                          className="custom-control-label"
-                          htmlFor="customCheck2"
-                        >
-                          Garage Facility
-                        </label>
-                      </li>
-                      <li className="col">
-                        <input
-                          type="checkbox"
-                          className="custom-control-input hide"
-                          id="customCheck3"
-                        />
-                        <label
-                          className="custom-control-label"
-                          htmlFor="customCheck3"
-                        >
-                          Swiming Pool
-                        </label>
-                      </li>
-                      <li className="col">
-                        <input
-                          type="checkbox"
-                          className="custom-control-input hide"
-                          id="customCheck4"
-                        />
-                        <label
-                          className="custom-control-label"
-                          htmlFor="customCheck4"
-                        >
-                          Fire Security
-                        </label>
-                      </li>
-                      <li className="col">
-                        <input
-                          type="checkbox"
-                          className="custom-control-input hide"
-                          id="customCheck5"
-                        />
-                        <label
-                          className="custom-control-label"
-                          htmlFor="customCheck5"
-                        >
-                          Fire Place Facility
-                        </label>
-                      </li>
-                      <li className="col">
-                        <input
-                          type="checkbox"
-                          className="custom-control-input hide"
-                          id="customCheck6"
-                        />
-                        <label
-                          className="custom-control-label"
-                          htmlFor="customCheck6"
-                        >
-                          Play Ground
-                        </label>
-                      </li>
-                      <li className="col">
-                        <input
-                          type="checkbox"
-                          className="custom-control-input hide"
-                          id="customCheck7"
-                        />
-                        <label
-                          className="custom-control-label"
-                          htmlFor="customCheck7"
-                        >
-                          Ferniture Include
-                        </label>
-                      </li>
-                      <li className="col">
-                        <input
-                          type="checkbox"
-                          className="custom-control-input hide"
-                          id="customCheck8"
-                        />
-                        <label
-                          className="custom-control-label"
-                          htmlFor="customCheck8"
-                        >
-                          Marbel Floor
-                        </label>
-                      </li>
-                      <li className="col">
-                        <input
-                          type="checkbox"
-                          className="custom-control-input hide"
-                          id="customCheck9"
-                        />
-                        <label
-                          className="custom-control-label"
-                          htmlFor="customCheck9"
-                        >
-                          Store Room
-                        </label>
-                      </li>
-                      <li className="col">
-                        <input
-                          type="checkbox"
-                          className="custom-control-input hide"
-                          id="customCheck10"
-                        />
-                        <label
-                          className="custom-control-label"
-                          htmlFor="customCheck10"
-                        >
-                          Hight Class Door
-                        </label>
-                      </li>
-                      <li className="col">
-                        <input
-                          type="checkbox"
-                          className="custom-control-input hide"
-                          id="customCheck11"
-                        />
-                        <label
-                          className="custom-control-label"
-                          htmlFor="customCheck11"
-                        >
-                          Floor Heating System
-                        </label>
-                      </li>
-                      <li className="col">
-                        <input
-                          type="checkbox"
-                          className="custom-control-input hide"
-                          id="customCheck12"
-                        />
-                        <label
-                          className="custom-control-label"
-                          htmlFor="customCheck12"
-                        >
-                          Garden Include
-                        </label>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/*============== Property Search Form End ==============*/}
-
-      {/*============== Recent Property Start ==============*/}
-      <div className="full-row bg-white pt-5 pb-5">
+      <div className="full-row">
         <div className="container">
-          <div className="row mb-5 align-items-center">
-            <div className="col-md-8">
-              <div className="me-auto">
-                <h2 className="d-table mb-4 down-line">Recent Properties</h2>
-                <span className="d-table sub-title text-secondary">
-                  Mauris primis turpis Laoreet magna felis mi amet quam enim
-                  curae. Sodales semper tempor dictum.
-                </span>
-              </div>
-            </div>
-            <div className="col-md-4">
-              <a href="#" className="ms-auto btn-link d-table p y-2 sm-mx-0">
-                View All Properties &gt;
-              </a>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col">
-              <div className="properties-carousel nav-disable owl-carousel">
-                <div className="item">
-                  <div className="property-grid-1 property-block bg-light transation-this">
-                    <div className="overflow-hidden position-relative transation thumbnail-img bg-secondary hover-img-zoom">
-                      <div className="cata position-absolute">
-                        <span className="sale bg-secondary text-white">
-                          For Sale
-                        </span>
-                      </div>
-                      <a href="property-single-v1.html">
-                        <img src="assets/images/property_grid/property-grid-1.png" />
-                      </a>
-                      <a href="#" className="listing-ctg text-white">
-                        <i className="fa-solid fa-building" />
-                        <span>Apartment</span>
-                      </a>
-                      <ul className="position-absolute quick-meta">
-                        <li>
-                          <a href="#" title="Add Favourite">
-                            <i className="flaticon-like-1 flat-mini" />
-                          </a>
-                        </li>
-                        <li className="md-mx-none">
-                          <a
-                            className="quick-view"
-                            href="#quick-view"
-                            title="Quick View"
-                          >
-                            <i className="flaticon-zoom-increasing-symbol flat-mini" />
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="property_text p-3 pb-0">
-                      <span className="listing-price">
-                        $1850<small> ( Monthly )</small>
-                      </span>
-                      <h5 className="listing-title">
-                        <a href="property-single-v1.html">
-                          Family House Residense
-                        </a>
-                      </h5>
-                      <span className="listing-location">
-                        <i className="fas fa-map-marker-alt" /> 4213 South
-                        Burlington, VT 05403
-                      </span>
-                    </div>
-                    <div className="d-flex align-items-center post-meta mt-2 py-3 px-3 border-top">
-                      <div className="agent">
-                        <a
-                          href="#"
-                          className="d-flex text-general align-items-center"
-                        >
-                          <img
-                            className="rounded-circle me-2"
-                            src="assets/images/team/1.jpg"
-                          />
-                          <span>Ali Tufan</span>
-                        </a>
-                      </div>
-                      <div className="post-date ms-auto">
-                        <span>2 Month Ago</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="item">
-                  <div className="property-grid-1 property-block bg-light transation-this">
-                    <div className="overflow-hidden position-relative transation thumbnail-img bg-secondary hover-img-zoom">
-                      <div className="cata position-absolute">
-                        <span className="sale bg-secondary text-white">
-                          For Sale
-                        </span>
-                      </div>
-                      <a href="property-single-v1.html">
-                        <img src="assets/images/property_grid/property-grid-1.png" />
-                      </a>
-                      <a href="#" className="listing-ctg text-white">
-                        <i className="fa-solid fa-building" />
-                        <span>Apartment</span>
-                      </a>
-                      <ul className="position-absolute quick-meta">
-                        <li>
-                          <a href="#" title="Add Favourite">
-                            <i className="flaticon-like-1 flat-mini" />
-                          </a>
-                        </li>
-                        <li className="md-mx-none">
-                          <a
-                            className="quick-view"
-                            href="#quick-view"
-                            title="Quick View"
-                          >
-                            <i className="flaticon-zoom-increasing-symbol flat-mini" />
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="property_text p-3 pb-0">
-                      <span className="listing-price">
-                        $1850<small> ( Monthly )</small>
-                      </span>
-                      <h5 className="listing-title">
-                        <a href="property-single-v1.html">
-                          Family House Residense
-                        </a>
-                      </h5>
-                      <span className="listing-location">
-                        <i className="fas fa-map-marker-alt" /> 4213 South
-                        Burlington, VT 05403
-                      </span>
-                    </div>
-                    <div className="d-flex align-items-center post-meta mt-2 py-3 px-3 border-top">
-                      <div className="agent">
-                        <a
-                          href="#"
-                          className="d-flex text-general align-items-center"
-                        >
-                          <img
-                            className="rounded-circle me-2"
-                            src="assets/images/team/1.jpg"
-                          />
-                          <span>Ali Tufan</span>
-                        </a>
-                      </div>
-                      <div className="post-date ms-auto">
-                        <span>2 Month Ago</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="item">
-                  <div className="property-grid-1 property-block bg-light transation-this">
-                    <div className="overflow-hidden position-relative transation thumbnail-img bg-secondary hover-img-zoom">
-                      <div className="cata position-absolute">
-                        <span className="sale bg-secondary text-white">
-                          For Sale
-                        </span>
-                      </div>
-                      <a href="property-single-v1.html">
-                        <img src="assets/images/property_grid/property-grid-1.png" />
-                      </a>
-                      <a href="#" className="listing-ctg text-white">
-                        <i className="fa-solid fa-building" />
-                        <span>Apartment</span>
-                      </a>
-                      <ul className="position-absolute quick-meta">
-                        <li>
-                          <a href="#" title="Add Favourite">
-                            <i className="flaticon-like-1 flat-mini" />
-                          </a>
-                        </li>
-                        <li className="md-mx-none">
-                          <a
-                            className="quick-view"
-                            href="#quick-view"
-                            title="Quick View"
-                          >
-                            <i className="flaticon-zoom-increasing-symbol flat-mini" />
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="property_text p-3 pb-0">
-                      <span className="listing-price">
-                        $1850<small> ( Monthly )</small>
-                      </span>
-                      <h5 className="listing-title">
-                        <a href="property-single-v1.html">
-                          Family House Residense
-                        </a>
-                      </h5>
-                      <span className="listing-location">
-                        <i className="fas fa-map-marker-alt" /> 4213 South
-                        Burlington, VT 05403
-                      </span>
-                    </div>
-                    <div className="d-flex align-items-center post-meta mt-2 py-3 px-3 border-top">
-                      <div className="agent">
-                        <a
-                          href="#"
-                          className="d-flex text-general align-items-center"
-                        >
-                          <img
-                            className="rounded-circle me-2"
-                            src="assets/images/team/1.jpg"
-                          />
-                          <span>Ali Tufan</span>
-                        </a>
-                      </div>
-                      <div className="post-date ms-auto">
-                        <span>2 Month Ago</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="item">
-                  <div className="property-grid-1 property-block bg-light transation-this">
-                    <div className="overflow-hidden position-relative transation thumbnail-img bg-secondary hover-img-zoom">
-                      <div className="cata position-absolute">
-                        <span className="sale bg-secondary text-white">
-                          For Sale
-                        </span>
-                      </div>
-                      <a href="property-single-v1.html">
-                        <img src="assets/images/property_grid/property-grid-1.png" />
-                      </a>
-                      <a href="#" className="listing-ctg text-white">
-                        <i className="fa-solid fa-building" />
-                        <span>Apartment</span>
-                      </a>
-                      <ul className="position-absolute quick-meta">
-                        <li>
-                          <a href="#" title="Add Favourite">
-                            <i className="flaticon-like-1 flat-mini" />
-                          </a>
-                        </li>
-                        <li className="md-mx-none">
-                          <a
-                            className="quick-view"
-                            href="#quick-view"
-                            title="Quick View"
-                          >
-                            <i className="flaticon-zoom-increasing-symbol flat-mini" />
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="property_text p-3 pb-0">
-                      <span className="listing-price">
-                        $1850<small> ( Monthly )</small>
-                      </span>
-                      <h5 className="listing-title">
-                        <a href="property-single-v1.html">
-                          Family House Residense
-                        </a>
-                      </h5>
-                      <span className="listing-location">
-                        <i className="fas fa-map-marker-alt" /> 4213 South
-                        Burlington, VT 05403
-                      </span>
-                    </div>
-                    <div className="d-flex align-items-center post-meta mt-2 py-3 px-3 border-top">
-                      <div className="agent">
-                        <a
-                          href="#"
-                          className="d-flex text-general align-items-center"
-                        >
-                          <img
-                            className="rounded-circle me-2"
-                            src="assets/images/team/1.jpg"
-                          />
-                          <span>Ali Tufan</span>
-                        </a>
-                      </div>
-                      <div className="post-date ms-auto">
-                        <span>2 Month Ago</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="item">
-                  <div className="property-grid-1 property-block bg-light transation-this">
-                    <div className="overflow-hidden position-relative transation thumbnail-img bg-secondary hover-img-zoom">
-                      <div className="cata position-absolute">
-                        <span className="sale bg-secondary text-white">
-                          For Sale
-                        </span>
-                      </div>
-                      <a href="property-single-v1.html">
-                        <img src="assets/images/property_grid/property-grid-1.png" />
-                      </a>
-                      <a href="#" className="listing-ctg text-white">
-                        <i className="fa-solid fa-building" />
-                        <span>Apartment</span>
-                      </a>
-                      <ul className="position-absolute quick-meta">
-                        <li>
-                          <a href="#" title="Add Favourite">
-                            <i className="flaticon-like-1 flat-mini" />
-                          </a>
-                        </li>
-                        <li className="md-mx-none">
-                          <a
-                            className="quick-view"
-                            href="#quick-view"
-                            title="Quick View"
-                          >
-                            <i className="flaticon-zoom-increasing-symbol flat-mini" />
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="property_text p-3 pb-0">
-                      <span className="listing-price">
-                        $1850<small> ( Monthly )</small>
-                      </span>
-                      <h5 className="listing-title">
-                        <a href="property-single-v1.html">
-                          Family House Residense
-                        </a>
-                      </h5>
-                      <span className="listing-location">
-                        <i className="fas fa-map-marker-alt" /> 4213 South
-                        Burlington, VT 05403
-                      </span>
-                    </div>
-                    <div className="d-flex align-items-center post-meta mt-2 py-3 px-3 border-top">
-                      <div className="agent">
-                        <a
-                          href="#"
-                          className="d-flex text-general align-items-center"
-                        >
-                          <img
-                            className="rounded-circle me-2"
-                            src="assets/images/team/1.jpg"
-                          />
-                          <span>Ali Tufan</span>
-                        </a>
-                      </div>
-                      <div className="post-date ms-auto">
-                        <span>2 Month Ago</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="item">
-                  <div className="property-grid-1 property-block bg-light transation-this">
-                    <div className="overflow-hidden position-relative transation thumbnail-img bg-secondary hover-img-zoom">
-                      <div className="cata position-absolute">
-                        <span className="sale bg-secondary text-white">
-                          For Sale
-                        </span>
-                      </div>
-                      <a href="property-single-v1.html">
-                        <img src="assets/images/property_grid/property-grid-1.png" />
-                      </a>
-                      <a href="#" className="listing-ctg text-white">
-                        <i className="fa-solid fa-building" />
-                        <span>Apartment</span>
-                      </a>
-                      <ul className="position-absolute quick-meta">
-                        <li>
-                          <a href="#" title="Add Favourite">
-                            <i className="flaticon-like-1 flat-mini" />
-                          </a>
-                        </li>
-                        <li className="md-mx-none">
-                          <a
-                            className="quick-view"
-                            href="#quick-view"
-                            title="Quick View"
-                          >
-                            <i className="flaticon-zoom-increasing-symbol flat-mini" />
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="property_text p-3 pb-0">
-                      <span className="listing-price">
-                        $1850<small> ( Monthly )</small>
-                      </span>
-                      <h5 className="listing-title">
-                        <a href="property-single-v1.html">
-                          Family House Residense
-                        </a>
-                      </h5>
-                      <span className="listing-location">
-                        <i className="fas fa-map-marker-alt" /> 4213 South
-                        Burlington, VT 05403
-                      </span>
-                    </div>
-                    <div className="d-flex align-items-center post-meta mt-2 py-3 px-3 border-top">
-                      <div className="agent">
-                        <a
-                          href="#"
-                          className="d-flex text-general align-items-center"
-                        >
-                          <img
-                            className="rounded-circle me-2"
-                            src="assets/images/team/1.jpg"
-                          />
-                          <span>Ali Tufan</span>
-                        </a>
-                      </div>
-                      <div className="post-date ms-auto">
-                        <span>2 Month Ago</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="item">
-                  <div className="property-grid-1 property-block bg-light transation-this">
-                    <div className="overflow-hidden position-relative transation thumbnail-img bg-secondary hover-img-zoom">
-                      <div className="cata position-absolute">
-                        <span className="sale bg-secondary text-white">
-                          For Sale
-                        </span>
-                      </div>
-                      <a href="property-single-v1.html">
-                        <img src="assets/images/property_grid/property-grid-1.png" />
-                      </a>
-                      <a href="#" className="listing-ctg text-white">
-                        <i className="fa-solid fa-building" />
-                        <span>Apartment</span>
-                      </a>
-                      <ul className="position-absolute quick-meta">
-                        <li>
-                          <a href="#" title="Add Favourite">
-                            <i className="flaticon-like-1 flat-mini" />
-                          </a>
-                        </li>
-                        <li className="md-mx-none">
-                          <a
-                            className="quick-view"
-                            href="#quick-view"
-                            title="Quick View"
-                          >
-                            <i className="flaticon-zoom-increasing-symbol flat-mini" />
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="property_text p-3 pb-0">
-                      <span className="listing-price">
-                        $1850<small> ( Monthly )</small>
-                      </span>
-                      <h5 className="listing-title">
-                        <a href="property-single-v1.html">
-                          Family House Residense
-                        </a>
-                      </h5>
-                      <span className="listing-location">
-                        <i className="fas fa-map-marker-alt" /> 4213 South
-                        Burlington, VT 05403
-                      </span>
-                    </div>
-                    <div className="d-flex align-items-center post-meta mt-2 py-3 px-3 border-top">
-                      <div className="agent">
-                        <a
-                          href="#"
-                          className="d-flex text-general align-items-center"
-                        >
-                          <img
-                            className="rounded-circle me-2"
-                            src="assets/images/team/1.jpg"
-                          />
-                          <span>Ali Tufan</span>
-                        </a>
-                      </div>
-                      <div className="post-date ms-auto">
-                        <span>2 Month Ago</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="item">
-                  <div className="property-grid-1 property-block bg-light transation-this">
-                    <div className="overflow-hidden position-relative transation thumbnail-img bg-secondary hover-img-zoom">
-                      <div className="cata position-absolute">
-                        <span className="sale bg-secondary text-white">
-                          For Sale
-                        </span>
-                      </div>
-                      <a href="property-single-v1.html">
-                        <img src="assets/images/property_grid/property-grid-1.png" />
-                      </a>
-                      <a href="#" className="listing-ctg text-white">
-                        <i className="fa-solid fa-building" />
-                        <span>Apartment</span>
-                      </a>
-                      <ul className="position-absolute quick-meta">
-                        <li>
-                          <a href="#" title="Add Favourite">
-                            <i className="flaticon-like-1 flat-mini" />
-                          </a>
-                        </li>
-                        <li className="md-mx-none">
-                          <a
-                            className="quick-view"
-                            href="#quick-view"
-                            title="Quick View"
-                          >
-                            <i className="flaticon-zoom-increasing-symbol flat-mini" />
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="property_text p-3 pb-0">
-                      <span className="listing-price">
-                        $1850<small> ( Monthly )</small>
-                      </span>
-                      <h5 className="listing-title">
-                        <a href="property-single-v1.html">
-                          Family House Residense
-                        </a>
-                      </h5>
-                      <span className="listing-location">
-                        <i className="fas fa-map-marker-alt" /> 4213 South
-                        Burlington, VT 05403
-                      </span>
-                    </div>
-                    <div className="d-flex align-items-center post-meta mt-2 py-3 px-3 border-top">
-                      <div className="agent">
-                        <a
-                          href="#"
-                          className="d-flex text-general align-items-center"
-                        >
-                          <img
-                            className="rounded-circle me-2"
-                            src="assets/images/team/1.jpg"
-                          />
-                          <span>Ali Tufan</span>
-                        </a>
-                      </div>
-                      <div className="post-date ms-auto">
-                        <span>2 Month Ago</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/*============== Recent Property End ==============*/}
+          <div className="p-0">
+            <h6 className="text-primary">
+              <strong>Last Modified:</strong>
+            </h6>
 
-      {/*============== Our Aminities Section Start ==============*/}
-      <div className="full-row bg-light pt-5 pb-6">
-        <div className="container">
-          <div className="row">
-            <div className="col">
-              <h1 className="main-title w-50 mx-auto mb-4 text-center w-sm-100 base-line">
-                What are you looking for?
-              </h1>
-            </div>
-          </div>
-          <div className="row row-cols-xl-4 row-cols-sm-2 row-cols-1 gy-5">
-            <div className="col">
-              <div className="service-style-1 text-center p-30 bg-white hover-bg-primary transation box-shadow h-100 rounded">
-                <div className="icon-wrap">
-                  <span className="icon flaticon-home flat-medium text-primary" />
-                </div>
-                <h6 className="title mb-1 font-400">
-                  <a href="#" className="d-block text-secondary font-600 mt-3">
-                    Living Houses
-                  </a>
-                </h6>
-                <h6 className="title mb-3 font-400">
-                  <a href="#" className="d-block text-secondary font-600 mt-0">
-                    500+
-                  </a>
-                </h6>
-                <a href="#" className="btn-icon box-shadow">
-                  <i className="icon fas fa-long-arrow-alt-right" />
-                </a>
-              </div>
-            </div>
-            <div className="col">
-              <div className="service-style-1 text-center p-30 bg-white hover-bg-primary transation box-shadow h-100 rounded">
-                <div className="icon-wrap">
-                  <span className="icon flaticon-online-booking flat-medium text-primary" />
-                </div>
-                <h6 className="title mb-1 font-400">
-                  <a href="#" className="d-block text-secondary font-600 mt-3">
-                    Apartments
-                  </a>
-                </h6>
-                <h6 className="title mb-3 font-400">
-                  <a href="#" className="d-block text-secondary font-600 mt-0">
-                    200+
-                  </a>
-                </h6>
-                <a href="#" className="btn-icon box-shadow">
-                  <i className="icon fas fa-long-arrow-alt-right" />
-                </a>
-              </div>
-            </div>
-            <div className="col">
-              <div className="service-style-1 text-center p-30 bg-white hover-bg-primary transation box-shadow h-100 rounded">
-                <div className="icon-wrap">
-                  <span className="icon flaticon-shop flat-medium text-primary" />
-                </div>
-                <h6 className="title mb-1 font-400">
-                  <a href="#" className="d-block text-secondary font-600 mt-3">
-                    Commercial
-                  </a>
-                </h6>
-                <h6 className="title mb-3 font-400">
-                  <a href="#" className="d-block text-secondary font-600 mt-0">
-                    400+
-                  </a>
-                </h6>
-                <a href="#" className="btn-icon box-shadow">
-                  <i className="icon fas fa-long-arrow-alt-right" />
-                </a>
-              </div>
-            </div>
-            <div className="col">
-              <div className="service-style-1 text-center p-30 bg-white hover-bg-primary transation box-shadow h-100 rounded">
-                <div className="icon-wrap">
-                  <span className="icon flaticon-shop flat-medium text-primary" />
-                </div>
-                <h6 className="title mb-1 font-400">
-                  <a href="#" className="d-block text-secondary font-600 mt-3">
-                    Office Space
-                  </a>
-                </h6>
-                <h6 className="title mb-3 font-400">
-                  <a href="#" className="d-block text-secondary font-600 mt-0">
-                    300+
-                  </a>
-                </h6>
-                <a href="#" className="btn-icon box-shadow">
-                  <i className="icon fas fa-long-arrow-alt-right" />
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/*============== Our Aminities Section End ==============*/}
+            <p>
+              This privacy policy sets out how{" "}
+              <strong className="text-primary">Assets Watch</strong> uses and
+              protects any information that you give{" "}
+              <strong className="text-primary">Assets Watch</strong> when you
+              use this website.
+            </p>
 
-      {/*============== Agents Start ==============*/}
-      <div className="full-row bg-white pt-5 pb-5">
-        <div className="container">
-          <div className="row mb-5 align-items-center">
-            <div className="col-md-8">
-              <div className="me-auto">
-                <h2 className="d-table mb-4 down-line">
-                  Our Listed Property Agents
-                </h2>
-                <span className="d-table sub-title text-secondary">
-                  Mauris primis turpis Laoreet magna felis mi amet quam enim
-                  curae. Sodales semper tempor dictum.
-                </span>
-              </div>
-            </div>
-            <div className="col-md-4">
-              <a href="#" className="ms-auto btn-link d-table p y-2 sm-mx-0">
-                View All Agents &gt;
-              </a>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col">
-              <div className="agents-carousel nav-disable owl-carousel">
-                <div className="item">
-                  <div className="property-grid-1 property-block bg-light transation-this">
-                    <div className="overflow-hidden position-relative transation thumbnail-img bg-secondary">
-                      <a href="property-single-v1.html">
-                        <img src="assets/images/property_grid/property-grid-1.png" />
-                      </a>
-                    </div>
-                    <div className="d-flex align-items-top post-meta mt-2 py-2 px-2">
-                      <div className="agent">
-                        <h5 className="listing-title">
-                          <a
-                            href="property-single-v1.html"
-                            className="text-primary"
-                          >
-                            Ronald Johnson
-                          </a>
-                        </h5>
-                        <span className="listing-location">
-                          At 1st April, 2012
-                        </span>
-                      </div>
-                      <div className="post-date ms-auto">
-                        <span className="text-primary rating-icon">
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-regular fa-star"></i>
-                          <i className="fa-regular fa-star"></i>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="item">
-                  <div className="property-grid-1 property-block bg-light transation-this">
-                    <div className="overflow-hidden position-relative transation thumbnail-img bg-secondary">
-                      <a href="property-single-v1.html">
-                        <img src="assets/images/property_grid/property-grid-1.png" />
-                      </a>
-                    </div>
-                    <div className="d-flex align-items-top post-meta mt-2 py-2 px-2">
-                      <div className="agent">
-                        <h5 className="listing-title">
-                          <a
-                            href="property-single-v1.html"
-                            className="text-primary"
-                          >
-                            Ronald Johnson
-                          </a>
-                        </h5>
-                        <span className="listing-location">
-                          At 1st April, 2012
-                        </span>
-                      </div>
-                      <div className="post-date ms-auto">
-                        <span className="text-primary rating-icon">
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-regular fa-star"></i>
-                          <i className="fa-regular fa-star"></i>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="item">
-                  <div className="property-grid-1 property-block bg-light transation-this">
-                    <div className="overflow-hidden position-relative transation thumbnail-img bg-secondary">
-                      <a href="property-single-v1.html">
-                        <img src="assets/images/property_grid/property-grid-1.png" />
-                      </a>
-                    </div>
-                    <div className="d-flex align-items-top post-meta mt-2 py-2 px-2">
-                      <div className="agent">
-                        <h5 className="listing-title">
-                          <a
-                            href="property-single-v1.html"
-                            className="text-primary"
-                          >
-                            Ronald Johnson
-                          </a>
-                        </h5>
-                        <span className="listing-location">
-                          At 1st April, 2012
-                        </span>
-                      </div>
-                      <div className="post-date ms-auto">
-                        <span className="text-primary rating-icon">
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-regular fa-star"></i>
-                          <i className="fa-regular fa-star"></i>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="item">
-                  <div className="property-grid-1 property-block bg-light transation-this">
-                    <div className="overflow-hidden position-relative transation thumbnail-img bg-secondary">
-                      <a href="property-single-v1.html">
-                        <img src="assets/images/property_grid/property-grid-1.png" />
-                      </a>
-                    </div>
-                    <div className="d-flex align-items-top post-meta mt-2 py-2 px-2">
-                      <div className="agent">
-                        <h5 className="listing-title">
-                          <a
-                            href="property-single-v1.html"
-                            className="text-primary"
-                          >
-                            Ronald Johnson
-                          </a>
-                        </h5>
-                        <span className="listing-location">
-                          At 1st April, 2012
-                        </span>
-                      </div>
-                      <div className="post-date ms-auto">
-                        <span className="text-primary rating-icon">
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-regular fa-star"></i>
-                          <i className="fa-regular fa-star"></i>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="item">
-                  <div className="property-grid-1 property-block bg-light transation-this">
-                    <div className="overflow-hidden position-relative transation thumbnail-img bg-secondary">
-                      <a href="property-single-v1.html">
-                        <img src="assets/images/property_grid/property-grid-1.png" />
-                      </a>
-                    </div>
-                    <div className="d-flex align-items-top post-meta mt-2 py-2 px-2">
-                      <div className="agent">
-                        <h5 className="listing-title">
-                          <a
-                            href="property-single-v1.html"
-                            className="text-primary"
-                          >
-                            Ronald Johnson
-                          </a>
-                        </h5>
-                        <span className="listing-location">
-                          At 1st April, 2012
-                        </span>
-                      </div>
-                      <div className="post-date ms-auto">
-                        <span className="text-primary rating-icon">
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-regular fa-star"></i>
-                          <i className="fa-regular fa-star"></i>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="item">
-                  <div className="property-grid-1 property-block bg-light transation-this">
-                    <div className="overflow-hidden position-relative transation thumbnail-img bg-secondary">
-                      <a href="property-single-v1.html">
-                        <img src="assets/images/property_grid/property-grid-1.png" />
-                      </a>
-                    </div>
-                    <div className="d-flex align-items-top post-meta mt-2 py-2 px-2">
-                      <div className="agent">
-                        <h5 className="listing-title">
-                          <a
-                            href="property-single-v1.html"
-                            className="text-primary"
-                          >
-                            Ronald Johnson
-                          </a>
-                        </h5>
-                        <span className="listing-location">
-                          At 1st April, 2012
-                        </span>
-                      </div>
-                      <div className="post-date ms-auto">
-                        <span className="text-primary rating-icon">
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-regular fa-star"></i>
-                          <i className="fa-regular fa-star"></i>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="item">
-                  <div className="property-grid-1 property-block bg-light transation-this">
-                    <div className="overflow-hidden position-relative transation thumbnail-img bg-secondary">
-                      <a href="property-single-v1.html">
-                        <img src="assets/images/property_grid/property-grid-1.png" />
-                      </a>
-                    </div>
-                    <div className="d-flex align-items-top post-meta mt-2 py-2 px-2">
-                      <div className="agent">
-                        <h5 className="listing-title">
-                          <a
-                            href="property-single-v1.html"
-                            className="text-primary"
-                          >
-                            Ronald Johnson
-                          </a>
-                        </h5>
-                        <span className="listing-location">
-                          At 1st April, 2012
-                        </span>
-                      </div>
-                      <div className="post-date ms-auto">
-                        <span className="text-primary rating-icon">
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-solid fa-star"></i>
-                          <i className="fa-regular fa-star"></i>
-                          <i className="fa-regular fa-star"></i>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/*============== Agents End ==============*/}
+            <p>
+              <strong className="text-primary">Assets Watch</strong> is
+              committed to ensuring that your privacy is protected. Should we
+              ask you to provide certain information by which you can be
+              identified when using this website, then you can be assured that
+              it will only be used in accordance with this privacy statement.
+            </p>
 
-      {/*============== Counter Banner Start ==============*/}
-      <div className="full-row bg-secondary py-0">
-        <div className="container pt-3">
-          <div className="fact-counter position-relative z-index-9">
-            <div className="row row-cols-lg-4 row-cols-sm-2 row-cols-1">
-              <div className="col">
-                <div
-                  className="my-30 text-center count wow fadeIn animate"
-                  data-wow-duration="300ms"
-                  style={{
-                    visibility: "visible",
-                    animationDuration: "300ms",
-                    animationName: "fadeIn",
-                  }}
-                >
-                  <i
-                    className="text-white fa fa-building flat-medium"
-                    aria-hidden="true"
-                  ></i>
-                  <h5 className="text-white font-400 pt-2">Properties</h5>
-                  <span
-                    className="count-num text-primary h2"
-                    data-speed={3000}
-                    data-stop={310}
-                  >
-                    310
-                  </span>
-                </div>
-              </div>
-              <div className="col">
-                <div
-                  className="my-30 text-center count wow fadeIn animate"
-                  data-wow-duration="300ms"
-                  style={{
-                    visibility: "visible",
-                    animationDuration: "300ms",
-                    animationName: "fadeIn",
-                  }}
-                >
-                  <i
-                    className="text-white fa fa-users flat-medium"
-                    aria-hidden="true"
-                  ></i>
-                  <h5 className="text-white font-400 pt-2">Owners</h5>
-                  <span
-                    className="count-num text-primary h2"
-                    data-speed={3000}
-                    data-stop={200}
-                  >
-                    200
-                  </span>
-                </div>
-              </div>
-              <div className="col">
-                <div
-                  className="my-30 text-center count wow fadeIn animate"
-                  data-wow-duration="300ms"
-                  style={{
-                    visibility: "visible",
-                    animationDuration: "300ms",
-                    animationName: "fadeIn",
-                  }}
-                >
-                  <i
-                    className="text-white fa fa-users flat-medium"
-                    aria-hidden="true"
-                  ></i>
-                  <h5 className="text-white font-400 pt-2">Agents</h5>
-                  <span
-                    className="count-num text-primary h2"
-                    data-speed={3000}
-                    data-stop={51}
-                  >
-                    51
-                  </span>
-                </div>
-              </div>
-              <div className="col">
-                <div
-                  className="my-30 text-center count wow fadeIn animate"
-                  data-wow-duration="300ms"
-                  style={{
-                    visibility: "visible",
-                    animationDuration: "300ms",
-                    animationName: "fadeIn",
-                  }}
-                >
-                  <i
-                    className="text-white fa fa-users flat-medium"
-                    aria-hidden="true"
-                  ></i>
-                  <h5 className="text-white font-400 pt-2">Tenants</h5>
-                  <span
-                    className="count-num text-primary h2"
-                    data-speed={3000}
-                    data-stop={25}
-                  >
-                    25
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/*============== Counter Banner End ==============*/}
+            <p>
+              <strong className="text-primary">Assets Watch</strong> may change
+              this policy from time to time by updating this page. You should
+              check this page from time to time to ensure that you are happy
+              with any changes.This policy is effective from December 2nd, 2018.
+            </p>
 
-      {/*============== Testimonials Start ==============*/}
-      <div className="full-row bg-light pt-5 pb-5">
-        <div className="container-fluid">
-          <div className="row">
-            <div className="col mb-3">
-              <span className="text-primary tagline pb-2 d-table m-auto">
-                Testimonials
-              </span>
-              <h2 className="down-line w-50 mx-auto mb-4 text-center w-sm-100">
-                What Client Says About Us
-              </h2>
-            </div>
-          </div>
-          <div className="row justify-content-center">
-            <div className="col-lg-7">
-              <div className="testimonial-simple text-center px-5">
-                <div className="testimonial-carousel owl-carousel">
-                  <div className="item">
-                    <i className="flaticon-right-quote flat-large text-primary d-table mx-auto" />
-                    <blockquote className="text-secondary fs-5 fst-italic">
-                      “ Assetswatch saves time in processing rental payments and
-                      I'm always sure that the rent is paid every month.I love
-                      the "split the rent option" so I'm going to sign up my
-                      roommates too. ”
-                    </blockquote>
-                    <h4 className="mt-4 font-400">Mark Wiggins</h4>
-                    <span className="text-primary font-fifteen">
-                      CEO ( AssetsWatch )
-                    </span>
-                  </div>
-                  <div className="item">
-                    <i className="flaticon-right-quote flat-large text-primary d-table mx-auto" />
-                    <blockquote className="text-secondary fs-5 fst-italic">
-                      “ I must say that I've been looking for such program for
-                      long. Only one rental application! That's just perfect, no
-                      need to refill it each time you move. ”
-                    </blockquote>
-                    <h4 className="mt-4 font-400">Kiran</h4>
-                    <span className="text-primary font-fifteen">
-                      MANAGER ( Kansolve Technologies )
-                    </span>
-                  </div>
-                  <div className="item">
-                    <i className="flaticon-right-quote flat-large text-primary d-table mx-auto" />
-                    <blockquote className="text-secondary fs-5 fst-italic">
-                      “ Assetswatch saves time in processing rental payments and
-                      I'm always sure that the rent is paid every month.I love
-                      the "split the rent option" so I'm going to sign up my
-                      roommates too! ”
-                    </blockquote>
-                    <h4 className="mt-4 font-400">Manoj</h4>
-                    <span className="text-primary font-fifteen">
-                      CTO ( Eyegate Parking Solutions )
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <h6 className="text-primary">Information We Require</h6>
+
+            <p>We require and collect the following information:</p>
+
+            <ul className="pb-20">
+              <li>Email address in order to set up an account</li>
+              <li>IP address in order to verify location</li>
+            </ul>
+
+            <h6 className="text-primary">Information We Store</h6>
+
+            <p>We store the following information:</p>
+
+            <ul className="pb-20">
+              <li>
+                Demographic information such as postcode, preferences, and
+                interests
+              </li>
+              <li>
+                Other information relevant to customer surveys and/or offers
+              </li>
+              <li>IP address, device type, and web browser</li>
+              <li>Time and date of login and use</li>
+            </ul>
+
+            <h6 className="text-primary">
+              What We Do with the Information We Gather
+            </h6>
+
+            <p>
+              We require this information to understand your needs and provide
+              you with a better service, and in particular for the following
+              reasons:
+            </p>
+
+            <ul className="pb-20">
+              <li>
+                Payment and transaction-based fraud prevention, which is to help
+                protect you, your tenants, owners, service professionals you
+                engage with and other{" "}
+                <strong className="text-primary">Assets Watch</strong> users.
+              </li>
+              <li>
+                Listing fraud prevention, which helps protect your listing from
+                others copying or stealing the listing in order to prey on
+                unsuspecting applicants.
+              </li>
+              <li>Internal record keeping.</li>
+              <li>
+                We may use the information to improve our products and services.
+              </li>
+              <li>
+                We may periodically send promotional emails about new products,
+                special offers, or other information which we think you may find
+                interesting using the email address which you have provided.
+              </li>
+              <li>
+                From time to time, we may also use your information to contact
+                you for market research purposes. We may contact you by email,
+                phone, fax, or mail.
+              </li>
+              <li>
+                We may use the information to customise the website according to
+                your interests.
+              </li>
+            </ul>
+
+            <h6 className="text-primary">Security</h6>
+            <p>
+              We are committed to ensuring that your information is secure. In
+              order to prevent unauthorized access or disclosure, we have put in
+              place suitable physical, electronic, and managerial procedures to
+              safeguard and secure the information we collect online.
+            </p>
+
+            <h6 className="text-primary">How We Use Cookies</h6>
+            <p>
+              A cookie is a small file which asks permission to be placed on
+              your computer's hard drive. Once you agree, the file is added and
+              the cookie helps analyse web traffic or lets you know when you
+              visit a particular site. Cookies allow web applications to respond
+              to you as an individual. The web application can tailor its
+              operations to your needs, likes, and dislikes by gathering and
+              remembering information about your preferences.
+            </p>
+
+            <p>
+              We use traffic log cookies to identify which pages are being used.
+              This helps us analyse data about web page traffic and improve our
+              website in order to tailor it to customer needs. We only use this
+              information for statistical analysis purposes and then the data is
+              removed from the system.
+            </p>
+
+            <p>
+              Overall, cookies help us provide you with a better website
+              experience, by enabling us to monitor which pages you find useful
+              and which you do not. A cookie in no way gives us access to your
+              computer or any information about you, other than the data you
+              choose to share with us.
+            </p>
+
+            <p>
+              You can choose to accept or decline cookies. Most web browsers
+              automatically accept cookies, but you can usually modify your
+              browser setting to decline cookies if you prefer. This may prevent
+              you from taking full advantage of the website.
+            </p>
+
+            <h6 className="text-primary">Links to Other Websites</h6>
+            <p>
+              Our website may contain links to enable you to visit other
+              websites of interest easily. However, once you have used these
+              links to leave our site, you should note that we do not have any
+              control over that other website. Therefore, we cannot be
+              responsible for the protection and privacy of any information
+              which you provide whilst visiting such sites and such sites are
+              not governed by this privacy statement. You should exercise
+              caution and look at the privacy statement applicable to the
+              website in question.
+            </p>
+
+            <h6 className="text-primary">Your Datum - Your Rights</h6>
+            <p>
+              You may choose to restrict the collection or use of your personal
+              information in the following ways:
+            </p>
+
+            <ul className="pb-20">
+              <li>
+                Whenever you are asked to fill in a form on the website, look
+                for the box that you can click to indicate that you do not want
+                the information to be used by anybody for direct marketing
+                purposes.
+              </li>
+              <li>
+                If your information will be shared with a 3rd party, you will
+                see a notice to inform you in advance so you can opt-in if you
+                desire. Such opt-in information shared with a 3rd party is for
+                the purpose of buying products, listing properties, and other
+                integrated partner services that help keep your account running
+                smoothly.
+              </li>
+            </ul>
+
+            <p>
+              We will not sell, distribute, or lease your personal information
+              to third parties unless we have your permission or are required by
+              law to do so. We may use your personal information to send you
+              promotional information about third parties which we think you may
+              find interesting if you tell us that you wish this to happen.
+            </p>
+
+            <h6 className="text-primary">Data Correction and Deletion</h6>
+            <p>
+              You have the right to access data, request changes, deletions, and
+              corrections.
+            </p>
+
+            <p>
+              You may request details of personal information which we hold
+              about you under the Data Protection Act 1998. A small fee will be
+              payable. If you would like a copy of the information held on you,
+              please contact us. We will provide all your information within 30
+              days.
+            </p>
+
+            <p>
+              If you believe that any information we are holding on you is
+              incorrect or incomplete, please write to or email us as soon as
+              possible. We will promptly correct any information found to be
+              incorrect.
+            </p>
           </div>
         </div>
       </div>
-      {/*============== Testimonials End ==============*/}
     </>
   );
 };

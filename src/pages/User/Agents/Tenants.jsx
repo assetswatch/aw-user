@@ -24,13 +24,12 @@ import { axiosPost } from "../../../helpers/axiosHelper";
 import config from "../../../config.json";
 import TextAreaControl from "../../../components/common/TextAreaControl";
 import { formCtrlTypes } from "../../../utils/formvalidation";
-import { useGetDdlUserAssetsGateway } from "../../../hooks/useGetDdlUserAssetsGateway";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 import { Toast } from "../../../components/common/ToastView";
 
 const Joined = lazy(() => import("./JoinedTenants"));
 const Requested = lazy(() => import("./TenantsRequested"));
-const ConnectionHistory = lazy(() => import("./ConnectionHistory"));
+const ConnectionHistory = lazy(() => import("./TenantsConnectionHistory"));
 
 const Tenants = () => {
   let $ = window.$;
@@ -42,16 +41,9 @@ const Tenants = () => {
   const [activeTab, setActiveTab] = useState(Tabs[0]);
   const [sendInviteModalState, setSendInviteModalState] = useState(false);
   const [selectedUsersProfile, setSelectedUsersProfile] = useState(null);
-  const [selectedAsset, setSelectedAsset] = useState(null);
   const [tabJoinedKey, setTabJoinedKey] = useState(0);
   const [tabRequestedKey, setTabRequestedKey] = useState(0);
   const [tabConnectionKey, setTabConnectionKey] = useState(0);
-
-  const { userAssetsList } = useGetDdlUserAssetsGateway(
-    "",
-    parseInt(GetUserCookieValues(UserCookie.AccountId, loggedinUser)),
-    parseInt(GetUserCookieValues(UserCookie.ProfileId, loggedinUser))
-  );
 
   function setInitialSendInvitationFormData() {
     return {
@@ -155,10 +147,6 @@ const Tenants = () => {
       });
   };
 
-  const handleAssetChange = (e) => {
-    setSelectedAsset(e?.value);
-  };
-
   const handleSendInvitationInputChange = (e) => {
     const { name, value } = e?.target;
     setSendInvitationFormData({
@@ -176,7 +164,6 @@ const Tenants = () => {
     e?.preventDefault();
     setSendInviteModalState(false);
     setSelectedUsersProfile(null);
-    setSelectedAsset(null);
     setSendInvitationErrors({});
     setSendInvitationFormData(setInitialSendInvitationFormData());
   };
@@ -190,10 +177,6 @@ const Tenants = () => {
         ValidationMessages.TenantReq;
     }
 
-    if (checkEmptyVal(selectedAsset)) {
-      formSendInvitaionErrors["ddlassets"] = ValidationMessages.PropertyReq;
-    }
-
     if (Object.keys(formSendInvitaionErrors).length === 0) {
       setSendInvitationErrors({});
       apiReqResLoader(
@@ -205,7 +188,7 @@ const Tenants = () => {
 
       let isapimethoderr = false;
       let objBodyParams = {
-        AssetId: parseInt(setSelectDefaultVal(selectedAsset)),
+        AssetId: 0,
         InviterId: parseInt(
           GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
         ),
@@ -352,35 +335,6 @@ const Tenants = () => {
               <>
                 <div className="row">
                   <div className="col-12 mb-15">
-                    <AsyncSelect
-                      placeHolder={
-                        userAssetsList.length <= 0 && selectedAsset == null
-                          ? AppMessages.DdLLoading
-                          : AppMessages.DdlDefaultSelect
-                      }
-                      noData={
-                        userAssetsList.length <= 0 && selectedAsset == null
-                          ? AppMessages.DdLLoading
-                          : AppMessages.NoProperties
-                      }
-                      options={userAssetsList}
-                      onChange={(e) => {
-                        handleAssetChange(e);
-                      }}
-                      dataKey="AssetId"
-                      dataVal="AddressOne"
-                      value={selectedAsset}
-                      name="ddlassets"
-                      lbl={formCtrlTypes.asset}
-                      lblText="Property"
-                      lblClass="mb-0 lbl-req-field"
-                      required={true}
-                      errors={sendInvitationErrors}
-                      formErrors={formSendInvitaionErrors}
-                      tabIndex={1}
-                    ></AsyncSelect>
-                  </div>
-                  <div className="col-12 mb-15">
                     <AsyncRemoteSelect
                       placeHolder={AppMessages.DdlTypetoSearch}
                       noData={AppMessages.NoTenants}
@@ -397,7 +351,7 @@ const Tenants = () => {
                       errors={sendInvitationErrors}
                       formErrors={formSendInvitaionErrors}
                       isClearable={true}
-                      tabIndex={2}
+                      tabIndex={1}
                     ></AsyncRemoteSelect>
                   </div>
                   <div className="col-12 mb-0">
@@ -411,7 +365,7 @@ const Tenants = () => {
                       errors={sendInvitationErrors}
                       formErrors={formSendInvitaionErrors}
                       rows={3}
-                      tabIndex={3}
+                      tabIndex={2}
                     ></TextAreaControl>
                   </div>
                 </div>

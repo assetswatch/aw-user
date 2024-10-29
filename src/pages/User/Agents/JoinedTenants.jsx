@@ -128,7 +128,7 @@ const JoinedTenants = memo(() => {
         inviterid: parseInt(
           GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
         ),
-        InviterProfileTypeId: config.userProfileTypes.Owner,
+        InviterProfileTypeId: config.userProfileTypes.Agent,
         InviteeProfileTypeId: config.userProfileTypes.Tenant,
         fromdate: setSearchInitialFormData.txtfromdate,
         todate: setSearchInitialFormData.txttodate,
@@ -448,7 +448,6 @@ const JoinedTenants = memo(() => {
                       value={searchFormData.txtkeyword}
                       onChange={handleChange}
                       formErrors={formErrors}
-                      tabIndex={1}
                     ></InputControl>
                   </div>
                   <div className="col-lg-3 col-xl-2 col-md-4">
@@ -460,7 +459,6 @@ const JoinedTenants = memo(() => {
                       onChange={(dt) => onDateChange(dt, "txtfromdate")}
                       value={searchFormData.txtfromdate}
                       isTime={false}
-                      tabIndex={2}
                     ></DateControl>
                   </div>
                   <div className="col-lg-3 col-xl-2 col-md-4">
@@ -475,7 +473,6 @@ const JoinedTenants = memo(() => {
                       objProps={{
                         checkVal: searchFormData.txtfromdate,
                       }}
-                      tabIndex={2}
                     ></DateControl>
                   </div>
                   <div className="col-lg-3 col-xl-4 col-md-4 grid-search-action">

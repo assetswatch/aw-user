@@ -671,10 +671,10 @@ const UserHeader = () => {
                       Reports
                     </Link>
                   </li>
-                  <li className="nav-item d-none">
+                  <li className="nav-item">
                     <Link
-                      className="nav-link"
-                      id="nav-home"
+                      className="nav-link-owner-agent"
+                      id="nav-owner-agent"
                       to={routeNames.owneragents.path}
                     >
                       <i className="fa fa-users flat-mini pe-2"></i>
@@ -815,9 +815,9 @@ const UserHeader = () => {
                   </li>
                   <li className="nav-item">
                     <Link
-                      className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      className="nav-link-agent-owner"
+                      id="nav-agent-owner"
+                      to={routeNames.agentowners.path}
                     >
                       <i className="fa fa-users flat-mini pe-2"></i>
                       Owners
@@ -825,9 +825,9 @@ const UserHeader = () => {
                   </li>
                   <li className="nav-item">
                     <Link
-                      className="nav-link"
-                      id="nav-group"
-                      to={routeNames.comingup.path}
+                      className="nav-link-agent-tenant"
+                      id="nav-agent-tenant"
+                      to={routeNames.agenttenants.path}
                     >
                       <i className="fa fa-users flat-mini pe-2"></i>
                       Tenants
@@ -913,11 +913,11 @@ const UserHeader = () => {
                       Owners
                     </Link>
                   </li>
-                  <li className="nav-item d-none">
+                  <li className="nav-item">
                     <Link
-                      className="nav-link"
-                      id="nav-group"
-                      to={routeNames.comingup.path}
+                      className="nav-link-tenant-agent"
+                      id="nav-tenant-agent"
+                      to={routeNames.tenantagents.path}
                     >
                       <i className="fa fa-users flat-mini pe-2"></i>
                       Agents

@@ -12,7 +12,6 @@ const HowItWorks = () => {
 
   return (
     <>
-      {SetPageLoaderNavLinks()}
       {/*============== Page title Start ==============*/}
       <PageTitle
         title="How It Works"

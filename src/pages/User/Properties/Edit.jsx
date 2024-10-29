@@ -903,7 +903,7 @@ const Edit = () => {
                                 ></TextAreaControl>
                               </div>
                               <div className="col-md-6 mb-15">
-                                <TextAreaControl
+                                <InputControl
                                   lblClass="mb-0 lbl-req-field"
                                   name="txtaddressone"
                                   ctlType={formCtrlTypes.addressone}
@@ -913,11 +913,10 @@ const Edit = () => {
                                   errors={errors}
                                   formErrors={formErrors}
                                   tabIndex={3}
-                                  rows={2}
-                                ></TextAreaControl>
+                                ></InputControl>
                               </div>
                               <div className="col-md-6 mb-15">
-                                <TextAreaControl
+                                <InputControl
                                   lblClass="mb-0"
                                   name="txtaddresstwo"
                                   ctlType={formCtrlTypes.addresstwo}
@@ -926,8 +925,7 @@ const Edit = () => {
                                   errors={errors}
                                   formErrors={formErrors}
                                   tabIndex={4}
-                                  rows={2}
-                                ></TextAreaControl>
+                                ></InputControl>
                               </div>
                               {initApisLoaded && (
                                 <>
@@ -1314,7 +1312,7 @@ const Edit = () => {
                                     ></InputControl>
                                   </div>
                                   <div className="col-md-6 mb-15">
-                                    <TextAreaControl
+                                    <InputControl
                                       lblClass="mb-0 lbl-req-field"
                                       name={`txtaddressone${idx}`}
                                       ctlType={formCtrlTypes.addressone}
@@ -1324,11 +1322,10 @@ const Edit = () => {
                                       }
                                       errors={errors}
                                       formErrors={formErrors}
-                                      rows={2}
-                                    ></TextAreaControl>
+                                    ></InputControl>
                                   </div>
                                   <div className="col-md-6 mb-15">
-                                    <TextAreaControl
+                                    <InputControl
                                       lblClass="mb-0"
                                       name={`txtaddresstwo${idx}`}
                                       ctlType={formCtrlTypes.addresstwo}
@@ -1338,8 +1335,7 @@ const Edit = () => {
                                       }
                                       errors={errors}
                                       formErrors={formErrors}
-                                      rows={2}
-                                    ></TextAreaControl>
+                                    ></InputControl>
                                   </div>
                                   {initApisLoaded && (
                                     <>
