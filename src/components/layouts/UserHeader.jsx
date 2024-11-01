@@ -695,7 +695,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.comingup.path}
+                      to={routeNames.ownersettings.path}
                     >
                       <i className="fa fa-gear flat-mini pe-2"></i>
                       Settings
