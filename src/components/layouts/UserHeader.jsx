@@ -837,7 +837,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.comingup.path}
+                      to={routeNames.agentsettings.path}
                     >
                       <i className="fa fa-gear flat-mini pe-2"></i>
                       Settings
@@ -927,7 +927,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.comingup.path}
+                      to={routeNames.tenantsettings.path}
                     >
                       <i className="fa fa-gear flat-mini pe-2"></i>
                       Settings
