@@ -27,6 +27,12 @@ const TextAreaControl = ({
         formErrors[name] = rex.required;
       }
       break;
+    case formCtrlTypes.aboutme:
+      rex = Regex.aboutme;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      break;
     case formCtrlTypes.addressone:
       rex = Regex.addressone;
       if (required && checkEmptyVal(value)) {

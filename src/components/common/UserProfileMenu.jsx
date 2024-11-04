@@ -69,6 +69,10 @@ const UserProfileMenu = (styleprops) => {
     );
   };
 
+  const onProfile = () => {
+    return getPagesPathByLoggedinUserProfile(loggedinProfileTypeId, "profile");
+  };
+
   return (
     <>
       <li
@@ -129,7 +133,7 @@ const UserProfileMenu = (styleprops) => {
                     {`${GetCookieValues(UserCookie.Plan)} Plan`}
                   </div>
                 </div>
-                <div className="col text-right px-0 w-130 flex-end">
+                <div className="col text-right px-0 w-120 flex-end">
                   <button
                     className="btn btn-primary btn-xs btn-round box-shadow btn-glow"
                     onClick={onUpgradePlan}
@@ -141,7 +145,7 @@ const UserProfileMenu = (styleprops) => {
             </div>
           </div>
           <li className="dropdown-item">
-            <Link id="nav-user-info-dashboard" to={routeNames.comingup.path}>
+            <Link id="nav-user-info-dashboard" to={onProfile()}>
               <i className="fa fa-user pe-1"></i> My Profile
             </Link>
           </li>

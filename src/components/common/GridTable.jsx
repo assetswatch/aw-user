@@ -16,6 +16,8 @@ const GridTable = ({
   actionProps,
   loading,
   noData,
+  showPaging = true,
+  headerClass = "box-shadow",
 }) => {
   const {
     getTableProps,
@@ -83,7 +85,7 @@ const GridTable = ({
             {headerGroups.map((headerGroup, hidx) => (
               <tr
                 {...headerGroup.getHeaderGroupProps()}
-                className="bg-white box-shadow"
+                className={`bg-white ${headerClass}`}
                 key={"th-" + hidx}
               >
                 {headerGroup.headers.map((column, thcidx) => (
@@ -166,7 +168,7 @@ const GridTable = ({
       </div>
 
       {/* Pagination */}
-      {data.length > 0 && (
+      {showPaging && data.length > 0 && (
         <div className="container">
           <div className="row my-4 pb-20 pt-10 flex-center">
             <div className="col-sm-12 col-md-4 col-lg-3 col-xl-3 font-small font-500">

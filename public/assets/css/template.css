@@ -469,6 +469,11 @@ a.hover-bg-primary:hover,
   line-height: 15px;
 }
 
+.flat-general::before {
+  font-size: 18px;
+  line-height: 18px;
+}
+
 .font-mini {
   font-size: 11px !important;
 }
@@ -487,6 +492,10 @@ a.hover-bg-primary:hover,
 
 .font-16 {
   font-size: 16px !important;
+}
+
+.font-18 {
+  font-size: 18px !important;
 }
 
 .font-medium {
@@ -1337,6 +1346,12 @@ a.text-dark:focus {
 .p-10,
 .pt-10 {
   padding-top: 10px !important;
+}
+
+.py-15,
+.p-15,
+.pt-15 {
+  padding-top: 15px !important;
 }
 
 .py-20,
@@ -4488,11 +4503,14 @@ Newsletter Style
 .flex-se {
   justify-content: space-evenly;
 }
-
+.flex-direction-col {
+  flex-direction: column;
+}
 .flex-center {
   justify-content: center;
   align-items: center;
 }
+
 .v-center {
   align-items: center;
 }

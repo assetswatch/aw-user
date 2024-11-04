@@ -367,6 +367,12 @@ h6,
 img {
   max-width: 100%;
 }
+.bb-lr-0 {
+  border-bottom-left-radius: 0 !important;
+}
+.bb-rr-0 {
+  border-bottom-right-radius: 0 !important;
+}
 .max-100 {
   max-width: 100px !important;
 }
@@ -388,14 +394,23 @@ img {
 .min-h-150 {
   min-height: 150px !important;
 }
+.min-h-130 {
+  min-height: 130px !important;
+}
 .min-h-200 {
   min-height: 200px !important;
+}
+.min-h-250 {
+  min-height: 250px !important;
 }
 .min-h-300 {
   min-height: 300px !important;
 }
 .min-h-400 {
   min-height: 400px !important;
+}
+.max-h-400 {
+  max-height: 400px !important;
 }
 ul,
 li {
@@ -1164,9 +1179,16 @@ Header Style Start
   width: 50px !important;
   max-width: 50px !important;
 }
-.w-130 {
+.w-120 {
   width: 120px !important;
   max-width: 120px !important;
+}
+.w-130 {
+  width: 130px !important;
+  max-width: 130px !important;
+}
+.lh-26 {
+  line-height: 26px !important;
 }
 .lh-22 {
   line-height: 22px !important;
@@ -1176,6 +1198,9 @@ Header Style Start
 }
 .lh-38 {
   line-height: 38px !important;
+}
+.lh-45 {
+  line-height: 45px !important;
 }
 .bo-0 {
   border: none !important;
@@ -3876,6 +3901,12 @@ Social Media Style Start
 .w-100px {
   width: 100px !important;
 }
+.w-120px {
+  width: 120px !important;
+}
+.w-130px {
+  width: 130px !important;
+}
 .w-140px {
   width: 140px !important;
 }
@@ -4003,6 +4034,12 @@ Social Media Style Start
 .gr-action-menu li a:hover i {
   color: var(--theme-primary-color) !important;
 }
+.gr-head-p12 th {
+  padding: 12px !important;
+}
+.gr-head-bt {
+  border-top: 1px solid #ececec;
+}
 
 .upload-icon {
   color: var(--theme-primary-color);
@@ -4076,6 +4113,89 @@ Social Media Style Start
 }
 
 /*modal*/
+
+/*profile-card*/
+.profile-card {
+  position: relative;
+  margin-top: -80px;
+}
+.profile-card-widget .bg-bb {
+  border-bottom: solid 2px var(--theme-footer-color);
+}
+.profile-card .profile-img {
+  min-width: 120px;
+  min-height: 120px;
+  width: 120px;
+  border: solid 3px var(--theme-white-color);
+}
+.profile-card .div-action {
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  top: 100px;
+  left: 100px;
+  width: 100%;
+}
+.profile-card .btn-rt {
+  font-size: 12px;
+  font-weight: normal;
+  float: right;
+  line-height: 26px;
+  padding: 0 20px;
+}
+.profile-card .title {
+  margin-top: -10px;
+}
+.profile-card .down-line::before {
+  height: 2px;
+}
+.profile-card .info {
+  font-size: 13px;
+  font-weight: 400;
+}
+.profile-card .info .row {
+  padding: 3px 0;
+}
+/*profile-card*/
+
+/*dashboard count*/
+.dashboard-stats .success {
+  border-left: solid 4px var(--toastify-color-success);
+}
+.dashboard-stats .success i {
+  color: var(--toastify-color-success);
+}
+.dashboard-stats .error {
+  border-left: solid 4px var(--toastify-color-error);
+}
+.dashboard-stats .error i {
+  color: var(--toastify-color-error);
+}
+.dashboard-stats .warning {
+  border-left: solid 4px var(--toastify-color-warning);
+}
+.dashboard-stats .warning i {
+  color: var(--toastify-color-warning);
+}
+.dashboard-stats .info {
+  border-left: solid 4px var(--toastify-color-info);
+}
+.dashboard-stats .info i {
+  color: var(--toastify-color-info);
+}
+.dashboard-stats i::before {
+  font-size: 35px;
+}
+.dashboard-stats .count {
+  font-size: 18px;
+  font-weight: 600;
+}
+.dashboard-stats .title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/*dashboard count*/
 
 /*Toast*/
 .Toastify {

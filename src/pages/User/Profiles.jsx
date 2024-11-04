@@ -1,14 +1,21 @@
 import React from "react";
 import { useGetUserProfilesGateway } from "../../hooks/useGetUserProfilesGateway";
 import { DataLoader, NoData } from "../../components/common/LazyComponents";
-import { apiReqResLoader, checkObjNullorEmpty } from "../../utils/common";
-import { AppMessages } from "../../utils/constants";
+import {
+  apiReqResLoader,
+  checkObjNullorEmpty,
+  GetCookieValues,
+  getPagesPathByLoggedinUserProfile,
+} from "../../utils/common";
+import { AppMessages, UserCookie } from "../../utils/constants";
 import { useAuth } from "../../contexts/AuthContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { routeNames } from "../../routes/routes";
 
 const Profiles = () => {
   let $ = window.$;
+
+  let loggedinProfileTypeId = GetCookieValues(UserCookie.ProfileTypeId);
 
   const { userProfilesList, isDataLoading } = useGetUserProfilesGateway();
   const { updateUserProfile } = useAuth();
@@ -29,7 +36,13 @@ const Profiles = () => {
     };
 
     updateUserProfile(profileData);
-    navigate(routeNames.dashboard.path);
+    navigate(
+      getPagesPathByLoggedinUserProfile(
+        parseInt(pelem.getAttribute("profile-typeid")),
+        "profile"
+      )
+    );
+
     apiReqResLoader("x", "", "completed");
   };
 

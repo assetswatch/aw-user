@@ -1436,7 +1436,9 @@ const Edit = () => {
                       <div className="container-fluid">
                         <div className="row">
                           <div className="col px-0">
-                            <h6 className="mb-4 down-line">Property Media</h6>
+                            <h6 className="mb-4 down-line pb-10">
+                              Property Media
+                            </h6>
                             <div className="row">
                               <div className="col-md-12 mt-0 mb-20">
                                 <ul className="row row-cols-xl-6 row-cols-md-3 row-cols-2 media-upload">

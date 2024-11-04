@@ -48,30 +48,49 @@ export function SetPageLoaderNavLinks() {
         case routeNames.editproperty.path.toLowerCase():
           activelink = "myproperties";
           break;
+        case routeNames.agentconnectedproperties.path.toLowerCase():
+        case routeNames.tenantconnectedproperties.path.toLowerCase():
+          activelink = "myproperties";
+          activesublink = "connectedproperties";
+          break;
         case routeNames.dashboard.path.toLowerCase():
           activelink = "dashboard";
           break;
         case routeNames.ownertenants.path.toLowerCase():
-          activelink = "owner-tenant";
-          break;
-        case routeNames.tenantowners.path.toLowerCase():
-          activelink = "tenant-owner";
-          break;
-        case routeNames.tenantagents.path.toLowerCase():
-          activelink = "tenant-agent";
+          activelink = "myconnections";
+          activesublink = "owner-tenant";
           break;
         case routeNames.owneragents.path.toLowerCase():
-          activelink = "owner-agent";
+          activelink = "myconnections";
+          activesublink = "owner-agent";
+          break;
+        case routeNames.tenantowners.path.toLowerCase():
+          activelink = "myconnections";
+          activesublink = "tenant-owner";
+          break;
+        case routeNames.tenantagents.path.toLowerCase():
+          activelink = "myconnections";
+          activesublink = "tenant-agent";
           break;
         case routeNames.agentowners.path.toLowerCase():
-          activelink = "agent-owner";
+          activelink = "myconnections";
+          activesublink = "agent-owner";
           break;
         case routeNames.agenttenants.path.toLowerCase():
-          activelink = "agent-tenant";
+          activelink = "myconnections";
+          activesublink = "agent-tenant";
           break;
         case routeNames.tenantpayments.path.toLowerCase():
         case routeNames.tenantcheckout.path.toLowerCase():
           activelink = "tenant-payments";
+          break;
+        case routeNames.tenantprofile.path.toLowerCase():
+        case routeNames.agentprofile.path.toLowerCase():
+        case routeNames.ownerprofile.path.toLowerCase():
+        case routeNames.tenantprofileedit.path.toLowerCase():
+        case routeNames.agentprofileedit.path.toLowerCase():
+        case routeNames.ownerprofileedit.path.toLowerCase():
+          activelink = "user-profile";
           break;
       }
 
@@ -390,6 +409,9 @@ function readCookieVal(cookiekey, user) {
     case UserCookie.ProfilePic:
       retval = user?.[UserCookie.Profile][UserCookie.ProfilePic];
       break;
+    case UserCookie.Email:
+      retval = user?.[UserCookie.Email];
+      break;
     case UserCookie.PlanId:
       retval = user?.[UserCookie.PlanId];
       break;
@@ -489,6 +511,24 @@ export function getPagesPathByLoggedinUserProfile(
           ? routeNames.agentpayments.path
           : loggedinProfileTypeId == config.userProfileTypes.Tenant
           ? routeNames.tenantpayments.path
+          : path;
+    } else if (page?.toLowerCase() == "profile") {
+      path =
+        loggedinProfileTypeId == config.userProfileTypes.Owner
+          ? routeNames.ownerprofile.path
+          : loggedinProfileTypeId == config.userProfileTypes.Agent
+          ? routeNames.agentprofile.path
+          : loggedinProfileTypeId == config.userProfileTypes.Tenant
+          ? routeNames.tenantprofile.path
+          : path;
+    } else if (page?.toLowerCase() == "profileedit") {
+      path =
+        loggedinProfileTypeId == config.userProfileTypes.Owner
+          ? routeNames.ownerprofileedit.path
+          : loggedinProfileTypeId == config.userProfileTypes.Agent
+          ? routeNames.agentprofileedit.path
+          : loggedinProfileTypeId == config.userProfileTypes.Tenant
+          ? routeNames.tenantprofileedit.path
           : path;
     }
     return path;
