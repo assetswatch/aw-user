@@ -16,7 +16,7 @@ import {
   AppConstants,
   UserCookie,
   API_ACTION_STATUS,
-  NotificationTypes,
+  UserConnectionTabIds,
   ValidationMessages,
 } from "../../../utils/constants";
 import AsyncRemoteSelect from "../../../components/common/AsyncRemoteSelect";
@@ -25,6 +25,7 @@ import config from "../../../config.json";
 import TextAreaControl from "../../../components/common/TextAreaControl";
 import { formCtrlTypes } from "../../../utils/formvalidation";
 import { Toast } from "../../../components/common/ToastView";
+import { useLocation } from "react-router-dom";
 
 const Joined = lazy(() => import("./JoinedOwners"));
 const Requested = lazy(() => import("./OwnersRequested"));
@@ -33,11 +34,33 @@ const ConnectionHistory = lazy(() => import("./OwnersConnectionHistory"));
 const Owners = () => {
   let $ = window.$;
 
+  const location = useLocation();
+  const Tabs = [
+    UserConnectionTabIds.joined,
+    UserConnectionTabIds.requested,
+    UserConnectionTabIds.connection,
+  ];
+  let defaultTab = Tabs[0];
+  const [activeTab, setActiveTab] = useState("");
+
+  useEffect(() => {
+    let checkStateTab = location.state || {};
+    if (!checkObjNullorEmpty(checkStateTab)) {
+      if (!checkObjNullorEmpty(checkStateTab.tab)) {
+        defaultTab = checkStateTab?.tab?.toString().toLowerCase();
+      }
+    }
+    $(".nav-tab-line").children("li").removeClass("active");
+    document
+      .querySelector(`[data-target="${defaultTab}"]`)
+      ?.classList.add("active");
+
+    handleTabClick(defaultTab);
+  }, []);
+
   let formSendInvitaionErrors = {};
   const { loggedinUser } = useAuth();
   const [sendInvitationErrors, setSendInvitationErrors] = useState({});
-  const Tabs = ["#tab-joined", "#tab-requested", "#tab-connection"];
-  const [activeTab, setActiveTab] = useState(Tabs[0]);
   const [sendInviteModalState, setSendInviteModalState] = useState(false);
   const [selectedUsersProfile, setSelectedUsersProfile] = useState(null);
   const [tabJoinedKey, setTabJoinedKey] = useState(0);
@@ -72,9 +95,9 @@ const Owners = () => {
 
   useEffect(() => {
     // default action
-    $(".tab-element .tab-pane").hide();
-    $(".tab-action > ul li:first-child").addClass("active");
-    $(".tab-element .tab-pane:first-child").show();
+    // $(".tab-element .tab-pane").hide();
+    // $(".tab-action > ul li:first-child").addClass("active");
+    // $(".tab-element .tab-pane:first-child").show();
 
     // on click event
     $(".tab-action ul li").on("click", function (e) {

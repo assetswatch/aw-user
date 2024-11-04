@@ -74,6 +74,14 @@ export const GridDefaultValues = {
 };
 /*Grid default values*/
 
+/*connection tab ids*/
+export const UserConnectionTabIds = {
+  requested: "#tab-requested",
+  joined: "#tab-joined",
+  connection: "#tab-connection",
+};
+/*connection tab ids*/
+
 /*Common App messages*/
 export const AppMessages = {
   DdlDefaultSelect: " Select ",
