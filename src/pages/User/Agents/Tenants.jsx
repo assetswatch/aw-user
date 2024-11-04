@@ -56,17 +56,17 @@ const Tenants = () => {
   );
 
   const handleTabClick = (tabselected) => {
-    switch (tabselected) {
-      case Tabs[0]:
-        setTabJoinedKey((prevKey) => prevKey + 1);
-        break;
-      case Tabs[1]:
-        setTabRequestedKey((prevKey) => prevKey + 1);
-        break;
-      case Tabs[2]:
-        setTabConnectionKey((prevKey) => prevKey + 1);
-        break;
-    }
+    // switch (tabselected) {
+    //   case Tabs[0]:
+    //     setTabJoinedKey((prevKey) => prevKey + 1);
+    //     break;
+    //   case Tabs[1]:
+    //     setTabRequestedKey((prevKey) => prevKey + 1);
+    //     break;
+    //   case Tabs[2]:
+    //     setTabConnectionKey((prevKey) => prevKey + 1);
+    //     break;
+    // }
 
     setActiveTab(tabselected);
   };

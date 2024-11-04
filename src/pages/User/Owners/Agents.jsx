@@ -1,4 +1,4 @@
-import React, { lazy, useCallback, useEffect, useState } from "react";
+import React, { lazy, useCallback, useEffect, useMemo, useState } from "react";
 import {
   apiReqResLoader,
   checkEmptyVal,
@@ -27,6 +27,7 @@ import { formCtrlTypes } from "../../../utils/formvalidation";
 import { useGetDdlUserAssetsGateway } from "../../../hooks/useGetDdlUserAssetsGateway";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 import { Toast } from "../../../components/common/ToastView";
+import { useLocation } from "react-router-dom";
 
 const Joined = lazy(() => import("./JoinedAgents"));
 const Requested = lazy(() => import("./AgentsRequested"));
@@ -35,11 +36,34 @@ const ConnectionHistory = lazy(() => import("./AgentsConnectionHistory"));
 const Agents = () => {
   let $ = window.$;
 
+  //const location = useLocation();
+  const Tabs = ["#tab-joined", "#tab-requested", "#tab-connection"];
+  let defaultTab = Tabs[0];
+  //let requestedStateTab = location.state || {};
+
+  // if (!checkObjNullorEmpty(location.state)) {
+  //   switch (location.state.tab.toString().toLowerCase()) {
+  //     case "joined":
+  //     default:
+  //       defaultTab = Tabs[0];
+  //       break;
+  //     case "requested":
+  //       defaultTab = Tabs[1];
+  //       break;
+  //     case "history":
+  //       defaultTab = Tabs[2];
+  //       break;
+  //   }
+  //   $(".nav-tab-line").children("li").removeClass("active");
+  //   document
+  //     .querySelector(`[data-target="${defaultTab}"]`)
+  //     ?.classList.add("active");
+  // }
+
   let formSendInvitaionErrors = {};
   const { loggedinUser } = useAuth();
   const [sendInvitationErrors, setSendInvitationErrors] = useState({});
-  const Tabs = ["#tab-joined", "#tab-requested", "#tab-connection"];
-  const [activeTab, setActiveTab] = useState(Tabs[0]);
+  const [activeTab, setActiveTab] = useState(defaultTab);
   const [sendInviteModalState, setSendInviteModalState] = useState(false);
   const [selectedUsersProfile, setSelectedUsersProfile] = useState(null);
   const [selectedAsset, setSelectedAsset] = useState(null);
@@ -64,17 +88,17 @@ const Agents = () => {
   );
 
   const handleTabClick = (tabselected) => {
-    switch (tabselected) {
-      case Tabs[0]:
-        setTabJoinedKey((prevKey) => prevKey + 1);
-        break;
-      case Tabs[1]:
-        setTabRequestedKey((prevKey) => prevKey + 1);
-        break;
-      case Tabs[2]:
-        setTabConnectionKey((prevKey) => prevKey + 1);
-        break;
-    }
+    // switch (tabselected) {
+    //   case Tabs[0]:
+    //     setTabJoinedKey((prevKey) => prevKey + 1);
+    //     break;
+    //   case Tabs[1]:
+    //     setTabRequestedKey((prevKey) => prevKey + 1);
+    //     break;
+    //   case Tabs[2]:
+    //     setTabConnectionKey((prevKey) => prevKey + 1);
+    //     break;
+    // }
 
     setActiveTab(tabselected);
   };
@@ -283,7 +307,7 @@ const Agents = () => {
               <div className="tabw100 tab-action shadow rounded bg-white">
                 <ul className="nav-tab-line list-color-secondary d-table mb-0 d-flex box-shadow">
                   <li
-                    className="active"
+                    className="" //"active"
                     data-target={Tabs[0]}
                     onClick={() => {
                       handleTabClick(Tabs[0]);

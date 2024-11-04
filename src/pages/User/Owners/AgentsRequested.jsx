@@ -222,8 +222,8 @@ const AgentsRequested = memo(() => {
       },
 
       {
-        Header: "Joined On",
-        accessor: "RepliedDateDisplay",
+        Header: "Requested On",
+        accessor: "InvitedDateDisplay",
         className: "w-180px",
       },
       {

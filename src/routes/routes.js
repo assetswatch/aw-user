@@ -18,12 +18,20 @@ export const routeNames = {
   dashboard: { name: "Dashboard", path: "/User/Dashboard" },
   ownertenants: { name: "OwnerTenants", path: "/User/Owner-Tenant" },
   owneragents: { name: "OwnerAgents", path: "/User/Owner-Agent" },
+  ownerprofile: {
+    name: "OwnerProfile",
+    path: "/User/Owner-Profile",
+  },
+  ownerprofileedit: {
+    name: "OwnerProfileEdit",
+    path: "/User/Owner-Profile-Edit",
+  },
   ownernotifications: {
     name: "OwnerNotifications",
     path: "/User/Owner-Notifications",
   },
   profiles: { name: "Profiles", path: "/User/Profiles" },
-  upgradeplan: { name: "Profiles", path: "/User/UpgradePlan" },
+  upgradeplan: { name: "UpgradePlan", path: "/User/UpgradePlan" },
   userproperties: { name: "UserProperties", path: "/User/Properties/View" },
   addproperty: {
     name: "AddProperty",
@@ -35,6 +43,19 @@ export const routeNames = {
   },
   tenantowners: { name: "TenantOwners", path: "/User/Tenant-Owner" },
   tenantagents: { name: "TenantAgents", path: "/User/Tenant-Agent" },
+  tenantconnectedproperties: {
+    name: "TenantConnectedProperties",
+    path: "/User/Tenant-ConnectedProperties",
+  },
+  tenantprofile: {
+    name: "TenantProfile",
+    path: "/User/Tenant-Profile",
+  },
+
+  tenantprofileedit: {
+    name: "TenantProfileEdit",
+    path: "/User/Tenant-Profile-Edit",
+  },
   tenantnotifications: {
     name: "TenantNotifications",
     path: "/User/Tenant-Notifications",
@@ -49,6 +70,18 @@ export const routeNames = {
   },
   agentowners: { name: "TenantOwners", path: "/User/Agent-Owner" },
   agenttenants: { name: "TenantAgents", path: "/User/Agent-Tenant" },
+  agentconnectedproperties: {
+    name: "AgentConnectedProperties",
+    path: "/User/Agent-ConnectedProperties",
+  },
+  agentprofile: {
+    name: "AgentProfile",
+    path: "/User/Agent-Profile",
+  },
+  agentprofileedit: {
+    name: "AgentProfileEdit",
+    path: "/User/Agent-Profile-Edit",
+  },
   agentnotifications: {
     name: "AgentNotifications",
     path: "/User/Agent-Notifications",
@@ -199,6 +232,20 @@ const routes = [
     isprotected: true,
   },
   {
+    path: routeNames.ownerprofile.path,
+    name: routeNames.ownerprofile.name,
+    element: lazy(() => import("../pages/User/Owners/Profile")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.ownerprofileedit.path,
+    name: routeNames.ownerprofileedit.name,
+    element: lazy(() => import("../pages/User/Owners/EditProfile")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
     path: routeNames.ownernotifications.path,
     name: routeNames.ownernotifications.name,
     element: lazy(() => import("../pages/User/Owners/Notifications")),
@@ -216,6 +263,27 @@ const routes = [
     path: routeNames.tenantagents.path,
     name: routeNames.tenantagents.name,
     element: lazy(() => import("../pages/User/Tenants/Agents")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.tenantconnectedproperties.path,
+    name: routeNames.tenantconnectedproperties.name,
+    element: lazy(() => import("../pages/User/Tenants/ConnectedProperties")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.tenantprofile.path,
+    name: routeNames.tenantprofile.name,
+    element: lazy(() => import("../pages/User/Tenants/Profile")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.tenantprofileedit.path,
+    name: routeNames.tenantprofileedit.name,
+    element: lazy(() => import("../pages/User/Tenants/EditProfile")),
     isexact: true,
     isprotected: true,
   },
@@ -251,6 +319,27 @@ const routes = [
     path: routeNames.agenttenants.path,
     name: routeNames.agenttenants.name,
     element: lazy(() => import("../pages/User/Agents/Tenants")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.agentconnectedproperties.path,
+    name: routeNames.agentconnectedproperties.name,
+    element: lazy(() => import("../pages/User/Agents/ConnectedProperties")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.agentprofile.path,
+    name: routeNames.agentprofile.name,
+    element: lazy(() => import("../pages/User/Agents/Profile")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.agentprofileedit.path,
+    name: routeNames.agentprofileedit.name,
+    element: lazy(() => import("../pages/User/Agents/EditProfile")),
     isexact: true,
     isprotected: true,
   },

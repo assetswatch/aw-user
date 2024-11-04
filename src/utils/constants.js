@@ -36,6 +36,7 @@ export const SessionStorageKeys = {
   ObjAssetfilters: "oasf",
   OwnerTenantConnectionTab: "otcontab",
   TenantCheckoutPaymentId: "tcpmid",
+  EditProfileId: "epid",
 };
 /*Session storage keys*/
 
@@ -68,6 +69,8 @@ export const API_ACTION_STATUS = Object.freeze({
 export const GridDefaultValues = {
   pi: 0,
   ps: 10,
+  ps5: 5,
+  ps3: 3,
 };
 /*Grid default values*/
 
@@ -86,6 +89,7 @@ export const AppMessages = {
   NoProfiles: "No profiles found...",
   NoProfileTypes: "No profile types found...",
   NoProperties: "No properties found...",
+  NoConnectedProperties: "No connected properties found...",
   NoPayments: "No payments found...",
   NoPropertyDetails: "Property details not found...",
   NoConnection: `No connections found...`,
@@ -140,6 +144,8 @@ export const AppMessages = {
   SendPaymentNotificationModalTitle: "Send Payment Notification",
   SupportTicketSuccess:
     "Your message has been sent. We will get back to you shortly.",
+  ProfileDetailsNotFound: "Profile details not found...",
+  UpdateProfileSuccess: "Profile details updated successfully...",
 };
 /*Common App messages*/
 
@@ -183,6 +189,7 @@ export const ValidationMessages = {
   TermsReq: "Please check the terms.",
   SubjectReq: "Subject can not be empty.",
   MessageReq: "Message can not be empty.",
+  AboutmeReq: "Aboutme can not be empty.",
   SearchKeywordReq: "Keyword can not be empty.",
   LocationReq: "Location can not be empty.",
   FileReq: "File can not be empty.",
@@ -235,6 +242,7 @@ export let ApiUrls = {
   getProfileTypes: `users/v1/GetProfileTypes`,
   getProfileCategories: `users/v1/GetProfileCategories`,
   registerUser: `users/v1/RegisterUser`,
+  updateUser: `users/v1/UpdateUser`,
   login: `users/v1/Login`,
   logout: `users/v1/Logout`,
   getUserProfiles: `users/v1/GetUserProfiles`,
@@ -245,8 +253,10 @@ export let ApiUrls = {
   getJoinedUserConnections: `users/v1/GetJoinedUserConnections`,
   getRequestedUserConnections: `users/v1/getRequestedUserConnections`,
   getUserConnectionsHistory: `users/v1/getUserConnectionsHistory`,
+  getUserConnectedAssets: `users/v1/GetUserConnectedAssets`,
   updateUserConnectionStatus: `users/v1/UpdateUserConnectionStatus`,
   createUserConnection: `users/v1/CreateUserConnection`,
+  getUserDetails: `users/v1/GetUserDetails`,
   getAssetTypes: `assets/v1/GetAssetTypes`,
   getAssetContractTypes: `assets/v1/GetAssetContractTypes`,
   getAssetAcccessTypes: `assets/v1/GetAssetAccessTypes`,

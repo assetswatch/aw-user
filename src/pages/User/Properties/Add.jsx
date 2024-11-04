@@ -1183,7 +1183,9 @@ const Add = () => {
                       <div className="container-fluid">
                         <div className="row">
                           <div className="col px-0">
-                            <h6 className="mb-4 down-line">Property Media</h6>
+                            <h6 className="mb-4 down-line pb-10">
+                              Property Media
+                            </h6>
                             <div className="row">
                               {selectedFiles.length > 0 && (
                                 <div className="col-md-12 mt-0 mb-20">

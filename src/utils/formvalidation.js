@@ -134,6 +134,10 @@ export const Regex = {
     max: length500,
     required: ValidationMessages.MessageReq,
   },
+  aboutme: {
+    max: length1000,
+    required: ValidationMessages.AboutmeReq,
+  },
   searchkeyword: {
     max: length50,
     required: ValidationMessages.SearchKeywordReq,
@@ -410,6 +414,13 @@ export const formCtrlTypes = {
     input: {
       type: "text",
       max: length500,
+    },
+  },
+  aboutme: {
+    lbl: "About me:",
+    input: {
+      type: "text",
+      max: length1000,
     },
   },
   searchkeyword: {

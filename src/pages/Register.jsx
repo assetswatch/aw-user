@@ -50,7 +50,6 @@ const Register = () => {
 
   //Load
   useEffect(() => {
-    console.log("l");
     Promise.allSettled([getProfileTypes(), getCountries()]).then(() => {
       setinitApisLoaded(true);
     });
