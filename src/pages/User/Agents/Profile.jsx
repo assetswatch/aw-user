@@ -9,6 +9,7 @@ import {
   ApiUrls,
   AppMessages,
   GridDefaultValues,
+  UserConnectionTabIds,
   UserCookie,
 } from "../../../utils/constants";
 import {
@@ -69,11 +70,10 @@ const Profile = () => {
       .finally(() => {});
 
     //Joined owners
-    objParams.InviteeProfileTypeId = config.userProfileTypes.Owner;
-    axiosPost(
-      `${config.apiBaseUrl}${ApiUrls.getJoinedUserConnections}`,
-      objParams
-    )
+    axiosPost(`${config.apiBaseUrl}${ApiUrls.getJoinedUserConnections}`, {
+      ...objParams,
+      InviteeProfileTypeId: config.userProfileTypes.Owner,
+    })
       .then((response) => {
         let objResponse = response.data;
         if (objResponse.StatusCode === 200) {
@@ -418,13 +418,13 @@ const Profile = () => {
 
   const onRequestedTenants = () => {
     navigate(routeNames.agenttenants.path, {
-      state: { tab: "requested" },
+      state: { tab: UserConnectionTabIds.requested },
     });
   };
 
   const onRequestedOwners = () => {
     navigate(routeNames.agentowners.path, {
-      state: { tab: "requested" },
+      state: { tab: UserConnectionTabIds.requested },
     });
   };
 

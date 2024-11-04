@@ -16,7 +16,7 @@ import {
   AppConstants,
   UserCookie,
   API_ACTION_STATUS,
-  NotificationTypes,
+  UserConnectionTabIds,
   ValidationMessages,
 } from "../../../utils/constants";
 import AsyncRemoteSelect from "../../../components/common/AsyncRemoteSelect";
@@ -35,35 +35,33 @@ const ConnectionHistory = lazy(() => import("./AgentsConnectionHistory"));
 
 const Agents = () => {
   let $ = window.$;
-
-  //const location = useLocation();
-  const Tabs = ["#tab-joined", "#tab-requested", "#tab-connection"];
+  const location = useLocation();
+  const Tabs = [
+    UserConnectionTabIds.joined,
+    UserConnectionTabIds.requested,
+    UserConnectionTabIds.connection,
+  ];
   let defaultTab = Tabs[0];
-  //let requestedStateTab = location.state || {};
+  const [activeTab, setActiveTab] = useState("");
 
-  // if (!checkObjNullorEmpty(location.state)) {
-  //   switch (location.state.tab.toString().toLowerCase()) {
-  //     case "joined":
-  //     default:
-  //       defaultTab = Tabs[0];
-  //       break;
-  //     case "requested":
-  //       defaultTab = Tabs[1];
-  //       break;
-  //     case "history":
-  //       defaultTab = Tabs[2];
-  //       break;
-  //   }
-  //   $(".nav-tab-line").children("li").removeClass("active");
-  //   document
-  //     .querySelector(`[data-target="${defaultTab}"]`)
-  //     ?.classList.add("active");
-  // }
+  useEffect(() => {
+    let checkStateTab = location.state || {};
+    if (!checkObjNullorEmpty(checkStateTab)) {
+      if (!checkObjNullorEmpty(checkStateTab.tab)) {
+        defaultTab = checkStateTab?.tab?.toString().toLowerCase();
+      }
+    }
+    $(".nav-tab-line").children("li").removeClass("active");
+    document
+      .querySelector(`[data-target="${defaultTab}"]`)
+      ?.classList.add("active");
+
+    handleTabClick(defaultTab);
+  }, []);
 
   let formSendInvitaionErrors = {};
   const { loggedinUser } = useAuth();
   const [sendInvitationErrors, setSendInvitationErrors] = useState({});
-  const [activeTab, setActiveTab] = useState(defaultTab);
   const [sendInviteModalState, setSendInviteModalState] = useState(false);
   const [selectedUsersProfile, setSelectedUsersProfile] = useState(null);
   const [selectedAsset, setSelectedAsset] = useState(null);
@@ -105,9 +103,9 @@ const Agents = () => {
 
   useEffect(() => {
     // default action
-    $(".tab-element .tab-pane").hide();
-    $(".tab-action > ul li:first-child").addClass("active");
-    $(".tab-element .tab-pane:first-child").show();
+    // $(".tab-element .tab-pane").hide();
+    // $(".tab-action > ul li:first-child").addClass("active");
+    // $(".tab-element .tab-pane:first-child").show();
 
     // on click event
     $(".tab-action ul li").on("click", function (e) {
