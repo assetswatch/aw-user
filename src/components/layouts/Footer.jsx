@@ -41,20 +41,23 @@ const Footer = () => {
                     </p>
                   </div>
                   <div className="footer-widget media-widget mb-4">
-                    <a href="#">
+                    <a href="#" target="_blank">
+                      <i className="fa-brands fa-instagram" />
+                    </a>
+                    <a
+                      href="https://www.facebook.com/assetswatch/"
+                      target="_blank"
+                    >
                       <i className="fab fa-facebook-f" />
                     </a>
-                    <a href="#">
+                    <a href="https://twitter.com/assetswatch" target="_blank">
                       <i className="fab fa-twitter" />
                     </a>
-                    <a href="#">
+                    <a
+                      href="https://www.linkedin.com/in/assets-watch-355127175/"
+                      target="_blank"
+                    >
                       <i className="fab fa-linkedin-in" />
-                    </a>
-                    <a href="#">
-                      <i className="fab fa-google-plus-g" />
-                    </a>
-                    <a href="#">
-                      <i className="fab fa-pinterest-p" />
                     </a>
                   </div>
                 </div>
