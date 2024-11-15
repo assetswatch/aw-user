@@ -30,6 +30,10 @@ export const routeNames = {
     name: "OwnerNotifications",
     path: "/User/Owner-Notifications",
   },
+  ownerconnections: {
+    name: "OwnerConnections",
+    path: "/User/Owner-Connections",
+  },
   profiles: { name: "Profiles", path: "/User/Profiles" },
   upgradeplan: { name: "UpgradePlan", path: "/User/UpgradePlan" },
   userproperties: { name: "UserProperties", path: "/User/Properties/View" },
@@ -60,6 +64,10 @@ export const routeNames = {
     name: "TenantNotifications",
     path: "/User/Tenant-Notifications",
   },
+  tenantconnections: {
+    name: "TenantConnections",
+    path: "/User/Tenant-Connections",
+  },
   tenantpayments: {
     name: "TenantPayments",
     path: "/User/Tenant-Payments",
@@ -85,6 +93,10 @@ export const routeNames = {
   agentnotifications: {
     name: "AgentNotifications",
     path: "/User/Agent-Notifications",
+  },
+  agentconnections: {
+    name: "AgentConnections",
+    path: "/User/Agent-Connections",
   },
   comingup: { name: "ComingUp", path: "/User/ComingUp" },
   notFound: { name: "NotFound", path: "/*" },
@@ -253,6 +265,13 @@ const routes = [
     isprotected: true,
   },
   {
+    path: routeNames.ownerconnections.path,
+    name: routeNames.ownerconnections.name,
+    element: lazy(() => import("../pages/User/Owners/Oconnections")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
     path: routeNames.tenantowners.path,
     name: routeNames.tenantowners.name,
     element: lazy(() => import("../pages/User/Tenants/Owners")),
@@ -291,6 +310,13 @@ const routes = [
     path: routeNames.tenantnotifications.path,
     name: routeNames.tenantnotifications.name,
     element: lazy(() => import("../pages/User/Tenants/Notifications")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.tenantconnections.path,
+    name: routeNames.tenantconnections.name,
+    element: lazy(() => import("../pages/User/Tenants/Tconnections")),
     isexact: true,
     isprotected: true,
   },
@@ -347,6 +373,13 @@ const routes = [
     path: routeNames.agentnotifications.path,
     name: routeNames.agentnotifications.name,
     element: lazy(() => import("../pages/User/Agents/Notifications")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.agentconnections.path,
+    name: routeNames.agentconnections.name,
+    element: lazy(() => import("../pages/User/Agents/Aconnections")),
     isexact: true,
     isprotected: true,
   },

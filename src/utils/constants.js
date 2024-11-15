@@ -76,9 +76,12 @@ export const GridDefaultValues = {
 
 /*connection tab ids*/
 export const UserConnectionTabIds = {
-  requested: "#tab-requested",
-  joined: "#tab-joined",
-  connection: "#tab-connection",
+  // requested: "#tab-requested",
+  // joined: "#tab-joined",
+  // connection: "#tab-connection",
+  owners: "#tab-owners",
+  agents: "tab-agents",
+  tenants: "#tab-tenants",
 };
 /*connection tab ids*/
 
