@@ -38,6 +38,8 @@ import AsyncSelect from "../../../components/common/AsyncSelect";
 import { useGetAssetTypesGateway } from "../../../hooks/useGetAssetTypesGateway";
 import { useGetAssetContractTypesGateway } from "../../../hooks/useGetAssetContractTypesGateway";
 import { Toast } from "../../../components/common/ToastView";
+import TextAreaControl from "../../../components/common/TextAreaControl";
+import AsyncRemoteSelect from "../../../components/common/AsyncRemoteSelect";
 
 const View = () => {
   let $ = window.$;
@@ -58,6 +60,7 @@ const View = () => {
 
   //Modal
   const [modalDeleteConfirmShow, setModalDeleteConfirmShow] = useState(false);
+  const [modalAssignShow, setModalAssignShow] = useState(false);
   const [modalDeleteConfirmContent, setModalDeleteConfirmContent] = useState(
     AppMessages.DeleteAssetConfirmationMessage
   );
@@ -310,6 +313,10 @@ const View = () => {
             onclick: (e, row) => onEdit(e, row),
           },
           {
+            text: "Assign",
+            onclick: (e, row) => onAssignModalShow(e, row),
+          },
+          {
             text: "Delete",
             onclick: (e, row) => onDeleteConfirmModalShow(e, row),
           },
@@ -336,6 +343,12 @@ const View = () => {
     e.preventDefault();
     addSessionStorageItem(SessionStorageKeys.EditAssetId, row.original.AssetId);
     navigate(routeNames.editproperty.path);
+  };
+
+  const onAssignModalShow = (e, row) => {
+    e.preventDefault();
+    setSelectedGridRow(row);
+    setModalAssignShow(true);
   };
 
   const onAdd = () => {
@@ -627,6 +640,58 @@ const View = () => {
         </>
       )}
       {/*============== Delete Confirmation Modal End ==============*/}
+
+      {/*============== Assign Modal Start ==============*/}
+
+      {modalAssignShow && (
+        <>
+          <ModalView
+            title={AppMessages.AssignModalTitle}
+            content={
+              <>
+                <div className="row">
+                  <div className="col-12 mb-15">
+                    <AsyncRemoteSelect
+                      placeHolder={AppMessages.DdlTypetoSearch}
+                      noData={AppMessages.NoAgents}
+                      name="ddlusersprofiles"
+                      lblText="Agent"
+                      lblClass="mb-0 lbl-req-field"
+                      required={true}
+                    ></AsyncRemoteSelect>
+                  </div>
+                  <div className="col-12 mb-15">
+                    <TextAreaControl
+                      lblClass="mb-0 lbl-req-field"
+                      name={`txtmessage`}
+                      ctlType={formCtrlTypes.message}
+                      required={true}
+                    ></TextAreaControl>
+                  </div>
+                </div>
+              </>
+            }
+            onClose={() => setModalAssignShow(false)}
+            actions={[
+              {
+                text: "Assign",
+                displayOrder: 1,
+                btnClass: "btn-primary",
+                onClick: () => {
+                  setModalAssignShow(false);
+                },
+              },
+              {
+                text: "Cancel",
+                displayOrder: 2,
+                btnClass: "btn-secondary",
+                onClick: () => setModalAssignShow(false),
+              },
+            ]}
+          ></ModalView>
+        </>
+      )}
+      {/*============== Assign Modal End ==============*/}
     </>
   );
 };

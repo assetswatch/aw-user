@@ -138,6 +138,7 @@ export const AppMessages = {
   DeleteAssetConfirmationMessage: "You want to delete {propertyname} property.",
   SendInvitaionModalTitle: "Send Invitation",
   SendMessageModalTitle: "Send Message",
+  AssignModalTitle: "Assign Property",
   AddPropertySuccess: "Property successfully...",
   UpdatePropertySuccess: "Property details updated successfully...",
   DeleteAssetSuccess: "Property deleted successfully...",

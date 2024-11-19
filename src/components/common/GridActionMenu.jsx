@@ -26,6 +26,8 @@ const GridActionMenu = ({ row, actions }) => {
                       <i className="far fa-eye pe-2 text-general" />
                     ) : a["text"].toLowerCase().indexOf("edit") != -1 ? (
                       <i className="far fa-edit pe-2 text-general" />
+                    ) : a["text"].toLowerCase().indexOf("assign") != -1 ? (
+                      <i className="fa fa-user-plus pe-2 text-general" />
                     ) : a["text"].toLowerCase().indexOf("delete") != -1 ? (
                       <i className="fas fa-trash pe-2 text-general" />
                     ) : a["text"].toLowerCase().indexOf("terminate") != -1 ? (
