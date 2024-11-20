@@ -81,6 +81,19 @@ const View = () => {
   const [searchFormData, setSearchFormData] = useState(
     setSearchInitialFormData
   );
+  const [errors, setErrors] = useState({});
+  const [formData, setFormData] = useState({
+    txtpropertytitle: "",
+    txtdescription: "",
+    txtaddressone: "",
+    txtaddresstwo: "",
+    txtzip: "",
+    txtprice: "",
+    txtadvance: "",
+    txtsqfeet: "",
+    txtbrokerpercentage: "0",
+    owners: [],
+  });
 
   //Set search formdata
 
@@ -105,6 +118,10 @@ const View = () => {
     const { name, value } = e?.target;
     setSearchFormData({
       ...searchFormData,
+      [name]: value,
+    });
+    setFormData({
+      ...formData,
       [name]: value,
     });
   };
@@ -650,24 +667,39 @@ const View = () => {
             content={
               <>
                 <div className="row">
-                  <div className="col-12 mb-15">
-                    <AsyncRemoteSelect
-                      placeHolder={AppMessages.DdlTypetoSearch}
-                      noData={AppMessages.NoAgents}
-                      name="ddlusersprofiles"
-                      lblText="Agent"
-                      lblClass="mb-0 lbl-req-field"
-                      required={true}
-                    ></AsyncRemoteSelect>
-                  </div>
-                  <div className="col-12 mb-15">
-                    <TextAreaControl
-                      lblClass="mb-0 lbl-req-field"
-                      name={`txtmessage`}
-                      ctlType={formCtrlTypes.message}
-                      required={true}
-                    ></TextAreaControl>
-                  </div>
+                  <form noValidate>
+                    <div className="col-12 mb-15">
+                      <AsyncRemoteSelect
+                        placeHolder={AppMessages.DdlTypetoSearch}
+                        noData={AppMessages.NoAgents}
+                        name="ddlusersprofiles"
+                        lblText="Agent"
+                        lblClass="mb-0 lbl-req-field"
+                        required={true}
+                      ></AsyncRemoteSelect>
+                    </div>
+                    <div className="col-12 mb-15">
+                      <InputControl
+                        lblClass="mb-0"
+                        name="txtbrokerpercentage"
+                        value={formData.txtbrokerpercentage}
+                        ctlType={formCtrlTypes.brokerpercentage}
+                        onChange={handleChange}
+                        errors={errors}
+                        formErrors={formErrors}
+                        tabIndex={17}
+                      ></InputControl>
+                    </div>
+                    <div className="col-12 mb-15">
+                      <TextAreaControl
+                        lblClass="mb-0 lbl-req-field"
+                        name={`txtmessage`}
+                        ctlType={formCtrlTypes.message}
+                        errors={errors}
+                        required={true}
+                      ></TextAreaControl>
+                    </div>
+                  </form>
                 </div>
               </>
             }
