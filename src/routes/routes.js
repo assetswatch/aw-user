@@ -267,7 +267,7 @@ const routes = [
   {
     path: routeNames.ownerconnections.path,
     name: routeNames.ownerconnections.name,
-    element: lazy(() => import("../pages/User/Owners/Oconnections")),
+    element: lazy(() => import("../pages/User/Owners/OwnerConnections")),
     isexact: true,
     isprotected: true,
   },

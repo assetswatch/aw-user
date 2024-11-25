@@ -20,24 +20,22 @@ import {
   ValidationMessages,
 } from "../../../utils/constants";
 import AsyncRemoteSelect from "../../../components/common/AsyncRemoteSelect";
+import AsyncSelect from "../../../components/common/AsyncSelect";
 import { axiosPost } from "../../../helpers/axiosHelper";
 import config from "../../../config.json";
 import TextAreaControl from "../../../components/common/TextAreaControl";
 import { formCtrlTypes } from "../../../utils/formvalidation";
 import { Toast } from "../../../components/common/ToastView";
 import { useLocation } from "react-router-dom";
-import AsyncSelect from "../../../components/common/AsyncSelect";
-import { useGetNotificationTypesGateway } from "../../../hooks/useGetNotificationTypesGateway";
 import { useProfileTypesGateway } from "../../../hooks/useProfileTypesGateway";
 import InputControl from "../../../components/common/InputControl";
-const Owners = lazy(() => import("./Oowners"));
-const Agents = lazy(() => import("./Oagents"));
-const Tenants = lazy(() => import("./Otenants"));
 
-const Oconnections = () => {
+const Owners = lazy(() => import("./OwnersConnection"));
+const Agents = lazy(() => import("./AgentsConnection"));
+const Tenants = lazy(() => import("./TenantsConnection"));
+
+const OwnerConnections = () => {
   let $ = window.$;
-
-  let formErrors = {};
 
   const location = useLocation();
   const Tabs = [
@@ -81,6 +79,60 @@ const Oconnections = () => {
   const [sendInvitationFormData, setSendInvitationFormData] = useState(
     setInitialSendInvitationFormData()
   );
+  const [selectedProfileType, setSelectedProfileType] = useState(null);
+  const [selectedJoinedUser, setSelectedJoinedUser] = useState(null);
+
+  let { profileTypesList } = useProfileTypesGateway();
+  profileTypesList = profileTypesList ?? [];
+
+  const joinedUserOptions = useCallback(
+    debounce((inputval, callback) => {
+      if (inputval?.length >= AppConstants.DdlSearchMinLength) {
+        getJoinedUsers(inputval).then((options) => {
+          callback && callback(options);
+        });
+      } else {
+        callback && callback([]);
+      }
+    }, AppConstants.DebounceDelay), // 500ms debounce delay
+    [selectedProfileType]
+  );
+
+  //Get joined users.
+  const getJoinedUsers = async (searchValue) => {
+    if (checkEmptyVal(searchValue)) return [];
+    if (checkEmptyVal(selectedProfileType) == true) return [];
+    let objParams = {
+      keyword: searchValue,
+      inviterid: parseInt(
+        GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
+      ),
+      InviterProfileTypeId: config.userProfileTypes.Owner,
+      InviteeProfileTypeId: parseInt(selectedProfileType),
+    };
+
+    return axiosPost(
+      `${config.apiBaseUrl}${ApiUrls.getDdlJoinedUserConnections}`,
+      objParams
+    )
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode == 200) {
+          return objResponse.Data.map((item) => ({
+            label: item.FirstName + " " + item.LastName,
+            value: item.ProfileId,
+          }));
+        } else {
+          return [];
+        }
+      })
+      .catch((err) => {
+        console.error(
+          `"API :: ${ApiUrls.getDdlJoinedUserConnections}, Error ::" ${err}`
+        );
+        return [];
+      });
+  };
 
   const handleTabClick = (tabselected) => {
     // switch (tabselected) {
@@ -123,82 +175,6 @@ const Oconnections = () => {
 
   // Send invite modal
 
-  let formSendNotificationErrors = {};
-  const [sendNotificationErrors, setSendNotificationErrors] = useState({});
-  const [sendNotificationModalState, setSendNotificationModalState] =
-    useState(false);
-  let { profileTypesList } = useProfileTypesGateway();
-  profileTypesList = profileTypesList ?? [];
-
-  const [selectedProfileType, setSelectedProfileType] = useState(null);
-  const [selectedJoinedUser, setSelectedJoinedUser] = useState(null);
-  function setInitialSendNotificationFormData() {
-    return {
-      txtmessage: "",
-    };
-  }
-  const [sendNotificationFormData, setSendNotificationFormData] = useState(
-    setInitialSendNotificationFormData()
-  );
-
-  const joinedUserOptions = useCallback(
-    debounce((inputval, callback) => {
-      if (inputval?.length >= AppConstants.DdlSearchMinLength) {
-        getJoinedUsers(inputval).then((options) => {
-          callback && callback(options);
-        });
-      } else {
-        callback && callback([]);
-      }
-    }, AppConstants.DebounceDelay), // 500ms debounce delay
-    [selectedProfileType]
-  );
-
-  //Get joined users.
-  const getJoinedUsers = async (searchValue) => {
-    if (checkEmptyVal(searchValue)) return [];
-
-    let objParams = {
-      keyword: searchValue,
-      inviterid: parseInt(
-        GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
-      ),
-      InviterProfileTypeId: config.userProfileTypes.Agent,
-      InviteeProfileTypeId: parseInt(selectedProfileType),
-    };
-
-    return axiosPost(
-      `${config.apiBaseUrl}${ApiUrls.getDdlJoinedUserConnections}`,
-      objParams
-    )
-      .then((response) => {
-        let objResponse = response.data;
-        if (objResponse.StatusCode == 200) {
-          return objResponse.Data.map((item) => ({
-            label: item.FirstName + " " + item.LastName,
-            value: item.ProfileId,
-          }));
-        } else {
-          return [];
-        }
-      })
-      .catch((err) => {
-        console.error(
-          `"API :: ${ApiUrls.getDdlJoinedUserConnections}, Error ::" ${err}`
-        );
-        return [];
-      });
-  };
-
-  const handleProfileTypeChange = (e) => {
-    setSelectedProfileType(e?.value);
-    setSelectedJoinedUser(null);
-  };
-
-  const handleDdlJoinedUsersChange = () => {
-    joinedUserOptions();
-  };
-
   const usersProfilesOptions = useCallback(
     debounce((inputval, callback) => {
       if (inputval?.length >= AppConstants.DdlSearchMinLength) {
@@ -214,6 +190,15 @@ const Oconnections = () => {
 
   const handleDdlUsersProfilesChange = () => {
     usersProfilesOptions();
+  };
+
+  const handleProfileTypeChange = (e) => {
+    setSelectedProfileType(e?.value);
+    setSelectedJoinedUser(null);
+  };
+
+  const handleDdlJoinedUsersChange = () => {
+    joinedUserOptions();
   };
 
   //Get users profiles.
@@ -276,7 +261,11 @@ const Oconnections = () => {
     e.stopPropagation();
 
     if (checkEmptyVal(selectedUsersProfile)) {
-      formSendInvitaionErrors["ddlusersprofiles"] = ValidationMessages.OwnerReq;
+      formSendInvitaionErrors["ddlprofiletype"] =
+        ValidationMessages.ProfiletypeReq;
+    }
+    if (checkEmptyVal(selectedJoinedUser)) {
+      formSendInvitaionErrors["ddljoinedusers"] = ValidationMessages.UserReq;
     }
 
     if (Object.keys(formSendInvitaionErrors).length === 0) {
@@ -436,86 +425,87 @@ const Oconnections = () => {
             content={
               <>
                 <div className="row">
-                  <form noValidate>
-                    <div className="col-12 mb-15">
-                      <AsyncSelect
-                        placeHolder={
-                          profileTypesList.length <= 0 &&
-                          selectedProfileType == null
-                            ? AppMessages.DdLLoading
-                            : AppMessages.DdlDefaultSelect
-                        }
-                        noData={
-                          profileTypesList.length <= 0 &&
-                          selectedProfileType == null
-                            ? AppMessages.DdLLoading
-                            : AppMessages.NoProfileTypes
-                        }
-                        options={profileTypesList}
-                        onChange={(e) => {
-                          handleProfileTypeChange(e);
-                        }}
-                        dataKey="ProfileTypeId"
-                        dataVal="ProfileType"
-                        value={selectedProfileType}
-                        name="ddlprofiletype"
-                        lbl={formCtrlTypes.profiletype}
-                        lblText="Profile type"
-                        lblClass="mb-0 lbl-req-field"
-                        required={true}
-                        errors={sendNotificationErrors}
-                        formErrors={formSendNotificationErrors}
-                        tabIndex={1}
-                      ></AsyncSelect>
-                    </div>
-                    <div className="col-12 mb-15">
-                      <AsyncRemoteSelect
-                        placeHolder={AppMessages.DdlTypetoSearch}
-                        noData={AppMessages.NoUsers}
-                        loadOptions={joinedUserOptions}
-                        handleInputChange={(e, val) => {
-                          handleDdlJoinedUsersChange(e, val.prevInputValue);
-                        }}
-                        onChange={(option) => setSelectedJoinedUser(option)}
-                        value={selectedJoinedUser}
-                        name="ddljoinedusers"
-                        lblText="User"
-                        lblClass="mb-0 lbl-req-field"
-                        required={true}
-                        errors={sendNotificationErrors}
-                        formErrors={formSendNotificationErrors}
-                        isClearable={true}
-                        cacheOptions={false}
-                        tabIndex={2}
-                      ></AsyncRemoteSelect>
-                    </div>
-                    <div className="col-12 mb-0 mt-0 text-center">
-                      <span>Or Invite Through Email</span>
-                    </div>
-                    <div className="col-12 mb-15">
-                      <InputControl
-                        lblClass="mb-0"
-                        lblText="Email"
-                        name="txtemail"
-                        ctlType={formCtrlTypes.email}
-                        formErrors={formErrors}
-                      ></InputControl>
-                    </div>
-                    <div className="col-12 mb-0">
-                      <TextAreaControl
-                        lblClass="mb-0 lbl-req-field"
-                        name={`txtmessage`}
-                        ctlType={formCtrlTypes.message}
-                        onChange={handleSendInvitationInputChange}
-                        value={sendInvitationFormData.txtmessage}
-                        required={true}
-                        errors={sendInvitationErrors}
-                        formErrors={formSendInvitaionErrors}
-                        rows={3}
-                        tabIndex={3}
-                      ></TextAreaControl>
-                    </div>
-                  </form>
+                  <div className="col-12 mb-15">
+                    <AsyncSelect
+                      placeHolder={
+                        profileTypesList.length <= 0 &&
+                        selectedProfileType == null
+                          ? AppMessages.DdLLoading
+                          : AppMessages.DdlDefaultSelect
+                      }
+                      noData={
+                        profileTypesList.length <= 0 &&
+                        selectedProfileType == null
+                          ? AppMessages.DdLLoading
+                          : AppMessages.NoProfileTypes
+                      }
+                      options={profileTypesList}
+                      onChange={(e) => {
+                        handleProfileTypeChange(e);
+                      }}
+                      dataKey="ProfileTypeId"
+                      dataVal="ProfileType"
+                      value={selectedProfileType}
+                      name="ddlprofiletype"
+                      lbl={formCtrlTypes.profiletype}
+                      lblText="Profile type"
+                      lblClass="mb-0 lbl-req-field"
+                      required={true}
+                      errors={sendInvitationErrors}
+                      formErrors={formSendInvitaionErrors}
+                      tabIndex={1}
+                    ></AsyncSelect>
+                  </div>
+                  <div className="col-12 mb-15">
+                    <AsyncRemoteSelect
+                      placeHolder={AppMessages.DdlTypetoSearch}
+                      noData={AppMessages.NoUsers}
+                      loadOptions={joinedUserOptions}
+                      handleInputChange={(e, val) => {
+                        handleDdlJoinedUsersChange(e, val.prevInputValue);
+                      }}
+                      onChange={(option) => setSelectedJoinedUser(option)}
+                      value={selectedJoinedUser}
+                      name="ddljoinedusers"
+                      lblText="User"
+                      lblClass="mb-0 lbl-req-field"
+                      required={true}
+                      errors={sendInvitationErrors}
+                      formErrors={formSendInvitaionErrors}
+                      isClearable={true}
+                      cacheOptions={false}
+                      tabIndex={2}
+                    ></AsyncRemoteSelect>
+                  </div>
+                  <div className="col-12 mb-0 mt-0 text-center">
+                    <span>Or Invite Through Email</span>
+                  </div>
+                  <div className="col-12 mb-15">
+                    <InputControl
+                      lblClass="mb-0 lbl-req-field"
+                      lblText="Email:"
+                      name="txtemail"
+                      ctlType={formCtrlTypes.email}
+                      isFocus={true}
+                      required={true}
+                      errors={sendInvitationErrors}
+                      tabIndex={2}
+                    ></InputControl>
+                  </div>
+                  <div className="col-12 mb-0">
+                    <TextAreaControl
+                      lblClass="mb-0 lbl-req-field"
+                      name={`txtmessage`}
+                      ctlType={formCtrlTypes.message}
+                      onChange={handleSendInvitationInputChange}
+                      value={sendInvitationFormData.txtmessage}
+                      required={true}
+                      errors={sendInvitationErrors}
+                      formErrors={formSendInvitaionErrors}
+                      rows={3}
+                      tabIndex={3}
+                    ></TextAreaControl>
+                  </div>
                 </div>
               </>
             }
@@ -543,4 +533,4 @@ const Oconnections = () => {
   );
 };
 
-export default Oconnections;
+export default OwnerConnections;

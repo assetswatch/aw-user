@@ -25,7 +25,7 @@ import { Toast } from "../../../components/common/ToastView";
 import { useUserConnectionStatusTypesGateway } from "../../../hooks/useUserConnectionStatusTypesGateway";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 
-const Agents = memo(() => {
+const Tenants = memo(() => {
   let $ = window.$;
 
   let formErrors = {};
@@ -136,7 +136,7 @@ const Agents = memo(() => {
           GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
         ),
         InviterProfileTypeId: config.userProfileTypes.Owner,
-        InviteeProfileTypeId: config.userProfileTypes.Agent,
+        InviteeProfileTypeId: config.userProfileTypes.Tenant,
         fromdate: setSearchInitialFormData.txtfromdate,
         todate: setSearchInitialFormData.txttodate,
         status: setSearchInitialFormData.ddlstatus,
@@ -399,7 +399,7 @@ const Agents = memo(() => {
                 text: "Total Records",
                 count: totalCount,
               }}
-              noData={AppMessages.NoHistory}
+              noData={AppMessages.NoConnection}
             />
           </div>
         </div>
@@ -409,4 +409,4 @@ const Agents = memo(() => {
   );
 });
 
-export default Agents;
+export default Tenants;
