@@ -1,9 +1,15 @@
 import { Modal, Button } from "react-bootstrap";
 import { checkEmptyVal } from "../../utils/common";
-const ModalView = ({ title, content, onClose, actions }) => {
+const ModalView = ({ title, content, onClose, actions, modalSize = null }) => {
   return (
     <>
-      <Modal show={true} centered animation={true} backdrop="static">
+      <Modal
+        show={true}
+        centered
+        animation={true}
+        backdrop="static"
+        size={modalSize ? modalSize : ""}
+      >
         <Modal.Header className="box-shadow">
           <Modal.Title className="">
             {title ? title : "Are you sure?"}

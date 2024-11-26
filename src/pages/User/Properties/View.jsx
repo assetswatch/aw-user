@@ -52,6 +52,7 @@ const View = () => {
   const { assetContractTypesList } = useGetAssetContractTypesGateway("", 1);
 
   //Grid
+  const [usersData, setUsersData] = useState([]);
   const [assetsList, setAssetsList] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [pageCount, setPageCount] = useState(0);
@@ -330,7 +331,7 @@ const View = () => {
             onclick: (e, row) => onEdit(e, row),
           },
           {
-            text: "Assign",
+            text: "Assign/UnAssign",
             onclick: (e, row) => onAssignModalShow(e, row),
           },
           {
@@ -664,6 +665,7 @@ const View = () => {
         <>
           <ModalView
             title={AppMessages.AssignModalTitle}
+            modalSize="large"
             content={
               <>
                 <div className="row">
@@ -699,23 +701,110 @@ const View = () => {
                         required={true}
                       ></TextAreaControl>
                     </div>
+                    <div className="col-12 mb-15 text-right">
+                      <button
+                        className="btn btn-primary w- 100"
+                        value="Search"
+                        name="btnsearch"
+                        type="button"
+                      >
+                        Assign
+                      </button>
+                    </div>
                   </form>
+                  <hr className="w-100 text-primary d -none"></hr>
+                  <div div className="col-12 mb-15 text-center bg-primary">
+                    <p className="modal-title h4">Assigned Agents</p>
+                  </div>
+                  <form noValidate>
+                    <div className="col-12 mb-15">
+                      <InputControl
+                        lblClass="mb-0"
+                        lblText="Search by Name/ Email / Phone"
+                        name="txtkeyword"
+                        ctlType={formCtrlTypes.searchkeyword}
+                        value={searchFormData.txtkeyword}
+                        onChange={handleChange}
+                        formErrors={formErrors}
+                      ></InputControl>
+                    </div>
+                    <div className="col-12 mb-15">
+                      <DateControl
+                        lblClass="mb-0"
+                        lblText="Start date"
+                        name="txtfromdate"
+                        required={false}
+                        onChange={(dt) => onDateChange(dt, "txtfromdate")}
+                        value={searchFormData.txtfromdate}
+                        isTime={false}
+                      ></DateControl>
+                    </div>
+                    <div className="col-12 mb-15">
+                      <DateControl
+                        lblClass="mb-0"
+                        lblText="End date"
+                        name="txttodate"
+                        required={false}
+                        onChange={(dt) => onDateChange(dt, "txttodate")}
+                        value={searchFormData.txttodate}
+                        isTime={false}
+                        objProps={{
+                          checkVal: searchFormData.txtfromdate,
+                        }}
+                      ></DateControl>
+                    </div>
+                    <div className="col-12 mb-15 text-right">
+                      <label
+                        className="mb-0 form-error w-100"
+                        id="search-val-err-message"
+                      ></label>
+                      <button
+                        className="btn btn-primary w- 100 me-3"
+                        value="Search"
+                        name="btnsearch"
+                        type="button"
+                        onClick={onSearch}
+                      >
+                        Search
+                      </button>
+                      <button
+                        className="btn btn-primary w- 100 me-3"
+                        value="Show all"
+                        name="btnshowall"
+                        type="button"
+                        onClick={onShowAll}
+                      >
+                        Show All
+                      </button>
+                    </div>
+                  </form>
+                  {/*============== Grid Start ==============*/}
+                  <div className="row rounded">
+                    <div className="col">
+                      <div className="dashboard-panel bo-top bg-white rounded overflow-hidden w-100 box-shadow-top">
+                        <Grid
+                          columns={columns}
+                          data={usersData}
+                          loading={isDataLoading}
+                          fetchData={fetchData}
+                          pageCount={pageCount}
+                          totalInfo={{
+                            text: "Assigned Agents",
+                            count: totalCount,
+                          }}
+                          noData={AppMessages.NoAgents}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  {/*============== Grid End ==============*/}
                 </div>
               </>
             }
             onClose={() => setModalAssignShow(false)}
             actions={[
               {
-                text: "Assign",
-                displayOrder: 1,
-                btnClass: "btn-primary",
-                onClick: () => {
-                  setModalAssignShow(false);
-                },
-              },
-              {
                 text: "Cancel",
-                displayOrder: 2,
                 btnClass: "btn-secondary",
                 onClick: () => setModalAssignShow(false),
               },
