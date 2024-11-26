@@ -379,7 +379,7 @@ const routes = [
   {
     path: routeNames.agentconnections.path,
     name: routeNames.agentconnections.name,
-    element: lazy(() => import("../pages/User/Agents/Aconnections")),
+    element: lazy(() => import("../pages/User/Agents/AgentConnections")),
     isexact: true,
     isprotected: true,
   },

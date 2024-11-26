@@ -30,9 +30,9 @@ import AsyncSelect from "../../../components/common/AsyncSelect";
 import { useGetNotificationTypesGateway } from "../../../hooks/useGetNotificationTypesGateway";
 import { useProfileTypesGateway } from "../../../hooks/useProfileTypesGateway";
 import InputControl from "../../../components/common/InputControl";
-const Owners = lazy(() => import("./Aowners"));
-const Agents = lazy(() => import("./Aagents"));
-const Tenants = lazy(() => import("./Atenants"));
+const Owners = lazy(() => import("./OwnersConnection"));
+const Agents = lazy(() => import("./AgentsConnection"));
+const Tenants = lazy(() => import("./TenantsConnection"));
 
 const Aconnections = () => {
   let $ = window.$;
