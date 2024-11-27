@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { loadFile, unloadFile, getArrLoadFiles } from "../utils/loadFiles";
 import { routeNames } from "../routes/routes";
 import { Link, useNavigate } from "react-router-dom";
-import { SetPageLoaderNavLinks } from "../utils/common";
+import { checkEmptyVal, SetPageLoaderNavLinks } from "../utils/common";
 import { useGetTopAssetsGateWay } from "../hooks/useGetTopAssetsGateWay";
 import { useGetTopAgentsGateWay } from "../hooks/useGetTopAgentsGateWay";
 import Rating from "../components/common/Rating";
@@ -251,87 +251,6 @@ const Home = () => {
 
       {/*============== Property Search Form Start ==============*/}
       <PropertySearch></PropertySearch>
-      {/* <div className="full-row p-0" style={{ marginTop: "0px", zIndex: 99 }}>
-        <div className="container-fluid">
-          <div className="row">
-            <div className="col px-0">
-              <form
-                className="bg-light shadow-sm quick-search py-4 px-5 form-icon-right position-relative"
-                action="#"
-                method="post"
-              >
-                <div className="row row-cols-lg-6 row-cols-md-3 row-cols-1 g-3">
-                  <div className="col">
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="keyword"
-                      placeholder="Enter Keyword..."
-                    />
-                  </div>
-                  <div className="col">
-                    <select className="form-control">
-                      <option>Property Types</option>
-                      <option>House</option>
-                      <option>Office</option>
-                      <option>Appartment</option>
-                      <option>Condos</option>
-                      <option>Villa</option>
-                      <option>Small Family</option>
-                      <option>Single Room</option>
-                    </select>
-                  </div>
-                  <div className="col">
-                    <div className="position-relative">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="location"
-                        placeholder="Location"
-                      />
-                      <i className="flaticon-placeholder flat-mini icon-font y-center text-dark" />
-                    </div>
-                  </div>
-                  <div className="col">
-                    <div className="position-relative">
-                      <button
-                        className="form-control price-toggle toggle-btn"
-                        data-target="#data-range-price"
-                      >
-                        Price{" "}
-                        <i className="fas fa-angle-down font-mini icon-font y-center text-dark" />
-                      </button>
-                      <div
-                        id="data-range-price"
-                        className="price_range price-range-toggle"
-                      >
-                        <div className="area-filter price-filter">
-                          <span className="price-slider">
-                            <input
-                              className="filter_price"
-                              type="text"
-                              name="price"
-                              defaultValue="0;10000"
-                            />
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col">
-                    <Link
-                      to={routeNames.properties.path}
-                      className="btn btn-primary btn-mini w-100 btn-glow shadow rounded"
-                    >
-                      Search
-                    </Link>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div> */}
       {/*============== Property Search Form End ==============*/}
 
       {/*============== Recent Property Start ==============*/}
@@ -375,7 +294,7 @@ const Home = () => {
                             <div className="overflow-hidden position-relative transation thumbnail-img hover-img-zoom box-shadow rounded">
                               <div className="catart position-absolute">
                                 <span className="sale bg-secondary text-white">
-                                  For {a.ContractType}
+                                  For {a.ListingType}
                                 </span>
                               </div>
                               <Link
@@ -417,16 +336,27 @@ const Home = () => {
                                   to={routeNames.propertyDetails.path}
                                   className="text-primary font-16"
                                 >
-                                  {a.Title}
+                                  <i className="fas fa-map-marker-alt" />{" "}
+                                  {a.AddressOne}{" "}
+                                  {/* {checkEmptyVal(a.AddressTwo)
+                                    ? ""
+                                    : `, ${a.AddressTwo}`} */}
                                 </Link>
                               </h5>
-                              <span className="listing-location mb-1">
-                                <i className="fas fa-map-marker-alt" />{" "}
-                                {a.AddressOne}
+                              {/* <span className="listing-location mb-1">
+                                {a.City}, {a.State}, {a.CountryShortName}
                               </span>
-                              <span className="listing-price font-16 font-600 mb-1">
+                              <span className="listing-price font-15 font-500 mb-1">
                                 {a.PriceDisplay}
-                              </span>
+                              </span> */}
+                              <ul className="d-flex font-general mb-10 mt-10 flex-sb">
+                                <li className="flex-start pr-20 listing-location mb-1">
+                                  {a.City}, {a.State}, {a.CountryShortName}
+                                </li>
+                                <li className="flex-end listing-price font-15 font-500 mb-1">
+                                  {a.PriceDisplay}
+                                </li>
+                              </ul>
                               <ul className="d-flex quantity font-general mb-2 flex-sb">
                                 <li title="Beds">
                                   <span>
@@ -444,7 +374,7 @@ const Home = () => {
                                   <span>
                                     <i className="fa-solid fa-vector-square"></i>
                                   </span>
-                                  {a.SqfeetDisplay} Sqft
+                                  {a.AreaDisplay} {a.AreaUnitType}
                                 </li>
                               </ul>
                             </div>

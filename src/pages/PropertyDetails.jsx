@@ -3,7 +3,11 @@ import { loadFile, unloadFile, getArrLoadFiles } from "../utils/loadFiles";
 
 import PageTitle from "../components/layouts/PageTitle";
 import { routeNames } from "../routes/routes";
-import { apiReqResLoader, checkObjNullorEmpty } from "../utils/common";
+import {
+  apiReqResLoader,
+  checkEmptyVal,
+  checkObjNullorEmpty,
+} from "../utils/common";
 import {
   API_ACTION_STATUS,
   ApiUrls,
@@ -168,27 +172,41 @@ const PropertyDetails = () => {
                   <div className="media mb-3">
                     <LazyImage
                       className="rounded-circle me-3 shadow img-border-white w-80px"
-                      src={assetDetails.PicPath}
-                      alt={assetDetails.FirstName}
+                      src={
+                        assetDetails.IsAssigned == 1
+                          ? assetDetails.AssignedProfiles[0].PicPath
+                          : assetDetails.PicPath
+                      }
+                      alt={
+                        assetDetails.IsAssigned == 1
+                          ? assetDetails.AssignedProfiles[0].FirstName
+                          : assetDetails.FirstName
+                      }
                       placeHolderClass="min-h-80 w-80px"
                     />
                     <div className="media-body">
                       <div className="h6 mt-0 mb-1 text-primary">
-                        {assetDetails.FirstName} {assetDetails.LastName}
+                        {assetDetails.IsAssigned == 1
+                          ? `${assetDetails.AssignedProfiles[0].FirstName} ${assetDetails.AssignedProfiles[0].LastName}`
+                          : `${assetDetails.FirstName} ${assetDetails.LastName}`}
                       </div>
                       <span className="d-block">
                         <i
                           className="flat-mini flaticon-phone-call me-2"
                           aria-hidden="true"
                         ></i>
-                        {assetDetails.MobileNo}{" "}
+                        {assetDetails.IsAssigned == 1
+                          ? assetDetails.AssignedProfiles[0].MobileNo
+                          : assetDetails.MobileNo}{" "}
                       </span>
                       <span className="d-block">
                         <i
                           className="flat-mini flaticon-email me-2"
                           aria-hidden="true"
                         ></i>
-                        {assetDetails.Email}{" "}
+                        {assetDetails.IsAssigned == 1
+                          ? assetDetails.AssignedProfiles[0].Email
+                          : assetDetails.Email}{" "}
                       </span>
                     </div>
                   </div>
@@ -284,16 +302,27 @@ const PropertyDetails = () => {
                                   }
                                   className="text-primary font-general font-500"
                                 >
-                                  {a.Title}
+                                  <i className="fas fa-map-marker-alt" />{" "}
+                                  {a.AddressOne}
+                                  {/* {checkEmptyVal(a.AddressTwo)
+                                    ? ""
+                                    : `, ${a.AddressTwo}`} */}
                                 </Link>
                               </h5>
-                              <div className="listing-location mb-0 font-general">
-                                <i className="fas fa-map-marker-alt" />{" "}
-                                {a.AddressOne}
+                              {/* <div className="listing-location mb-0 font-general">
+                                {a.City}, {a.State}, {a.CountryShortName}
                               </div>
                               <div className="listing-price font-general mb-0 font-500">
                                 {a.PriceDisplay}
-                              </div>
+                              </div> */}
+                              <ul className="d-flex quantity font-general my-1 flex-sb">
+                                <li className="flex-start pr-20 listing-location mb-1">
+                                  {a.City}, {a.State}, {a.CountryShortName}
+                                </li>
+                                <li className="flex-end listing-price font-15 font-500 mb-1">
+                                  {a.PriceDisplay}
+                                </li>
+                              </ul>
                               <ul className="d-flex quantity font-general flex-sb">
                                 <li title="Beds">
                                   <span>
@@ -311,7 +340,7 @@ const PropertyDetails = () => {
                                   <span>
                                     <i className="fa-solid fa-vector-square"></i>
                                   </span>
-                                  {a.SqfeetDisplay} Sqft
+                                  {a.AreaDisplay} {a.AreaUnitType}
                                 </li>
                               </ul>
                             </div>
@@ -403,41 +432,56 @@ const PropertyDetails = () => {
                             <span>{assetDetails.AssetType}</span>
                           </a>
                         </div>
-                        <h4 className="listing-title">
-                          <a href="property-single-v1.html">
-                            {assetDetails.Title}
-                          </a>
-                        </h4>
-                        <span className="listing-location d-block">
+                        <h6 className="listing-title my-10 text-primary">
                           <i className="fas fa-map-marker-alt text-primary" />{" "}
                           {assetDetails.AddressOne}
+                          {checkEmptyVal(assetDetails.AddressTwo)
+                            ? ""
+                            : `, ${assetDetails.AddressTwo}`}
+                        </h6>
+                        <span className="listing-location d-block">
+                          {assetDetails.City}, {assetDetails.State},{" "}
+                          {assetDetails.CountryShortName}
                         </span>
-                        {assetDetails.AddressTwo && (
-                          <span className="listing-location d-block">
-                            <i className="fas fa-map-marker-alt text-primary" />{" "}
-                            {assetDetails.AddressTwo}
-                          </span>
-                        )}
                       </div>
                       <div className="col-auto ms-auto xs-m-0 text-end xs-text-start pb-4">
                         <span className="listing-price">
                           {assetDetails.PriceDisplay}
                         </span>
                       </div>
-                      <div className="col-12">
+                      <div className="col-12 px-2 mt-10">
                         <div className="mt-2">
                           <ul className="list-three-fold-width d-flex flex-se">
                             <li className="d-flex flex-start">
-                              <span className="font-500">Bedrooms: </span>{" "}
-                              {assetDetails.Bedrooms}
+                              <span className="font-500">Property Type: </span>{" "}
+                              {assetDetails.ClassificationType}
                             </li>
                             <li className="d-flex flex-center">
-                              <span className="font-500">Bathrooms: </span>{" "}
-                              {assetDetails.Bathrooms}
+                              <span className="font-500">List Type: </span>{" "}
+                              {assetDetails.ListingType}
                             </li>
                             <li className="d-flex flex-end">
                               <span className="font-500">Area: </span>{" "}
-                              {assetDetails.SqfeetDisplay} Sqft
+                              {assetDetails.AreaDisplay}{" "}
+                              {assetDetails.AreaUnitType}
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                      <div className="col-12 px-2 mb-10">
+                        <div className="mt-2">
+                          <ul className="list-three-fold-width d-flex flex-se">
+                            <li className="d-flex flex-start">
+                              <span className="font-500">Noof Floors: </span>{" "}
+                              {assetDetails.NoOfFloors}
+                            </li>
+                            <li className="d-flex flex-center">
+                              <span className="font-500">Bedrooms: </span>{" "}
+                              {assetDetails.Bedrooms}
+                            </li>
+                            <li className="d-flex flex-end">
+                              <span className="font-500">Bathrooms: </span>{" "}
+                              {assetDetails.Bathrooms}
                             </li>
                           </ul>
                         </div>

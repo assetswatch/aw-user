@@ -4495,7 +4495,9 @@ Newsletter Style
 .flex {
   display: flex;
 }
-
+.flex-shrink-0 {
+  flex-shrink: 0 !important;
+}
 .flex-sb {
   justify-content: space-between;
 }

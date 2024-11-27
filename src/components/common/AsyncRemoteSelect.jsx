@@ -155,6 +155,14 @@ const AsyncRemoteSelect = (ctlProps) => {
   //   }, 500);
   // };
 
+  const singleValue = (props) => {
+    return (
+      <div className="css-1dimb5e-singleValue">
+        {props.data.customlabel ? props.data.customlabel : props.data.label}
+      </div>
+    );
+  };
+
   return (
     <>
       <label className={ctlProps.lblClass}>
@@ -172,6 +180,7 @@ const AsyncRemoteSelect = (ctlProps) => {
           animatedComponents,
           DropdownIndicator,
           ClearIndicator,
+          SingleValue: singleValue,
         }}
         isLoading={isLoading}
         noOptionsMessage={noOptionsMessage}
@@ -180,6 +189,9 @@ const AsyncRemoteSelect = (ctlProps) => {
         onChange={ctlProps.onChange}
         isDisabled={ctlProps.isDisabled && true}
         defaultValue={ctlProps.placeHolder}
+        onBlur={ctlProps.onBlur}
+        blurInputOnSelect={false}
+        inputValue={ctlProps.inputValue}
         value={selectedValue}
         tabIndex={ctlProps.tabIndex}
         defaultOptions

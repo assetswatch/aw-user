@@ -66,6 +66,7 @@ const Tenants = () => {
   const [sendInvitationErrors, setSendInvitationErrors] = useState({});
   const [sendInviteModalState, setSendInviteModalState] = useState(false);
   const [selectedUsersProfile, setSelectedUsersProfile] = useState(null);
+  const [inputProfileValue, setInputProfileValue] = useState("");
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [tabJoinedKey, setTabJoinedKey] = useState(0);
   const [tabRequestedKey, setTabRequestedKey] = useState(0);
@@ -145,12 +146,24 @@ const Tenants = () => {
     usersProfilesOptions();
   };
 
+  const handleInputProfileChange = (newValue, actionMeta) => {
+    if (
+      actionMeta.action !== "menu-close" &&
+      actionMeta.action !== "input-blur"
+    ) {
+      setInputProfileValue(newValue);
+    }
+  };
+
   //Get users profiles.
   const getUsersProfiles = async (searchValue) => {
     if (checkEmptyVal(searchValue)) return [];
     let objParams = {
       AccountId: parseInt(
         GetUserCookieValues(UserCookie.AccountId, loggedinUser)
+      ),
+      ProfileId: parseInt(
+        GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
       ),
       ProfileTypeId: config.userProfileTypes.Tenant,
       Keyword: searchValue,
@@ -164,8 +177,25 @@ const Tenants = () => {
         let objResponse = response.data;
         if (objResponse.StatusCode == 200) {
           return objResponse.Data.map((item) => ({
-            label: item.FirstName + " " + item.LastName,
+            label: (
+              <div className="flex items-center">
+                <div className="w-40px h-40px mr-10 flex-shrink-0">
+                  <img
+                    alt=""
+                    src={item.PicPath}
+                    className="rounded cur-pointer w-40px"
+                  />
+                </div>
+                <div>
+                  <span className="text-primary lh-1 d-block">
+                    {item.FirstName + " " + item.LastName}
+                  </span>
+                  <span className="small text-light">Owner</span>
+                </div>
+              </div>
+            ),
             value: item.ProfileId,
+            customlabel: item.FirstName + " " + item.LastName,
           }));
         } else {
           return [];
@@ -209,7 +239,10 @@ const Tenants = () => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (checkEmptyVal(selectedUsersProfile)) {
+    if (
+      checkEmptyVal(selectedUsersProfile) &&
+      checkEmptyVal(inputProfileValue)
+    ) {
       formSendInvitaionErrors["ddlusersprofiles"] =
         ValidationMessages.TenantReq;
     }
@@ -410,9 +443,17 @@ const Tenants = () => {
                       noData={AppMessages.NoTenants}
                       loadOptions={usersProfilesOptions}
                       handleInputChange={(e, val) => {
+                        handleInputProfileChange(e, val);
                         handleDdlUsersProfilesChange(e, val.prevInputValue);
                       }}
-                      onChange={(option) => setSelectedUsersProfile(option)}
+                      onChange={(option) => {
+                        setSelectedUsersProfile(option);
+                        //setInputProfileValue(option ? option.customlabel : "");
+                      }}
+                      onBlur={() => {
+                        setInputProfileValue(inputProfileValue);
+                      }}
+                      inputValue={inputProfileValue}
                       value={selectedUsersProfile}
                       name="ddlusersprofiles"
                       lblText="Tenant"
