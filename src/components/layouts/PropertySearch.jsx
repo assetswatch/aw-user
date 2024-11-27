@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formCtrlTypes } from "../../utils/formvalidation";
 import InputControl from "../common/InputControl";
-import { useGetAssetAccessTypesGateway } from "../../hooks/useGetAssetAccessTypesGateway";
+import { useGetAssetListingTypesGateway } from "../../hooks/useGetAssetListingTypesGateway";
 import { useGetAssetTypesGateway } from "../../hooks/useGetAssetTypesGateway";
-import { useGetAssetContractTypesGateway } from "../../hooks/useGetAssetContractTypesGateway";
+import { useAssetClassificationTypesGateway } from "../../hooks/useAssetClassificationTypesGateway";
 import { useAssetsAppConfigGateway } from "../../hooks/useAssetsAppConfigGateway";
 import AsyncSelect from "../common/AsyncSelect";
 import { AppMessages, SessionStorageKeys } from "../../utils/constants";
@@ -48,8 +48,11 @@ const PropertySearch = () => {
       ddlassettype: !checkEmptyVal(propfilters?.["atid"])
         ? propfilters?.["atid"]
         : null,
-      ddlcontracttype: !checkEmptyVal(propfilters?.["ctid"])
+      ddlclassificationtype: !checkEmptyVal(propfilters?.["ctid"])
         ? propfilters?.["ctid"]
+        : null,
+      ddllistingtype: !checkEmptyVal(propfilters?.["ltid"])
+        ? propfilters?.["ltid"]
         : null,
       ddlbedrooms: !checkEmptyVal(propfilters?.["bed"])
         ? propfilters?.["bed"]
@@ -57,10 +60,10 @@ const PropertySearch = () => {
       ddlbathrooms: !checkEmptyVal(propfilters?.["bath"])
         ? propfilters?.["bath"]
         : "",
-      txtminsqfeet: !checkEmptyVal(propfilters?.["misq"])
+      txtminarea: !checkEmptyVal(propfilters?.["misq"])
         ? propfilters?.["misq"]
         : "",
-      txtmaxsqfeet: !checkEmptyVal(propfilters?.["masq"])
+      txtmaxarea: !checkEmptyVal(propfilters?.["masq"])
         ? propfilters?.["masq"]
         : "",
     };
@@ -72,14 +75,23 @@ const PropertySearch = () => {
     setSearchInitialFormData
   );
 
-  const { assetTypesList } = useGetAssetTypesGateway("", 1);
+  const { assetClassificationTypes } = useAssetClassificationTypesGateway();
+  const [selectedClassificationType, setSelectedClassificationType] = useState(
+    !checkEmptyVal(propfilters?.["ctid"]) ? propfilters?.["ctid"] : null
+  );
+
+  const { assetTypesList } = useGetAssetTypesGateway(
+    "",
+    1,
+    selectedClassificationType
+  );
   const [selectedAssetType, setSelectedAssetType] = useState(
     !checkEmptyVal(propfilters?.["atid"]) ? propfilters?.["atid"] : null
   );
 
-  const { assetContractTypesList } = useGetAssetContractTypesGateway("", 1);
-  const [selectedContractType, setSelectedContractType] = useState(
-    !checkEmptyVal(propfilters?.["ctid"]) ? propfilters?.["ctid"] : null
+  const { assetListingTypesList } = useGetAssetListingTypesGateway();
+  const [selectedListingType, setSelectedListingType] = useState(
+    !checkEmptyVal(propfilters?.["ltid"]) ? propfilters?.["ltid"] : null
   );
 
   const { assetsAppConfigList } = useAssetsAppConfigGateway();
@@ -102,8 +114,13 @@ const PropertySearch = () => {
     setSelectedAssetType(e?.value);
   };
 
-  const handleContractTypeChange = (e) => {
-    setSelectedContractType(e?.value);
+  const handleClassificationTypeChange = (e) => {
+    setSelectedClassificationType(e?.value);
+    setSelectedAssetType(null);
+  };
+
+  const handleListingTypeChange = (e) => {
+    setSelectedListingType(e?.value);
   };
 
   const handleBedroomsChange = (e) => {
@@ -128,9 +145,10 @@ const PropertySearch = () => {
           bath: selectedBathRooms,
           bed: selectedBedRooms,
           atid: parseInt(setSelectDefaultVal(selectedAssetType)),
-          ctid: parseInt(setSelectDefaultVal(selectedContractType)),
-          misq: searchFormData.txtminsqfeet,
-          masq: searchFormData.txtmaxsqfeet,
+          ctid: parseInt(setSelectDefaultVal(selectedClassificationType)),
+          ltid: parseInt(setSelectDefaultVal(selectedListingType)),
+          misq: searchFormData.txtminarea,
+          masq: searchFormData.txtmaxarea,
         })
       );
     }
@@ -158,7 +176,7 @@ const PropertySearch = () => {
                   method="post"
                 >
                   <div className="row row-cols-lg-5 row-cols-md-3 row-cols-1 g-3 mx-auto">
-                    <div className="col">
+                    {/* <div className="col">
                       <InputControl
                         lblClass="d-none"
                         name="txtkeyword"
@@ -169,7 +187,7 @@ const PropertySearch = () => {
                         placeHolder="Keyword..."
                         tabIndex={1}
                       ></InputControl>
-                    </div>
+                    </div> */}
                     <div className="col">
                       <div className="position-relative">
                         <InputControl
@@ -180,22 +198,59 @@ const PropertySearch = () => {
                           onChange={handleChange}
                           formErrors={formErrors}
                           placeHolder="Location"
-                          tabIndex={2}
+                          tabIndex={1}
                         ></InputControl>
                         <i className="flaticon-placeholder flat-mini icon-font y-center text-dark" />
                       </div>
                     </div>
                     <div className="col">
+                      <div className="position-relative">
+                        <AsyncSelect
+                          placeHolder={
+                            assetClassificationTypes.length <= 0 &&
+                            selectedClassificationType == null
+                              ? AppMessages.DdLLoading
+                              : "Classification Type"
+                          }
+                          noData={
+                            assetClassificationTypes.length <= 0 &&
+                            selectedClassificationType == null
+                              ? AppMessages.DdLLoading
+                              : AppMessages.NoData
+                          }
+                          options={assetClassificationTypes}
+                          dataKey="Id"
+                          dataVal="Type"
+                          onChange={handleClassificationTypeChange}
+                          value={selectedClassificationType}
+                          name="ddlclassificationtype"
+                          lbl={formCtrlTypes.assetclassificationtype}
+                          lblClass="d-none"
+                          className="ddlborder"
+                          isClearable={true}
+                          errors={errors}
+                          formErrors={formErrors}
+                          tabIndex={2}
+                        ></AsyncSelect>
+                      </div>
+                    </div>
+                    <div className="col">
                       <AsyncSelect
                         placeHolder={
-                          assetTypesList.length <= 0 &&
-                          selectedAssetType == null
+                          selectedAssetType == null ||
+                          Object.keys(selectedAssetType).length === 0
+                            ? "Property Type"
+                            : assetTypesList?.length <= 0 &&
+                              selectedAssetType == null
                             ? AppMessages.DdLLoading
                             : "Property Type"
                         }
                         noData={
-                          assetTypesList.length <= 0 &&
-                          selectedAssetType == null
+                          selectedAssetType == null ||
+                          Object.keys(selectedAssetType).length === 0
+                            ? AppMessages.NoData
+                            : assetTypesList?.length <= 0 &&
+                              selectedAssetType == null
                             ? AppMessages.DdLLoading
                             : AppMessages.NoData
                         }
@@ -218,24 +273,24 @@ const PropertySearch = () => {
                       <div className="position-relative">
                         <AsyncSelect
                           placeHolder={
-                            assetContractTypesList.length <= 0 &&
-                            selectedContractType == null
+                            assetListingTypesList.length <= 0 &&
+                            selectedListingType == null
                               ? AppMessages.DdLLoading
-                              : "Property Status"
+                              : "Listing Type"
                           }
                           noData={
-                            assetContractTypesList.length <= 0 &&
-                            selectedContractType == null
+                            assetListingTypesList.length <= 0 &&
+                            selectedListingType == null
                               ? AppMessages.DdLLoading
                               : AppMessages.NoData
                           }
-                          options={assetContractTypesList}
-                          dataKey="ContractTypeId"
-                          dataVal="ContractType"
-                          onChange={handleContractTypeChange}
-                          value={selectedContractType}
-                          name="ddlcontracttype"
-                          lbl={formCtrlTypes.assetcontracttype}
+                          options={assetListingTypesList}
+                          dataKey="ListingTypeId"
+                          dataVal="ListingType"
+                          onChange={handleListingTypeChange}
+                          value={selectedListingType}
+                          name="ddllistingtype"
+                          lbl={formCtrlTypes.assetlistingtype}
                           lblClass="d-none"
                           className="ddlborder"
                           isClearable={true}
@@ -268,7 +323,7 @@ const PropertySearch = () => {
             method="post"
           >
             <div className="row g-3">
-              <div className="col-12">
+              {/* <div className="col-12">
                 <InputControl
                   lblClass="d-none"
                   name="txtkeyword"
@@ -279,16 +334,66 @@ const PropertySearch = () => {
                   placeHolder="Keyword..."
                   tabIndex={1}
                 ></InputControl>
+              </div> */}
+              <div className="col-12">
+                <div className="position-relative">
+                  <InputControl
+                    lblClass="d-none"
+                    name="txtlocation"
+                    ctlType={formCtrlTypes.location}
+                    value={searchFormData.txtlocation}
+                    onChange={handleChange}
+                    formErrors={formErrors}
+                    placeHolder="Location"
+                    tabIndex={1}
+                  ></InputControl>
+                  <i className="flaticon-placeholder flat-mini icon-font y-center text-dark" />
+                </div>
               </div>
               <div className="col-12">
                 <AsyncSelect
                   placeHolder={
-                    assetTypesList.length <= 0 && selectedAssetType == null
+                    assetClassificationTypes.length <= 0 &&
+                    selectedClassificationType == null
+                      ? AppMessages.DdLLoading
+                      : "Classification Type"
+                  }
+                  noData={
+                    assetClassificationTypes.length <= 0 &&
+                    selectedClassificationType == null
+                      ? AppMessages.DdLLoading
+                      : AppMessages.NoData
+                  }
+                  options={assetClassificationTypes}
+                  dataKey="Id"
+                  dataVal="Type"
+                  onChange={handleClassificationTypeChange}
+                  value={selectedClassificationType}
+                  name="ddlclassificationtype"
+                  lbl={formCtrlTypes.assetclassificationtype}
+                  lblClass="d-none"
+                  className="ddlborder"
+                  isClearable={true}
+                  errors={errors}
+                  formErrors={formErrors}
+                  tabIndex={2}
+                ></AsyncSelect>
+              </div>
+              <div className="col-12">
+                <AsyncSelect
+                  placeHolder={
+                    selectedAssetType == null ||
+                    Object.keys(selectedAssetType).length === 0
+                      ? "Property Type"
+                      : assetTypesList?.length <= 0 && selectedAssetType == null
                       ? AppMessages.DdLLoading
                       : "Property Type"
                   }
                   noData={
-                    assetTypesList.length <= 0 && selectedAssetType == null
+                    selectedAssetType == null ||
+                    Object.keys(selectedAssetType).length === 0
+                      ? AppMessages.NoData
+                      : assetTypesList?.length <= 0 && selectedAssetType == null
                       ? AppMessages.DdLLoading
                       : AppMessages.NoData
                   }
@@ -304,52 +409,37 @@ const PropertySearch = () => {
                   isClearable={true}
                   errors={errors}
                   formErrors={formErrors}
-                  tabIndex={2}
+                  tabIndex={3}
                 ></AsyncSelect>
               </div>
               <div className="col-12">
                 <AsyncSelect
                   placeHolder={
-                    assetContractTypesList.length <= 0 &&
-                    selectedContractType == null
+                    assetListingTypesList.length <= 0 &&
+                    selectedListingType == null
                       ? AppMessages.DdLLoading
-                      : "Property Status"
+                      : "Listing Type"
                   }
                   noData={
-                    assetContractTypesList.length <= 0 &&
-                    selectedContractType == null
+                    assetListingTypesList.length <= 0 &&
+                    selectedListingType == null
                       ? AppMessages.DdLLoading
                       : AppMessages.NoData
                   }
-                  options={assetContractTypesList}
-                  dataKey="ContractTypeId"
-                  dataVal="ContractType"
-                  onChange={handleContractTypeChange}
-                  value={selectedContractType}
-                  name="ddlcontracttype"
-                  lbl={formCtrlTypes.assetcontracttype}
+                  options={assetListingTypesList}
+                  dataKey="ListingTypeId"
+                  dataVal="ListingType"
+                  onChange={handleListingTypeChange}
+                  value={selectedListingType}
+                  name="ddllistingtype"
+                  lbl={formCtrlTypes.assetlistingtype}
                   lblClass="d-none"
                   className="ddlborder"
                   isClearable={true}
                   errors={errors}
                   formErrors={formErrors}
-                  tabIndex={3}
+                  tabIndex={4}
                 ></AsyncSelect>
-              </div>
-              <div className="col-12">
-                <div className="position-relative">
-                  <InputControl
-                    lblClass="d-none"
-                    name="txtlocation"
-                    ctlType={formCtrlTypes.location}
-                    value={searchFormData.txtlocation}
-                    onChange={handleChange}
-                    formErrors={formErrors}
-                    placeHolder="Location"
-                    tabIndex={4}
-                  ></InputControl>
-                  <i className="flaticon-placeholder flat-mini icon-font y-center text-dark" />
-                </div>
               </div>
               {/* <div className="col-12">
               <div className="position-relative">
@@ -443,9 +533,9 @@ const PropertySearch = () => {
               <div className="col-6">
                 <InputControl
                   lblClass="d-none"
-                  name="txtminsqfeet"
+                  name="txtminarea"
                   ctlType={formCtrlTypes.sqfeet}
-                  value={searchFormData.txtminsqfeet}
+                  value={searchFormData.txtminarea}
                   onChange={handleChange}
                   formErrors={formErrors}
                   placeHolder="Min Area"
@@ -455,9 +545,9 @@ const PropertySearch = () => {
               <div className="col-6">
                 <InputControl
                   lblClass="d-none"
-                  name="txtmaxsqfeet"
+                  name="txtmaxarea"
                   ctlType={formCtrlTypes.sqfeet}
-                  value={searchFormData.txtmaxsqfeet}
+                  value={searchFormData.txtmaxarea}
                   onChange={handleChange}
                   formErrors={formErrors}
                   placeHolder="Max Area"

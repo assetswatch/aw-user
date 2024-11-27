@@ -178,11 +178,14 @@ const Properties = () => {
       location: !checkEmptyVal(propfilters?.["loc"])
         ? propfilters?.["loc"]
         : "",
-      contracttypeid: !checkEmptyVal(propfilters?.["ctid"])
+      classificationtypeid: !checkEmptyVal(propfilters?.["ctid"])
         ? propfilters?.["ctid"]
         : 0,
       assettypeid: !checkEmptyVal(propfilters?.["atid"])
         ? propfilters?.["atid"]
+        : 0,
+      listingtypeid: !checkEmptyVal(propfilters?.["ltid"])
+        ? propfilters?.["ltid"]
         : 0,
       bedrooms: !checkEmptyVal(propfilters?.["bed"])
         ? propfilters?.["bed"]
@@ -190,10 +193,10 @@ const Properties = () => {
       bathrooms: !checkEmptyVal(propfilters?.["bath"])
         ? propfilters?.["bath"]
         : "",
-      minsqfeet: !checkEmptyVal(propfilters?.["misq"])
+      minarea: !checkEmptyVal(propfilters?.["misq"])
         ? propfilters?.["misq"]
         : 0,
-      maxsqfeet: !checkEmptyVal(propfilters?.["masq"])
+      maxarea: !checkEmptyVal(propfilters?.["masq"])
         ? propfilters?.["masq"]
         : 0,
       pi: parseInt(pi),
@@ -248,7 +251,7 @@ const Properties = () => {
                 <div className="overflow-hidden position-relative transation thumbnail-img hover-img-zoom box-shadow rounded">
                   <div className="catart position-absolute">
                     <span className="sale bg-secondary text-white">
-                      For {row.original.ContractType}
+                      For {row.original.ListingType}
                     </span>
                   </div>
                   <div className="prop-carousel owl-carousel single-carusel dot-disable nav-between-in">
@@ -288,16 +291,29 @@ const Properties = () => {
                       }
                       className="text-primary font-16"
                     >
-                      {row.original.Title}
+                      <i className="fas fa-map-marker-alt" />{" "}
+                      {row.original.AddressOne}{" "}
+                      {/* {checkEmptyVal(a.AddressTwo)
+                                    ? ""
+                                    : `, ${a.AddressTwo}`} */}
                     </Link>
                   </h5>
-                  <span className="listing-location mb-1">
-                    <i className="fas fa-map-marker-alt" />{" "}
-                    {row.original.AddressOne}
+                  {/* <span className="listing-location mb-1">
+                    {row.original.City}, {row.original.State},{" "}
+                    {row.original.CountryShortName}
                   </span>
-                  <span className="listing-price font-16 font-600 mb-1">
+                  <span className="listing-price font-15 font-500 mb-1">
                     {row.original.PriceDisplay}
-                  </span>
+                  </span> */}
+                  <ul className="d-flex font-general mb-10 mt-10 flex-sb">
+                    <li className="flex-start pr-20 listing-location mb-1">
+                      {row.original.City}, {row.original.State},{" "}
+                      {row.original.CountryShortName}
+                    </li>
+                    <li className="flex-end listing-price font-15 font-500 mb-1">
+                      {row.original.PriceDisplay}
+                    </li>
+                  </ul>
                   <ul className="d-flex quantity font-general mb-2 flex-sb">
                     <li title="Beds">
                       <span>
@@ -315,7 +331,7 @@ const Properties = () => {
                       <span>
                         <i className="fa-solid fa-vector-square"></i>
                       </span>
-                      {row.original.SqfeetDisplay} Sqft
+                      {row.original.AreaDisplay} {row.original.AreaUnitType}
                     </li>
                   </ul>
                 </div>
@@ -417,7 +433,7 @@ const Properties = () => {
                                 <div className="overflow-hidden position-relative transation thumbnail-img rounded hover-img-zoom">
                                   <div className="cata position-absolute">
                                     <span className="sale bg-secondary text-white">
-                                      For {a.ContractType}
+                                      For {a.ListingType}
                                     </span>
                                   </div>
                                   <Link
@@ -453,16 +469,27 @@ const Properties = () => {
                                       }
                                       className="text-primary font-15"
                                     >
-                                      {a.Title}
+                                      <i className="fas fa-map-marker-alt" />{" "}
+                                      {a.AddressOne}
+                                      {/* {checkEmptyVal(a.AddressTwo)
+                                    ? ""
+                                    : `, ${a.AddressTwo}`} */}
                                     </Link>
                                   </h5>
-                                  <span className="listing-location mb-2">
-                                    <i className="fas fa-map-marker-alt" />{" "}
-                                    {a.AddressOne}
+                                  {/* <span className="listing-location mb-2">
+                                    {a.City}, {a.State}, {a.CountryShortName}
                                   </span>
                                   <span className="listing-price font-16 mb-1 font-600">
                                     {a.PriceDisplay}
-                                  </span>
+                                  </span> */}
+                                  <ul className="d-flex font-general my-10 flex-sb">
+                                    <li className="flex-start pr-20 listing-location mb-1">
+                                      {a.City}, {a.State}, {a.CountryShortName}
+                                    </li>
+                                    <li className="flex-end listing-price font-15 font-500 mb-1">
+                                      {a.PriceDisplay}
+                                    </li>
+                                  </ul>
                                   <ul className="d-flex quantity font-general flex-sb">
                                     <li title="Beds">
                                       <span>
@@ -480,7 +507,7 @@ const Properties = () => {
                                       <span>
                                         <i className="fa-solid fa-vector-square"></i>
                                       </span>
-                                      {a.SqfeetDisplay} Sqft
+                                      {a.AreaDisplay} {a.AreaUnitType}
                                     </li>
                                   </ul>
                                 </div>

@@ -485,6 +485,12 @@ export const formCtrlTypes = {
   assetcontracttype: {
     lbl: "Contract type:",
   },
+  assetclassificationtype: {
+    lbl: "Classification type:",
+  },
+  assetlistingtype: {
+    lbl: "Listing type:",
+  },
   assetaccesstype: {
     lbl: "Property access:",
   },

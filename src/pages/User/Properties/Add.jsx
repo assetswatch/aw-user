@@ -23,7 +23,7 @@ import {
   ValidationMessages,
 } from "../../../utils/constants";
 import { useGetAssetTypesGateway } from "../../../hooks/useGetAssetTypesGateway";
-import { useGetAssetContractTypesGateway } from "../../../hooks/useGetAssetContractTypesGateway";
+import { useGetAssetListingTypesGateway } from "../../../hooks/useGetAssetListingTypesGateway";
 import { useGetAssetAccessTypesGateway } from "../../../hooks/useGetAssetAccessTypesGateway";
 import { useAssetsAppConfigGateway } from "../../../hooks/useAssetsAppConfigGateway";
 import SelectControl from "../../../components/common/SelectControl";
@@ -64,7 +64,7 @@ const Add = () => {
   const { assetTypesList } = useGetAssetTypesGateway("", 1);
   const [selectedAssetType, setSelectedAssetType] = useState(null);
 
-  const { assetContractTypesList } = useGetAssetContractTypesGateway("", 1);
+  const { assetListingTypesList } = useGetAssetListingTypesGateway("", 1);
   const [selectedContractType, setSelectedContractType] = useState(null);
 
   const { assetAccessTypesList } = useGetAssetAccessTypesGateway("", 1);
@@ -817,18 +817,18 @@ const Add = () => {
                               <div className="col-md-6 mb-15">
                                 <AsyncSelect
                                   placeHolder={
-                                    assetContractTypesList.length <= 0 &&
+                                    assetListingTypesList.length <= 0 &&
                                     selectedContractType == null
                                       ? AppMessages.DdLLoading
                                       : AppMessages.DdlDefaultSelect
                                   }
                                   noData={
-                                    assetContractTypesList.length <= 0 &&
+                                    assetListingTypesList.length <= 0 &&
                                     selectedContractType == null
                                       ? AppMessages.DdLLoading
                                       : AppMessages.DdlNoData
                                   }
-                                  options={assetContractTypesList}
+                                  options={assetListingTypesList}
                                   dataKey="ContractTypeId"
                                   dataVal="ContractType"
                                   onChange={handleContractTypeChange}

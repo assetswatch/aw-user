@@ -36,7 +36,7 @@ import {
 } from "../../../helpers/sessionStorageHelper";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 import { useGetAssetTypesGateway } from "../../../hooks/useGetAssetTypesGateway";
-import { useGetAssetContractTypesGateway } from "../../../hooks/useGetAssetContractTypesGateway";
+import { useGetAssetListingTypesGateway } from "../../../hooks/useGetAssetListingTypesGateway";
 import { Toast } from "../../../components/common/ToastView";
 
 const View = () => {
@@ -47,7 +47,7 @@ const View = () => {
 
   //Search data.
   const { assetTypesList } = useGetAssetTypesGateway("", 1);
-  const { assetContractTypesList } = useGetAssetContractTypesGateway("", 1);
+  const { assetListingTypesList } = useGetAssetListingTypesGateway("", 1);
 
   //Grid
   const [assetsList, setAssetsList] = useState([]);
@@ -482,18 +482,18 @@ const View = () => {
                           <div className="col-lg-4 col-xl-2 col-md-4">
                             <AsyncSelect
                               placeHolder={
-                                assetContractTypesList.length <= 0 &&
+                                assetListingTypesList.length <= 0 &&
                                 searchFormData.ddlcontracttype == null
                                   ? AppMessages.DdLLoading
                                   : AppMessages.DdlDefaultSelect
                               }
                               noData={
-                                assetContractTypesList.length <= 0 &&
+                                assetListingTypesList.length <= 0 &&
                                 searchFormData.ddlcontracttype == null
                                   ? AppMessages.DdLLoading
                                   : AppMessages.DdlNoData
                               }
-                              options={assetContractTypesList}
+                              options={assetListingTypesList}
                               dataKey="ContractTypeId"
                               dataVal="ContractType"
                               onChange={(e) => ddlChange(e, "ddlcontracttype")}

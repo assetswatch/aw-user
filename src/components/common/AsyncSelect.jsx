@@ -24,7 +24,7 @@ const AsyncSelect = (ctlProps) => {
       };
     });
   } else {
-    mapOptions = ctlProps.options.map((option) => {
+    mapOptions = ctlProps.options?.map((option) => {
       let opt = {
         value: option[ctlProps.dataKey] || option.Id,
         label: option[ctlProps.dataVal] || option.Text,
