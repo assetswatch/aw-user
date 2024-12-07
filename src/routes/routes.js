@@ -88,6 +88,18 @@ export const routeNames = {
   },
   comingup: { name: "ComingUp", path: "/User/ComingUp" },
   notFound: { name: "NotFound", path: "/*" },
+  ownerconnections: {
+    name: "OwnerConnections",
+    path: "/User/Owner-Connections",
+  },
+  agentconnections: {
+    name: "AgentConnections",
+    path: "/User/Agent-Connections",
+  },
+  tenantconnections: {
+    name: "TenantConnections",
+    path: "/User/Tenant-Connections",
+  },
 };
 
 const routes = [
@@ -361,6 +373,27 @@ const routes = [
     path: routeNames.notFound.path,
     name: routeNames.notFound.name,
     element: lazy(() => import("../pages/NotFound")),
+  },
+  {
+    path: routeNames.ownerconnections.path,
+    name: routeNames.ownernotifications.name,
+    element: lazy(() => import("../pages/User/Owners/OwnerConnections")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.agentconnections.path,
+    name: routeNames.ownernotifications.name,
+    element: lazy(() => import("../pages/User/Agents/AgentConnections")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.tenantconnections.path,
+    name: routeNames.ownernotifications.name,
+    element: lazy(() => import("../pages/User/Tenants/TenantConnections")),
+    isexact: true,
+    isprotected: true,
   },
 ];
 
