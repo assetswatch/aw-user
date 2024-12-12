@@ -541,13 +541,13 @@ const Home = () => {
               </div>
             </div>
             <div className="col-md-4">
-              <a
-                href="#"
+              <Link
+                to={routeNames.agentsList.path}
                 className="ms-auto btn-link d-table p y-2 sm-mx-0 text-primary"
               >
                 View All Agents{" "}
                 <i className="fa-solid fa-chevron-right font-mini"></i>
-              </a>
+              </Link>
             </div>
           </div>
           <div className="row">
@@ -563,23 +563,23 @@ const Home = () => {
                         <div className="item" key={`ragent-key-${i}`}>
                           <div className="property-grid-1 property-block bg-light transation-this rounded">
                             <div className="overflow-hidden position-relative transation thumbnail-img box-shadow rounded">
-                              <a href="property-single-v1.html">
+                              <Link to={routeNames.agentdetails.path}>
                                 <LazyImage
                                   src={a.PicPath}
                                   alt={a.FirstName}
                                   className="img-fit-grid-contain"
                                   placeHolderClass="min-h-200"
                                 />
-                              </a>
+                              </Link>
                             </div>
                             <div className="property_text p-3 pb-2">
                               <h5 className="listing-title">
-                                <a
-                                  href="property-single-v1.html"
+                                <Link
+                                  to={routeNames.agentdetails.path}
                                   className="text-primary font-16"
                                 >
                                   {a.FirstName} {a.LastName}
-                                </a>
+                                </Link>
                               </h5>
                               <ul className="d-flex quantity font-general mb-2 flex-sb">
                                 <li>

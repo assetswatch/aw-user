@@ -15,6 +15,8 @@ export const routeNames = {
   forgotPwd: { name: "ForgotPwd", path: "/ForgotPassword" },
   properties: { name: "Properties", path: "/Properties" },
   propertyDetails: { name: "PropertyDetails", path: "/PropertyDetails" },
+  agentsList: { name: "AgentsList", path: "/Agents-List" },
+  agentdetails: { name: "AgentDetails", path: "/Agent-Details" },
   dashboard: { name: "Dashboard", path: "/User/Dashboard" },
   ownertenants: { name: "OwnerTenants", path: "/User/Owner-Tenant" },
   owneragents: { name: "OwnerAgents", path: "/User/Owner-Agent" },
@@ -173,6 +175,18 @@ const routes = [
     path: routeNames.propertyDetails.path,
     name: routeNames.propertyDetails.name,
     element: lazy(() => import("../pages/PropertyDetails")),
+    isexact: true,
+  },
+  {
+    path: routeNames.agentsList.path,
+    name: routeNames.agentsList.name,
+    element: lazy(() => import("../pages/AgentsList")),
+    isexact: true,
+  },
+  {
+    path: routeNames.agentdetails.path,
+    name: routeNames.agentdetails.name,
+    element: lazy(() => import("../pages/AgentDetails")),
     isexact: true,
   },
   {

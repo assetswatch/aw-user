@@ -550,12 +550,12 @@ const Properties = () => {
                               />
                               <div className="thumb-body">
                                 <h5 className="listing-title">
-                                  <a
-                                    href="property-single-v1.html"
+                                  <Link
+                                    to={routeNames.agentdetails.path}
                                     className="text-primary font-16 font-500"
                                   >
                                     {a.FirstName} {a.LastName}
-                                  </a>
+                                  </Link>
                                 </h5>
                                 <span className="font-general">
                                   At {a.ModifiedDateDisplay}
@@ -570,12 +570,12 @@ const Properties = () => {
                           );
                         })}
                         <li className="flex-end m-0 p-0">
-                          <a
-                            href="#"
+                          <Link
+                            to={routeNames.agentsList.path}
                             className="btn-link font-small text-primary"
                           >
                             View more...
-                          </a>
+                          </Link>
                         </li>
                       </>
                     )}
