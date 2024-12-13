@@ -19,7 +19,11 @@ import {
 } from "../utils/common";
 import { axiosPost } from "../helpers/axiosHelper";
 import config from "../config.json";
-import { LazyImage } from "../components/common/LazyComponents";
+import {
+  DataLoader,
+  LazyImage,
+  NoData,
+} from "../components/common/LazyComponents";
 import { useGetTopAssetsGateWay } from "../hooks/useGetTopAssetsGateWay";
 import Rating from "../components/common/Rating";
 import {
@@ -33,6 +37,14 @@ const AgentDetails = () => {
   const navigate = useNavigate();
 
   const [rerouteKey, setRerouteKey] = useState(0);
+
+  let ProfileDetailsId = parseInt(
+    getsessionStorageItem(SessionStorageKeys.ProfileDetailsId, 0)
+  );
+
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const [initApisLoaded, setinitApisLoaded] = useState(false);
+  const [profileDetails, setProfileDetails] = useState(null);
 
   const { topAssetsList } = useGetTopAssetsGateWay("recent", 5);
   const topAssetsRef = useRef(null);
@@ -49,6 +61,13 @@ const AgentDetails = () => {
       }
     };
   }, [topAssetsList, rerouteKey]);
+
+  //Load
+  useEffect(() => {
+    Promise.allSettled([getProfileDetails()]).then(() => {
+      setinitApisLoaded(true);
+    });
+  }, []);
 
   function setCarousel(elem) {
     try {
@@ -129,6 +148,35 @@ const AgentDetails = () => {
 
   const [file, setFile] = useState(null);
 
+  //Get Profile details
+  const getProfileDetails = () => {
+    setIsDataLoading(true);
+    let isapimethoderr = false;
+    let objParams = {
+      ProfileId: ProfileDetailsId,
+    };
+
+    axiosPost(`${config.apiBaseUrl}${ApiUrls.getUserDetails}`, objParams)
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode === 200) {
+          setProfileDetails(objResponse.Data);
+        } else {
+          isapimethoderr = true;
+        }
+      })
+      .catch((err) => {
+        isapimethoderr = true;
+        console.error(`"API :: ${ApiUrls.getUserDetails}, Error ::" ${err}`);
+      })
+      .finally(() => {
+        if (isapimethoderr === true) {
+          setProfileDetails(null);
+        }
+        setIsDataLoading(false);
+      });
+  };
+
   return (
     <div key={rerouteKey}>
       {/*============== Page title Start ==============*/}
@@ -142,13 +190,39 @@ const AgentDetails = () => {
       <div className="full-row pt-30 bg-light">
         <div className="container">
           <div className="row">
-            <div className="col-12"></div>
+            <div className="col">
+              {isDataLoading && (
+                <div className="property-overview border rounded bg-white p-30 mb-30  box-shadow">
+                  <div className="row row-cols-1">
+                    <div className="col">
+                      <h5 className="mb-3">Agent Details</h5>
+                      <div className="min-h-150">
+                        <DataLoader />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {!isDataLoading && checkObjNullorEmpty(profileDetails) && (
+                <div className="property-overview border rounded bg-white p-30 mb-30  box-shadow">
+                  <div className="row row-cols-1">
+                    <div className="col">
+                      <h5 className="mb-3">Agent Details</h5>
+                      <NoData
+                        className="min-h-150 font-500"
+                        message={AppMessages.NoAgentDetails}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
           <div className="row">
             <div className="col-xl-4 order-xl-2">
               {/* Message Form */}
-              <div className="widget widget_send_message mb-30 shadow">
-                <h5 className="mb-4"></h5>
+              <div className="widget widget_contact bg-white border p-30 rounded mb-30 box-shadow">
                 <form
                   className="quick-search form-icon-right"
                   action="#"
@@ -156,42 +230,51 @@ const AgentDetails = () => {
                 >
                   <div className="form-row">
                     <div className="col-12 mb-10">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="name"
-                        placeholder="Your Name"
-                      />
+                      <div className="form-group mb-0">
+                        <input
+                          type="text"
+                          className="form-control"
+                          name="name"
+                          placeholder="Your Name"
+                        />
+                      </div>
                     </div>
                     <div className="col-12 mb-10">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="phone"
-                        placeholder="Phone Number"
-                      />
+                      <div className="form-group mb-0">
+                        <input
+                          type="text"
+                          className="form-control"
+                          name="phone"
+                          placeholder="Phone Number"
+                        />
+                      </div>
                     </div>
                     <div className="col-12 mb-10">
-                      <input
-                        type="email"
-                        className="form-control"
-                        name="email"
-                        placeholder="Your Email"
-                      />
+                      <div className="form-group mb-0">
+                        <input
+                          type="email"
+                          className="form-control"
+                          name="email"
+                          placeholder="Your Email"
+                        />
+                      </div>
                     </div>
                     <div className="col-12 mb-10">
-                      <textarea
-                        className="form-control"
-                        name="message"
-                        placeholder="Message"
-                        rows={10}
-                        defaultValue={""}
-                      />
+                      <div className="form-group mb-0">
+                        <textarea
+                          className="form-control"
+                          name="message"
+                          placeholder="Message"
+                          rows={4}
+                        />
+                      </div>
                     </div>
                     <div className="col-12">
-                      <button className="btn btn-primary w-100">
-                        Send Message
-                      </button>
+                      <div className="form-group mb-0">
+                        <button className="btn btn-primary w-100 btn-glow box-shadow rounded">
+                          Send Message
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </form>
@@ -299,87 +382,78 @@ const AgentDetails = () => {
               {/*============== Recent Property Widget End ==============*/}
             </div>
             <div className="col-xl-8 order-xl-1">
-              <div className="entry-wrapper">
-                {/* Agent Overview */}
-                <div className="agent-overview p-30 bg-white mb-50 shadow">
-                  <h4 className="mb-4">Agent Overview</h4>
-                  <p></p>
-                  <p></p>
-                </div>
-
+              <div className="widget widget_contact bg-white border p-30 rounded mb-30 box-shadow">
                 {/* Comments Form */}
-                <div className="comments-block bg-white p-30 mt-4 shadow">
-                  <div className="row row-cols-1">
-                    <div className="col">
-                      <h5 className="mb-4">Write A Review</h5>
-                      <div className="d-flex w-100 mb-5">
-                        <span>Your Rating:</span>
-                        <ul className="d-flex mx-2 text-primary font-12">
-                          <li>
-                            <i className="fas fa-star" />
-                          </li>
-                          <li>
-                            <i className="fas fa-star" />
-                          </li>
-                          <li>
-                            <i className="fas fa-star" />
-                          </li>
-                          <li>
-                            <i className="fas fa-star" />
-                          </li>
-                          <li>
-                            <i className="fas fa-star" />
-                          </li>
-                        </ul>
-                      </div>
-                      <form
-                        className="contact_message form-boder"
-                        action="#"
-                        method="post"
-                        noValidate="novalidate"
-                      >
-                        <div className="row g-3">
-                          <div className="col-md-6 col-sm-6">
-                            <input
-                              className="form-control"
-                              id="name"
-                              name="name"
-                              placeholder="Name"
-                              type="text"
-                            />
-                          </div>
-                          <div className="col-md-6 col-sm-6">
-                            <input
-                              className="form-control"
-                              id="email"
-                              name="email"
-                              placeholder="Email Address"
-                              type="text"
-                            />
-                          </div>
-                          <div className="col-md-12 col-sm-12">
-                            <textarea
-                              className="form-control"
-                              id="message"
-                              rows={5}
-                              name="message"
-                              placeholder="Message"
-                              defaultValue={""}
-                            />
-                          </div>
-                          <div className="col-md-12 col-sm-6">
-                            <button
-                              className="btn btn-primary"
-                              id="send"
-                              value="send"
-                              type="submit"
-                            >
-                              Submit
-                            </button>
-                          </div>
-                        </div>
-                      </form>
+                <div className="row row-cols-1">
+                  <div className="col">
+                    <h5 className="mb-4">Write A Review</h5>
+                    <div className="d-flex w-100 mb-5">
+                      <span>Your Rating:</span>
+                      <ul className="d-flex mx-2 text-primary font-12">
+                        <li>
+                          <i className="fas fa-star" />
+                        </li>
+                        <li>
+                          <i className="fas fa-star" />
+                        </li>
+                        <li>
+                          <i className="fas fa-star" />
+                        </li>
+                        <li>
+                          <i className="fas fa-star" />
+                        </li>
+                        <li>
+                          <i className="fas fa-star" />
+                        </li>
+                      </ul>
                     </div>
+                    <form
+                      className="contact_message form-boder"
+                      action="#"
+                      method="post"
+                      noValidate="novalidate"
+                    >
+                      <div className="row g-3">
+                        <div className="col-md-6 col-sm-6">
+                          <input
+                            className="form-control"
+                            id="name"
+                            name="name"
+                            placeholder="Name"
+                            type="text"
+                          />
+                        </div>
+                        <div className="col-md-6 col-sm-6">
+                          <input
+                            className="form-control"
+                            id="email"
+                            name="email"
+                            placeholder="Email Address"
+                            type="text"
+                          />
+                        </div>
+                        <div className="col-md-12 col-sm-12">
+                          <textarea
+                            className="form-control"
+                            id="message"
+                            rows={5}
+                            name="message"
+                            placeholder="Message"
+                            defaultValue={""}
+                          />
+                        </div>
+                        <div className="col-md-12 col-sm-6">
+                          <button
+                            className="btn btn-primary"
+                            id="send"
+                            value="send"
+                            type="submit"
+                          >
+                            Submit
+                          </button>
+                        </div>
+                      </div>
+                    </form>
                   </div>
                 </div>
               </div>

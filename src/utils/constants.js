@@ -37,6 +37,7 @@ export const SessionStorageKeys = {
   OwnerTenantConnectionTab: "otcontab",
   TenantCheckoutPaymentId: "tcpmid",
   EditProfileId: "epid",
+  ProfileDetailsId: "agentid",
 };
 /*Session storage keys*/
 
@@ -100,6 +101,7 @@ export const AppMessages = {
   NoConnectedProperties: "No connected properties found...",
   NoPayments: "No payments found...",
   NoPropertyDetails: "Property details not found...",
+  NoAgentDetails: "Agent details not found...",
   NoConnection: `No connections found...`,
   NoTenants: `No ${Object.keys(config.userProfileTypes)
     .find(
