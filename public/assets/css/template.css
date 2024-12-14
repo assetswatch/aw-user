@@ -183,6 +183,10 @@ h6 a,
   position: relative;
 }
 
+.breadcrumb-item + .breadcrumb-item.text-primary::before {
+  color: var(--theme-praimry-color) !important;
+}
+
 .list-color-white li a,
 .list-color-white li,
 .list-color-white a,
@@ -496,6 +500,10 @@ a.hover-bg-primary:hover,
 
 .font-18 {
   font-size: 18px !important;
+}
+
+.font-20 {
+  font-size: 20px !important;
 }
 
 .font-medium {
@@ -1135,6 +1143,9 @@ a.text-dark:focus {
 .t-1 {
   top: 1px !important;
 }
+.t-2 {
+  top: 2px !important;
+}
 
 .my-0,
 .m-0,
@@ -1394,6 +1405,12 @@ a.text-dark:focus {
 .p-0,
 .pr-0 {
   padding-right: 0px !important;
+}
+
+.px-8,
+.p-8,
+.pr-8 {
+  padding-right: 8px !important;
 }
 
 .px-10,
@@ -1717,7 +1734,7 @@ a.text-dark:focus {
 
 .form-control {
   border-radius: 3px;
-  height: 42px;
+  height: 38px;
   padding: 0.375rem 1rem;
   /* border: none; */
   font: var(--theme-general-font) !important;

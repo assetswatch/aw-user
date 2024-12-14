@@ -152,6 +152,18 @@ export const Regex = {
     invalid: ValidationMessages.DateInvalid,
     pattern: RegexPattern.date,
   },
+  tenurestartdate: {
+    max: length10,
+    required: ValidationMessages.TenureStartDateReq,
+    invalid: ValidationMessages.TenureStartDateInvalid,
+    pattern: RegexPattern.date,
+  },
+  tenureenddate: {
+    max: length10,
+    required: ValidationMessages.TenureEndDateReq,
+    invalid: ValidationMessages.TenureEndDateInvalid,
+    pattern: RegexPattern.date,
+  },
   propertytitle: {
     max: length50,
     required: ValidationMessages.PropertyTitleReq,
@@ -174,6 +186,11 @@ export const Regex = {
   },
   description: {
     max: length2000,
+    required: ValidationMessages.DescriptionReq,
+    invalid: ValidationMessages.DescriptionInvalid,
+  },
+  description500: {
+    max: length500,
     required: ValidationMessages.DescriptionReq,
     invalid: ValidationMessages.DescriptionInvalid,
   },
@@ -212,6 +229,15 @@ export const Regex = {
     required: ValidationMessages.AgentPercentReq,
     invalid: ValidationMessages.AgentPercentInvalid,
     pattern: RegexPattern.price,
+  },
+  title: {
+    max: length50,
+    required: ValidationMessages.TitleReq,
+    invalid: ValidationMessages.TitleInvalid,
+  },
+  comments: {
+    max: length500,
+    required: ValidationMessages.CommentsReq,
   },
 };
 /*Regex */
@@ -393,6 +419,9 @@ export const formCtrlTypes = {
   profiletype: {
     lbl: "Profile type:",
   },
+  rentpaidto: {
+    lbl: "Rent paid to:",
+  },
   state: {
     lbl: "State:",
   },
@@ -444,6 +473,20 @@ export const formCtrlTypes = {
       max: length10,
     },
   },
+  tenurestartdate: {
+    lbl: "Tenure start date:",
+    input: {
+      type: "text",
+      max: length10,
+    },
+  },
+  tenureenddate: {
+    lbl: "Tenure end date:",
+    input: {
+      type: "text",
+      max: length10,
+    },
+  },
   propertytitle: {
     lbl: "Property Title:",
     input: {
@@ -473,10 +516,17 @@ export const formCtrlTypes = {
     },
   },
   description: {
-    lbl: "Description :",
+    lbl: "Description:",
     input: {
       type: "text",
       max: length2000,
+    },
+  },
+  description500: {
+    lbl: "Description:",
+    input: {
+      type: "text",
+      max: length500,
     },
   },
   assettype: {
@@ -577,7 +627,7 @@ export const formCtrlTypes = {
     },
   },
   file: {
-    lbl: "Upload image:",
+    lbl: "Upload file:",
     input: {
       type: "file",
       max: length250,
@@ -588,6 +638,35 @@ export const formCtrlTypes = {
         return file && file.size > uploadFileMaxSize;
       },
     },
+  },
+  documenttype: {
+    lbl: "Document type:",
+  },
+  sharedtype: {
+    lbl: "Share type:",
+  },
+  folder: {
+    lbl: "Folder:",
+  },
+  title: {
+    lbl: "Title:",
+    input: {
+      type: "text",
+      max: length50,
+    },
+  },
+  comments: {
+    lbl: "Comments:",
+    input: {
+      type: "text",
+      max: length500,
+    },
+  },
+  users: {
+    lbl: "Users:",
+  },
+  user: {
+    lbl: "User:",
   },
 };
 /*control types*/

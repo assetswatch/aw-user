@@ -37,6 +37,10 @@ export const SessionStorageKeys = {
   OwnerTenantConnectionTab: "otcontab",
   TenantCheckoutPaymentId: "tcpmid",
   EditProfileId: "epid",
+  SendAgreementId: "sagid",
+  ViewAgreementId: "vagid",
+  ObjSendAgreement: "osag",
+  ViewEditDocumentId: "vedid",
 };
 /*Session storage keys*/
 
@@ -79,6 +83,13 @@ export const UserConnectionTabIds = {
   requested: "#tab-requested",
   joined: "#tab-joined",
   connection: "#tab-connection",
+};
+/*connection tab ids*/
+
+/*documents tab ids*/
+export const DocumentsTabIds = {
+  mydocuments: "#tab-mydocuments",
+  shareddocuments: "#tab-shared",
 };
 /*connection tab ids*/
 
@@ -154,6 +165,13 @@ export const AppMessages = {
     "Your message has been sent. We will get back to you shortly.",
   ProfileDetailsNotFound: "Profile details not found...",
   UpdateProfileSuccess: "Profile details updated successfully...",
+  NoAgreementTemplates: "No templates found...",
+  NoDocuments: `No documents found...`,
+  DeleteDocumentMessage: "You want to delete the {name}.",
+  EditFolderModalTitle: "Edit folder",
+  ShareFolderModalTitle: "Share Folder",
+  DdlNoFolders: "No folders found.",
+  AddDocumentSuccess: "Document added successfully...",
 };
 /*Common App messages*/
 
@@ -205,6 +223,11 @@ export const ValidationMessages = {
   FileSizeInvalid: "File size exceeds the limit of",
   DateReq: "Date can not be empty.",
   DateInvalid: "Date is not valid.",
+  TenureStartDateReq: "Tenure start date can not be empty.",
+  TenureStartDateInvalid: "Tenure start date is not valid.",
+  TenureEndDateReq: "Tenure end date can not be empty.",
+  TenureEndDateDateInvalid: "enure end date is not valid.",
+  RentPaidToReq: "Rent paid to can not be empty.",
   PropertyReq: "Property can not be empty.",
   TenantReq: "Tenant can not be empty.",
   AgentReq: "Tenant can not be empty.",
@@ -236,6 +259,10 @@ export const ValidationMessages = {
   SqfeetInvalid: "Squarefeet is not valid.",
   AgentPercentReq: "Agent percentage can not be empty.",
   AgentPercentInvalid: "Agent percentage is not valid.",
+  TitleReq: "Title can not be empty.",
+  TitleInvalid: "Title is not valid.",
+  CommentsReq: "Comments can not be empty.",
+  DocumentTypeReq: "Document type can not be empty.",
 };
 
 /*Api Urls*/
@@ -292,5 +319,19 @@ export let ApiUrls = {
   getAssetPayments: `payments/v1/GetAssetPayments`,
   getAssetPaymentDetails: `payments/v1/GetAssetPaymentDetails`,
   processAssetPayment: `payments/v1/ProcessAssetPayment`,
+  getAgreements: `agreements/v1/GetAgreements`,
+  getAgreementDetails: `agreements/v1/GetAgreementDetails`,
+  getAgreementFile: `agreements/v1/GetAgreementFile`,
+  getDocumentsList: `documents/v1/GetDocumentsList`,
+  getDocumentsTypes: `documents/v1/GetDocumentTypes`,
+  deleteDocument: `documents/v1/DeleteDocument`,
+  getDdlDocumentFolders: `documents/v1/GetDdlDocumentFolders`,
+  updateDocumentFolder: `documents/v1/UpdateDocumentFolder`,
+  getSharedDocuments: `documents/v1/GetSharedDocuments`,
+  shareDocument: `documents/v1/ShareDocument`,
+  getDocumentDetails: `documents/v1/GetDocumentDetails`,
+  getDocumentFile: `documents/v1/GetDocumentFile`,
+  editDocument: `documents/v1/EditDocument`,
+  addDocument: `documents/v1/AddDocument`,
 };
 /*Api Urls*/

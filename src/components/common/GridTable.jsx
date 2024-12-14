@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useTable, usePagination, useSortBy } from "react-table";
+import React, { useEffect, useState } from "react";
+import { useTable, usePagination, useSortBy, useExpanded } from "react-table";
 import DataLoader from "./DataLoader";
 import NoData from "./NoData";
-import GridActionMenu from "./GridActionMenu";
+import GridActionMenu, { GridDocActionMenu } from "./GridActionMenu";
 import { GridDefaultValues } from "../../utils/constants";
-import { checkEmptyVal } from "../../utils/common";
+import { checkEmptyVal, checkObjNullorEmpty } from "../../utils/common";
 
 const GridTable = ({
   columns,
@@ -18,6 +18,7 @@ const GridTable = ({
   noData,
   showPaging = true,
   headerClass = "box-shadow",
+  getSubRows,
 }) => {
   const {
     getTableProps,
@@ -38,6 +39,7 @@ const GridTable = ({
     {
       columns,
       data,
+      getSubRows: getSubRows,
       initialState: {
         pageIndex: GridDefaultValues.pi,
         pageSize: GridDefaultValues.ps,
@@ -48,8 +50,21 @@ const GridTable = ({
       autoResetPage: false,
     },
     useSortBy,
+    useExpanded,
     usePagination
   );
+
+  const [expandedRows, setExpandedRows] = useState({});
+  const handleRowToggle = (row) => {
+    const newExpandedRows = { ...expandedRows };
+    if (row.isExpanded) {
+      delete newExpandedRows[row.id];
+    } else {
+      newExpandedRows[row.id] = true;
+    }
+    setExpandedRows(newExpandedRows);
+    row.toggleRowExpanded(!row.isExpanded);
+  };
 
   const renderPageNumbers = () => {
     const totalNumbers = 5;
@@ -139,7 +154,16 @@ const GridTable = ({
               page.map((row, tridx) => {
                 prepareRow(row);
                 return (
-                  <tr {...row.getRowProps()} key={"tr-" + tridx}>
+                  <tr
+                    {...row.getRowProps()}
+                    key={"tr-" + tridx}
+                    className={
+                      row.id.toString().indexOf(".") != -1
+                        ? "subrow expanded"
+                        : ""
+                    }
+                    //onClick={() => handleRowToggle(row)}
+                  >
                     {row.cells.map((cell, tdidx) => (
                       <td
                         {...cell.getCellProps()}
@@ -149,10 +173,17 @@ const GridTable = ({
                         {cell.column.id === "Actions" &&
                         checkEmptyVal(cell.column.showActionMenu) ? (
                           <>
-                            <GridActionMenu
-                              row={row}
-                              actions={cell.column.actions}
-                            />
+                            {cell.column.isDocActionMenu ? (
+                              <GridDocActionMenu
+                                row={row}
+                                actions={cell.column.actions}
+                              />
+                            ) : (
+                              <GridActionMenu
+                                row={row}
+                                actions={cell.column.actions}
+                              />
+                            )}
                           </>
                         ) : (
                           cell.render("Cell")

@@ -1,5 +1,5 @@
 {
-  "apiBaseUrl": "https://dev.assetswatch.com:8000/api/",
+  "apiBaseUrl": "http://localhost:5198/api/",
   "usioPaymentConfig": {
     "getTokenUrl": "https://checkout.usiopay.com/2.0/GenerateToken",
     "merchantAPIKey": "AEAE82F9-5A34-47C3-A61E-1E8EE37BE3AD"
@@ -24,5 +24,9 @@
   "paymentStatusTypes": {
     "Pending": 0,
     "Paid": 1
+  },
+  "sharedTypes": {
+    "Sent": 1,
+    "Received": 2
   }
 }

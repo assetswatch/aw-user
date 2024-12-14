@@ -220,6 +220,12 @@ const InputControl = ({
         formErrors[name] = rex.invalid;
       }
       break;
+    case formCtrlTypes.title:
+      rex = Regex.title;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      break;
   }
 
   return (

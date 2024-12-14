@@ -92,6 +92,30 @@ export function SetPageLoaderNavLinks() {
         case routeNames.ownerprofileedit.path.toLowerCase():
           activelink = "user-profile";
           break;
+        case routeNames.owneragreementtemplates.path.toLowerCase():
+        case routeNames.ownersendagreement.path.toLowerCase():
+        case routeNames.ownerpreviewagreement.path.toLowerCase():
+          activelink = "agreements";
+          activesublink = "owner-agreement-templates";
+          break;
+        case routeNames.ownerdocuments.path.toLowerCase():
+        case routeNames.owneradddocument.path.toLowerCase():
+        case routeNames.ownereditdocument.path.toLowerCase():
+        case routeNames.ownersharedocument.path.toLowerCase():
+        case routeNames.ownerviewdocument.path.toLowerCase():
+        case routeNames.agentdocuments.path.toLowerCase():
+        case routeNames.agentadddocument.path.toLowerCase():
+        case routeNames.agenteditdocument.path.toLowerCase():
+        case routeNames.agentsharedocument.path.toLowerCase():
+        case routeNames.agentviewdocument.path.toLowerCase():
+        case routeNames.tenantdocuments.path.toLowerCase():
+        case routeNames.tenantadddocument.path.toLowerCase():
+        case routeNames.tenantviewdocument.path.toLowerCase():
+        case routeNames.tenanteditdocument.path.toLowerCase():
+        case routeNames.tenantsharedocument.path.toLowerCase():
+          activelink = "agreements";
+          activesublink = "documents";
+          break;
       }
 
       $('[id^="nav-"],[id^="nav-lnk-"],[id^="page-lnk-"]')

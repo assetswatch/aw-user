@@ -618,26 +618,27 @@ const UserHeader = () => {
                     <ul className="dropdown-menu">
                       <li className="dropdown-item">
                         <Link
-                          id="nav-lnk-myagreement"
+                          id="nav-lnk-owner-send-agreement"
                           to={routeNames.comingup.path}
                         >
                           <i className="fa-regular fa-file-lines pe-1"></i> My
-                          Agreement
+                          Agreements
                         </Link>
                       </li>
                       <li className="dropdown-item">
                         <Link
                           id="nav-lnk-documents"
-                          to={routeNames.comingup.path}
+                          to={routeNames.ownerdocuments.path}
                         >
-                          <i className="fa-regular fa-file-lines pe-1"></i>{" "}
+                          <i className="fa-regular fa-file-lines pe-1"></i> My
                           Documents
                         </Link>
                       </li>
                       <li className="dropdown-item">
                         <Link
-                          id="nav-lnk-agreementtemplates"
-                          to={routeNames.comingup.path}
+                          className="nav-link-owner-agreement-templates"
+                          id="nav-lnk-owner-agreement-templates"
+                          to={routeNames.owneragreementtemplates.path}
                         >
                           <i className="fa-regular fa-file-lines pe-1"></i>{" "}
                           Agreement Templates
@@ -773,15 +774,15 @@ const UserHeader = () => {
                           to={routeNames.comingup.path}
                         >
                           <i className="fa-regular fa-file-lines pe-1"></i> My
-                          Agreement
+                          Agreements
                         </Link>
                       </li>
                       <li className="dropdown-item">
                         <Link
                           id="nav-lnk-documents"
-                          to={routeNames.comingup.path}
+                          to={routeNames.agentdocuments.path}
                         >
-                          <i className="fa-regular fa-file-lines pe-1"></i>{" "}
+                          <i className="fa-regular fa-file-lines pe-1"></i> My
                           Documents
                         </Link>
                       </li>
@@ -912,11 +913,31 @@ const UserHeader = () => {
                       </li>
                     </ul>
                   </li>
-                  <li className="nav-item">
-                    <a className="nav-link" id="nav-agreements">
+                  <li className="nav-item dropdown">
+                    <a className="nav-link dropdown-toggle" id="nav-agreements">
                       <i className="fa fa-handshake pe-2"></i>
                       Agreements
                     </a>
+                    <ul className="dropdown-menu">
+                      <li className="dropdown-item">
+                        <Link
+                          id="nav-lnk-myagreement"
+                          to={routeNames.comingup.path}
+                        >
+                          <i className="fa-regular fa-file-lines pe-1"></i> My
+                          Agreements
+                        </Link>
+                      </li>
+                      <li className="dropdown-item">
+                        <Link
+                          id="nav-lnk-documents"
+                          to={routeNames.tenantdocuments.path}
+                        >
+                          <i className="fa-regular fa-file-lines pe-1"></i> My
+                          Documents
+                        </Link>
+                      </li>
+                    </ul>
                   </li>
                   <li className="nav-item">
                     <Link

@@ -33,7 +33,7 @@ const Joined = lazy(() => import("./JoinedTenants"));
 const Requested = lazy(() => import("./TenantsRequested"));
 const ConnectionHistory = lazy(() => import("./TenantsConnectionHistory"));
 
-const Tenants = () => {
+const MyAgreements = () => {
   let $ = window.$;
   const location = useLocation();
   const Tabs = [
@@ -506,4 +506,4 @@ const Tenants = () => {
   );
 };
 
-export default Tenants;
+export default MyAgreements;
