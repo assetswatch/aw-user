@@ -31,6 +31,7 @@ export const routeNames = {
     path: "/User/Owner-Notifications",
   },
   profiles: { name: "Profiles", path: "/User/Profiles" },
+  reports: { name: "Reports", path: "/User/Reports" },
   upgradeplan: { name: "UpgradePlan", path: "/User/UpgradePlan" },
   userproperties: { name: "UserProperties", path: "/User/Properties/View" },
   addproperty: {
@@ -186,6 +187,13 @@ const routes = [
     path: routeNames.profiles.path,
     name: routeNames.profiles.name,
     element: lazy(() => import("../pages/User/Profiles")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.reports.path,
+    name: routeNames.reports.name,
+    element: lazy(() => import("../pages/User/Reports/Reports")),
     isexact: true,
     isprotected: true,
   },

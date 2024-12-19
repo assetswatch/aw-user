@@ -56,6 +56,9 @@ export function SetPageLoaderNavLinks() {
         case routeNames.dashboard.path.toLowerCase():
           activelink = "dashboard";
           break;
+        case routeNames.reports.path.toLowerCase():
+          activelink = "home-reports";
+          break;
         case routeNames.ownertenants.path.toLowerCase():
           activelink = "myconnections";
           activesublink = "owner-tenant";

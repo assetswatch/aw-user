@@ -79,6 +79,8 @@ export const UserConnectionTabIds = {
   requested: "#tab-requested",
   joined: "#tab-joined",
   connection: "#tab-connection",
+  transactionreport: "#tab-transactionreport",
+  propertyreport: "#tab-propertyreport",
 };
 /*connection tab ids*/
 
@@ -101,6 +103,7 @@ export const AppMessages = {
   NoPayments: "No payments found...",
   NoPropertyDetails: "Property details not found...",
   NoConnection: `No connections found...`,
+  NoReports: `No Reports found...`,
   NoTenants: `No ${Object.keys(config.userProfileTypes)
     .find(
       (key) => config.userProfileTypes[key] === config.userProfileTypes.Tenant

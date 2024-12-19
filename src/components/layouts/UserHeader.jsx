@@ -668,8 +668,8 @@ const UserHeader = () => {
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      id="nav-home-reports"
+                      to={routeNames.reports.path}
                     >
                       <i className="fa fa-chart-pie flat-mini pe-2"></i>
                       Reports
@@ -819,8 +819,8 @@ const UserHeader = () => {
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      id="nav-home-reports"
+                      to={routeNames.reports.path}
                     >
                       <i className="fa fa-chart-pie flat-mini pe-2"></i>
                       Reports
@@ -941,8 +941,8 @@ const UserHeader = () => {
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      id="nav-home-reports"
+                      to={routeNames.reports.path}
                     >
                       <i className="fa fa-chart-pie flat-mini pe-2"></i>
                       Reports
