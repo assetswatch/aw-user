@@ -31,6 +31,11 @@ export const routeNames = {
     path: "/User/Owner-Notifications",
   },
   profiles: { name: "Profiles", path: "/User/Profiles" },
+  services: { name: "Services", path: "/User/Services" },
+  createrequest: {
+    name: "CreateRequest",
+    path: "/User/Services/Create-Service-Request",
+  },
   upgradeplan: { name: "UpgradePlan", path: "/User/UpgradePlan" },
   userproperties: { name: "UserProperties", path: "/User/Properties/View" },
   addproperty: {
@@ -186,6 +191,20 @@ const routes = [
     path: routeNames.profiles.path,
     name: routeNames.profiles.name,
     element: lazy(() => import("../pages/User/Profiles")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.services.path,
+    name: routeNames.services.name,
+    element: lazy(() => import("../pages/User/Services")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.createrequest.path,
+    name: routeNames.createrequest.name,
+    element: lazy(() => import("../pages/User/CreateRequest")),
     isexact: true,
     isprotected: true,
   },

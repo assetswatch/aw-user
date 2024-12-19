@@ -101,6 +101,7 @@ export const AppMessages = {
   NoPayments: "No payments found...",
   NoPropertyDetails: "Property details not found...",
   NoConnection: `No connections found...`,
+  NoServices: `No Services found...`,
   NoTenants: `No ${Object.keys(config.userProfileTypes)
     .find(
       (key) => config.userProfileTypes[key] === config.userProfileTypes.Tenant
