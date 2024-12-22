@@ -38,7 +38,7 @@ import TextAreaControl from "../../../components/common/TextAreaControl";
 import { useProfileTypesGateway } from "../../../hooks/useProfileTypesGateway";
 import PdfViewer from "../../../components/common/PdfViewer";
 
-const MyDocuments = memo(() => {
+const MyDocuments1 = memo(() => {
   let $ = window.$;
 
   let formErrors = {};
@@ -291,7 +291,7 @@ const MyDocuments = memo(() => {
                   style={{ paddingLeft: `${row.depth * 30}px` }}
                   className="gr-link"
                   onClick={(e) => {
-                    row.toggleRowExpanded(!row.isExpanded);
+                    //row.toggleRowExpanded(!row.isExpanded);
                     onGridDoubleClick(row);
                   }}
                 >
@@ -377,14 +377,14 @@ const MyDocuments = memo(() => {
         SessionStorageKeys.ViewEditDocfolderId,
         row.original.Id
       );
-      navigate(routeNames.tenantfolderdocuments.path);
+      navigate(routeNames.ownerfolderdocuments.path);
     } else if (row.original?.IsFolder == 1 && isexpand) {
     } else {
       addSessionStorageItem(
         SessionStorageKeys.ViewEditDocumentId,
         row.original.Id
       );
-      navigate(routeNames.tenantviewdocument.path);
+      navigate(routeNames.ownerviewdocument.path);
     }
   };
 
@@ -397,7 +397,7 @@ const MyDocuments = memo(() => {
         SessionStorageKeys.ViewEditDocumentId,
         row.original.Id
       );
-      navigate(routeNames.tenanteditdocument.path);
+      navigate(routeNames.ownereditdocument.path);
     }
   };
 
@@ -470,7 +470,7 @@ const MyDocuments = memo(() => {
         SessionStorageKeys.ViewEditDocumentId,
         row.original.Id
       );
-      navigate(routeNames.tenantsharedocument.path);
+      navigate(routeNames.ownersharedocument.path);
     }
   };
 
@@ -593,6 +593,12 @@ const MyDocuments = memo(() => {
       setCurrentIndex(row.original?.rowid);
       setViewerModalShow(true);
       setFileUrl(null);
+    } else {
+      addSessionStorageItem(
+        SessionStorageKeys.ViewEditDocfolderId,
+        row.original.Id
+      );
+      navigate(routeNames.ownerfolderdocuments.path);
     }
   };
 
@@ -712,7 +718,7 @@ const MyDocuments = memo(() => {
     let objParams = {
       keyword: "",
       inviterid: profileid,
-      InviterProfileTypeId: config.userProfileTypes.Tenant,
+      InviterProfileTypeId: config.userProfileTypes.Owner,
       InviteeProfileTypeId: parseInt(profileTypeId),
     };
 
@@ -956,9 +962,9 @@ const MyDocuments = memo(() => {
                 count: totalCount,
               }}
               noData={AppMessages.NoDocuments}
-              getSubRows={(row) => {
-                return row.Documents || [];
-              }}
+              // getSubRows={(row) => {
+              //   return row.Documents || [];
+              // }}
               onRowDoubleClick={onGridDoubleClick}
               rowHover={true}
             />
@@ -1193,12 +1199,10 @@ const MyDocuments = memo(() => {
                     showThumbnail={false}
                   ></PdfViewer>
                 ) : (
-                  <>
-                    <img
-                      src={fileUrl}
-                      className="bg-light border rounded max-h-600"
-                    ></img>
-                  </>
+                  <img
+                    src={fileUrl}
+                    className="bg-light border rounded max-h-600"
+                  ></img>
                 )
               ) : (
                 <div className={`flex flex-center py-50`}>
@@ -1224,4 +1228,4 @@ const MyDocuments = memo(() => {
   );
 });
 
-export default MyDocuments;
+export default MyDocuments1;

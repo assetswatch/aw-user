@@ -103,16 +103,19 @@ export function SetPageLoaderNavLinks() {
         case routeNames.ownereditdocument.path.toLowerCase():
         case routeNames.ownersharedocument.path.toLowerCase():
         case routeNames.ownerviewdocument.path.toLowerCase():
+        case routeNames.ownerfolderdocuments.path.toLowerCase():
         case routeNames.agentdocuments.path.toLowerCase():
         case routeNames.agentadddocument.path.toLowerCase():
         case routeNames.agenteditdocument.path.toLowerCase():
         case routeNames.agentsharedocument.path.toLowerCase():
         case routeNames.agentviewdocument.path.toLowerCase():
+        case routeNames.agentfolderdocuments.path.toLowerCase():
         case routeNames.tenantdocuments.path.toLowerCase():
         case routeNames.tenantadddocument.path.toLowerCase():
         case routeNames.tenantviewdocument.path.toLowerCase():
         case routeNames.tenanteditdocument.path.toLowerCase():
         case routeNames.tenantsharedocument.path.toLowerCase():
+        case routeNames.tenantfolderdocuments.path.toLowerCase():
           activelink = "agreements";
           activesublink = "documents";
           break;
@@ -585,4 +588,13 @@ export const Encrypt = (text) => {
     mode: CryptoJS.mode.CBC,
     padding: CryptoJS.pad.Pkcs7,
   }).toString();
+};
+
+export const formatBytes = (bytes) => {
+  if (bytes === 0) return "0 Bytes";
+  const k = 1024;
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  const result = parseFloat((bytes / Math.pow(k, i)).toFixed(2));
+  return `${result} ${sizes[i]}`;
 };

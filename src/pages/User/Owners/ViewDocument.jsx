@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
+  checkObjNullorEmpty,
   GetUserCookieValues,
   SetPageLoaderNavLinks,
 } from "../../../utils/common";
@@ -84,7 +85,8 @@ const ViewDocument = () => {
   //PdfViewer
 
   const navigateToDocuments = () => {
-    navigate(routeNames.ownerdocuments.path);
+    // navigate(routeNames.ownerdocuments.path);
+    window.history.go(-1);
   };
 
   const onCancel = (e) => {
@@ -97,44 +99,40 @@ const ViewDocument = () => {
       {SetPageLoaderNavLinks()}
       <div className="full-row  bg-light">
         <div className="container">
-          <div className="row mx-auto col-12 shadow">
-            <div className="bg-white xs-p-20 p-30 pb-30 border rounded">
-              <ol className="breadcrumb mb-0 bg-transparent p-0">
+          <div className="mx-auto col-12 shadow">
+            <div className="row bg-white xs-p-20 p-30 pb-30 border rounded">
+              <ol className="breadcrumb mb-0 bg-transparent p-0 col-md-8 col-lg-8 col-xl-8 mb-15">
                 <li className="breadcrumb-item" aria-current="page">
-                  <h6 className="mb-4 down-line pb-10">View Document</h6>
+                  {!checkObjNullorEmpty(documentDetails) && (
+                    <h6 className="mb-0 down-line pb-10 higlight-font">
+                      {documentDetails?.Name}.{documentDetails?.Extension}
+                    </h6>
+                  )}
                 </li>
               </ol>
+              <div className="col-md-4 col-lg-4 col-xl-4 mb-15 text-lg-end px-0">
+                <span className="font-500 font-general">
+                  Modified On : {documentDetails?.ModifiedDateDisplay}
+                </span>
+              </div>
 
               <div className="container-fluid">
                 <div className="row">
                   <div className="col px-0">
-                    <div className="row font-13 font-500">
-                      <div className="col-md-6 col-lg-4 col-xl-4 mb-15">
-                        <span>Title : {documentDetails.Title}</span>
-                      </div>
-                      <div className="col-md-6 col-lg-4 col-xl-4 mb-15 text-lg-center">
-                        <span>
-                          Document Type : {documentDetails.DocumentType}
-                        </span>
-                      </div>
-                      <div className="col-md-6 col-lg-4 col-xl-4 mb-15 text-lg-end">
-                        <span>
-                          Modified On : {documentDetails.ModifiedDateDisplay}
-                        </span>
-                      </div>
-                      <div className="col-md-6 col-lg-12 col-xl-6 mb-15">
-                        <span>Description : {documentDetails.Description}</span>
-                      </div>
-                    </div>
                     {fileUrl ? (
-                      <div>
+                      <div className="min-h-300">
                         {documentDetails.Extension === "pdf" ? (
-                          <PdfViewer file={fileUrl}></PdfViewer>
+                          <PdfViewer
+                            file={fileUrl}
+                            cssclass="mt-10"
+                          ></PdfViewer>
                         ) : (
-                          <img
-                            src={fileUrl}
-                            className="bg-light border rounded max-h-600"
-                          ></img>
+                          <div className="flex flex-center min-h-300 max-h-600">
+                            <img
+                              src={fileUrl}
+                              className="bg-light border rounded max-h-600"
+                            ></img>
+                          </div>
                         )}
                       </div>
                     ) : (

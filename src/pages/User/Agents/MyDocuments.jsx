@@ -1,5 +1,9 @@
-import React, { memo, useCallback, useRef, useState } from "react";
-import { Grid, ModalView } from "../../../components/common/LazyComponents";
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
+import {
+  DataLoader,
+  Grid,
+  ModalView,
+} from "../../../components/common/LazyComponents";
 import InputControl from "../../../components/common/InputControl";
 import { formCtrlTypes } from "../../../utils/formvalidation";
 import {
@@ -22,9 +26,9 @@ import {
   ValidationMessages,
 } from "../../../utils/constants";
 import { useAuth } from "../../../contexts/AuthContext";
-import { axiosPost } from "../../../helpers/axiosHelper";
+import { axiosPost, fetchPost } from "../../../helpers/axiosHelper";
 import config from "../../../config.json";
-import { useGetDocumentTypesGateway } from "../../../hooks/useGetDocumentTypesGateway";
+// import { useGetDocumentTypesGateway } from "../../../hooks/useGetDocumentTypesGateway";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 import { Toast } from "../../../components/common/ToastView";
 import { routeNames } from "../../../routes/routes";
@@ -32,6 +36,7 @@ import { addSessionStorageItem } from "../../../helpers/sessionStorageHelper";
 import { useNavigate } from "react-router-dom";
 import TextAreaControl from "../../../components/common/TextAreaControl";
 import { useProfileTypesGateway } from "../../../hooks/useProfileTypesGateway";
+import PdfViewer from "../../../components/common/PdfViewer";
 
 const MyDocuments = memo(() => {
   let $ = window.$;
@@ -47,14 +52,19 @@ const MyDocuments = memo(() => {
     GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
   );
 
-  const { documentTypesList } = useGetDocumentTypesGateway("");
+  // const { documentTypesList } = useGetDocumentTypesGateway("");
 
   //Grid
   const [documentsData, setDocumentsData] = useState([]);
+  const [documentfilesData, setDocumentfilesData] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [pageCount, setPageCount] = useState(0);
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [selectedGridRow, setSelectedGridRow] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(null);
+  const [viewerModalShow, setViewerModalShow] = useState(false);
+  const [documentDetails, setDocumentDetails] = useState({});
+  const [fileUrl, setFileUrl] = useState(null);
 
   //Modal
   const [modalDeleteConfirmShow, setModalDeleteConfirmShow] = useState(false);
@@ -97,7 +107,7 @@ const MyDocuments = memo(() => {
       txtkeyword: "",
       txtfromdate: moment().subtract(3, "month"),
       txttodate: moment(),
-      ddldocumenttype: null,
+      ddldocumenttype: 0,
     };
   };
 
@@ -200,9 +210,10 @@ const MyDocuments = memo(() => {
           keyword: searchFormData.txtkeyword,
           fromdate: searchFormData.txtfromdate,
           todate: searchFormData.txttodate,
-          documenttypeid: parseInt(
-            setSelectDefaultVal(searchFormData.ddldocumenttype)
-          ),
+          documenttypeid: 0,
+          // parseInt(
+          //   setSelectDefaultVal(searchFormData.ddldocumenttype)
+          // ),
         };
       }
 
@@ -215,16 +226,38 @@ const MyDocuments = memo(() => {
           if (objResponse.StatusCode === 200) {
             setTotalCount(objResponse.Data.TotalCount);
             setPageCount(Math.ceil(objResponse.Data.TotalCount / ps));
-            setDocumentsData(objResponse.Data.Folders);
+            //setDocumentsData(objResponse.Data.Folders);
+            let result = [];
+            let data = [];
+            let rowid = -1;
+            objResponse.Data.Folders.forEach((item, i) => {
+              data.push(item);
+              // Recursively flatten children
+              if (item.IsFolder === 1 && item.Documents) {
+                item.Documents.forEach((d, di) => {
+                  rowid = rowid + 1;
+                  result.push({ ...d, rowid: rowid });
+                  data[i].Documents[di].rowid = rowid;
+                });
+              } else {
+                rowid = rowid + 1;
+                result.push({ ...item, rowid: rowid });
+                data[i].rowid = rowid;
+              }
+            });
+            setDocumentfilesData(result);
+            setDocumentsData(data);
           } else {
             isapimethoderr = true;
             setDocumentsData([]);
+            setDocumentfilesData([]);
             setPageCount(0);
           }
         })
         .catch((err) => {
           isapimethoderr = true;
           setDocumentsData([]);
+          setDocumentfilesData([]);
           setPageCount(0);
           console.error(
             `"API :: ${ApiUrls.getDocumentsList}, Error ::" ${err}`
@@ -246,51 +279,60 @@ const MyDocuments = memo(() => {
   const columns = React.useMemo(
     () => [
       {
-        Header: "Name / Title",
+        Header: "Name",
         accessor: "",
-        className: "w-300px",
+        className: "w-450px",
         disableSortBy: true,
         Cell: ({ row }) => {
           return (
-            <div
-              style={{ paddingLeft: `${row.depth * 30}px` }}
-              className="gr-link"
-            >
+            <>
               {row.original.IsFolder === 1 ? (
-                <span
-                  className="gr-txt-14-b"
-                  onClick={() => row.toggleRowExpanded(!row.isExpanded)}
+                <div
+                  style={{ paddingLeft: `${row.depth * 30}px` }}
+                  className="gr-link"
+                  onClick={(e) => {
+                    row.toggleRowExpanded(!row.isExpanded);
+                    onGridDoubleClick(row);
+                  }}
                 >
-                  <i
-                    className={`${
-                      !row.isExpanded ? "fa fa-folder" : "far fa-folder-open"
-                    } gr-icon`}
-                  ></i>
-                  {row.original.Title}
-                </span>
+                  <span className="gr-txt-14-b">
+                    <i
+                      className={`${
+                        !row.isExpanded ? "fa fa-folder" : "far fa-folder-open"
+                      } gr-icon`}
+                    ></i>
+                    {row.original.Name}
+                  </span>
+                </div>
               ) : (
-                <span className="gr-txt-14-b" onClick={(e) => onView(e, row)}>
-                  <i className={`far fa-file-lines gr-icon`}></i>
-                  {row.original.Title}
-                </span>
+                <div
+                  style={{ paddingLeft: `${row.depth * 30}px` }}
+                  className="gr-link"
+                  onClick={(e) => onGridDoubleClick(row)}
+                >
+                  <span className="gr-txt-14-b">
+                    <i className={`far fa-file-lines gr-icon`}></i>
+                    {row.original.Name}
+                  </span>
+                </div>
               )}
-            </div>
+            </>
           );
         },
       },
       {
-        Header: "Document Type",
-        accessor: "DocumentType",
-        className: "w-250px",
+        Header: "File Size",
+        accessor: "Size",
+        className: "w-180px",
       },
       {
         Header: "Last Modified On",
         accessor: "ModifiedDateDisplay",
-        className: "w-200px",
+        className: "w-250px",
       },
       {
         Header: "Actions",
-        className: "w-150px",
+        className: "w-180px",
         isDocActionMenu: true,
         actions: [
           {
@@ -328,13 +370,22 @@ const MyDocuments = memo(() => {
 
   //Grid actions
 
-  const onView = (e, row) => {
+  const onView = (e, row, isexpand = false) => {
     e.preventDefault();
-    addSessionStorageItem(
-      SessionStorageKeys.ViewEditDocumentId,
-      row.original.Id
-    );
-    navigate(routeNames.agentviewdocument.path);
+    if (row.original?.IsFolder == 1 && isexpand == false) {
+      addSessionStorageItem(
+        SessionStorageKeys.ViewEditDocfolderId,
+        row.original.Id
+      );
+      navigate(routeNames.agentfolderdocuments.path);
+    } else if (row.original?.IsFolder == 1 && isexpand) {
+    } else {
+      addSessionStorageItem(
+        SessionStorageKeys.ViewEditDocumentId,
+        row.original.Id
+      );
+      navigate(routeNames.agentviewdocument.path);
+    }
   };
 
   const onEdit = (e, row) => {
@@ -359,15 +410,19 @@ const MyDocuments = memo(() => {
       apiReqResLoader("btnupdatefolder", "Updating", API_ACTION_STATUS.START);
 
       let isapimethoderr = false;
+
       let objBodyParams = {
+        ParentFolderId: 0,
         FolderId: parseInt(selectedGridRow?.original?.Id),
         AccountId: accountid,
         ProfileId: profileid,
         Name: editFolderFormData.txtname,
+        StorageTypeId: 1,
+        StorageFolderId: selectedGridRow?.original?.StorageFileId,
       };
 
       axiosPost(
-        `${config.apiBaseUrl}${ApiUrls.updateDocumentFolder}`,
+        `${config.apiBaseUrl}${ApiUrls.addDocumentFolder}`,
         objBodyParams
       )
         .then((response) => {
@@ -387,7 +442,7 @@ const MyDocuments = memo(() => {
         .catch((err) => {
           isapimethoderr = true;
           console.error(
-            `"API :: ${ApiUrls.updateDocumentFolder}, Error ::" ${err}`
+            `"API :: ${ApiUrls.addDocumentFolder}, Error ::" ${err}`
           );
         })
         .finally(() => {
@@ -521,6 +576,99 @@ const MyDocuments = memo(() => {
       });
   };
 
+  const handleNameClick = (e, row) => {
+    // e.preventDefault();
+    // e.stopPropagation();
+    // if (row.original.IsFolder === 0 || checkEmptyVal(row.original.IsFolder)) {
+    //   setSelectedGridRow(row);
+    //   setCurrentIndex(row.original?.rowid);
+    //   setViewerModalShow(true);
+    //   setFileUrl(null);
+    // }
+  };
+
+  const onGridDoubleClick = (row) => {
+    if (row.original.IsFolder === 0 || checkEmptyVal(row.original.IsFolder)) {
+      setSelectedGridRow(row);
+      setCurrentIndex(row.original?.rowid);
+      setViewerModalShow(true);
+      setFileUrl(null);
+    }
+  };
+
+  const closeFullScreen = () => {
+    setCurrentIndex(null);
+    setSelectedGridRow(null);
+    setViewerModalShow(false);
+    setFileUrl(null);
+  };
+
+  // Navigate to previous file
+  const handlePrevious = () => {
+    setFileUrl(null);
+    const newIndex =
+      currentIndex > 0 ? currentIndex - 1 : documentfilesData.length - 1;
+    setCurrentIndex(newIndex);
+  };
+
+  // Navigate to next file
+  const handleNext = () => {
+    setFileUrl(null);
+    const newIndex =
+      currentIndex < documentfilesData.length - 1 ? currentIndex + 1 : 0;
+    setCurrentIndex(newIndex);
+  };
+
+  useEffect(() => {
+    if (currentIndex !== null) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    if (currentIndex != null) {
+      getDocumentDetails(documentfilesData[currentIndex].Id);
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [currentIndex]);
+
+  const getDocumentDetails = async (id) => {
+    if (id > 0) {
+      let objParams = {
+        DocumentId: parseInt(id),
+      };
+      axiosPost(`${config.apiBaseUrl}${ApiUrls.getDocumentDetails}`, objParams)
+        .then(async (response) => {
+          let objResponse = response.data;
+          if (objResponse.StatusCode === 200) {
+            setDocumentDetails(objResponse.Data);
+            const fresponse = await fetchPost(
+              `${config.apiBaseUrl}${ApiUrls.getDocumentFile}`,
+              {
+                StorageDocumentId: objResponse.Data.StorageDocumentId,
+              }
+            );
+            if (fresponse.ok) {
+              const blob = await fresponse.blob();
+              const url = URL.createObjectURL(blob);
+              setFileUrl(url);
+            }
+          } else {
+          }
+        })
+        .catch((err) => {
+          console.error(
+            `"API :: ${ApiUrls.getDocumentDetails}, Error ::" ${err}`
+          );
+        })
+        .finally(() => {
+          setIsDataLoading(false);
+        });
+    }
+  };
+
   //Grid actions
 
   //Edit Folder Modal actions
@@ -529,6 +677,8 @@ const MyDocuments = memo(() => {
     seteditFolderModalShow(false);
     setSelectedGridRow(null);
     setEditFolderFormData(setInitialEditFolderFormData());
+    setEditFolderErrors({});
+    formEditFolderErrors = {};
     apiReqResLoader(
       "btnupdatefolder",
       "Update",
@@ -540,7 +690,9 @@ const MyDocuments = memo(() => {
   const onEditModalShow = (e, row) => {
     e.preventDefault();
     setSelectedGridRow(row);
-    setEditFolderFormData({ txtname: row.original.Title });
+    setEditFolderFormData({ txtname: row.original.Name });
+    setEditFolderErrors({});
+    formEditFolderErrors = {};
     seteditFolderModalShow(true);
   };
 
@@ -623,7 +775,7 @@ const MyDocuments = memo(() => {
     setSelectedGridRow(row);
     setShareFolderFormData({
       ...shareFolderFormData,
-      lblfolder: `Folder: ${row.original.Title}`,
+      lblfolder: `Folder: ${row.original.Name}`,
     });
     setshareFolderModalShow(true);
   };
@@ -677,7 +829,7 @@ const MyDocuments = memo(() => {
     setSelectedGridRow(row);
     setModalDeleteConfirmContent(
       replacePlaceHolders(modalDeleteConfirmContent, {
-        name: `${row?.original?.Title}`,
+        name: `${row?.original?.Name}`,
       })
     );
     setModalDeleteConfirmShow(true);
@@ -696,7 +848,7 @@ const MyDocuments = memo(() => {
                   <div className="col-lg-3 col-xl-3 col-md-4">
                     <InputControl
                       lblClass="mb-0"
-                      lblText="Search by Name / Title"
+                      lblText="Search Name"
                       name="txtkeyword"
                       ctlType={formCtrlTypes.searchkeyword}
                       value={searchFormData.txtkeyword}
@@ -704,7 +856,7 @@ const MyDocuments = memo(() => {
                       formErrors={formErrors}
                     ></InputControl>
                   </div>
-                  <div className="col-lg-3 col-xl-2 col-md-4">
+                  {/* <div className="col-lg-3 col-xl-2 col-md-4">
                     <AsyncSelect
                       placeHolder={
                         documentTypesList.length <= 0 &&
@@ -732,7 +884,7 @@ const MyDocuments = memo(() => {
                       isSearchCtl={true}
                       formErrors={formErrors}
                     ></AsyncSelect>
-                  </div>
+                  </div> */}
                   <div className="col-lg-3 col-xl-2 col-md-4">
                     <DateControl
                       lblClass="mb-0"
@@ -807,6 +959,8 @@ const MyDocuments = memo(() => {
               getSubRows={(row) => {
                 return row.Documents || [];
               }}
+              onRowDoubleClick={onGridDoubleClick}
+              rowHover={true}
             />
           </div>
         </div>
@@ -1005,6 +1159,65 @@ const MyDocuments = memo(() => {
         </>
       )}
       {/*============== Delete Confirmation Modal End ==============*/}
+
+      {/*==============FileViewer Modal Start ==============*/}
+      {viewerModalShow && (
+        <div id="modal" className="modal-fullview">
+          <div className="header">
+            <span className="text-white font-16 font-500">
+              {documentDetails?.Name}.{documentDetails?.Extension}
+            </span>
+            <div>
+              <button
+                onClick={closeFullScreen}
+                className="btn text-white btn-mini pr-10 flex flex-center"
+              >
+                <i className="fa fa-times-circle font-22" />
+              </button>
+            </div>
+          </div>
+          <div className="content">
+            <button
+              className="nav-btn left"
+              onClick={handlePrevious}
+              disabled={currentIndex === null || currentIndex === 0}
+            >
+              <i className="fa fa-chevron-left font-16" />
+            </button>
+            <div className="viewer">
+              {fileUrl ? (
+                documentDetails.Extension === "pdf" ? (
+                  <PdfViewer
+                    file={fileUrl}
+                    cssclass="bg-white w-800px"
+                    showThumbnail={false}
+                  ></PdfViewer>
+                ) : (
+                  <img
+                    src={fileUrl}
+                    className="bg-light border rounded max-h-600"
+                  ></img>
+                )
+              ) : (
+                <div className={`flex flex-center py-50`}>
+                  <div className="data-loader"></div>
+                </div>
+              )}
+            </div>
+            <button
+              className="nav-btn right"
+              onClick={handleNext}
+              disabled={
+                currentIndex === null ||
+                currentIndex == documentfilesData.length - 1
+              }
+            >
+              <i className="fa fa-chevron-right font-16" />
+            </button>
+          </div>
+        </div>
+      )}
+      {/*==============FileViewer Modal End ==============*/}
     </>
   );
 });

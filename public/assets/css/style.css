@@ -62,6 +62,71 @@ select:focus > option:checked {
 
 /* Loader css */
 
+/* Continuous Progress/Processing Bar */
+.processing {
+  position: relative;
+  height: 2px;
+  display: block;
+  width: 100%;
+  background-color: #e1ffe0;
+  border-radius: 2px;
+  background-clip: padding-box;
+  margin: 0.5rem 0 1rem 0;
+  overflow: hidden;
+}
+.processing .continuous {
+  background-color: var(--theme-primary-color);
+}
+.processing .continuous:before {
+  content: "";
+  position: absolute;
+  background-color: inherit;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  will-change: left, right;
+  animation: continuous 3.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+}
+.processing .continuous:after {
+  content: "";
+  position: absolute;
+  background-color: inherit;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  will-change: left, right;
+  animation: continuous-short 3.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+  animation-delay: 1.15s;
+}
+@keyframes continuous {
+  0% {
+    left: -35%;
+    right: 100%;
+  }
+  60% {
+    left: 100%;
+    right: -90%;
+  }
+  100% {
+    left: 100%;
+    right: -90%;
+  }
+}
+@keyframes continuous-short {
+  0% {
+    left: -200%;
+    right: 100%;
+  }
+  60% {
+    left: 107%;
+    right: -8%;
+  }
+  100% {
+    left: 107%;
+    right: -8%;
+  }
+}
+
 /*==================================
 Theme Color All Codes Variable
 ==================================*/
@@ -85,7 +150,9 @@ Theme Color All Codes Variable
   --theme-white-color: #fff;
   /* theme white font color */
 }
-
+:root {
+  --theme-li-hover-bg-color: #f6f8fb;
+}
 :root {
   --theme-light-color: #f8f9fa;
   /* theme light gray color */
@@ -1305,7 +1372,7 @@ Header Style Start
 .ddmenu {
   position: absolute !important;
   border: solid 1px var(--theme-gray-color) !important;
-  margin-top: 4px !important;
+  margin-top: 8px !important;
   right: 0px;
   z-index: 1000;
 }
@@ -1548,10 +1615,10 @@ Header Style Start
   align-items: center;
   --bs-gutter-x: 0 !important;
 }
-.widget-cnt-body > div.nlist:nth-child(odd) {
+.widget-cnt-body > div.nlist .row:nth-child(odd) {
   background-color: var(--collapse-widget-grid-bg);
 }
-.widget-cnt-body > div.nlist:nth-child(even) {
+.widget-cnt-body > div.nlist .row:nth-child(even) {
   background-color: var(--theme-white-color);
 }
 .widget-cnt-body .date {
@@ -3712,6 +3779,13 @@ Deshboard Style Start
 .cur-pointer {
   cursor: pointer;
 }
+:focus-visible {
+  outline: none !important;
+}
+.hrl {
+  height: 0 !important;
+  border-top: solid 1px;
+}
 .msg-history li .avata,
 .active-chat-list li .avata {
   position: relative;
@@ -4018,6 +4092,9 @@ Social Media Style Start
 .w-250px {
   width: 250px !important;
 }
+.w-800px {
+  width: 800px !important;
+}
 .h-40px {
   height: 40px !important;
 }
@@ -4147,7 +4224,12 @@ Social Media Style Start
   overflow: hidden;
   height: auto;
 }
-.row {
+.gr-row-hover:hover {
+  background-color: var(--theme-li-hover-bg-color) !important;
+  transition: all 0.3s ease-out;
+}
+.row,
+.gr-row-hover {
   transition: all 0.3s ease-out;
 }
 .subrow {
@@ -4507,10 +4589,10 @@ Social Media Style Start
   background-color: transparent !important;
   border: solid 2px var(--theme-primary-color) !important;
 }
-[aria-controls="rpv-core__modal-body-properties"],
+/* [aria-controls="rpv-core__modal-body-properties"], */
 [aria-describedby="rpv-core__tooltip-body-open"],
-[aria-describedby="rpv-core__tooltip-body-get-file"],
-[aria-describedby="rpv-core__tooltip-body-print"],
+/* [aria-describedby="rpv-core__tooltip-body-get-file"], */
+/* [aria-describedby="rpv-core__tooltip-body-print"], */
 [aria-describedby="rpv-core__tooltip-body-default-layout-sidebar-tab-1"],
 [aria-describedby="rpv-core__tooltip-body-default-layout-sidebar-tab-2"],
 [aria-describedby="rpv-core__tooltip-body-theme-switch"] {
@@ -4551,6 +4633,104 @@ Social Media Style Start
     width: 18rem !important;
   }
 }
+
+.modal-fullview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8); /* Transparent background */
+  display: flex; /* Hidden by default */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 100000;
+}
+
+/* Show Modal */
+.modal-fullview.show {
+  display: flex;
+}
+
+/* Header */
+.modal-fullview .header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.9); /* Slightly darker header */
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+/* Modal Content */
+.modal-fullview .content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* position: relative; */
+  width: 100%;
+  height: calc(100% - 40px);
+  margin-top: 40px;
+  color: white;
+  text-align: center;
+}
+
+/* Navigation Buttons */
+.modal-fullview .content .nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  border: none !important;
+  color: white;
+  font-size: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.modal-fullview .content .nav-btn:disabled,
+.modal-fullview .content .nav-btn:disabled:hover {
+  cursor: default;
+  background: rgba(0, 0, 0, 0.6) !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.modal-fullview .content .nav-btn.left {
+  left: 10px;
+}
+
+.modal-fullview .content .nav-btn.right {
+  right: 10px;
+}
+
+.modal-fullview .content .nav-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+/* Viewer Area */
+.modal-fullview .viewer {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /*===============================================================================
 Responsive Style Start
 ==================================================================================*/

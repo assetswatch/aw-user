@@ -1,43 +1,32 @@
-import React, { lazy, useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   API_ACTION_STATUS,
   ApiUrls,
   AppMessages,
-  DocumentsTabIds,
   UploadProgressState,
   UserCookie,
   ValidationMessages,
-} from "../../../utils/constants";
-import { useLocation, useNavigate } from "react-router-dom";
+} from "../../utils/constants";
+import config from "../../config.json";
 import {
   apiReqResLoader,
-  checkEmptyVal,
-  checkObjNullorEmpty,
   formatBytes,
   GetUserCookieValues,
-  SetPageLoaderNavLinks,
-} from "../../../utils/common";
-import { routeNames } from "../../../routes/routes";
-import {
-  FilesUploadProgressView,
-  ModalView,
-} from "../../../components/common/LazyComponents";
-import InputControl from "../../../components/common/InputControl";
-import { formCtrlTypes } from "../../../utils/formvalidation";
-import { axiosPost } from "../../../helpers/axiosHelper";
-import { Toast } from "../../../components/common/ToastView";
-import config from "../../../config.json";
-import { useAuth } from "../../../contexts/AuthContext";
+} from "../../utils/common";
+import { axiosPost } from "../../helpers/axiosHelper";
+import { Toast } from "./ToastView";
 import { useDropzone } from "react-dropzone";
+import { useAuth } from "../../contexts/AuthContext";
+import { formCtrlTypes } from "../../utils/formvalidation";
+import InputControl from "./InputControl";
+import { FilesUploadProgressView, ModalView } from "./LazyComponents";
 
-const MyDocuments = lazy(() => import("./MyDocuments"));
-const SharedDocuments = lazy(() => import("./SharedDocuments"));
-
-const Documents = () => {
+const FoldersBreadCrumb = React.memo(({ folders, onReloadData }) => {
   let $ = window.$;
-  const location = useLocation();
-  const navigate = useNavigate();
+
   const { loggedinUser } = useAuth();
+
+  const currentFolder = folders[folders.length - 1];
 
   let accountid = parseInt(
     GetUserCookieValues(UserCookie.AccountId, loggedinUser)
@@ -45,13 +34,6 @@ const Documents = () => {
   let profileid = parseInt(
     GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
   );
-
-  const Tabs = [DocumentsTabIds.mydocuments, DocumentsTabIds.shareddocuments];
-  let defaultTab = Tabs[0];
-
-  const [activeTab, setActiveTab] = useState("");
-  const [tabMyDocumentsKey, setTabMyDocumentsKey] = useState(0);
-  const [tabSharedDocumentsKey, setTabSharedDocumentsKey] = useState(0);
 
   const [addFolderModalShow, setAddFolderModalShow] = useState(false);
   function setInitialAddFolderFormData() {
@@ -73,63 +55,6 @@ const Documents = () => {
   const [uploadState, setUploadState] = useState(
     UploadProgressState.NotStarted
   );
-
-  useEffect(() => {
-    let checkStateTab = location.state || {};
-    if (!checkObjNullorEmpty(checkStateTab)) {
-      if (!checkObjNullorEmpty(checkStateTab.tab)) {
-        defaultTab = checkStateTab?.tab?.toString().toLowerCase();
-      }
-    }
-
-    $(".nav-tab-line").children("li").removeClass("active");
-    document
-      .querySelector(`[data-target="${defaultTab}"]`)
-      ?.classList.add("active");
-
-    handleTabClick(defaultTab);
-  }, []);
-
-  const handleTabClick = (tabselected) => {
-    setActiveTab(tabselected);
-  };
-
-  useEffect(() => {
-    // default action
-    //$(".tab-element .tab-pane").hide();
-    // $(".tab-action > ul li:first-child").addClass("active");
-    // $(".tab-element .tab-pane:first-child").show();
-
-    // on click event
-
-    $(".tab-action ul li").on("click", function (e) {
-      apiReqResLoader("x");
-      $(this).parent("ul").children("li").removeClass("active");
-      $(this).addClass("active");
-      $(this).parent("ul").next(".tab-element").children(".tab-pane").hide();
-      var activeTab = $(this).attr("data-target");
-      $(activeTab).fadeIn();
-
-      const parentElement = e.target;
-      const parentAttribute = parentElement.getAttribute("data-target");
-      setActiveTab(parentAttribute);
-      apiReqResLoader("x", "", "completed");
-    });
-  }, []);
-
-  const reloadMyDocumentsTab = () => {
-    apiReqResLoader("x");
-    let $this = $(".tab-action ul li").eq(0);
-    $this.parent("ul").children("li").removeClass("active");
-    $this.addClass("active");
-    $this.parent("ul").next(".tab-element").children(".tab-pane").hide();
-    var activeTab = $this.attr("data-target");
-    $(activeTab).fadeIn();
-    setTabMyDocumentsKey((prevKey) => prevKey + 1);
-    setActiveTab(defaultTab);
-    apiReqResLoader("x", "", "completed");
-    //return false;
-  };
 
   const onAdd = (e) => {
     e.preventDefault();
@@ -157,7 +82,7 @@ const Documents = () => {
 
       let isapimethoderr = false;
       let objBodyParams = {
-        ParentFolderId: 0,
+        ParentFolderId: currentFolder.FolderId,
         FolderId: 0,
         AccountId: accountid,
         ProfileId: profileid,
@@ -176,7 +101,7 @@ const Documents = () => {
             if (objResponse.Data.Status === 1) {
               Toast.success(objResponse.Data.Message);
               onAddModalClose();
-              reloadMyDocumentsTab();
+              onReloadData();
             } else {
               Toast.error(objResponse.Data.Message);
             }
@@ -256,7 +181,7 @@ const Documents = () => {
         let objBodyParams = new FormData();
         objBodyParams.append("ProfileId", profileid);
         objBodyParams.append("AccountId", accountid);
-        objBodyParams.append("FolderId", 0);
+        objBodyParams.append("FolderId", currentFolder.FolderId);
         objBodyParams.append("FolderName", "");
         objBodyParams.append("DocumentTypeId", 0);
         objBodyParams.append("StorageTypeId", 1);
@@ -313,7 +238,8 @@ const Documents = () => {
             }, {})
           );
           setUploadState(UploadProgressState.Completed);
-          reloadMyDocumentsTab();
+          onFileUploadModalClose();
+          onReloadData();
         });
       } catch (error) {
         setUploadStatus(
@@ -328,15 +254,7 @@ const Documents = () => {
     }
   };
 
-  // useEffect(() => {
-  //   if (files.length === 0) {
-  //     formAddFileErrors["filesupload"] = ValidationMessages.UploadFileReq;
-  //   }
-  //   setAddFileErrors(formAddFileErrors);
-  // }, [files]);
-
   const onDrop = (acceptedFiles) => {
-    // setFiles((prevFiles) => [...acceptedFiles, ...prevFiles]);
     const selectedFiles = acceptedFiles.map((file) => ({
       file,
       status: UploadProgressState.NotStarted,
@@ -367,101 +285,80 @@ const Documents = () => {
 
   return (
     <>
-      {SetPageLoaderNavLinks()}
-      <div className="full-row bg-light">
-        <div className="container">
-          <div className="row">
-            <div className="col-12">
-              <div className="row">
-                <div className="col-6">
-                  <h5 className="mb-4 down-line">My Documents</h5>
-                </div>
-                <div className="col-6 d-flex justify-content-end align-items-end pb-10">
-                  <div className="dropdown">
-                    <div
-                      className="btn btn-primary btn-mini btn-glow shadow rounded"
+      <div class="breadcrumb w-400px">
+        <>
+          {folders && folders?.length === 1 ? (
+            <>
+              <div class="breadcrumb-item bc-fh">
+                <a href="#">My Documents</a>
+              </div>
+              <div class="breadcrumb-item bc-fh dropdown">
+                <a
+                  data-bs-toggle="collapse"
+                  data-bs-target="#ddhierarchyfoldermenu"
+                  aria-controls="ddhierarchyfoldermenu"
+                  aria-expanded="false"
+                >
+                  <label>{folders[0].Name}</label>
+                  <i className="fa fa-chevron-circle-down font-small"></i>
+                </a>
+              </div>
+            </>
+          ) : (
+            folders?.map((f, i) => {
+              if (i == folders.length - 1) {
+                return (
+                  <div class="breadcrumb-item bc-fh dropdown">
+                    <a
                       data-bs-toggle="collapse"
-                      data-bs-target="#dropdownMenuButton"
-                      aria-controls="dropdownMenuButton"
+                      data-bs-target="#ddhierarchyfoldermenu"
+                      aria-controls="ddhierarchyfoldermenu"
                       aria-expanded="false"
                     >
-                      <i className="icons icon-plus position-relative me-2 t-2"></i>{" "}
-                      New
-                    </div>
-                    <ul
-                      className={`ddmenu arrow collapse in bg-white py-0 px-0 lh-1 shadow rounded text-primary`}
-                      id="dropdownMenuButton"
-                    >
-                      <li>
-                        <a className="dropdown-item" onClick={onAdd}>
-                          <i className="mdi mdi-folder-plus font-22 position-relative me-1 t-4"></i>{" "}
-                          New Folder
-                        </a>
-                      </li>
-                      <li>
-                        <a className="dropdown-item" onClick={onFileUpload}>
-                          <i className="fa fa-file-arrow-up font-18 position-relative me-2 t-1 pl-5"></i>{" "}
-                          File Upload
-                        </a>
-                      </li>
-                      {/* <div className="dropdown-divider" />
-                      <li>
-                        <a className="dropdown-item">
-                          <i className="mdi mdi-folder-upload font-22 position-relative me-1 t-3"></i>{" "}
-                          Folder Upload
-                        </a>
-                      </li> */}
-                    </ul>
+                      <label>{f.Name}</label>
+                      <i className="fa fa-chevron-circle-down font-small"></i>
+                    </a>
                   </div>
-                </div>
-              </div>
-              <div className="tabw100 tab-action shadow rounded bg-white">
-                <ul className="nav-tab-line list-color-secondary d-table mb-0 d-flex box-shadow">
-                  <li
-                    className="ac tive"
-                    data-target={Tabs[0]}
-                    onClick={() => {
-                      handleTabClick(Tabs[0]);
-                    }}
-                  >
-                    My Documents
-                  </li>
-                  <li
-                    className=""
-                    data-target={Tabs[1]}
-                    onClick={() => {
-                      handleTabClick(Tabs[1]);
-                    }}
-                  >
-                    Shared Documents
-                  </li>
-                </ul>
-                <div className="tab-element">
-                  {activeTab == Tabs[0] && (
-                    <div
-                      className="tab-pane tab"
-                      id={Tabs[0].toString().substring(1)}
-                    >
-                      <MyDocuments
-                        key={tabMyDocumentsKey}
-                        tabkey={tabMyDocumentsKey}
-                      />
-                    </div>
-                  )}
-                  {activeTab == Tabs[1] && (
-                    <div
-                      className="tab-pane tab"
-                      id={Tabs[1].toString().substring(1)}
-                    >
-                      <SharedDocuments key={tabSharedDocumentsKey} />
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+                );
+              } else if (i >= 1) {
+                return (
+                  <div class="breadcrumb-item bc-fh">
+                    <a href="#">
+                      <label> {f.Name}</label>
+                    </a>
+                  </div>
+                );
+              } else {
+                return (
+                  <div class="breadcrumb-item bc-fh">
+                    <a href="#" className="flex flex-center">
+                      <i class="fa fa-ellipsis"></i>
+                    </a>
+                  </div>
+                );
+              }
+            })
+          )}
+        </>
       </div>
+
+      <ul
+        className={`ddmenu arrow collapse in bg-white py-0 px-0 mt-2 l-2rem lh-1 shadow rounded text-primary`}
+        id="ddhierarchyfoldermenu"
+      >
+        <li>
+          <a className="dropdown-item" onClick={(e) => onAdd(e)}>
+            <i className="mdi mdi-folder-plus font-22 position-relative me-1 t-4"></i>{" "}
+            New Folder
+          </a>
+        </li>
+        <li>
+          <a className="dropdown-item" onClick={onFileUpload}>
+            <i className="fa fa-file-arrow-up font-18 position-relative me-2 t-1 pl-5"></i>{" "}
+            File Upload
+          </a>
+        </li>
+      </ul>
 
       {/*============== File Upload Modal Start ==============*/}
       {fileUploadModalShow && (
@@ -618,6 +515,6 @@ const Documents = () => {
       {/*============== Add Folder Modal End ==============*/}
     </>
   );
-};
+});
 
-export default Documents;
+export default FoldersBreadCrumb;

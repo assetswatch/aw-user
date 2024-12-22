@@ -5,7 +5,7 @@ import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
 import { themePlugin } from "@react-pdf-viewer/theme";
 import { thumbnailPlugin } from "@react-pdf-viewer/thumbnail";
 
-const PdfViewer = ({ file }) => {
+const PdfViewer = ({ file, cssclass, showThumbnail = true }) => {
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
   const thumbnailPluginInstance = thumbnailPlugin({
@@ -14,14 +14,17 @@ const PdfViewer = ({ file }) => {
   });
 
   const handleDocumentLoad = (DocumentLoadEvent) => {
-    const { activateTab } = defaultLayoutPluginInstance;
-
-    // Activate the bookmark tab
-    activateTab(0);
+    if (showThumbnail) {
+      const { activateTab } = defaultLayoutPluginInstance;
+      // Activate the bookmark tab
+      activateTab(0);
+    }
   };
 
   return (
-    <div className="rounded box-shadow pb-20 pdf-viewer-container">
+    <div
+      className={`${cssclass} rounded box-shadow pb-20 pdf-viewer-container`}
+    >
       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
         <Viewer
           fileUrl={file}

@@ -1,4 +1,5 @@
 import config from "../../config.json";
+import { checkEmptyVal } from "../../utils/common";
 
 const GridActionMenu = ({ row, actions }) => {
   return (
@@ -60,8 +61,11 @@ const GridActionMenu = ({ row, actions }) => {
 };
 
 export const GridDocActionMenu = ({ row, actions }) => {
-  if (row.original.IsFolder == 1) {
-    actions = actions.filter((item) => item.text.toLowerCase() !== "view");
+  // if (row.original.IsFolder == 1) {
+  //   actions = actions.filter((item) => item.text.toLowerCase() !== "view");
+  // }
+  if (row.original.IsFolder == 0 || checkEmptyVal(row.original["IsFolder"])) {
+    actions = actions.filter((item) => item.text.toLowerCase() !== "edit");
   }
   if (
     row.original.SharedType?.toString().toLowerCase() == config.sharedTypes.Sent

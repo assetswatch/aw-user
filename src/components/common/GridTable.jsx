@@ -19,6 +19,8 @@ const GridTable = ({
   showPaging = true,
   headerClass = "box-shadow",
   getSubRows,
+  onRowDoubleClick,
+  rowHover = false,
 }) => {
   const {
     getTableProps,
@@ -89,6 +91,26 @@ const GridTable = ({
     fetchData({ pageIndex, pageSize });
   }, [fetchData, pageIndex, pageSize]);
 
+  const [selectedRow, setSelectedRow] = useState(null); // Track selected row
+
+  // Handle row selection
+  const handleRowClick = (rowIndex) => {
+    // Toggle row selection (deselect if already selected)
+    setSelectedRow((prevSelectedRow) =>
+      prevSelectedRow === rowIndex ? null : rowIndex
+    );
+  };
+
+  const getRowProps = (state, rowInfo) => {
+    // return {
+    //   onClick: () => handleRowClick(rowInfo?.index),
+    //   style: {
+    //     backgroundColor: rowInfo?.index === selectedRow ? "" : "#a3d8f4", // Highlight the selected row
+    //     cursor: "pointer",
+    //   },
+    // };
+  };
+
   return (
     <>
       <div className="overflow-x-scroll">
@@ -156,13 +178,18 @@ const GridTable = ({
                 return (
                   <tr
                     {...row.getRowProps()}
+                    {...getRowProps()}
                     key={"tr-" + tridx}
                     className={
-                      row.id.toString().indexOf(".") != -1
+                      (rowHover == true ? "gr-row-hover" : "") +
+                      " " +
+                      (row.id.toString().indexOf(".") != -1
                         ? "subrow expanded"
-                        : ""
+                        : "") +
+                      " "
                     }
-                    //onClick={() => handleRowToggle(row)}
+                    //onClick={() => onHighlightSelectedRow(row)}
+                    onDoubleClick={() => onRowDoubleClick(row)}
                   >
                     {row.cells.map((cell, tdidx) => (
                       <td

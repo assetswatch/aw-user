@@ -102,6 +102,10 @@ export const routeNames = {
     name: "OwnerDocuments",
     path: "/User/Owner-Documents",
   },
+  ownerfolderdocuments: {
+    name: "OwnerFolderDocuments",
+    path: "/User/Owner-FolderDocuments",
+  },
   owneradddocument: {
     name: "OwnerAddDocument",
     path: "/User/Owner-AddDocument",
@@ -121,6 +125,10 @@ export const routeNames = {
   agentdocuments: {
     name: "AgentDocuments",
     path: "/User/Agent-Documents",
+  },
+  agentfolderdocuments: {
+    name: "AgentFolderDocuments",
+    path: "/User/Agent-FolderDocuments",
   },
   agentadddocument: {
     name: "AgentAddDocument",
@@ -142,6 +150,10 @@ export const routeNames = {
     name: "TenantDocuments",
     path: "/User/Tenant-Documents",
   },
+  tenantfolderdocuments: {
+    name: "TenantFolderDocuments",
+    path: "/User/Tenant-FolderDocuments",
+  },
   tenantadddocument: {
     name: "TenantAddDocument",
     path: "/User/Tenant-AddDocument",
@@ -153,6 +165,10 @@ export const routeNames = {
   tenanteditdocument: {
     name: "TenantEditDocument",
     path: "/User/Tenant-EditDocument",
+  },
+  tenantsharedocument: {
+    name: "TenantShareDocument",
+    path: "/User/Tenant-ShareDocument",
   },
   tenantsharedocument: {
     name: "TenantShareDocument",
@@ -451,6 +467,13 @@ const routes = [
     isprotected: true,
   },
   {
+    path: routeNames.ownerfolderdocuments.path,
+    name: routeNames.ownerfolderdocuments.name,
+    element: lazy(() => import("../pages/User/Owners/FolderDocuments")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
     path: routeNames.owneradddocument.path,
     name: routeNames.owneradddocument.name,
     element: lazy(() => import("../pages/User/Owners/AddDocument")),
@@ -486,6 +509,13 @@ const routes = [
     isprotected: true,
   },
   {
+    path: routeNames.agentfolderdocuments.path,
+    name: routeNames.agentfolderdocuments.name,
+    element: lazy(() => import("../pages/User/Agents/FolderDocuments")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
     path: routeNames.agentadddocument.path,
     name: routeNames.agentadddocument.name,
     element: lazy(() => import("../pages/User/Agents/AddDocument")),
@@ -517,6 +547,13 @@ const routes = [
     path: routeNames.tenantdocuments.path,
     name: routeNames.tenantdocuments.name,
     element: lazy(() => import("../pages/User/Tenants/Documents")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.tenantfolderdocuments.path,
+    name: routeNames.tenantfolderdocuments.name,
+    element: lazy(() => import("../pages/User/Tenants/FolderDocuments")),
     isexact: true,
     isprotected: true,
   },

@@ -186,6 +186,47 @@ h6 a,
 .breadcrumb-item + .breadcrumb-item.text-primary::before {
   color: var(--theme-praimry-color) !important;
 }
+.breadcrumb-item.bc-fh > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 10px;
+}
+.breadcrumb-item.bc-fh > a label {
+  max-width: 100px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  display: inline-block;
+  cursor: pointer;
+  box-sizing: border-box;
+  letter-spacing: 0;
+  border-radius: 0.25rem;
+  line-height: 1.75rem;
+}
+.breadcrumb-item.bc-fh .dropdown-toggle.ddmenu-toggle::after {
+  display: inline !important;
+  position: absolute !important;
+  font-size: 18px !important;
+  top: 1em !important;
+  outline: none !important;
+}
+.breadcrumb-item.bc-fh + .breadcrumb-item.bc-fh::before {
+  color: var(--text-light-dark-color);
+  content: "\f105";
+  font-size: 12px;
+}
+.breadcrumb-item.bc-fh > a {
+  color: var(--text-light-dark-color);
+  font-size: 14px;
+  font-weight: 500;
+}
+.breadcrumb-item.bc-fh > a:hover,
+.breadcrumb-item.bc-fh > a:active,
+.breadcrumb-item.bc-fh > a.active {
+  background-color: var(--form-border-color);
+  border-radius: 25px;
+}
 
 .list-color-white li a,
 .list-color-white li,
@@ -201,7 +242,7 @@ a.hover-text-white:hover {
   color: var(--theme-dark-color) !important;
 }
 .text-light-dark {
-  color: var(--text-light-dark-color) !important;
+  color: var(--text-light-color) !important;
 }
 .list-color-dark li,
 .list-color-dark li a,
@@ -231,6 +272,10 @@ a.hover-text-white:hover {
 .footer-default-dark .media-widget a,
 .footer-classic-dark.text-light .footer-widget li a {
   color: var(--text-light-color);
+}
+
+.text-error {
+  color: var(--theme-validation-err) !important;
 }
 
 .text-extra1,
@@ -504,6 +549,10 @@ a.hover-bg-primary:hover,
 
 .font-20 {
   font-size: 20px !important;
+}
+
+.font-22 {
+  font-size: 22px !important;
 }
 
 .font-medium {
@@ -893,7 +942,7 @@ a.text-dark:focus {
 .full-row {
   position: relative;
   width: 100%;
-  padding: 60px 0;
+  padding: 30px 0 60px 0;
 }
 
 .p-35 {
@@ -1146,7 +1195,12 @@ a.text-dark:focus {
 .t-2 {
   top: 2px !important;
 }
-
+.t-3 {
+  top: 3px !important;
+}
+.t-4 {
+  top: 4px !important;
+}
 .my-0,
 .m-0,
 .mt-0 {
@@ -1158,7 +1212,9 @@ a.text-dark:focus {
 .mt-10 {
   margin-top: 10px !important;
 }
-
+.l-2rem {
+  left: 2rem !important;
+}
 .my-20,
 .m-20,
 .mt-20 {
@@ -1581,6 +1637,10 @@ a.text-dark:focus {
   border-style: solid;
 }
 
+.border-dash {
+  border-style: dashed;
+}
+
 .border-primary {
   border-color: var(--theme-primary-color) !important;
 }
@@ -1591,6 +1651,10 @@ a.text-dark:focus {
 
 .border-geay {
   border-color: var(--theme-gray-color) !important;
+}
+
+.border-light {
+  border-color: var(--text-light-color) !important;
 }
 
 /*==========================================
@@ -4791,7 +4855,7 @@ Newsletter Style
     font-size: 13px;
   }
   .full-row {
-    padding: 50px 0;
+    padding: 20px 0 50px 0;
   }
 }
 @media screen and (max-width: 1200px) {

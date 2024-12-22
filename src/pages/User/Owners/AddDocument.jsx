@@ -57,7 +57,7 @@ const AddDocument = () => {
     GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
   );
 
-  const { documentTypesList } = useGetDocumentTypesGateway("");
+  // const { documentTypesList } = useGetDocumentTypesGateway("");
   const { documentFoldersList } = useGetDdlDocumentFoldersGateway({
     Keyword: "",
     AccountId: accountid,
@@ -111,9 +111,9 @@ const AddDocument = () => {
   const onAdd = (e) => {
     e.preventDefault();
 
-    if (checkEmptyVal(formData.ddldocumenttype)) {
-      formErrors["ddldocumenttype"] = ValidationMessages.DocumentTypeReq;
-    }
+    // if (checkEmptyVal(formData.ddldocumenttype)) {
+    //   formErrors["ddldocumenttype"] = ValidationMessages.DocumentTypeReq;
+    // }
 
     if (Object.keys(formErrors).length === 0) {
       apiReqResLoader("btnadd", "Adding", API_ACTION_STATUS.START);
@@ -130,7 +130,7 @@ const AddDocument = () => {
       objBodyParams.append("FolderName", inputFolderValue);
       objBodyParams.append(
         "DocumentTypeId",
-        parseInt(setSelectDefaultVal(formData.ddldocumenttype))
+        0 //parseInt(setSelectDefaultVal(formData.ddldocumenttype))
       );
       objBodyParams.append("Title", formData.txttitle);
       objBodyParams.append("Description", formData.txtdescription);
@@ -170,6 +170,32 @@ const AddDocument = () => {
   const onCancel = (e) => {
     e.preventDefault();
     navigate(routeNames.ownerdocuments.path);
+  };
+
+  const [files, setFiles] = useState([]);
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    setFiles((prevFiles) => [...prevFiles, ...droppedFiles]);
+  };
+
+  const handleFileSelect = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    setFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
+  };
+
+  const handleFileUpload = async () => {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append("files", file);
+    });
   };
 
   return (
@@ -216,7 +242,7 @@ const AddDocument = () => {
                             tabIndex={1}
                           ></AsyncSelect>
                         </div>
-                        <div className="col-md-6 mb-15">
+                        {/* <div className="col-md-6 mb-15">
                           <AsyncSelect
                             placeHolder={
                               documentTypesList.length <= 0 &&
@@ -246,7 +272,7 @@ const AddDocument = () => {
                             errors={errors}
                             formErrors={formErrors}
                           ></AsyncSelect>
-                        </div>
+                        </div> */}
                         <div className="col-md-6 mb-15">
                           <InputControl
                             lblClass="mb-0 lbl-req-field"
@@ -276,7 +302,71 @@ const AddDocument = () => {
                             Note : Only image or pdf is allowed.
                           </span>
                         </div>
-                        <div className="col-md-6 mb-15">
+                        <div className="col-md-12 mb-15">
+                          <div
+                            style={{
+                              border: "2px dashed #ccc",
+                              borderRadius: "10px",
+                              padding: "20px",
+                              textAlign: "center",
+                              color: "#888",
+                              width: "300px",
+                              margin: "50px auto",
+                            }}
+                            onDragOver={handleDragOver}
+                            onDrop={handleDrop}
+                          >
+                            <p>Drag and drop files here</p>
+                            <p>or</p>
+                            <button
+                              onClick={() =>
+                                document.getElementById("fileInput").click()
+                              }
+                              style={{
+                                padding: "10px 20px",
+                                border: "none",
+                                background: "#007bff",
+                                color: "#fff",
+                                borderRadius: "5px",
+                                cursor: "pointer",
+                              }}
+                            >
+                              Browse Files
+                            </button>
+                            <input
+                              id="fileInput"
+                              type="file"
+                              multiple
+                              style={{ display: "none" }}
+                              onChange={handleFileSelect}
+                            />
+                            {files.length > 0 && (
+                              <div>
+                                <h4>Selected Files:</h4>
+                                <ul>
+                                  {files.map((file, index) => (
+                                    <li key={index}>{file.name}</li>
+                                  ))}
+                                </ul>
+                                <button
+                                  onClick={handleFileUpload}
+                                  style={{
+                                    padding: "10px 20px",
+                                    border: "none",
+                                    background: "#28a745",
+                                    color: "#fff",
+                                    borderRadius: "5px",
+                                    cursor: "pointer",
+                                    marginTop: "10px",
+                                  }}
+                                >
+                                  Upload Files
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        {/* <div className="col-md-6 mb-15">
                           <TextAreaControl
                             lblClass="mb-0"
                             name="txtdescription"
@@ -289,7 +379,7 @@ const AddDocument = () => {
                             tabIndex={4}
                             rows={3}
                           ></TextAreaControl>
-                        </div>
+                        </div> */}
                       </div>
                       {file && file.url && (
                         <div>

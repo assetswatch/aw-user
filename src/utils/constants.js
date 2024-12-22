@@ -41,6 +41,7 @@ export const SessionStorageKeys = {
   ViewAgreementId: "vagid",
   ObjSendAgreement: "osag",
   ViewEditDocumentId: "vedid",
+  ViewEditDocfolderId: "vedfid",
 };
 /*Session storage keys*/
 
@@ -92,6 +93,15 @@ export const DocumentsTabIds = {
   shareddocuments: "#tab-shared",
 };
 /*connection tab ids*/
+
+/*file upload progess states*/
+export const UploadProgressState = {
+  NotStarted: 0,
+  Started: 1,
+  Uploading: 2,
+  Completed: 3,
+};
+/*file upload progess states*/
 
 /*Common App messages*/
 export const AppMessages = {
@@ -172,6 +182,8 @@ export const AppMessages = {
   ShareFolderModalTitle: "Share Folder",
   DdlNoFolders: "No folders found.",
   AddDocumentSuccess: "Document added successfully...",
+  AddFolderModalTitle: "Create folder",
+  UploadDocumentSuccess: "Documents uploaded successfully...",
 };
 /*Common App messages*/
 
@@ -263,6 +275,7 @@ export const ValidationMessages = {
   TitleInvalid: "Title is not valid.",
   CommentsReq: "Comments can not be empty.",
   DocumentTypeReq: "Document type can not be empty.",
+  UploadFileReq: "Please select files to upload.",
 };
 
 /*Api Urls*/
@@ -326,12 +339,14 @@ export let ApiUrls = {
   getDocumentsTypes: `documents/v1/GetDocumentTypes`,
   deleteDocument: `documents/v1/DeleteDocument`,
   getDdlDocumentFolders: `documents/v1/GetDdlDocumentFolders`,
-  updateDocumentFolder: `documents/v1/UpdateDocumentFolder`,
+  addDocumentFolder: `documents/v1/AddDocumentFolder`,
   getSharedDocuments: `documents/v1/GetSharedDocuments`,
   shareDocument: `documents/v1/ShareDocument`,
   getDocumentDetails: `documents/v1/GetDocumentDetails`,
   getDocumentFile: `documents/v1/GetDocumentFile`,
   editDocument: `documents/v1/EditDocument`,
   addDocument: `documents/v1/AddDocument`,
+  getFolderDocuments: `documents/v1/GetFolderDocuments`,
+  getDocumentFoldersHierarchy: `documents/v1/GetDocumentFoldersHierarchy`,
 };
 /*Api Urls*/
