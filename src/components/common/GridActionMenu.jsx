@@ -25,7 +25,9 @@ const GridActionMenu = ({ row, actions }) => {
                       a["onclick"](e, row);
                     }}
                   >
-                    {a["text"].toLowerCase().indexOf("view") != -1 ? (
+                    {a["text"].toLowerCase().indexOf("users") != -1 ? (
+                      <i className="fa fa-users pe-2 text-general" />
+                    ) : a["text"].toLowerCase().indexOf("view") != -1 ? (
                       <i className="far fa-eye pe-2 text-general" />
                     ) : a["text"].toLowerCase().indexOf("edit") != -1 ? (
                       <i className="far fa-edit pe-2 text-general" />
@@ -73,7 +75,12 @@ export const GridDocActionMenu = ({ row, actions }) => {
     actions = actions.filter((item) => item.text.toLowerCase() !== "reject");
   }
   if (row.original.SharedTypeId == config.sharedTypes.Received) {
-    actions = actions.filter((item) => item.text.toLowerCase() !== "delete");
+    actions = actions.filter(
+      (item) =>
+        item.text.toLowerCase() !== "delete" &&
+        item.text.toLowerCase() !== "remove" &&
+        item.text.toLowerCase() !== "view users"
+    );
   }
   return (
     <>
@@ -98,16 +105,31 @@ export const GridDocActionMenu = ({ row, actions }) => {
                       a["onclick"](e, row);
                     }}
                   >
-                    {a["text"].toLowerCase().indexOf("view") != -1 ? (
-                      <i className="far fa-eye pe-2 text-general" />
+                    {a["text"].toLowerCase().indexOf("users") != -1 ? (
+                      <i
+                        className={`fa fa-users pe-2 text-general ${a["icssclass"]}`}
+                      />
+                    ) : a["text"].toLowerCase().indexOf("view") != -1 ? (
+                      <i
+                        className={`far fa-eye pe-2 text-general ${a["icssclass"]}`}
+                      />
                     ) : a["text"].toLowerCase().indexOf("edit") != -1 ? (
-                      <i className="far fa-edit pe-2 text-general" />
-                    ) : a["text"].toLowerCase().indexOf("delete") != -1 ? (
-                      <i className="fas fa-trash pe-2 text-general" />
+                      <i
+                        className={`far fa-edit pe-2 text-general ${a["icssclass"]}`}
+                      />
+                    ) : a["text"].toLowerCase().indexOf("delete") != -1 ||
+                      a["text"].toLowerCase().indexOf("remove") != -1 ? (
+                      <i
+                        className={`fas fa-trash pe-2 text-general ${a["icssclass"]}`}
+                      />
                     ) : a["text"].toLowerCase().indexOf("share") != -1 ? (
-                      <i className="fa fa-share-from-square pe-2 text-general" />
+                      <i
+                        className={`fa fa-share-from-square pe-2 text-general ${a["icssclass"]}`}
+                      />
                     ) : a["text"].toLowerCase().indexOf("reject") != -1 ? (
-                      <i className="fa fa-times-circle pe-2 text-general" />
+                      <i
+                        className={`fa fa-times-circle pe-2 text-general ${a["icssclass"]}`}
+                      />
                     ) : (
                       ""
                     )}

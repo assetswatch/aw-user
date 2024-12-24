@@ -85,7 +85,6 @@ const ViewDocument = () => {
   //PdfViewer
 
   const navigateToDocuments = () => {
-    // navigate(routeNames.tenantdocuments.path);
     window.history.go(-1);
   };
 

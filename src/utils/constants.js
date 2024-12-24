@@ -42,6 +42,10 @@ export const SessionStorageKeys = {
   ObjSendAgreement: "osag",
   ViewEditDocumentId: "vedid",
   ViewEditDocfolderId: "vedfid",
+  ViewSharedDocfolderId: "vsdfid",
+  ViewSharedDocRootfolderId: "vsdrfid",
+  ViewSharedDocRootfolder: "vsdrf",
+  ViewSharedDocUsersSharedId: "vsdusid",
 };
 /*Session storage keys*/
 
@@ -184,6 +188,7 @@ export const AppMessages = {
   AddDocumentSuccess: "Document added successfully...",
   AddFolderModalTitle: "Create folder",
   UploadDocumentSuccess: "Documents uploaded successfully...",
+  DocumentRemoveAccessMessage: "You want to remove access for {name}.",
 };
 /*Common App messages*/
 
@@ -348,5 +353,8 @@ export let ApiUrls = {
   addDocument: `documents/v1/AddDocument`,
   getFolderDocuments: `documents/v1/GetFolderDocuments`,
   getDocumentFoldersHierarchy: `documents/v1/GetDocumentFoldersHierarchy`,
+  getDocumentSharedUsers: `documents/v1/GetDocumentSharedUsers`,
+  removeSharedDocumentAccess: `documents/v1/RemoveSharedDocumentAccess`,
+  unshareDocument: `documents/v1/UnshareDocument`,
 };
 /*Api Urls*/

@@ -1,70 +1,341 @@
-import React, { memo, useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  DataLoader,
-  Grid,
-  ModalView,
-} from "../../../components/common/LazyComponents";
-import InputControl from "../../../components/common/InputControl";
-import { formCtrlTypes } from "../../../utils/formvalidation";
+  API_ACTION_STATUS,
+  ApiUrls,
+  AppMessages,
+  GridDefaultValues,
+  UploadProgressState,
+  UserCookie,
+  ValidationMessages,
+  SessionStorageKeys,
+} from "../../../utils/constants";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   apiReqResLoader,
   checkEmptyVal,
   checkStartEndDateGreater,
+  formatBytes,
   GetUserCookieValues,
+  SetPageLoaderNavLinks,
   replacePlaceHolders,
-  setSelectDefaultVal,
 } from "../../../utils/common";
-import DateControl from "../../../components/common/DateControl";
-import moment from "moment";
 import {
-  ApiUrls,
-  AppMessages,
-  UserCookie,
-  API_ACTION_STATUS,
-  GridDefaultValues,
-  SessionStorageKeys,
-  ValidationMessages,
-} from "../../../utils/constants";
-import { useAuth } from "../../../contexts/AuthContext";
-import { axiosPost, fetchPost } from "../../../helpers/axiosHelper";
-import config from "../../../config.json";
-// import { useGetDocumentTypesGateway } from "../../../hooks/useGetDocumentTypesGateway";
-import AsyncSelect from "../../../components/common/AsyncSelect";
-import { Toast } from "../../../components/common/ToastView";
+  addSessionStorageItem,
+  deletesessionStorageItem,
+  getsessionStorageItem,
+} from "../../../helpers/sessionStorageHelper";
 import { routeNames } from "../../../routes/routes";
-import { addSessionStorageItem } from "../../../helpers/sessionStorageHelper";
-import { useNavigate } from "react-router-dom";
-import TextAreaControl from "../../../components/common/TextAreaControl";
+import {
+  FilesUploadProgressView,
+  ModalView,
+  Grid,
+  FoldersBreadCrumb,
+} from "../../../components/common/LazyComponents";
+import moment from "moment";
+import DateControl from "../../../components/common/DateControl";
+import InputControl from "../../../components/common/InputControl";
+import { formCtrlTypes } from "../../../utils/formvalidation";
+import { axiosPost, fetchPost } from "../../../helpers/axiosHelper";
+import { Toast } from "../../../components/common/ToastView";
+import config from "../../../config.json";
+import { useAuth } from "../../../contexts/AuthContext";
+import { useDropzone } from "react-dropzone";
 import { useProfileTypesGateway } from "../../../hooks/useProfileTypesGateway";
+import AsyncSelect from "../../../components/common/AsyncSelect";
+import TextAreaControl from "../../../components/common/TextAreaControl";
 import PdfViewer from "../../../components/common/PdfViewer";
 
-const MyDocuments = memo(() => {
+const MyDocuments = () => {
   let $ = window.$;
-
-  let formErrors = {};
-  const { loggedinUser } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
+  const { loggedinUser } = useAuth();
+
+  let folderid = parseInt(
+    getsessionStorageItem(SessionStorageKeys.ViewEditDocfolderId, 0)
+  );
 
   let accountid = parseInt(
     GetUserCookieValues(UserCookie.AccountId, loggedinUser)
   );
+
   let profileid = parseInt(
     GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
   );
 
-  // const { documentTypesList } = useGetDocumentTypesGateway("");
+  let loggedinprofiletypeid = parseInt(
+    GetUserCookieValues(UserCookie.ProfileTypeId, loggedinUser)
+  );
 
-  //Grid
-  const [documentsData, setDocumentsData] = useState([]);
-  const [documentfilesData, setDocumentfilesData] = useState([]);
+  const [addFolderModalShow, setAddFolderModalShow] = useState(false);
+  function setInitialAddFolderFormData() {
+    return {
+      txtname: "",
+    };
+  }
+  const [addFolderFormData, setAddFolderFormData] = useState(
+    setInitialAddFolderFormData()
+  );
+  let formAddFolderErrors = {};
+  const [addFolderErrors, setAddFolderErrors] = useState({});
+
+  let formAddFileErrors = {};
+  const [addFileErrors, setAddFileErrors] = useState({});
+  const [fileUploadModalShow, setFileUploadModalShow] = useState(false);
+  const [files, setFiles] = useState([]);
+  const [uploadStatus, setUploadStatus] = useState({});
+  const [uploadState, setUploadState] = useState(
+    UploadProgressState.NotStarted
+  );
+
+  const onAdd = (e) => {
+    e.preventDefault();
+    setAddFolderFormData(setInitialAddFolderFormData());
+    formAddFolderErrors = {};
+    setAddFolderErrors({});
+    setAddFolderModalShow(true);
+  };
+
+  const handleAddFolderInputChange = (e) => {
+    const { name, value } = e?.target;
+    setAddFolderFormData({
+      ...addFolderFormData,
+      [name]: value,
+    });
+  };
+
+  const onAddFolder = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (Object.keys(formAddFolderErrors).length === 0) {
+      setAddFolderErrors({});
+      apiReqResLoader("btnaddfolder", "Creating", API_ACTION_STATUS.START);
+
+      let isapimethoderr = false;
+      let objBodyParams = {
+        ParentFolderId: folderid,
+        FolderId: 0,
+        AccountId: accountid,
+        ProfileId: profileid,
+        Name: addFolderFormData.txtname,
+        StorageTypeId: 1,
+        StorageFolderId: "",
+      };
+
+      axiosPost(
+        `${config.apiBaseUrl}${ApiUrls.addDocumentFolder}`,
+        objBodyParams
+      )
+        .then((response) => {
+          let objResponse = response.data;
+          if (objResponse.StatusCode === 200) {
+            if (objResponse.Data.Status === 1) {
+              Toast.success(objResponse.Data.Message);
+              onAddModalClose();
+              getDocuments({});
+            } else {
+              Toast.error(objResponse.Data.Message);
+            }
+          } else {
+            isapimethoderr = true;
+          }
+        })
+        .catch((err) => {
+          isapimethoderr = true;
+          console.error(
+            `"API :: ${ApiUrls.addDocumentFolder}, Error ::" ${err}`
+          );
+        })
+        .finally(() => {
+          if (isapimethoderr == true) {
+            Toast.error(AppMessages.SomeProblem);
+          }
+          apiReqResLoader(
+            "btnaddfolder",
+            "Create",
+            API_ACTION_STATUS.COMPLETED
+          );
+        });
+    } else {
+      $(`[name=${Object.keys(formAddFolderErrors)[0]}]`).focus();
+      setAddFolderErrors(formAddFolderErrors);
+    }
+  };
+
+  const onAddModalClose = () => {
+    setAddFolderModalShow(false);
+    setAddFolderFormData(setInitialAddFolderFormData());
+    setAddFolderErrors({});
+    formAddFolderErrors = {};
+    apiReqResLoader(
+      "btnaddfolder",
+      "Create",
+      API_ACTION_STATUS.COMPLETED,
+      false
+    );
+  };
+
+  const onFileUpload = (e) => {
+    e.preventDefault();
+    setFileUploadModalShow(true);
+  };
+
+  const onFileUploadModalClose = () => {
+    setFileUploadModalShow(false);
+    setFiles([]);
+    setAddFileErrors({});
+    formAddFileErrors = {};
+    apiReqResLoader("btnupload", "Upload", API_ACTION_STATUS.COMPLETED, false);
+  };
+
+  const onUploadFiles = async () => {
+    let notstartedfiles = files.filter(
+      (obj) => obj.status == UploadProgressState.NotStarted
+    );
+
+    if (notstartedfiles.length === 0) {
+      formAddFileErrors["filesupload"] = ValidationMessages.UploadFileReq;
+    }
+
+    if (Object.keys(formAddFileErrors).length === 0) {
+      setAddFileErrors({});
+      setUploadState(UploadProgressState.Started);
+      apiReqResLoader("btnupload", "Uploading", API_ACTION_STATUS.START, false);
+
+      let isapimethoderr = false;
+      const uploadPromises = notstartedfiles.map((file, i) => {
+        setFiles((prevFiles) =>
+          prevFiles.map((f, idx) =>
+            i === idx ? { ...f, status: UploadProgressState.Started } : f
+          )
+        );
+        let objBodyParams = new FormData();
+        objBodyParams.append("ProfileId", profileid);
+        objBodyParams.append("AccountId", accountid);
+        objBodyParams.append("FolderId", folderid);
+        objBodyParams.append("FolderName", "");
+        objBodyParams.append("DocumentTypeId", 0);
+        objBodyParams.append("StorageTypeId", 1);
+        objBodyParams.append("StorageDocumentId", "");
+        if (file) objBodyParams.append("File", file.file);
+        return axiosPost(
+          `${config.apiBaseUrl}${ApiUrls.addDocument}?r=$`,
+          objBodyParams,
+          {
+            "Content-Type": "multipart/form-data",
+          }
+        )
+          .then((response) => {
+            let objResponse = response.data;
+            if (objResponse.StatusCode === 200) {
+              if (objResponse.Data.Status === 1) {
+                //Toast.success(objResponse.Data.Message);
+              } else {
+                //Toast.error(objResponse.Data.Message);
+              }
+            } else {
+              isapimethoderr = true;
+            }
+          })
+          .catch((err) => {
+            isapimethoderr = true;
+            console.error(`"API :: ${ApiUrls.addDocument}, Error ::" ${err}`);
+          })
+          .finally(() => {
+            if (isapimethoderr == true) {
+              //Toast.error(AppMessages.SomeProblem);
+            }
+            setFiles((prevFiles) =>
+              prevFiles.map((f, idx) =>
+                i === idx ? { ...f, status: UploadProgressState.Completed } : f
+              )
+            );
+          });
+      });
+
+      try {
+        Promise.all(uploadPromises).then(() => {
+          apiReqResLoader(
+            "btnupload",
+            "Upload",
+            API_ACTION_STATUS.COMPLETED,
+            false
+          );
+          getDocuments({});
+          Toast.success(AppMessages.UploadDocumentSuccess);
+          setUploadStatus(
+            files.reduce((acc, file) => {
+              acc[file.name] = "Uploaded";
+              return acc;
+            }, {})
+          );
+          setUploadState(UploadProgressState.Completed);
+          onFileUploadModalClose();
+        });
+      } catch (error) {
+        setUploadStatus(
+          files.reduce((acc, file) => {
+            acc[file.name] = "Failed";
+            return acc;
+          }, {})
+        );
+      }
+    } else {
+      setAddFileErrors(formAddFileErrors);
+    }
+  };
+
+  // useEffect(() => {
+  //   if (files.length === 0) {
+  //     formAddFileErrors["filesupload"] = ValidationMessages.UploadFileReq;
+  //   }
+  //   setAddFileErrors(formAddFileErrors);
+  // }, [files]);
+
+  const onDrop = (acceptedFiles) => {
+    // setFiles((prevFiles) => [...acceptedFiles, ...prevFiles]);
+    const selectedFiles = acceptedFiles.map((file) => ({
+      file,
+      status: UploadProgressState.NotStarted,
+    }));
+    setFiles((prevFiles) => [...selectedFiles, ...prevFiles]);
+  };
+
+  const onDropRejected = (rejectedFiles) => {
+    Toast.error("Some files were rejected. Please upload valid files.");
+  };
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    onDropRejected,
+    accept: {
+      "image/*": [".jpeg", ".jpg", ".png", ".gif"],
+      "application/pdf": [".pdf"],
+      "application/msword": [".doc"],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        [".docx"],
+    },
+    multiple: true,
+  });
+
+  const removeUploadedFile = (id) => {
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== id));
+  };
+
+  let formErrors = {};
+  const [reloadKey, setReloadKey] = useState(new Date().toLocaleTimeString());
+  const [foldersHierarchyData, setFoldersHierarchyData] = useState([]);
+  const [isDataLoading, setIsDataLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [pageCount, setPageCount] = useState(0);
-  const [isDataLoading, setIsDataLoading] = useState(false);
+  const [documentsData, setDocumentsData] = useState([]);
+  const [documentfilesData, setDocumentfilesData] = useState([]);
+  const [fileUrl, setFileUrl] = useState(null);
   const [selectedGridRow, setSelectedGridRow] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(null);
   const [viewerModalShow, setViewerModalShow] = useState(false);
   const [documentDetails, setDocumentDetails] = useState({});
-  const [fileUrl, setFileUrl] = useState(null);
 
   //Modal
   const [modalDeleteConfirmShow, setModalDeleteConfirmShow] = useState(false);
@@ -101,6 +372,135 @@ const MyDocuments = memo(() => {
   const [joinedUsersData, setJoinedUsersData] = useState([]);
   const [selectedJoinedUser, setSelectedJoinedUser] = useState(null);
 
+  useEffect(() => {
+    folderid = parseInt(
+      getsessionStorageItem(SessionStorageKeys.ViewEditDocfolderId, 0)
+    );
+    getFoldersHierarchy();
+    //getDocuments({});
+    setSearchFormData(setSearchInitialFormData);
+  }, [reloadKey]);
+
+  useEffect(() => {
+    return () => {
+      deletesessionStorageItem(SessionStorageKeys.ViewEditDocfolderId);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (currentIndex !== null) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    if (currentIndex != null) {
+      getDocumentDetails(documentfilesData[currentIndex].Id);
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [currentIndex]);
+
+  const closeFullScreen = () => {
+    setCurrentIndex(null);
+    setSelectedGridRow(null);
+    setViewerModalShow(false);
+    setFileUrl(null);
+  };
+
+  // Navigate to previous file
+  const handlePrevious = () => {
+    setFileUrl(null);
+    const newIndex =
+      currentIndex > 0 ? currentIndex - 1 : documentfilesData.length - 1;
+    setCurrentIndex(newIndex);
+  };
+
+  // Navigate to next file
+  const handleNext = () => {
+    setFileUrl(null);
+    const newIndex =
+      currentIndex < documentfilesData.length - 1 ? currentIndex + 1 : 0;
+    setCurrentIndex(newIndex);
+  };
+
+  const getDocumentDetails = async (id) => {
+    if (id > 0) {
+      let objParams = {
+        DocumentId: parseInt(id),
+      };
+      axiosPost(`${config.apiBaseUrl}${ApiUrls.getDocumentDetails}`, objParams)
+        .then(async (response) => {
+          let objResponse = response.data;
+          if (objResponse.StatusCode === 200) {
+            setDocumentDetails(objResponse.Data);
+            const fresponse = await fetchPost(
+              `${config.apiBaseUrl}${ApiUrls.getDocumentFile}`,
+              {
+                StorageDocumentId: objResponse.Data.StorageDocumentId,
+              }
+            );
+            if (fresponse.ok) {
+              const blob = await fresponse.blob();
+              const url = URL.createObjectURL(blob);
+              setFileUrl(url);
+            }
+          } else {
+          }
+        })
+        .catch((err) => {
+          console.error(
+            `"API :: ${ApiUrls.getDocumentDetails}, Error ::" ${err}`
+          );
+        })
+        .finally(() => {
+          setIsDataLoading(false);
+        });
+    }
+  };
+
+  const getFoldersHierarchy = () => {
+    if (folderid > 0) {
+      // apiReqResLoader("x");
+      let isapimethoderr = false;
+      let objParams = {};
+      objParams = {
+        folderid: folderid,
+        profileid: profileid,
+      };
+
+      return axiosPost(
+        `${config.apiBaseUrl}${ApiUrls.getDocumentFoldersHierarchy}`,
+        objParams
+      )
+        .then((response) => {
+          let objResponse = response.data;
+          if (objResponse.StatusCode === 200) {
+            setFoldersHierarchyData(objResponse.Data);
+          } else {
+            isapimethoderr = true;
+            setFoldersHierarchyData([]);
+          }
+        })
+        .catch((err) => {
+          isapimethoderr = true;
+          setFoldersHierarchyData([]);
+          console.error(
+            `"API :: ${ApiUrls.getDocumentFoldersHierarchy}, Error ::" ${err}`
+          );
+        })
+        .finally(() => {
+          if (isapimethoderr === true) {
+            Toast.error(AppMessages.SomeProblem);
+          }
+          // apiReqResLoader("x", "", API_ACTION_STATUS.COMPLETED);
+        });
+    } else {
+      setFoldersHierarchyData([]);
+    }
+  };
+
   //Set search form intial data
   const setSearchInitialFormData = () => {
     return {
@@ -112,7 +512,7 @@ const MyDocuments = memo(() => {
   };
 
   const [searchFormData, setSearchFormData] = useState(
-    setSearchInitialFormData
+    setSearchInitialFormData()
   );
 
   //Set search formdata
@@ -197,6 +597,7 @@ const MyDocuments = memo(() => {
         keyword: "",
         accountid: accountid,
         profileid: profileid,
+        folderid: folderid,
         documenttypeid: 0,
         fromdate: setSearchInitialFormData.txtfromdate,
         todate: setSearchInitialFormData.txttodate,
@@ -233,13 +634,7 @@ const MyDocuments = memo(() => {
             objResponse.Data.Folders.forEach((item, i) => {
               data.push(item);
               // Recursively flatten children
-              if (item.IsFolder === 1 && item.Documents) {
-                item.Documents.forEach((d, di) => {
-                  rowid = rowid + 1;
-                  result.push({ ...d, rowid: rowid });
-                  data[i].Documents[di].rowid = rowid;
-                });
-              } else {
+              if (item.IsFolder === 0) {
                 rowid = rowid + 1;
                 result.push({ ...item, rowid: rowid });
                 data[i].rowid = rowid;
@@ -290,8 +685,8 @@ const MyDocuments = memo(() => {
                 <div
                   style={{ paddingLeft: `${row.depth * 30}px` }}
                   className="gr-link"
-                  onClick={(e) => {
-                    row.toggleRowExpanded(!row.isExpanded);
+                  onDoubleClick={(e) => {
+                    //row.toggleRowExpanded(!row.isExpanded);
                     onGridDoubleClick(row);
                   }}
                 >
@@ -359,12 +754,15 @@ const MyDocuments = memo(() => {
 
   const fetchIdRef = useRef(0);
 
-  const fetchData = useCallback(({ pageIndex, pageSize }) => {
-    const fetchId = ++fetchIdRef.current;
-    if (fetchId === fetchIdRef.current) {
-      getDocuments({ pi: pageIndex, ps: pageSize });
-    }
-  }, []);
+  const fetchData = useCallback(
+    ({ pageIndex, pageSize }) => {
+      const fetchId = ++fetchIdRef.current;
+      if (fetchId === fetchIdRef.current) {
+        getDocuments({ pi: pageIndex, ps: pageSize });
+      }
+    },
+    [reloadKey]
+  );
 
   //Setup Grid.
 
@@ -377,14 +775,14 @@ const MyDocuments = memo(() => {
         SessionStorageKeys.ViewEditDocfolderId,
         row.original.Id
       );
-      navigate(routeNames.tenantfolderdocuments.path);
+      setReloadKey((p) => p + 1);
     } else if (row.original?.IsFolder == 1 && isexpand) {
     } else {
       addSessionStorageItem(
         SessionStorageKeys.ViewEditDocumentId,
         row.original.Id
       );
-      navigate(routeNames.tenantviewdocument.path);
+      navigate(routeNames.viewdocument.path);
     }
   };
 
@@ -397,7 +795,7 @@ const MyDocuments = memo(() => {
         SessionStorageKeys.ViewEditDocumentId,
         row.original.Id
       );
-      navigate(routeNames.tenanteditdocument.path);
+      navigate(routeNames.editdocument.path);
     }
   };
 
@@ -412,7 +810,7 @@ const MyDocuments = memo(() => {
       let isapimethoderr = false;
 
       let objBodyParams = {
-        ParentFolderId: 0,
+        ParentFolderId: folderid,
         FolderId: parseInt(selectedGridRow?.original?.Id),
         AccountId: accountid,
         ProfileId: profileid,
@@ -470,7 +868,7 @@ const MyDocuments = memo(() => {
         SessionStorageKeys.ViewEditDocumentId,
         row.original.Id
       );
-      navigate(routeNames.tenantsharedocument.path);
+      navigate(routeNames.sharedocument.path);
     }
   };
 
@@ -576,101 +974,6 @@ const MyDocuments = memo(() => {
       });
   };
 
-  const handleNameClick = (e, row) => {
-    // e.preventDefault();
-    // e.stopPropagation();
-    // if (row.original.IsFolder === 0 || checkEmptyVal(row.original.IsFolder)) {
-    //   setSelectedGridRow(row);
-    //   setCurrentIndex(row.original?.rowid);
-    //   setViewerModalShow(true);
-    //   setFileUrl(null);
-    // }
-  };
-
-  const onGridDoubleClick = (row) => {
-    if (row.original.IsFolder === 0 || checkEmptyVal(row.original.IsFolder)) {
-      setSelectedGridRow(row);
-      setCurrentIndex(row.original?.rowid);
-      setViewerModalShow(true);
-      setFileUrl(null);
-    }
-  };
-
-  const closeFullScreen = () => {
-    setCurrentIndex(null);
-    setSelectedGridRow(null);
-    setViewerModalShow(false);
-    setFileUrl(null);
-  };
-
-  // Navigate to previous file
-  const handlePrevious = () => {
-    setFileUrl(null);
-    const newIndex =
-      currentIndex > 0 ? currentIndex - 1 : documentfilesData.length - 1;
-    setCurrentIndex(newIndex);
-  };
-
-  // Navigate to next file
-  const handleNext = () => {
-    setFileUrl(null);
-    const newIndex =
-      currentIndex < documentfilesData.length - 1 ? currentIndex + 1 : 0;
-    setCurrentIndex(newIndex);
-  };
-
-  useEffect(() => {
-    if (currentIndex !== null) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-    if (currentIndex != null) {
-      getDocumentDetails(documentfilesData[currentIndex].Id);
-    }
-
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [currentIndex]);
-
-  const getDocumentDetails = async (id) => {
-    if (id > 0) {
-      let objParams = {
-        DocumentId: parseInt(id),
-      };
-      axiosPost(`${config.apiBaseUrl}${ApiUrls.getDocumentDetails}`, objParams)
-        .then(async (response) => {
-          let objResponse = response.data;
-          if (objResponse.StatusCode === 200) {
-            setDocumentDetails(objResponse.Data);
-            const fresponse = await fetchPost(
-              `${config.apiBaseUrl}${ApiUrls.getDocumentFile}`,
-              {
-                StorageDocumentId: objResponse.Data.StorageDocumentId,
-              }
-            );
-            if (fresponse.ok) {
-              const blob = await fresponse.blob();
-              const url = URL.createObjectURL(blob);
-              setFileUrl(url);
-            }
-          } else {
-          }
-        })
-        .catch((err) => {
-          console.error(
-            `"API :: ${ApiUrls.getDocumentDetails}, Error ::" ${err}`
-          );
-        })
-        .finally(() => {
-          setIsDataLoading(false);
-        });
-    }
-  };
-
-  //Grid actions
-
   //Edit Folder Modal actions
 
   const onEditModalClose = () => {
@@ -712,7 +1015,7 @@ const MyDocuments = memo(() => {
     let objParams = {
       keyword: "",
       inviterid: profileid,
-      InviterProfileTypeId: config.userProfileTypes.Tenant,
+      InviterProfileTypeId: loggedinprofiletypeid,
       InviteeProfileTypeId: parseInt(profileTypeId),
     };
 
@@ -837,26 +1140,121 @@ const MyDocuments = memo(() => {
 
   //Delete confirmation Modal actions
 
+  const onGridDoubleClick = (row) => {
+    if (row.original.IsFolder === 0 || checkEmptyVal(row.original.IsFolder)) {
+      setSelectedGridRow(row);
+      setCurrentIndex(row.original?.rowid);
+      setViewerModalShow(true);
+      setFileUrl(null);
+    } else {
+      addSessionStorageItem(
+        SessionStorageKeys.ViewEditDocfolderId,
+        row.original.Id
+      );
+      setReloadKey((p) => p + 1);
+    }
+  };
+
+  //Grid actions
+
+  const onFolderHierarchyFolderClick = (e, folderid) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (folderid > 0) {
+      addSessionStorageItem(SessionStorageKeys.ViewEditDocfolderId, folderid);
+    } else {
+      deletesessionStorageItem(SessionStorageKeys.ViewEditDocfolderId);
+    }
+    setReloadKey((p) => p + 1);
+  };
+
+  const navigateToSharedDocuments = (e) => {
+    navigate(routeNames.shareddocuments.path);
+  };
+
   return (
-    <>
-      <div className="woo-filter-bar full-row p-3 grid-search bo-0">
-        <div className="container-fluid v-center">
+    <div key={reloadKey}>
+      {SetPageLoaderNavLinks()}
+      <div className="full-row bg-light">
+        <div className="container">
           <div className="row">
-            <div className="col px-0">
-              <form noValidate>
-                <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
-                  <div className="col-lg-3 col-xl-3 col-md-4">
-                    <InputControl
-                      lblClass="mb-0"
-                      lblText="Search Name"
-                      name="txtkeyword"
-                      ctlType={formCtrlTypes.searchkeyword}
-                      value={searchFormData.txtkeyword}
-                      onChange={handleChange}
-                      formErrors={formErrors}
-                    ></InputControl>
+            <div className="col-12">
+              <div className="row">
+                <div className="col-6">
+                  <FoldersBreadCrumb
+                    folders={foldersHierarchyData}
+                    currentFolderId={folderid}
+                    title="My Documents"
+                    onAddFolder={onAdd}
+                    onAddFile={onFileUpload}
+                    onFolderHierarchyFolderClick={onFolderHierarchyFolderClick}
+                  ></FoldersBreadCrumb>
+                </div>
+                <div className="col-6 d-flex justify-content-end align-items-end pb-10">
+                  <div className="dropdown">
+                    <div
+                      className="btn btn-primary btn-mini btn-glow shadow rounded"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#dropdownMenuButton"
+                      aria-controls="dropdownMenuButton"
+                      aria-expanded="false"
+                    >
+                      <i className="icons icon-plus position-relative me-2 t-2"></i>{" "}
+                      New
+                    </div>
+                    <ul
+                      className={`ddmenu arrow collapse in bg-white py-0 px-0 lh-1 shadow rounded text-primary`}
+                      id="dropdownMenuButton"
+                    >
+                      <li>
+                        <a className="dropdown-item" onClick={onAdd}>
+                          <i className="mdi mdi-folder-plus font-22 position-relative me-1 t-4"></i>{" "}
+                          New Folder
+                        </a>
+                      </li>
+                      <li>
+                        <a className="dropdown-item" onClick={onFileUpload}>
+                          <i className="fa fa-file-arrow-up font-18 position-relative me-2 t-1 pl-5"></i>{" "}
+                          File Upload
+                        </a>
+                      </li>
+                      {/* <div className="dropdown-divider" />
+                      <li>
+                        <a className="dropdown-item">
+                          <i className="mdi mdi-folder-upload font-22 position-relative me-1 t-3"></i>{" "}
+                          Folder Upload
+                        </a>
+                      </li> */}
+                    </ul>
                   </div>
-                  {/* <div className="col-lg-3 col-xl-2 col-md-4">
+                </div>
+              </div>
+              <div className="tabw100 tab-action shadow rounded bg-white">
+                <ul className="nav-tab-line list-color-secondary d-table mb-0 d-flex box-shadow">
+                  <li className="active">My Documents</li>
+                  <li onClick={navigateToSharedDocuments}>Shared Documents</li>
+                </ul>
+              </div>
+              <div className="tab-element">
+                {/*============== Search Start ==============*/}
+                <div className="woo-filter-bar full-row px-3 py-4 box-shadow grid-search rounded">
+                  <div className="container-fluid v-center">
+                    <div className="row">
+                      <div className="col px-0">
+                        <form noValidate>
+                          <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
+                            <div className="col-lg-4 col-xl-3 col-md-4">
+                              <InputControl
+                                lblClass="mb-0"
+                                lblText="Search Name"
+                                name="txtkeyword"
+                                ctlType={formCtrlTypes.searchkeyword}
+                                value={searchFormData.txtkeyword}
+                                onChange={handleChange}
+                                formErrors={formErrors}
+                              ></InputControl>
+                            </div>
+                            {/* <div className="col-lg-3 col-xl-2 col-md-4">
                     <AsyncSelect
                       placeHolder={
                         documentTypesList.length <= 0 &&
@@ -885,87 +1283,96 @@ const MyDocuments = memo(() => {
                       formErrors={formErrors}
                     ></AsyncSelect>
                   </div> */}
-                  <div className="col-lg-3 col-xl-2 col-md-4">
-                    <DateControl
-                      lblClass="mb-0"
-                      lblText="Start date"
-                      name="txtfromdate"
-                      required={false}
-                      onChange={(dt) => onDateChange(dt, "txtfromdate")}
-                      value={searchFormData.txtfromdate}
-                      isTime={false}
-                    ></DateControl>
-                  </div>
-                  <div className="col-lg-3 col-xl-2 col-md-4">
-                    <DateControl
-                      lblClass="mb-0"
-                      lblText="End date"
-                      name="txttodate"
-                      required={false}
-                      onChange={(dt) => onDateChange(dt, "txttodate")}
-                      value={searchFormData.txttodate}
-                      isTime={false}
-                      objProps={{
-                        checkVal: searchFormData.txtfromdate,
-                      }}
-                    ></DateControl>
-                  </div>
-                  <div className="col-lg-4 col-xl-3 col-md-6 grid-search-action">
-                    <label
-                      className="mb-0 form-error w-100"
-                      id="search-val-err-message"
-                    ></label>
-                    <button
-                      className="btn btn-primary w- 100"
-                      value="Search"
-                      name="btnsearch"
-                      type="button"
-                      onClick={onSearch}
-                    >
-                      Search
-                    </button>
-                    <button
-                      className="btn btn-primary w- 100"
-                      value="Show all"
-                      name="btnshowall"
-                      type="button"
-                      onClick={onShowAll}
-                    >
-                      Show All
-                    </button>
+                            <div className="col-lg-3 col-xl-2 col-md-4">
+                              <DateControl
+                                lblClass="mb-0"
+                                lblText="Start date"
+                                name="txtfromdate"
+                                required={false}
+                                onChange={(dt) =>
+                                  onDateChange(dt, "txtfromdate")
+                                }
+                                value={searchFormData.txtfromdate}
+                                isTime={false}
+                              ></DateControl>
+                            </div>
+                            <div className="col-lg-3 col-xl-2 col-md-4">
+                              <DateControl
+                                lblClass="mb-0"
+                                lblText="End date"
+                                name="txttodate"
+                                required={false}
+                                onChange={(dt) => onDateChange(dt, "txttodate")}
+                                value={searchFormData.txttodate}
+                                isTime={false}
+                                objProps={{
+                                  checkVal: searchFormData.txtfromdate,
+                                }}
+                              ></DateControl>
+                            </div>
+                            <div className="col-lg-6 col-xl-5 col-md-7 grid-search-action">
+                              <label
+                                className="mb-0 form-error w-100"
+                                id="search-val-err-message"
+                              ></label>
+                              <button
+                                className="btn btn-primary w- 100"
+                                value="Search"
+                                name="btnsearch"
+                                type="button"
+                                onClick={onSearch}
+                              >
+                                Search
+                              </button>
+                              <button
+                                className="btn btn-primary w- 100"
+                                value="Show all"
+                                name="btnshowall"
+                                type="button"
+                                onClick={onShowAll}
+                              >
+                                Show All
+                              </button>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </form>
+                {/*============== Search End ==============*/}
+
+                {/*============== Grid Start ==============*/}
+                <div className="row rounded">
+                  <div className="col">
+                    <div className="dashboard-panel border bg-white rounded overflow-hidden w-100 box-shadow">
+                      <Grid
+                        columns={columns}
+                        data={documentsData}
+                        loading={isDataLoading}
+                        fetchData={fetchData}
+                        pageCount={pageCount}
+                        totalInfo={{
+                          text: "Total Documents",
+                          count: totalCount,
+                        }}
+                        noData={AppMessages.NoDocuments}
+                        getSubRows={(row) => {
+                          return row.Documents || [];
+                        }}
+                        onRowDoubleClick={onGridDoubleClick}
+                        rowHover={true}
+                        trClass="cur-pointer"
+                      />
+                    </div>
+                  </div>
+                </div>
+                {/*============== Grid End ==============*/}
+              </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/*============== Grid Start ==============*/}
-      <div className="row rounded">
-        <div className="col">
-          <div className="dashboard-panel bo-top bg-white rounded overflow-hidden w-100 box-shadow-top">
-            <Grid
-              columns={columns}
-              data={documentsData}
-              loading={isDataLoading}
-              fetchData={fetchData}
-              pageCount={pageCount}
-              totalInfo={{
-                text: "Total Documents",
-                count: totalCount,
-              }}
-              noData={AppMessages.NoDocuments}
-              getSubRows={(row) => {
-                return row.Documents || [];
-              }}
-              onRowDoubleClick={onGridDoubleClick}
-              rowHover={true}
-            />
-          </div>
-        </div>
-      </div>
-      {/*============== Grid End ==============*/}
 
       {/*============== Edi Folder Modal Start ==============*/}
       {editFolderModalShow && (
@@ -1160,6 +1567,160 @@ const MyDocuments = memo(() => {
       )}
       {/*============== Delete Confirmation Modal End ==============*/}
 
+      {/*============== File Upload Modal Start ==============*/}
+      {fileUploadModalShow && (
+        <>
+          <FilesUploadProgressView
+            content={
+              <>
+                <div
+                  className="row"
+                  {...getRootProps()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  <div className="col-12 mb-0 flex flex-center">
+                    <input
+                      type="file"
+                      name="filesupload"
+                      id="filesupload"
+                      className="d-none"
+                      multiple
+                      //onChange={handleFileChange}
+                      {...getInputProps()}
+                    />
+                    <label
+                      className="fileupload_label border-dash border-1x border-light rounded font-16 p-10 w-350px"
+                      htmlFor="filesupload"
+                    >
+                      <i
+                        className="fa fa-cloud-upload mb-10 upload-icon d-flex flex-center"
+                        aria-hidden="true"
+                      ></i>
+                      <p className="p-0 m-0">Drag & drop files here</p>
+                      <p className="font-general text-light">
+                        or click to select files
+                      </p>
+                    </label>
+                  </div>
+                  {Object.keys(addFileErrors).length > 0 && (
+                    <div className="err-invalid flex flex-center">
+                      Please select files to upload.
+                    </div>
+                  )}
+                  {files && files.length > 0 ? (
+                    <hr className="w-100 text-primary my-20" />
+                  ) : (
+                    isDragActive && <div className="row min-h-150"></div>
+                  )}
+                  <ul
+                    className="cscrollbar"
+                    style={{ maxHeight: "300px", overflowY: "auto" }}
+                  >
+                    {Array.from(files).map((file, idx) => (
+                      <li className="row" key={`${idx}`} name={`f-${idx}`}>
+                        <div className="col px-20">
+                          <div className="name">{file.file.name}</div>
+                          <div className="name">
+                            {formatBytes(file.file.size)}
+                          </div>
+                        </div>
+                        <div className="col-auto pt-10">
+                          {file.status == UploadProgressState.NotStarted && (
+                            <i
+                              className="icons icon-close font-16 pt-10 text-error cur-pointer"
+                              onClick={() => removeUploadedFile(idx)}
+                            ></i>
+                          )}
+                          {file.status == UploadProgressState.Started && (
+                            <i className="icons icon-clock font-16 pt-10 text-primary"></i>
+                          )}
+                          {file.status == UploadProgressState.Completed && (
+                            <i className="icons icon-check font-16 pt-10 text-primary"></i>
+                          )}
+                        </div>
+                        {file.status == UploadProgressState.NotStarted && (
+                          <hr className="w-100 text-light my-10 hrl" />
+                        )}
+                        {file.status == UploadProgressState.Started && (
+                          <div className="processing">
+                            <div className="continuous"></div>
+                          </div>
+                        )}
+                        {file.status == UploadProgressState.Completed && (
+                          <hr className="w-100 text-primary my-10 hrl" />
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </>
+            }
+            onClose={
+              uploadState == UploadProgressState.Started
+                ? ""
+                : onFileUploadModalClose
+            }
+            actions={[
+              {
+                id: "btnupload",
+                text: "Upload",
+                displayOrder: 1,
+                btnClass: "btn-primary",
+                onClick: (e) => onUploadFiles(e),
+              },
+            ]}
+          ></FilesUploadProgressView>
+        </>
+      )}
+      {/*============== File Upload Modal End ==============*/}
+
+      {/*============== Add Folder Modal Start ==============*/}
+      {addFolderModalShow && (
+        <>
+          <ModalView
+            title={AppMessages.AddFolderModalTitle}
+            content={
+              <>
+                <div className="row">
+                  <div className="col-12 mb-15">
+                    <InputControl
+                      lblClass="mb-0 lbl-req-field"
+                      name="txtname"
+                      ctlType={formCtrlTypes.name}
+                      required={true}
+                      onChange={handleAddFolderInputChange}
+                      value={addFolderFormData.txtname}
+                      errors={addFolderErrors}
+                      formErrors={formAddFolderErrors}
+                      isFocus={true}
+                    ></InputControl>
+                  </div>
+                </div>
+              </>
+            }
+            onClose={onAddModalClose}
+            actions={[
+              {
+                id: "btnaddfolder",
+                text: "Create",
+                displayOrder: 1,
+                btnClass: "btn-primary",
+                onClick: (e) => onAddFolder(e),
+              },
+              {
+                text: "Cancel",
+                displayOrder: 2,
+                btnClass: "btn-secondary",
+                onClick: (e) => onAddModalClose(e),
+              },
+            ]}
+          ></ModalView>
+        </>
+      )}
+      {/*============== Add Folder Modal End ==============*/}
+
       {/*==============FileViewer Modal Start ==============*/}
       {viewerModalShow && (
         <div id="modal" className="modal-fullview">
@@ -1193,12 +1754,10 @@ const MyDocuments = memo(() => {
                     showThumbnail={false}
                   ></PdfViewer>
                 ) : (
-                  <>
-                    <img
-                      src={fileUrl}
-                      className="bg-light border rounded max-h-600"
-                    ></img>
-                  </>
+                  <img
+                    src={fileUrl}
+                    className="bg-light border rounded max-h-600"
+                  ></img>
                 )
               ) : (
                 <div className={`flex flex-center py-50`}>
@@ -1220,8 +1779,8 @@ const MyDocuments = memo(() => {
         </div>
       )}
       {/*==============FileViewer Modal End ==============*/}
-    </>
+    </div>
   );
-});
+};
 
 export default MyDocuments;

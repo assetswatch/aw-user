@@ -628,7 +628,7 @@ const UserHeader = () => {
                       <li className="dropdown-item">
                         <Link
                           id="nav-lnk-documents"
-                          to={routeNames.ownerdocuments.path}
+                          to={routeNames.mydocuments.path}
                         >
                           <i className="fa-regular fa-file-lines pe-1"></i> My
                           Documents
@@ -780,7 +780,7 @@ const UserHeader = () => {
                       <li className="dropdown-item">
                         <Link
                           id="nav-lnk-documents"
-                          to={routeNames.agentdocuments.path}
+                          to={routeNames.mydocuments.path}
                         >
                           <i className="fa-regular fa-file-lines pe-1"></i> My
                           Documents
@@ -931,7 +931,7 @@ const UserHeader = () => {
                       <li className="dropdown-item">
                         <Link
                           id="nav-lnk-documents"
-                          to={routeNames.tenantdocuments.path}
+                          to={routeNames.mydocuments.path}
                         >
                           <i className="fa-regular fa-file-lines pe-1"></i> My
                           Documents

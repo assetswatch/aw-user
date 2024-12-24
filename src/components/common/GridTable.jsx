@@ -21,6 +21,7 @@ const GridTable = ({
   getSubRows,
   onRowDoubleClick,
   rowHover = false,
+  trClass,
 }) => {
   const {
     getTableProps,
@@ -186,10 +187,13 @@ const GridTable = ({
                       (row.id.toString().indexOf(".") != -1
                         ? "subrow expanded"
                         : "") +
-                      " "
+                      " " +
+                      trClass
                     }
                     //onClick={() => onHighlightSelectedRow(row)}
-                    onDoubleClick={() => onRowDoubleClick(row)}
+                    onDoubleClick={() => {
+                      onRowDoubleClick && onRowDoubleClick(row);
+                    }}
                   >
                     {row.cells.map((cell, tdidx) => (
                       <td

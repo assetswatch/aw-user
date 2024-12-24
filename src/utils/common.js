@@ -98,24 +98,12 @@ export function SetPageLoaderNavLinks() {
           activelink = "agreements";
           activesublink = "owner-agreement-templates";
           break;
-        case routeNames.ownerdocuments.path.toLowerCase():
-        case routeNames.owneradddocument.path.toLowerCase():
-        case routeNames.ownereditdocument.path.toLowerCase():
-        case routeNames.ownersharedocument.path.toLowerCase():
-        case routeNames.ownerviewdocument.path.toLowerCase():
-        case routeNames.ownerfolderdocuments.path.toLowerCase():
-        case routeNames.agentdocuments.path.toLowerCase():
-        case routeNames.agentadddocument.path.toLowerCase():
-        case routeNames.agenteditdocument.path.toLowerCase():
-        case routeNames.agentsharedocument.path.toLowerCase():
-        case routeNames.agentviewdocument.path.toLowerCase():
-        case routeNames.agentfolderdocuments.path.toLowerCase():
-        case routeNames.tenantdocuments.path.toLowerCase():
-        case routeNames.tenantadddocument.path.toLowerCase():
-        case routeNames.tenantviewdocument.path.toLowerCase():
-        case routeNames.tenanteditdocument.path.toLowerCase():
-        case routeNames.tenantsharedocument.path.toLowerCase():
-        case routeNames.tenantfolderdocuments.path.toLowerCase():
+        case routeNames.mydocuments.path.toLowerCase():
+        case routeNames.viewdocument.path.toLowerCase():
+        case routeNames.sharedocument.path.toLowerCase():
+        case routeNames.shareddocuments.path.toLowerCase():
+        case routeNames.sharedfolders.path.toLowerCase():
+        case routeNames.sharedusers.path.toLowerCase():
           activelink = "agreements";
           activesublink = "documents";
           break;

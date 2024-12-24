@@ -189,11 +189,12 @@ h6 a,
 .breadcrumb-item.bc-fh > a {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 8px;
   padding: 0 10px;
 }
-.breadcrumb-item.bc-fh > a label {
-  max-width: 100px;
+.breadcrumb-item.bc-fh > a label,
+.breadcrumb-item.bc-fh > label {
+  max-width: 120px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -223,6 +224,7 @@ h6 a,
 }
 .breadcrumb-item.bc-fh > a:hover,
 .breadcrumb-item.bc-fh > a:active,
+.breadcrumb-item.bc-fh > a:focus,
 .breadcrumb-item.bc-fh > a.active {
   background-color: var(--form-border-color);
   border-radius: 25px;
@@ -1212,6 +1214,10 @@ a.text-dark:focus {
 .mt-10 {
   margin-top: 10px !important;
 }
+
+.l-1p5rem {
+  left: 1.5rem !important;
+}
 .l-2rem {
   left: 2rem !important;
 }
@@ -1408,7 +1414,9 @@ a.text-dark:focus {
 .pb-5 {
   padding-bottom: 5px !important;
 } */
-
+.pt-2px {
+  padding-top: 2px !important;
+}
 .py-10,
 .p-10,
 .pt-10 {

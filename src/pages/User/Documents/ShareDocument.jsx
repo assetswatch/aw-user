@@ -51,6 +51,9 @@ const ShareDocument = () => {
   let profileid = parseInt(
     GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
   );
+  let loggedinprofiletypeid = parseInt(
+    GetUserCookieValues(UserCookie.ProfileTypeId, loggedinUser)
+  );
 
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [documentDetails, setDocumentDetails] = useState({});
@@ -110,7 +113,7 @@ const ShareDocument = () => {
     let objParams = {
       keyword: "",
       inviterid: profileid,
-      InviterProfileTypeId: config.userProfileTypes.Agent,
+      InviterProfileTypeId: loggedinprofiletypeid,
       InviteeProfileTypeId: parseInt(profileTypeId),
     };
 
@@ -242,7 +245,7 @@ const ShareDocument = () => {
   };
 
   const navigateToDocuments = () => {
-    navigate(routeNames.agentdocuments.path);
+    navigate(routeNames.mydocuments.path);
   };
 
   const onCancel = (e) => {
