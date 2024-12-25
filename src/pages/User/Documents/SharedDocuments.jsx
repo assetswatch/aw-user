@@ -406,10 +406,13 @@ const MyDocuments = () => {
         accessor: "UsersCountDisplay",
         className: "w-200px text-center",
         Cell: ({ row }) => {
-          return (
-            row.original.SharedTypeId == config.sharedTypes.Sent && (
+          return row.original.SharedTypeId == config.sharedTypes.Sent &&
+            row.original.UsersCount > 0 ? (
+            <a onClick={(e) => onViewUsers(e, row)} className="underline">
               <span>{row.original.UsersCountDisplay}</span>
-            )
+            </a>
+          ) : (
+            <span>{row.original.UsersCountDisplay}</span>
           );
         },
       },

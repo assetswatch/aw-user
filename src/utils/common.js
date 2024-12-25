@@ -586,3 +586,7 @@ export const formatBytes = (bytes) => {
   const result = parseFloat((bytes / Math.pow(k, i)).toFixed(2));
   return `${result} ${sizes[i]}`;
 };
+
+export const trimCommas = (str) => {
+  return str.replace(/^,+|,+$/g, "");
+};

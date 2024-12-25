@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { UserCookie } from "../../utils/constants";
 import { GetUserCookieValues } from "../../utils/common";
 import { useAuth } from "../../contexts/AuthContext";
@@ -90,14 +90,15 @@ const FoldersBreadCrumb = React.memo(
                         key={`foh-${i}`}
                       >
                         <a
-                          data-bs-toggle="collapse"
+                          data-toggle="collapse"
                           data-bs-target="#ddhierarchyactionmenu"
                           aria-controls="ddhierarchyactionmenu"
                           aria-expanded="false"
-                          className="active"
+                          className="active ctooltip-container"
                         >
                           <label>{f.Name}</label>
                           <i className="fa fa-chevron-circle-down font-small pt-2px"></i>
+                          <div className="ctooltip">{f.Name}</div>
                         </a>
                         <ul
                           className={`ddmenu lt arrow collapse in bg-white py-0 px-0 mt-2 l-1p5rem lh-1 shadow rounded text-primary`}
@@ -131,8 +132,10 @@ const FoldersBreadCrumb = React.memo(
                           onClick={(e) =>
                             onFolderHierarchyFolderClick(e, f.FolderId)
                           }
+                          className="ctooltip-container"
                         >
                           <label>{f.Name}</label>
+                          <div className="ctooltip">{f.Name}</div>
                         </a>
                       </div>
                     );

@@ -1585,6 +1585,12 @@ a.text-dark:focus {
   padding-left: 10px !important;
 }
 
+.px-15,
+.p-15,
+.pl-15 {
+  padding-left: 15px !important;
+}
+
 .px-20,
 .p-20,
 .pl-20 {

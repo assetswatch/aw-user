@@ -1148,6 +1148,11 @@ select:focus {
   line-height: 15px;
   font-size: 13px !important;
 }
+.custom-check-box-2.gr-cc > span {
+  padding-left: 20px;
+  line-height: 15px;
+  font-size: 13px !important;
+}
 .custom-check-box-2,
 .ccbox {
   padding: 0;
@@ -1158,6 +1163,7 @@ select:focus {
 }
 .custom-check-box-2 label::before,
 .custom-check-box li label::before,
+.custom-check-box.gr-cc li label::before,
 .ccbox > span::before {
   background-color: #ffffff;
   border: 1px solid var(--form-border-color);
@@ -1170,6 +1176,11 @@ select:focus {
   left: 0;
   position: absolute;
   transition: border-color 0.3s ease 0s;
+}
+.gr-cc > label::before {
+  width: 16px;
+  height: 16px;
+  top: 0.1rem;
 }
 .ccbox > span::before {
   width: 14px;
@@ -1185,6 +1196,7 @@ select:focus {
 }
 .custom-check-box-2 input[type="checkbox"]:checked + label::before,
 .custom-check-box li input[type="checkbox"]:checked + label::before,
+.custom-check-box-2.gr-cc input[type="checkbox"]:checked + label::before,
 .custom-check-box-2 input[type="radio"]:checked + .radio-lbl::before,
 .ccbox input[type="checkbox"]:checked + span::before,
 .ccbox input[type="radio"]:checked + .radio-lbl::before {
@@ -1202,6 +1214,10 @@ select:focus {
 .ccbox input[type="checkbox"]:checked + span::before,
 .ccbox input[type="radio"]:checked + .radio-lbl::before {
   line-height: 14px;
+}
+.custom-check-box-2.gr-cc input[type="checkbox"]:checked + label::before,
+.custom-check-box-2.gr-cc input[type="radio"]:checked + .radio-lbl::before {
+  line-height: 16px !important;
 }
 .price-toggle {
   text-align: left;
@@ -3782,8 +3798,66 @@ Deshboard Style Start
   line-height: 20px;
   cursor: pointer;
 }
+/* The container to hold the element and tooltip */
+.ctooltip-container {
+  position: relative;
+}
+
+/* The tooltip itself */
+.ctooltip {
+  visibility: hidden;
+  position: absolute;
+  top: 30px; /* Position it just below the container */
+  left: 50%;
+  transform: translateX(-50%); /* Center the tooltip horizontally */
+  background-color: var(--theme-secondary-color);
+  color: #fff;
+  text-align: center;
+  padding: 5px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+  z-index: 1;
+  padding: 2px 15px 4px 15px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Show the tooltip when hovering over the container */
+.ctooltip-container:hover .ctooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Optional: Add a small arrow pointing to the container */
+.ctooltip::after {
+  content: "";
+  position: absolute;
+  top: -0.25rem;
+  left: 45%;
+  display: block;
+  background: inherit;
+  width: 14px;
+  height: 14px;
+  transform: rotate(45deg);
+  transform-origin: center;
+  border-color: inherit;
+  clip: rect(0, 9px, 9px, 0);
+}
+.tooltip > .tooltip-inner {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  font-size: 13px !important;
+}
+.tooltip .tooltip-arrow,
+.tooltip-arrow::before {
+  border-bottom-color: rgba(0, 0, 0, 0.8) !important;
+}
 .cur-pointer {
   cursor: pointer;
+}
+.cur-default {
+  cursor: default !important;
 }
 :focus-visible {
   outline: none !important;

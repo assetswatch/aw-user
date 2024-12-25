@@ -22,6 +22,7 @@ const GridTable = ({
   onRowDoubleClick,
   rowHover = false,
   trClass,
+  objCheckAll,
 }) => {
   const {
     getTableProps,
@@ -130,9 +131,31 @@ const GridTable = ({
                   <th
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                     key={"thc-" + thcidx}
-                    className={column.className}
+                    className={`${column.className} ${
+                      thcidx == 0 && checkObjNullorEmpty(objCheckAll) == false
+                        ? "pl-15"
+                        : ""
+                    }`}
                   >
-                    {column.render("Header")}
+                    {thcidx == 0 &&
+                    checkObjNullorEmpty(objCheckAll) == false &&
+                    data.length > 0 ? (
+                      <div className="custom-check-box-2 gr-cc d-flex">
+                        <input
+                          className="d-none"
+                          type="checkbox"
+                          value="false"
+                          id={objCheckAll.checkAllId}
+                        ></input>
+                        <label
+                          htmlFor={objCheckAll.checkAllId}
+                          className="pt-0"
+                        ></label>
+                        {column.render("Header")}
+                      </div>
+                    ) : (
+                      column.render("Header")
+                    )}
                     <span>
                       {column.isSorted ? (
                         column.isSortedDesc ? (

@@ -16,6 +16,7 @@ import {
   replacePlaceHolders,
   SetPageLoaderNavLinks,
   setSelectDefaultVal,
+  trimCommas,
 } from "../../../utils/common";
 import {
   addSessionStorageItem,
@@ -32,13 +33,14 @@ import moment from "moment";
 import DateControl from "../../../components/common/DateControl";
 import InputControl from "../../../components/common/InputControl";
 import { formCtrlTypes } from "../../../utils/formvalidation";
-import { axiosPost, fetchPost } from "../../../helpers/axiosHelper";
+import { axiosPost } from "../../../helpers/axiosHelper";
 import { Toast } from "../../../components/common/ToastView";
 import config from "../../../config.json";
 import { useAuth } from "../../../contexts/AuthContext";
 
 const SharedUsers = () => {
   let $ = window.$;
+
   const location = useLocation();
   const navigate = useNavigate();
   const { loggedinUser } = useAuth();
@@ -48,7 +50,10 @@ const SharedUsers = () => {
   );
 
   let rootfolder = JSON.parse(
-    getsessionStorageItem(SessionStorageKeys.ViewSharedDocRootfolder, {})
+    getsessionStorageItem(
+      SessionStorageKeys.ViewSharedDocRootfolder,
+      JSON.stringify({})
+    )
   );
 
   let rootfolderid = parseInt(rootfolder?.Id);
@@ -69,17 +74,29 @@ const SharedUsers = () => {
   const [pageCount, setPageCount] = useState(0);
   const [usersData, setUsersData] = useState([]);
   const [selectedGridRow, setSelectedGridRow] = useState(null);
+  let selectedReceiverIds = "";
+  const [removeAccessReceiverIds, setRemoveAccessReceiverIds] = useState("");
+  const checkallusersid = "checkallusers";
+  const checkusersrowcssclass = "row-cb-user";
+  const btnremoveaccesstoallid = "btnremoveacesstoall";
   const [modalRemoveAccessConfirmShow, setModalRemoveAccessConfirmShow] =
     useState(false);
   const [modalRemoveAccessConfirmContent, setModalRemoveAccessConfirmContent] =
     useState(AppMessages.DocumentRemoveAccessMessage);
+  const [
+    modalRemoveAccessToAllConfirmShow,
+    setModalRemoveAccessToAllConfirmShow,
+  ] = useState(false);
 
   useEffect(() => {
     sharedid = parseInt(
       getsessionStorageItem(SessionStorageKeys.ViewSharedDocUsersSharedId, 0)
     );
     rootfolder = JSON.parse(
-      getsessionStorageItem(SessionStorageKeys.ViewSharedDocRootfolder, {})
+      getsessionStorageItem(
+        SessionStorageKeys.ViewSharedDocRootfolder,
+        JSON.stringify({})
+      )
     );
     rootfolderid = parseInt(rootfolder?.Id);
     rootfoldername = rootfolder?.Name;
@@ -245,22 +262,34 @@ const SharedUsers = () => {
       {
         Header: "Name",
         accessor: "",
-        className: "w-350px",
+        className: "w-400px",
         disableSortBy: true,
         Cell: ({ row }) => (
-          <>
-            <LazyImage
-              className="rounded cur-pointer w-50px"
-              src={row.original.PicPath}
-              alt={row.original.FirstName + " " + row.original.LastName}
-              placeHolderClass="pos-absolute w-50px min-h-50 fl-l"
-            ></LazyImage>
-            <div className="property-info flex v-center pb-0 min-h-50">
+          <div className="row px-5">
+            <div className="custom-check-box-2 gr-cc d-flex col-auto px-0">
+              <input
+                className={`d-none ${checkusersrowcssclass}`}
+                type="checkbox"
+                value="false"
+                id={row.original.ProfileId}
+                data-profileid={row.original.ProfileId}
+              ></input>
+              <label htmlFor={row.original.ProfileId} className="pt-0"></label>
+            </div>
+            <div className="col-auto px-0">
+              <LazyImage
+                className="rounded cur-pointer w-50px mx-1"
+                src={row.original.PicPath}
+                alt={row.original.FirstName + " " + row.original.LastName}
+                placeHolderClass="pos-absolute w-50px min-h-50 fl-l"
+              ></LazyImage>
+            </div>
+            <div className="col property-info flex v-center pb-0 min-h-50 px-5">
               <h5 className="text-secondary">
                 {row.original.FirstName + " " + row.original.LastName}
               </h5>
             </div>
-          </>
+          </div>
         ),
       },
       {
@@ -314,6 +343,75 @@ const SharedUsers = () => {
   //Setup Grid.
 
   //Grid actions
+
+  //Set Remove access receiver ids
+  $(`#${btnremoveaccesstoallid}`).on("click", function (e) {
+    setRemoveAccessReceiverIds(selectedReceiverIds);
+  });
+
+  //Show/Hide Remove access to all button
+  const showHideRemoveAccesstoAllBtn = (ids) => {
+    if (ids.length > 0) {
+      $("#" + btnremoveaccesstoallid).fadeIn(300);
+    } else {
+      $("#" + btnremoveaccesstoallid).fadeOut(300);
+    }
+  };
+
+  //User all check box change
+  $(document)
+    .off("change", `#${checkallusersid}`)
+    .on("change", `#${checkallusersid}`, function () {
+      selectedReceiverIds = "";
+      let receiverids = "";
+      $("." + checkusersrowcssclass).each((i, c) => {
+        c.checked = this.checked;
+        receiverids = receiverids + "," + $(c).attr("data-profileid");
+      });
+      if (this.checked) selectedReceiverIds = trimCommas(receiverids);
+      showHideRemoveAccesstoAllBtn(selectedReceiverIds);
+    });
+
+  //User check box change
+  $(document)
+    .off("change", `.${checkusersrowcssclass}`)
+    .on("change", `.${checkusersrowcssclass}`, function () {
+      const items = selectedReceiverIds
+        .split(",")
+        .map((str) => str.trim())
+        .filter(Boolean);
+      const index = items.indexOf($(this).attr("data-profileid"));
+      if (this.checked) {
+        if (index === -1) {
+          items.push($(this).attr("data-profileid"));
+        }
+      } else {
+        items.splice(index, 1);
+      }
+      selectedReceiverIds = trimCommas(items.join(","));
+      if (selectedReceiverIds.length <= 0) {
+        $("#" + checkallusersid).prop("checked", false);
+      }
+      showHideRemoveAccesstoAllBtn(selectedReceiverIds);
+    });
+
+  const onRemoveAccessToAllConfirmModalShow = (e) => {
+    e.preventDefault();
+    setModalRemoveAccessConfirmContent(
+      replacePlaceHolders(modalRemoveAccessConfirmContent, {
+        name: "all users",
+      })
+    );
+    setModalRemoveAccessToAllConfirmShow(true);
+  };
+
+  const onRemoveAccessToAllConfirmModalClose = (e) => {
+    setModalRemoveAccessToAllConfirmShow(false);
+    setRemoveAccessReceiverIds("");
+    apiReqResLoader("btndeleteall", "Yes", API_ACTION_STATUS.COMPLETED, false);
+    setModalRemoveAccessConfirmContent(AppMessages.DocumentRemoveAccessMessage);
+  };
+
   const onRemoveAccessConfirmModalShow = (e, row) => {
     e.preventDefault();
     setSelectedGridRow(row);
@@ -335,11 +433,14 @@ const SharedUsers = () => {
   const onRemoveAccess = (e) => {
     e.preventDefault();
 
-    apiReqResLoader("btndelete", "Removing", API_ACTION_STATUS.START);
+    apiReqResLoader(e.target.id, "Removing", API_ACTION_STATUS.START);
 
     let isapimethoderr = false;
     let objBodyParams = {
-      ReceiverIds: selectedGridRow?.original?.ProfileId.toString(),
+      ReceiverIds:
+        e.target.id == "btndeleteall"
+          ? removeAccessReceiverIds
+          : selectedGridRow?.original?.ProfileId.toString(),
       SharedId: sharedid,
     };
 
@@ -353,7 +454,13 @@ const SharedUsers = () => {
           Toast.success(objResponse.Data.Message);
           if (objResponse.Data.Status == 1) {
             getUsers({});
-            onRemoveAccessConfirmModalClose();
+            if (e.target.id == "btndeleteall") {
+              onRemoveAccessToAllConfirmModalClose();
+              $("#" + checkallusersid).prop("checked", false);
+              $("#" + btnremoveaccesstoallid).fadeOut(300);
+            } else {
+              onRemoveAccessConfirmModalClose();
+            }
           }
         } else {
           isapimethoderr = true;
@@ -369,7 +476,7 @@ const SharedUsers = () => {
         if (isapimethoderr == true) {
           Toast.error(AppMessages.SomeProblem);
         }
-        apiReqResLoader("btndelete", "Yes", API_ACTION_STATUS.COMPLETED);
+        apiReqResLoader(e.target.id, "Yes", API_ACTION_STATUS.COMPLETED);
       });
   };
 
@@ -403,13 +510,16 @@ const SharedUsers = () => {
                         </h6>
                       </a>
                     </div>
-                    <div className="breadcrumb-item bc-fh dropdown">
-                      <label className="font-general font-500">
+                    <div className="breadcrumb-item bc-fh ctooltip-container">
+                      <label className="font-general font-500 cur-default">
                         {rootfoldername}
                       </label>
+                      <div className="ctooltip">{rootfoldername}</div>
                     </div>
-                    <div className="breadcrumb-item bc-fh dropdown">
-                      <label className="font-general font-500">Users</label>
+                    <div className="breadcrumb-item bc-fh">
+                      <label className="font-general font-500 cur-default">
+                        Users
+                      </label>
                     </div>
                   </div>
                 </div>
@@ -437,7 +547,7 @@ const SharedUsers = () => {
                       <div className="col px-0">
                         <form noValidate>
                           <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
-                            <div className="col-lg-3 col-xl-4 col-md-4">
+                            <div className="col-lg-5 col-xl-3 col-md-4">
                               <InputControl
                                 lblClass="mb-0"
                                 lblText="Search by Name/ Email / Phone"
@@ -475,7 +585,7 @@ const SharedUsers = () => {
                                 }}
                               ></DateControl>
                             </div>
-                            <div className="col-lg-3 col-xl-4 col-md-4 grid-search-action">
+                            <div className="col-lg-5 col-xl-5 col-md-8 grid-search-action">
                               <label
                                 className="mb-0 form-error w-100"
                                 id="search-val-err-message"
@@ -497,6 +607,17 @@ const SharedUsers = () => {
                                 onClick={onShowAll}
                               >
                                 Show All
+                              </button>
+                              <button
+                                className="btn btn-primary w- 100"
+                                value="Remove Access"
+                                name={btnremoveaccesstoallid}
+                                id={btnremoveaccesstoallid}
+                                type="button"
+                                onClick={onRemoveAccessToAllConfirmModalShow}
+                                style={{ display: "none" }}
+                              >
+                                Remove Access
                               </button>
                             </div>
                           </div>
@@ -523,6 +644,9 @@ const SharedUsers = () => {
                         }}
                         noData={AppMessages.NoUsers}
                         rowHover={true}
+                        objCheckAll={{
+                          checkAllId: checkallusersid,
+                        }}
                       />
                     </div>
                   </div>
@@ -533,6 +657,32 @@ const SharedUsers = () => {
           </div>
         </div>
       </div>
+      {/*============== Remove access Confirmation Modal Start ==============*/}
+      {modalRemoveAccessToAllConfirmShow && (
+        <>
+          <ModalView
+            title={AppMessages.DeleteConfirmationTitle}
+            content={modalRemoveAccessConfirmContent}
+            onClose={onRemoveAccessToAllConfirmModalClose}
+            actions={[
+              {
+                id: "btndeleteall",
+                text: "Yes",
+                displayOrder: 1,
+                btnClass: "btn-primary",
+                onClick: (e) => onRemoveAccess(e),
+              },
+              {
+                text: "No",
+                displayOrder: 2,
+                btnClass: "btn-secondary",
+                onClick: (e) => onRemoveAccessToAllConfirmModalClose(e),
+              },
+            ]}
+          ></ModalView>
+        </>
+      )}
+      {/*============== Remove access Confirmation Modal End ==============*/}
       {/*============== Remove access Confirmation Modal Start ==============*/}
       {modalRemoveAccessConfirmShow && (
         <>
