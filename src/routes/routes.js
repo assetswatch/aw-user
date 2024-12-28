@@ -12,6 +12,7 @@ export const routeNames = {
   contactUs: { name: "ContactUs", path: "/ContactUs" },
   login: { name: "Login", path: "/Login" },
   register: { name: "Register", path: "/Register" },
+  addprofiles: { name: "AddProfiles", path: "/Register/AddProfile" },
   forgotPwd: { name: "ForgotPwd", path: "/ForgotPassword" },
   properties: { name: "Properties", path: "/Properties" },
   propertyDetails: { name: "PropertyDetails", path: "/PropertyDetails" },
@@ -155,6 +156,12 @@ const routes = [
     path: routeNames.register.path,
     name: routeNames.register.name,
     element: lazy(() => import("../pages/Register")),
+    isexact: true,
+  },
+  {
+    path: routeNames.addprofiles.path,
+    name: routeNames.addprofiles.name,
+    element: lazy(() => import("../pages/AddProfile")),
     isexact: true,
   },
   {

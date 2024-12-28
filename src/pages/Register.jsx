@@ -288,66 +288,66 @@ const Register = () => {
       delete formErrors["cbagreeterms"];
     }
 
-    if (Object.keys(formErrors).length === 0) {
-      apiReqResLoader("btnregister", "Registering");
-      let errctl = ".form-error";
-      $(errctl).html("");
-      setErrors({});
-      let isapimethoderr = false;
-      let sessionid = `web_${getuuid()}`;
-      let objBodyParams = {
-        email: formData.txtemail,
-        pwd: formData.txtpassword,
-        firstName: formData.txtfirstname,
-        lastName: formData.txtlastname,
-        mobile: formData.txtmobile,
-        landLine: formData.txtlandline,
-        addressOne: formData.txtaddressone,
-        addressTwo: formData.txtaddresstwo,
-        countryId: parseInt(setSelectDefaultVal(countrySelected)),
-        stateId: parseInt(setSelectDefaultVal(stateSelected)),
-        cityId: parseInt(setSelectDefaultVal(citySelected)),
-        zip: formData.txtzip,
-        profileTypeId: parseInt(formData.rblprofiletype),
-        profileCategoryId: parseInt(setSelectDefaultVal(selectedProfileCatId)),
-        planId: 1,
-        CompanyName: formData.txtcompanyname,
-        Website: formData.txtwebsite,
-        ProfilePic: "",
-        DeviceTypeId: AppDetails.devicetypeid,
-        SessionId: sessionid,
-      };
+    // if (Object.keys(formErrors).length === 0) {
+    //   apiReqResLoader("btnregister", "Registering");
+    //   let errctl = ".form-error";
+    //   $(errctl).html("");
+    //   setErrors({});
+    //   let isapimethoderr = false;
+    //   let sessionid = `web_${getuuid()}`;
+    //   let objBodyParams = {
+    //     email: formData.txtemail,
+    //     pwd: formData.txtpassword,
+    //     firstName: formData.txtfirstname,
+    //     lastName: formData.txtlastname,
+    //     mobile: formData.txtmobile,
+    //     landLine: formData.txtlandline,
+    //     addressOne: formData.txtaddressone,
+    //     addressTwo: formData.txtaddresstwo,
+    //     countryId: parseInt(setSelectDefaultVal(countrySelected)),
+    //     stateId: parseInt(setSelectDefaultVal(stateSelected)),
+    //     cityId: parseInt(setSelectDefaultVal(citySelected)),
+    //     zip: formData.txtzip,
+    //     profileTypeId: parseInt(formData.rblprofiletype),
+    //     profileCategoryId: parseInt(setSelectDefaultVal(selectedProfileCatId)),
+    //     planId: 1,
+    //     CompanyName: formData.txtcompanyname,
+    //     Website: formData.txtwebsite,
+    //     ProfilePic: "",
+    //     DeviceTypeId: AppDetails.devicetypeid,
+    //     SessionId: sessionid,
+    //   };
 
-      axiosPost(`${config.apiBaseUrl}${ApiUrls.registerUser}`, objBodyParams)
-        .then((response) => {
-          let objResponse = response.data;
-          if (objResponse.StatusCode === 200) {
-            let respData = objResponse.Data;
-            if (!checkObjNullorEmpty(respData) && respData?.AccountId > 0) {
-              loginUser(respData, formData.cbremme, sessionid);
-              clearForm();
-              navigate(routeNames.upgradeplan.path, { replace: true });
-            } else {
-              $(errctl).html(objResponse.Data.Message);
-            }
-          } else {
-            isapimethoderr = true;
-          }
-        })
-        .catch((err) => {
-          isapimethoderr = true;
-          console.error(`"API :: ${ApiUrls.registerUser}, Error ::" ${err}`);
-        })
-        .finally(() => {
-          if (isapimethoderr == true) {
-            $(errctl).html(AppMessages.SomeProblem);
-          }
-          apiReqResLoader("btnregister", "Register", "completed");
-        });
-    } else {
-      $(`[name=${Object.keys(formErrors)[0]}]`).focus();
-      setErrors(formErrors);
-    }
+    //   axiosPost(`${config.apiBaseUrl}${ApiUrls.registerUser}`, objBodyParams)
+    //     .then((response) => {
+    //       let objResponse = response.data;
+    //       if (objResponse.StatusCode === 200) {
+    //         let respData = objResponse.Data;
+    //         if (!checkObjNullorEmpty(respData) && respData?.AccountId > 0) {
+    //           loginUser(respData, formData.cbremme, sessionid);
+    //           clearForm();
+    //           navigate(routeNames.upgradeplan.path, { replace: true });
+    //         } else {
+    //           $(errctl).html(objResponse.Data.Message);
+    //         }
+    //       } else {
+    //         isapimethoderr = true;
+    //       }
+    //     })
+    //     .catch((err) => {
+    //       isapimethoderr = true;
+    //       console.error(`"API :: ${ApiUrls.registerUser}, Error ::" ${err}`);
+    //     })
+    //     .finally(() => {
+    //       if (isapimethoderr == true) {
+    //         $(errctl).html(AppMessages.SomeProblem);
+    //       }
+    //       apiReqResLoader("btnregister", "Register", "completed");
+    //     });
+    // } else {
+    //   $(`[name=${Object.keys(formErrors)[0]}]`).focus();
+    //   setErrors(formErrors);
+    // }
   };
 
   return (
@@ -376,51 +376,6 @@ const Register = () => {
                           <div className="col-md-12 mb-20 mt-10">
                             <h5 className="down-line">Login Information</h5>
                           </div>
-                          <div className="row mb-15" tabIndex={0}>
-                            {initApisLoaded &&
-                              profileTypes.map((pt, idx) => {
-                                return (
-                                  <div
-                                    className="col-md-4"
-                                    key={"ptkey-" + idx}
-                                  >
-                                    <div
-                                      className={`custom-check-box-2  ${
-                                        idx == 0
-                                          ? "text-left"
-                                          : idx == profileTypes.length - 1
-                                          ? "text-right"
-                                          : "text-center"
-                                      }`}
-                                    >
-                                      <input
-                                        className="d-none"
-                                        type="radio"
-                                        value={pt.ProfileTypeId}
-                                        id={"pt-" + pt.ProfileTypeId}
-                                        name="rblprofiletype"
-                                        onChange={(e) => {
-                                          handleChange(e);
-                                          getProfileCategories(e);
-                                        }}
-                                        data-iscat={pt.IsCategories}
-                                      />
-                                      <label
-                                        htmlFor={"pt-" + pt.ProfileTypeId}
-                                        className="radio-lbl"
-                                      >
-                                        {pt.ProfileType}
-                                      </label>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            {errors?.[`rblprofiletype`] && (
-                              <div className="err-invalid">
-                                {errors?.[`rblprofiletype`]}
-                              </div>
-                            )}
-                          </div>
                           <div className="col-md-6 mb-15">
                             <InputControl
                               lblClass="mb-0 lbl-req-field"
@@ -434,36 +389,6 @@ const Register = () => {
                               formErrors={formErrors}
                               tabIndex={1}
                             ></InputControl>
-                          </div>
-                          <div className="col-md-6 mb-15">
-                            <div id="divprofilecategory" className="hide">
-                              <AsyncSelect
-                                placeHolder={
-                                  profileCatData.length <= 0 &&
-                                  selectedProfileCatId == null
-                                    ? AppMessages.DdLLoading
-                                    : AppMessages.DdlNoData
-                                }
-                                noData={
-                                  profileCatData.length <= 0 &&
-                                  selectedProfileCatId == null
-                                    ? AppMessages.DdLLoading
-                                    : AppMessages.DdlNoData
-                                }
-                                options={profileCatData}
-                                onChange={handleProifleCatChange}
-                                value={selectedProfileCatId}
-                                defualtselected={selectedProfileCatId}
-                                name="ddlprofilecategory"
-                                lbl={formCtrlTypes.category}
-                                lblClass="mb-0 lbl-req-field"
-                                isClearable={false}
-                                required={true}
-                                errors={errors}
-                                formErrors={formErrors}
-                                tabIndex={2}
-                              ></AsyncSelect>
-                            </div>
                           </div>
                           <div className="col-md-6 mb-15">
                             <InputControl
@@ -732,14 +657,15 @@ const Register = () => {
                             </div>
                           </div>
                           <div className="col-md-12 mb-20">
-                            <button
+                            <Link
+                              to={routeNames.addprofiles.path}
                               className="btn btn-primary box-shadow"
                               name="btnregister"
                               id="btnregister"
                               type="submit"
                             >
-                              Register
-                            </button>
+                              Next
+                            </Link>
                           </div>
                           <div
                             className="form-error text-left"
