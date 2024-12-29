@@ -116,6 +116,11 @@ const GridList = ({
                   }`}
                   {...row.getRowProps()}
                   key={"tr-" + tridx}
+                  // style={{
+                  //   cursor: "pointer",
+                  //   backgroundColor:
+                  //     selectedRow === index ? "#f0f0f0" : "transparent",
+                  // }}
                 >
                   {row.cells.map((cell, tdidx) => (
                     <div

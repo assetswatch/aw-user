@@ -6,6 +6,7 @@ import {
   checkObjNullorEmpty,
   GetCookieValues,
   getPagesPathByLoggedinUserProfile,
+  SetPageLoaderNavLinks,
 } from "../../utils/common";
 import { AppMessages, UserCookie } from "../../utils/constants";
 import { useAuth } from "../../contexts/AuthContext";
@@ -48,6 +49,7 @@ const Profiles = () => {
 
   return (
     <>
+      {SetPageLoaderNavLinks()}
       <div className="full-row  bg-light">
         <div className="container">
           <div className="row mx-auto col-lg-8 shadow">

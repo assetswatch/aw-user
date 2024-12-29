@@ -1,10 +1,13 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useTable, usePagination, useSortBy } from "react-table";
+import React, { useEffect, useState } from "react";
+import { useTable, usePagination, useSortBy, useExpanded } from "react-table";
 import DataLoader from "./DataLoader";
 import NoData from "./NoData";
-import GridActionMenu from "./GridActionMenu";
+import GridActionMenu, {
+  GridDocActionMenu,
+  GridUserConnectionActionMenu,
+} from "./GridActionMenu";
 import { GridDefaultValues } from "../../utils/constants";
-import { checkEmptyVal } from "../../utils/common";
+import { checkEmptyVal, checkObjNullorEmpty } from "../../utils/common";
 
 const GridTable = ({
   columns,
@@ -18,6 +21,11 @@ const GridTable = ({
   noData,
   showPaging = true,
   headerClass = "box-shadow",
+  getSubRows,
+  onRowDoubleClick,
+  rowHover = false,
+  trClass,
+  objCheckAll,
 }) => {
   const {
     getTableProps,
@@ -38,6 +46,7 @@ const GridTable = ({
     {
       columns,
       data,
+      getSubRows: getSubRows,
       initialState: {
         pageIndex: GridDefaultValues.pi,
         pageSize: GridDefaultValues.ps,
@@ -48,8 +57,21 @@ const GridTable = ({
       autoResetPage: false,
     },
     useSortBy,
+    useExpanded,
     usePagination
   );
+
+  const [expandedRows, setExpandedRows] = useState({});
+  const handleRowToggle = (row) => {
+    const newExpandedRows = { ...expandedRows };
+    if (row.isExpanded) {
+      delete newExpandedRows[row.id];
+    } else {
+      newExpandedRows[row.id] = true;
+    }
+    setExpandedRows(newExpandedRows);
+    row.toggleRowExpanded(!row.isExpanded);
+  };
 
   const renderPageNumbers = () => {
     const totalNumbers = 5;
@@ -74,6 +96,26 @@ const GridTable = ({
     fetchData({ pageIndex, pageSize });
   }, [fetchData, pageIndex, pageSize]);
 
+  const [selectedRow, setSelectedRow] = useState(null); // Track selected row
+
+  // Handle row selection
+  const handleRowClick = (rowIndex) => {
+    // Toggle row selection (deselect if already selected)
+    setSelectedRow((prevSelectedRow) =>
+      prevSelectedRow === rowIndex ? null : rowIndex
+    );
+  };
+
+  const getRowProps = (state, rowInfo) => {
+    // return {
+    //   onClick: () => handleRowClick(rowInfo?.index),
+    //   style: {
+    //     backgroundColor: rowInfo?.index === selectedRow ? "" : "#a3d8f4", // Highlight the selected row
+    //     cursor: "pointer",
+    //   },
+    // };
+  };
+
   return (
     <>
       <div className="overflow-x-scroll">
@@ -92,9 +134,31 @@ const GridTable = ({
                   <th
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                     key={"thc-" + thcidx}
-                    className={column.className}
+                    className={`${column.className} ${
+                      thcidx == 0 && checkObjNullorEmpty(objCheckAll) == false
+                        ? "pl-15"
+                        : ""
+                    }`}
                   >
-                    {column.render("Header")}
+                    {thcidx == 0 &&
+                    checkObjNullorEmpty(objCheckAll) == false &&
+                    data.length > 0 ? (
+                      <div className="custom-check-box-2 gr-cc d-flex">
+                        <input
+                          className="d-none"
+                          type="checkbox"
+                          value="false"
+                          id={objCheckAll.checkAllId}
+                        ></input>
+                        <label
+                          htmlFor={objCheckAll.checkAllId}
+                          className="pt-0"
+                        ></label>
+                        {column.render("Header")}
+                      </div>
+                    ) : (
+                      column.render("Header")
+                    )}
                     <span>
                       {column.isSorted ? (
                         column.isSortedDesc ? (
@@ -139,7 +203,24 @@ const GridTable = ({
               page.map((row, tridx) => {
                 prepareRow(row);
                 return (
-                  <tr {...row.getRowProps()} key={"tr-" + tridx}>
+                  <tr
+                    {...row.getRowProps()}
+                    {...getRowProps()}
+                    key={"tr-" + tridx}
+                    className={
+                      (rowHover == true ? "gr-row-hover" : "") +
+                      " " +
+                      (row.id.toString().indexOf(".") != -1
+                        ? "subrow expanded"
+                        : "") +
+                      " " +
+                      trClass
+                    }
+                    //onClick={() => onHighlightSelectedRow(row)}
+                    onDoubleClick={() => {
+                      onRowDoubleClick && onRowDoubleClick(row);
+                    }}
+                  >
                     {row.cells.map((cell, tdidx) => (
                       <td
                         {...cell.getCellProps()}
@@ -149,10 +230,22 @@ const GridTable = ({
                         {cell.column.id === "Actions" &&
                         checkEmptyVal(cell.column.showActionMenu) ? (
                           <>
-                            <GridActionMenu
-                              row={row}
-                              actions={cell.column.actions}
-                            />
+                            {cell.column.isDocActionMenu ? (
+                              <GridDocActionMenu
+                                row={row}
+                                actions={cell.column.actions}
+                              />
+                            ) : cell.column.isUserConnectionActionMenu ? (
+                              <GridUserConnectionActionMenu
+                                row={row}
+                                actions={cell.column.actions}
+                              />
+                            ) : (
+                              <GridActionMenu
+                                row={row}
+                                actions={cell.column.actions}
+                              />
+                            )}
                           </>
                         ) : (
                           cell.render("Cell")

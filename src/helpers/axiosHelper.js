@@ -46,6 +46,23 @@ export async function axiosPost(url, data, headerConfigs) {
   return axios.post(url, data, { headers: headers });
 }
 
+export async function fetchPost(url, data, headerConfigs) {
+  let headers = {};
+  await getToken().then((response) => {
+    headers = {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      ...response,
+      ...headerConfigs,
+    };
+  });
+  return await fetch(url, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: headers,
+  });
+}
+
 export async function getToken() {
   let tokenDetails = JSON.parse(getLocalStorageItem(LSApiTokenKey));
   let objUserCookie = getCookie(UserCookie.CookieName);

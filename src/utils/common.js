@@ -56,29 +56,10 @@ export function SetPageLoaderNavLinks() {
         case routeNames.dashboard.path.toLowerCase():
           activelink = "dashboard";
           break;
-        case routeNames.ownertenants.path.toLowerCase():
+        case routeNames.connectionsowners.path.toLowerCase():
+        case routeNames.connectionsagents.path.toLowerCase():
+        case routeNames.connectionstenants.path.toLowerCase():
           activelink = "myconnections";
-          activesublink = "owner-tenant";
-          break;
-        case routeNames.owneragents.path.toLowerCase():
-          activelink = "myconnections";
-          activesublink = "owner-agent";
-          break;
-        case routeNames.tenantowners.path.toLowerCase():
-          activelink = "myconnections";
-          activesublink = "tenant-owner";
-          break;
-        case routeNames.tenantagents.path.toLowerCase():
-          activelink = "myconnections";
-          activesublink = "tenant-agent";
-          break;
-        case routeNames.agentowners.path.toLowerCase():
-          activelink = "myconnections";
-          activesublink = "agent-owner";
-          break;
-        case routeNames.agenttenants.path.toLowerCase():
-          activelink = "myconnections";
-          activesublink = "agent-tenant";
           break;
         case routeNames.tenantpayments.path.toLowerCase():
         case routeNames.tenantcheckout.path.toLowerCase():
@@ -91,6 +72,21 @@ export function SetPageLoaderNavLinks() {
         case routeNames.agentprofileedit.path.toLowerCase():
         case routeNames.ownerprofileedit.path.toLowerCase():
           activelink = "user-profile";
+          break;
+        case routeNames.owneragreementtemplates.path.toLowerCase():
+        case routeNames.ownersendagreement.path.toLowerCase():
+        case routeNames.ownerpreviewagreement.path.toLowerCase():
+          activelink = "agreements";
+          activesublink = "owner-agreement-templates";
+          break;
+        case routeNames.mydocuments.path.toLowerCase():
+        case routeNames.viewdocument.path.toLowerCase():
+        case routeNames.sharedocument.path.toLowerCase():
+        case routeNames.shareddocuments.path.toLowerCase():
+        case routeNames.sharedfolders.path.toLowerCase():
+        case routeNames.sharedusers.path.toLowerCase():
+          activelink = "agreements";
+          activesublink = "documents";
           break;
       }
 
@@ -561,4 +557,17 @@ export const Encrypt = (text) => {
     mode: CryptoJS.mode.CBC,
     padding: CryptoJS.pad.Pkcs7,
   }).toString();
+};
+
+export const formatBytes = (bytes) => {
+  if (bytes === 0) return "0 Bytes";
+  const k = 1024;
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  const result = parseFloat((bytes / Math.pow(k, i)).toFixed(2));
+  return `${result} ${sizes[i]}`;
+};
+
+export const trimCommas = (str) => {
+  return str.replace(/^,+|,+$/g, "");
 };

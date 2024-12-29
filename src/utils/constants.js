@@ -37,6 +37,15 @@ export const SessionStorageKeys = {
   OwnerTenantConnectionTab: "otcontab",
   TenantCheckoutPaymentId: "tcpmid",
   EditProfileId: "epid",
+  SendAgreementId: "sagid",
+  ViewAgreementId: "vagid",
+  ObjSendAgreement: "osag",
+  ViewEditDocumentId: "vedid",
+  ViewEditDocfolderId: "vedfid",
+  ViewSharedDocfolderId: "vsdfid",
+  ViewSharedDocRootfolderId: "vsdrfid",
+  ViewSharedDocRootfolder: "vsdrf",
+  ViewSharedDocUsersSharedId: "vsdusid",
 };
 /*Session storage keys*/
 
@@ -81,6 +90,22 @@ export const UserConnectionTabIds = {
   connection: "#tab-connection",
 };
 /*connection tab ids*/
+
+/*documents tab ids*/
+export const DocumentsTabIds = {
+  mydocuments: "#tab-mydocuments",
+  shareddocuments: "#tab-shared",
+};
+/*connection tab ids*/
+
+/*file upload progess states*/
+export const UploadProgressState = {
+  NotStarted: 0,
+  Started: 1,
+  Uploading: 2,
+  Completed: 3,
+};
+/*file upload progess states*/
 
 /*Common App messages*/
 export const AppMessages = {
@@ -154,6 +179,16 @@ export const AppMessages = {
     "Your message has been sent. We will get back to you shortly.",
   ProfileDetailsNotFound: "Profile details not found...",
   UpdateProfileSuccess: "Profile details updated successfully...",
+  NoAgreementTemplates: "No templates found...",
+  NoDocuments: `No documents found...`,
+  DeleteDocumentMessage: "You want to delete the {name}.",
+  EditFolderModalTitle: "Edit folder",
+  ShareFolderModalTitle: "Share Folder",
+  DdlNoFolders: "No folders found.",
+  AddDocumentSuccess: "Document added successfully...",
+  AddFolderModalTitle: "Create folder",
+  UploadDocumentSuccess: "Documents uploaded successfully...",
+  DocumentRemoveAccessMessage: "You want to remove access for {name}.",
 };
 /*Common App messages*/
 
@@ -205,9 +240,14 @@ export const ValidationMessages = {
   FileSizeInvalid: "File size exceeds the limit of",
   DateReq: "Date can not be empty.",
   DateInvalid: "Date is not valid.",
+  TenureStartDateReq: "Tenure start date can not be empty.",
+  TenureStartDateInvalid: "Tenure start date is not valid.",
+  TenureEndDateReq: "Tenure end date can not be empty.",
+  TenureEndDateDateInvalid: "enure end date is not valid.",
+  RentPaidToReq: "Rent paid to can not be empty.",
   PropertyReq: "Property can not be empty.",
   TenantReq: "Tenant can not be empty.",
-  AgentReq: "Tenant can not be empty.",
+  AgentReq: "Agent can not be empty.",
   OwnerReq: "Owner can not be empty.",
   UserReq: "User can not be empty.",
   PropertyTitleReq: "Property title can not be empty.",
@@ -236,6 +276,11 @@ export const ValidationMessages = {
   SqfeetInvalid: "Squarefeet is not valid.",
   AgentPercentReq: "Agent percentage can not be empty.",
   AgentPercentInvalid: "Agent percentage is not valid.",
+  TitleReq: "Title can not be empty.",
+  TitleInvalid: "Title is not valid.",
+  CommentsReq: "Comments can not be empty.",
+  DocumentTypeReq: "Document type can not be empty.",
+  UploadFileReq: "Please select files to upload.",
 };
 
 /*Api Urls*/
@@ -258,6 +303,7 @@ export let ApiUrls = {
   getTopAgents: `users/v1/GetTopAgents`,
   getDdlUsersProfiles: `users/v1/GetDdlUsersProfiles`,
   getDdlUsers: `users/v1/GetDdlUsers`,
+  getUserConnections: `users/v1/getUserConnections`,
   getDdlJoinedUserConnections: `users/v1/GetDdlJoinedUserConnections`,
   getJoinedUserConnections: `users/v1/GetJoinedUserConnections`,
   getRequestedUserConnections: `users/v1/getRequestedUserConnections`,
@@ -292,5 +338,24 @@ export let ApiUrls = {
   getAssetPayments: `payments/v1/GetAssetPayments`,
   getAssetPaymentDetails: `payments/v1/GetAssetPaymentDetails`,
   processAssetPayment: `payments/v1/ProcessAssetPayment`,
+  getAgreements: `agreements/v1/GetAgreements`,
+  getAgreementDetails: `agreements/v1/GetAgreementDetails`,
+  getAgreementFile: `agreements/v1/GetAgreementFile`,
+  getDocumentsList: `documents/v1/GetDocumentsList`,
+  getDocumentsTypes: `documents/v1/GetDocumentTypes`,
+  deleteDocument: `documents/v1/DeleteDocument`,
+  getDdlDocumentFolders: `documents/v1/GetDdlDocumentFolders`,
+  addDocumentFolder: `documents/v1/AddDocumentFolder`,
+  getSharedDocuments: `documents/v1/GetSharedDocuments`,
+  shareDocument: `documents/v1/ShareDocument`,
+  getDocumentDetails: `documents/v1/GetDocumentDetails`,
+  getDocumentFile: `documents/v1/GetDocumentFile`,
+  editDocument: `documents/v1/EditDocument`,
+  addDocument: `documents/v1/AddDocument`,
+  getFolderDocuments: `documents/v1/GetFolderDocuments`,
+  getDocumentFoldersHierarchy: `documents/v1/GetDocumentFoldersHierarchy`,
+  getDocumentSharedUsers: `documents/v1/GetDocumentSharedUsers`,
+  removeSharedDocumentAccess: `documents/v1/RemoveSharedDocumentAccess`,
+  unshareDocument: `documents/v1/UnshareDocument`,
 };
 /*Api Urls*/

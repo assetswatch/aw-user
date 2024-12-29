@@ -11,7 +11,7 @@ const AsyncSelect = (ctlProps) => {
   //set options
   let mapOptions = [];
 
-  let ctlHeight = ctlProps?.isSearchCtl ? "35px !important" : "42px !important";
+  let ctlHeight = ctlProps?.isSearchCtl ? "35px !important" : "38px !important";
   let ctlFont = ctlProps?.isSearchCtl ? "13px !important" : "14px !important";
   let indicatorSize = ctlProps?.isSearchCtl ? "16px 11px" : "16px 12px";
   let inputPadding = ctlProps?.isSearchCtl ? "2px 4px" : "2px 8px";
@@ -24,19 +24,48 @@ const AsyncSelect = (ctlProps) => {
       };
     });
   } else {
-    mapOptions = ctlProps.options?.map((option) => {
-      let opt = {
-        value: option[ctlProps.dataKey] || option.Id,
-        label: option[ctlProps.dataVal] || option.Text,
-      };
+    if (ctlProps?.isRenderOptions == false) {
+      mapOptions = ctlProps.options;
+      // mapOptions = ctlProps.options?.map((option) => {
+      //   let opt = {
+      //     label: (
+      //       <div className="items-center font-14 font-500">
+      //         <i className={`${ctlProps?.icon} pe-1 text-primary`}></i>
+      //         {option[ctlProps.dataVal] || option.Text}
+      //       </div>
+      //     ),
+      //     value: option[ctlProps.dataKey] || option.Id,
+      //     // options: option[ctlProps.subData?.objectKey].map((so) => ({
+      //     //   label: (
+      //     //     <div className="items-center font-14 font-500 pl-20">
+      //     //       <i
+      //     //         className={`${ctlProps.subData?.icon} pe-1 text-primary`}
+      //     //       ></i>
+      //     //       {so[ctlProps.subData?.dataVal]}
+      //     //     </div>
+      //     //   ),
+      //     //   value: option[ctlProps.subData?.dataKey],
+      //     //   isGroupLabel: true,
+      //     // })),
+      //   };
+      //   return opt;
+      // });
+    } else {
+      mapOptions = ctlProps.options?.map((option) => {
+        let opt = {
+          value: option[ctlProps.dataKey] || option.Id,
+          label: option[ctlProps.dataVal] || option.Text,
+        };
 
-      //add extrapotions
-      if (ctlProps.extraOptions) {
-        opt[ctlProps.extraOptions.key] = option[ctlProps.extraOptions.dataVal];
-      }
+        //add extrapotions
+        if (ctlProps.extraOptions) {
+          opt[ctlProps.extraOptions.key] =
+            option[ctlProps.extraOptions.dataVal];
+        }
 
-      return opt;
-    });
+        return opt;
+      });
+    }
   }
 
   let selectedValue = null;
@@ -210,16 +239,38 @@ const AsyncSelect = (ctlProps) => {
     }, 500);
   };
 
+  const multiValue = (props) => {
+    const { data, removeProps, innerRef, innerProps } = props;
+
+    return (
+      <div
+        className="multiValue"
+        ref={innerRef}
+        {...innerProps}
+        onClick={props.isSelected}
+      >
+        <span>
+          {props.data.customlabel ? props.data.customlabel : props.data.label}
+        </span>
+        <span {...removeProps} className="remove">
+          <i className="fa fa-times-circle"></i>
+        </span>
+      </div>
+    );
+  };
+
   const CheckboxOption = ({ children, ...props }) => {
     return (
       <components.Option {...props}>
-        <input
-          type="checkbox"
-          checked={props.isSelected}
-          onChange={() => null} // Checkbox change handled by react-select
-          style={{ marginRight: "10px" }}
-        />
-        {children}
+        <div className="ccbox row pl-10">
+          <input
+            type="checkbox"
+            className="d-none"
+            checked={props.isSelected}
+            onChange={() => null}
+          />
+          <span>{children}</span>
+        </div>
       </components.Option>
     );
   };
@@ -229,32 +280,64 @@ const AsyncSelect = (ctlProps) => {
       <label className={ctlProps.lblClass}>
         {checkEmptyVal(ctlProps.lblText) ? ctlProps.lbl?.lbl : ctlProps.lblText}
       </label>
-      <Select
-        className={`react_select_ctrl ${ctlProps.className} ${
-          ctlProps.errors?.[`${ctlProps.name}`] && "invalid box-shadow"
-        }`}
-        styles={customStyles}
-        options={mapOptions}
-        placeholder={ctlProps.placeHolder}
-        components={{
-          Menu,
-          animatedComponents,
-          DropdownIndicator,
-          ClearIndicator,
-          //Option: CheckboxOption,
-        }}
-        // isMulti={true}
-        // hideSelectedOptions={false}
-        isLoading={isLoading}
-        noOptionsMessage={noOptionsMessage}
-        isClearable={ctlProps?.isClearable ?? true}
-        onInputChange={handleInputChange}
-        onChange={ctlProps.onChange}
-        isDisabled={ctlProps.isDisabled && true}
-        defaultValue={ctlProps.placeHolder}
-        value={selectedValue}
-        tabIndex={ctlProps.tabIndex}
-      />
+      {ctlProps?.isMulti ? (
+        <Select
+          className={`react_select_ctrl ${ctlProps.className} ${
+            ctlProps.errors?.[`${ctlProps.name}`] && "invalid box-shadow"
+          }`}
+          styles={customStyles}
+          options={mapOptions}
+          placeholder={ctlProps.placeHolder}
+          components={{
+            Menu,
+            animatedComponents,
+            DropdownIndicator,
+            ClearIndicator,
+            MultiValue: multiValue,
+            Option: CheckboxOption,
+          }}
+          isMulti={true}
+          hideSelectedOptions={false}
+          isLoading={isLoading}
+          noOptionsMessage={noOptionsMessage}
+          isClearable={ctlProps?.isClearable ?? true}
+          onInputChange={handleInputChange}
+          onChange={ctlProps.onChange}
+          isDisabled={ctlProps.isDisabled && true}
+          defaultValue={ctlProps.placeHolder}
+          value={selectedValue}
+          tabIndex={ctlProps.tabIndex}
+          closeMenuOnSelect={false}
+        />
+      ) : (
+        <Select
+          className={`react_select_ctrl ${ctlProps.className} ${
+            ctlProps.errors?.[`${ctlProps.name}`] && "invalid box-shadow"
+          }`}
+          styles={customStyles}
+          options={mapOptions}
+          placeholder={ctlProps.placeHolder}
+          components={{
+            Menu,
+            animatedComponents,
+            DropdownIndicator,
+            ClearIndicator,
+          }}
+          isLoading={isLoading}
+          noOptionsMessage={noOptionsMessage}
+          isClearable={ctlProps?.isClearable ?? true}
+          onInputChange={ctlProps.handleInputChange}
+          onBlur={ctlProps.onBlur}
+          blurInputOnSelect={false}
+          inputValue={ctlProps.inputValue}
+          onChange={ctlProps.onChange}
+          isDisabled={ctlProps.isDisabled && true}
+          defaultValue={ctlProps.placeHolder}
+          value={selectedValue}
+          tabIndex={ctlProps.tabIndex}
+          isSearchable={ctlProps.isSearchable && true}
+        />
+      )}
       {ctlProps.errors?.[`${ctlProps.name}`] && (
         <div className="err-invalid">
           {ctlProps.errors?.[`${ctlProps.name}`]}

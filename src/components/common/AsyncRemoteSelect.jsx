@@ -73,12 +73,15 @@ const AsyncRemoteSelect = (ctlProps) => {
       },
       fontSize: "14px !important",
       fontFamily: "var(--theme-general-font) !important",
-      height: "42px !important",
+      height: "38px !important",
+      minHeight: "38px !important",
       padding: "0 0 0 0.375rem",
       cursor: state.isSelected ? "pointer" : "pointer",
       color: "var(--theme-general-color) !important",
       fontWeight: "400 !important",
       //caretColor: "transparent",
+      display: "flex",
+      alignItems: "center",
     }),
     option: (styles, { isDisabled, isFocused, isSelected }) => {
       return {
@@ -100,6 +103,19 @@ const AsyncRemoteSelect = (ctlProps) => {
         padding: "6px 12px",
       };
     },
+    valueContainer: (provided) => ({
+      ...provided,
+      height: "38px",
+      padding: "0px 8px",
+      display: "flex",
+      alignItems: "center",
+    }),
+    input: (provided) => ({
+      ...provided,
+      margin: "0",
+      padding: "0",
+      alignItems: "center",
+    }),
     indicatorSeparator: () => ({
       display: "none",
     }),
@@ -107,14 +123,14 @@ const AsyncRemoteSelect = (ctlProps) => {
       return {
         ...base,
         width: "30px !important",
-        padding: "8px 0 !important",
+        padding: "2px 0 !important",
       };
     },
     dropdownIndicator: (base) => {
       return {
         ...base,
         width: "30px !important",
-        padding: "8px 0 !important",
+        padding: "2px 0 !important",
       };
     },
     menuList: (base) => ({
@@ -163,40 +179,114 @@ const AsyncRemoteSelect = (ctlProps) => {
     );
   };
 
+  const multiValue = (props) => {
+    const { data, removeProps, innerRef, innerProps } = props;
+
+    return (
+      <div
+        className="multiValue"
+        ref={innerRef}
+        {...innerProps}
+        onClick={props.isSelected}
+      >
+        <span>
+          {props.data.customlabel ? props.data.customlabel : props.data.label}
+        </span>
+        <span {...removeProps} className="remove">
+          <i className="fa fa-times-circle"></i>
+        </span>
+      </div>
+    );
+  };
+
+  const CheckboxOption = ({ children, ...props }) => {
+    return (
+      <components.Option {...props}>
+        <div className="ccbox row pl-10">
+          <input
+            type="checkbox"
+            className="d-none"
+            checked={props.isSelected}
+            onChange={() => null}
+          />
+          <span>{children}</span>
+        </div>
+      </components.Option>
+    );
+  };
+
   return (
     <>
       <label className={ctlProps.lblClass}>
         {checkEmptyVal(ctlProps.lblText) ? ctlProps.lbl?.lbl : ctlProps.lblText}
       </label>
-      <AsyncSelect
-        className={`react_select_ctrl ${ctlProps.className} ${
-          ctlProps.errors?.[`${ctlProps.name}`] && "invalid box-shadow"
-        }`}
-        styles={customStyles}
-        loadOptions={ctlProps.loadOptions}
-        placeholder={ctlProps.placeHolder}
-        components={{
-          Menu,
-          animatedComponents,
-          DropdownIndicator,
-          ClearIndicator,
-          SingleValue: singleValue,
-        }}
-        isLoading={isLoading}
-        noOptionsMessage={noOptionsMessage}
-        isClearable={ctlProps?.isClearable ?? true}
-        onInputChange={ctlProps.handleInputChange}
-        onChange={ctlProps.onChange}
-        isDisabled={ctlProps.isDisabled && true}
-        defaultValue={ctlProps.placeHolder}
-        onBlur={ctlProps.onBlur}
-        blurInputOnSelect={false}
-        inputValue={ctlProps.inputValue}
-        value={selectedValue}
-        tabIndex={ctlProps.tabIndex}
-        defaultOptions
-        cacheOptions={ctlProps.cacheOptions ?? true}
-      />
+      {ctlProps?.isMulti ? (
+        <AsyncSelect
+          className={`react_select_ctrl ${ctlProps.className} ${
+            ctlProps.errors?.[`${ctlProps.name}`] && "invalid box-shadow"
+          }`}
+          styles={customStyles}
+          loadOptions={ctlProps.loadOptions}
+          placeholder={ctlProps.placeHolder}
+          components={{
+            Menu,
+            animatedComponents,
+            DropdownIndicator,
+            ClearIndicator,
+            // SingleValue: singleValue,
+            MultiValue: multiValue,
+            Option: CheckboxOption,
+          }}
+          isLoading={isLoading}
+          noOptionsMessage={noOptionsMessage}
+          isClearable={ctlProps?.isClearable ?? true}
+          onInputChange={ctlProps.handleInputChange}
+          onChange={ctlProps.onChange}
+          isDisabled={ctlProps.isDisabled && true}
+          defaultValue={ctlProps.placeHolder}
+          onBlur={ctlProps.onBlur}
+          blurInputOnSelect={false}
+          closeMenuOnSelect={false}
+          isMulti={true}
+          hideSelectedOptions={false}
+          //inputValue={ctlProps.inputValue}
+          value={selectedValue}
+          tabIndex={ctlProps.tabIndex}
+          defaultOptions
+          cacheOptions={ctlProps.cacheOptions ?? true}
+          onFocus={ctlProps.onFocus}
+        />
+      ) : (
+        <AsyncSelect
+          className={`react_select_ctrl ${ctlProps.className} ${
+            ctlProps.errors?.[`${ctlProps.name}`] && "invalid box-shadow"
+          }`}
+          styles={customStyles}
+          loadOptions={ctlProps.loadOptions}
+          placeholder={ctlProps.placeHolder}
+          components={{
+            Menu,
+            animatedComponents,
+            DropdownIndicator,
+            ClearIndicator,
+            SingleValue: singleValue,
+          }}
+          isLoading={isLoading}
+          noOptionsMessage={noOptionsMessage}
+          isClearable={ctlProps?.isClearable ?? true}
+          onInputChange={ctlProps.handleInputChange}
+          onChange={ctlProps.onChange}
+          isDisabled={ctlProps.isDisabled && true}
+          defaultValue={ctlProps.placeHolder}
+          onBlur={ctlProps.onBlur}
+          blurInputOnSelect={false}
+          inputValue={ctlProps.inputValue}
+          value={selectedValue}
+          tabIndex={ctlProps.tabIndex}
+          defaultOptions
+          cacheOptions={ctlProps.cacheOptions ?? true}
+        />
+      )}
       {ctlProps.errors?.[`${ctlProps.name}`] && (
         <div className="err-invalid">
           {ctlProps.errors?.[`${ctlProps.name}`]}
