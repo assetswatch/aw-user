@@ -553,6 +553,9 @@ export const formCtrlTypes = {
   status: {
     lbl: "Status :",
   },
+  requesttype: {
+    lbl: "Request type :",
+  },
   Notificationtype: {
     lbl: "Notification type:",
   },

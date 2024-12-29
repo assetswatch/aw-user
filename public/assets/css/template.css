@@ -337,6 +337,9 @@ a.hover-text-extra1:hover {
 .bg-primary {
   background-color: var(--theme-primary-color) !important;
 }
+.bg-danger {
+  background-color: var(--theme-red-color2) !important;
+}
 
 .hover-bg-secondary:hover,
 .fixed-bg-secondary.fixed-top {
@@ -4883,6 +4886,9 @@ Newsletter Style
   }
 }
 @media screen and (min-width: 1400px) {
+  .user-menu .nav-item:first-child {
+    padding-left: 0px !important;
+  }
   .user-menu .nav-item {
     padding: 0px 25px !important;
   }

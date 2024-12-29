@@ -56,29 +56,10 @@ export function SetPageLoaderNavLinks() {
         case routeNames.dashboard.path.toLowerCase():
           activelink = "dashboard";
           break;
-        case routeNames.ownertenants.path.toLowerCase():
+        case routeNames.connectionsowners.path.toLowerCase():
+        case routeNames.connectionsagents.path.toLowerCase():
+        case routeNames.connectionstenants.path.toLowerCase():
           activelink = "myconnections";
-          activesublink = "owner-tenant";
-          break;
-        case routeNames.owneragents.path.toLowerCase():
-          activelink = "myconnections";
-          activesublink = "owner-agent";
-          break;
-        case routeNames.tenantowners.path.toLowerCase():
-          activelink = "myconnections";
-          activesublink = "tenant-owner";
-          break;
-        case routeNames.tenantagents.path.toLowerCase():
-          activelink = "myconnections";
-          activesublink = "tenant-agent";
-          break;
-        case routeNames.agentowners.path.toLowerCase():
-          activelink = "myconnections";
-          activesublink = "agent-owner";
-          break;
-        case routeNames.agenttenants.path.toLowerCase():
-          activelink = "myconnections";
-          activesublink = "agent-tenant";
           break;
         case routeNames.tenantpayments.path.toLowerCase():
         case routeNames.tenantcheckout.path.toLowerCase():

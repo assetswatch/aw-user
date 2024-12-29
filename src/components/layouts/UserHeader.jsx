@@ -676,34 +676,15 @@ const UserHeader = () => {
                       Reports
                     </Link>
                   </li>
-                  <li className="nav-item dropdown">
-                    <a
-                      className="nav-link dropdown-toggle"
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link"
                       id="nav-myconnections"
+                      to={routeNames.connectionsowners.path}
                     >
-                      <i className="fa fa-users pe-2"></i>
+                      <i className="fa fa-users flat-mini pe-2"></i>
                       Connections
-                    </a>
-                    <ul className="dropdown-menu">
-                      <li className="dropdown-item">
-                        <Link
-                          className="nav-link-owner-agent"
-                          id="nav-lnk-owner-agent"
-                          to={routeNames.owneragents.path}
-                        >
-                          <i className="fa fa-user pe-1"></i> Agents
-                        </Link>
-                      </li>
-                      <li className="dropdown-item">
-                        <Link
-                          className="nav-link-owner-tenant"
-                          id="nav-lnk-owner-tenant"
-                          to={routeNames.ownertenants.path}
-                        >
-                          <i className="fa fa-user pe-1"></i> Tenants
-                        </Link>
-                      </li>
-                    </ul>
+                    </Link>
                   </li>
                   <li className="nav-item">
                     <Link
@@ -827,34 +808,15 @@ const UserHeader = () => {
                       Reports
                     </Link>
                   </li>
-                  <li className="nav-item dropdown">
-                    <a
-                      className="nav-link dropdown-toggle"
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link"
                       id="nav-myconnections"
+                      to={routeNames.connectionsagents.path}
                     >
-                      <i className="fa fa-users pe-2"></i>
+                      <i className="fa fa-users flat-mini pe-2"></i>
                       Connections
-                    </a>
-                    <ul className="dropdown-menu">
-                      <li className="dropdown-item">
-                        <Link
-                          className="nav-link-owner-agent"
-                          id="nav-lnk-agent-owner"
-                          to={routeNames.agentowners.path}
-                        >
-                          <i className="fa fa-user pe-1"></i> Owners
-                        </Link>
-                      </li>
-                      <li className="dropdown-item">
-                        <Link
-                          className="nav-link-owner-tenant"
-                          id="nav-lnk-agent-tenant"
-                          to={routeNames.agenttenants.path}
-                        >
-                          <i className="fa fa-user pe-1"></i> Tenants
-                        </Link>
-                      </li>
-                    </ul>
+                    </Link>
                   </li>
                   <li className="nav-item">
                     <Link
@@ -969,34 +931,15 @@ const UserHeader = () => {
                       Reports
                     </Link>
                   </li>
-                  <li className="nav-item dropdown">
-                    <a
-                      className="nav-link dropdown-toggle"
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link"
                       id="nav-myconnections"
+                      to={routeNames.connectionstenants.path}
                     >
-                      <i className="fa fa-users pe-2"></i>
+                      <i className="fa fa-users flat-mini pe-2"></i>
                       Connections
-                    </a>
-                    <ul className="dropdown-menu">
-                      <li className="dropdown-item">
-                        <Link
-                          className="nav-link-owner-agent"
-                          id="nav-lnk-tenant-owner"
-                          to={routeNames.tenantowners.path}
-                        >
-                          <i className="fa fa-user pe-1"></i> Owners
-                        </Link>
-                      </li>
-                      <li className="dropdown-item">
-                        <Link
-                          className="nav-link-owner-tenant"
-                          id="nav-lnk-tenant-agent"
-                          to={routeNames.tenantagents.path}
-                        >
-                          <i className="fa fa-user pe-1"></i> Agents
-                        </Link>
-                      </li>
-                    </ul>
+                    </Link>
                   </li>
                   <li className="nav-item">
                     <Link

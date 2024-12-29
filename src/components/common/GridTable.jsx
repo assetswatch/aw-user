@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useTable, usePagination, useSortBy, useExpanded } from "react-table";
 import DataLoader from "./DataLoader";
 import NoData from "./NoData";
-import GridActionMenu, { GridDocActionMenu } from "./GridActionMenu";
+import GridActionMenu, {
+  GridDocActionMenu,
+  GridUserConnectionActionMenu,
+} from "./GridActionMenu";
 import { GridDefaultValues } from "../../utils/constants";
 import { checkEmptyVal, checkObjNullorEmpty } from "../../utils/common";
 
@@ -229,6 +232,11 @@ const GridTable = ({
                           <>
                             {cell.column.isDocActionMenu ? (
                               <GridDocActionMenu
+                                row={row}
+                                actions={cell.column.actions}
+                              />
+                            ) : cell.column.isUserConnectionActionMenu ? (
+                              <GridUserConnectionActionMenu
                                 row={row}
                                 actions={cell.column.actions}
                               />

@@ -8868,3 +8868,27 @@
 .mdi-folder-upload:before {
   content: "\F259";
 }
+
+.mdi-arrow-right-bold:before {
+  content: "\F055";
+}
+
+.mdi-arrow-left-bold:before {
+  content: "\F04e";
+}
+
+.mdi-arrow-right-bold-circle:before {
+  content: "\F056";
+}
+
+.mdi-arrow-left-bold-circle:before {
+  content: "\F04F";
+}
+
+.mdi-arrow-right-bold-circle-outline:before {
+  content: "\F057";
+}
+
+.mdi-arrow-left-bold-circle-outline:before {
+  content: "\F050";
+}

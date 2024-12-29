@@ -13,9 +13,13 @@
   },
   "userConnectionStatusTypes": {
     "Pending": 0,
-    "Accepted": 1,
+    "Joined": 1,
     "Rejected": 2,
     "Terminated": 3
+  },
+  "userConnectionRequestTypes": {
+    "Sent": 1,
+    "Received": 2
   },
   "assetClassificationTypes": {
     "Residential": 1,

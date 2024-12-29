@@ -1364,6 +1364,10 @@ Header Style Start
 .lh-45 {
   line-height: 45px !important;
 }
+.bg-none {
+  background: none !important;
+  background-color: none !important;
+}
 .bo-0 {
   border: none !important;
 }
@@ -3798,6 +3802,11 @@ Deshboard Style Start
   line-height: 20px;
   cursor: pointer;
 }
+
+.opa9 {
+  opacity: 0.9 !important;
+}
+
 /* The container to hold the element and tooltip */
 .ctooltip-container {
   position: relative;
@@ -3805,6 +3814,7 @@ Deshboard Style Start
 
 /* The tooltip itself */
 .ctooltip {
+  font-family: var(--theme-hiperlink-font) !important;
   visibility: hidden;
   position: absolute;
   top: 30px; /* Position it just below the container */
@@ -4141,6 +4151,9 @@ Social Media Style Start
 }
 .w-350px {
   width: 350px !important;
+}
+.min-w-30px {
+  min-width: 30px !important;
 }
 .w-30px {
   width: 30px !important;
@@ -4603,7 +4616,7 @@ Social Media Style Start
 }
 .gr-badge-pill-suc {
   background-color: #eefbec;
-  color: rgb(117, 204, 104);
+  color: rgb(117, 204, 104) !important;
   border: solid 1px currentColor;
 }
 .gr-badge-pill-suc::after {
@@ -4611,7 +4624,7 @@ Social Media Style Start
 }
 .gr-badge-pill-warning {
   background-color: #fcf2e8;
-  color: rgb(231, 139, 47);
+  color: rgb(231, 139, 47) !important;
   border: solid 1px currentColor;
 }
 .gr-badge-pill-warning::after {
@@ -4619,7 +4632,7 @@ Social Media Style Start
 }
 .gr-badge-pill-info {
   background-color: #f1faff;
-  color: rgb(44, 154, 255);
+  color: rgb(44, 154, 255) !important;
   border: solid 1px currentColor;
 }
 .gr-badge-pill-info::after {
@@ -4627,7 +4640,7 @@ Social Media Style Start
 }
 .gr-badge-pill-error {
   background-color: #fff2f1;
-  color: rgb(241, 76, 65);
+  color: rgb(241, 76, 65) !important;
   border: solid 1px currentColor;
 }
 .gr-badge-pill.nocnt::after {
