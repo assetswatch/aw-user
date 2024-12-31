@@ -4879,6 +4879,13 @@ Responsive Style Start
     text-align: right;
     margin: 0 0 10px 0;
   }
+  .div-agdetails-img {
+    width: 100% !important;
+    text-align: center;
+  }
+  .div-agdetails-img img {
+    width: 120px !important;
+  }
 }
 @media screen and (max-width: 600px) {
   .user-info-nav-item.publiclayout .user-option {
@@ -5016,6 +5023,12 @@ Responsive Style Start
     display: block !important;
     opacity: 1 !important;
     position: static !important;
+  }
+  .div-agdetails-img {
+    width: 150px !important;
+  }
+  .div-agdetails-img img {
+    width: 140px !important;
   }
 }
 @media screen and (min-width: 576px) {

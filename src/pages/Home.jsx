@@ -191,6 +191,12 @@ const Home = () => {
     navigate(routeNames.propertyDetails.path);
   };
 
+  const onAgentDetails = (e, profileid) => {
+    e.preventDefault();
+    addSessionStorageItem(SessionStorageKeys.AgentDetailsId, profileid);
+    navigate(routeNames.agentdetails.path);
+  };
+
   return (
     <>
       {SetPageLoaderNavLinks()}
@@ -333,7 +339,9 @@ const Home = () => {
                             <div className="property_text p-3 pb-0">
                               <h5 className="listing-title">
                                 <Link
-                                  to={routeNames.propertyDetails.path}
+                                  onClick={(e) =>
+                                    onPropertyDetails(e, a.AssetId)
+                                  }
                                   className="text-primary font-16"
                                 >
                                   <i className="fas fa-map-marker-alt" />{" "}
@@ -541,13 +549,13 @@ const Home = () => {
               </div>
             </div>
             <div className="col-md-4">
-              <a
-                href="#"
+              <Link
+                to={routeNames.agents.path}
                 className="ms-auto btn-link d-table p y-2 sm-mx-0 text-primary"
               >
                 View All Agents{" "}
                 <i className="fa-solid fa-chevron-right font-mini"></i>
-              </a>
+              </Link>
             </div>
           </div>
           <div className="row">
@@ -563,7 +571,9 @@ const Home = () => {
                         <div className="item" key={`ragent-key-${i}`}>
                           <div className="property-grid-1 property-block bg-light transation-this rounded">
                             <div className="overflow-hidden position-relative transation thumbnail-img box-shadow rounded">
-                              <a href="property-single-v1.html">
+                              <a
+                                onClick={(e) => onAgentDetails(e, a.ProfileId)}
+                              >
                                 <LazyImage
                                   src={a.PicPath}
                                   alt={a.FirstName}
@@ -575,7 +585,9 @@ const Home = () => {
                             <div className="property_text p-3 pb-2">
                               <h5 className="listing-title">
                                 <a
-                                  href="property-single-v1.html"
+                                  onClick={(e) =>
+                                    onAgentDetails(e, a.ProfileId)
+                                  }
                                   className="text-primary font-16"
                                 >
                                   {a.FirstName} {a.LastName}

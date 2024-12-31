@@ -10,13 +10,7 @@ import {
   GridDefaultValues,
   SessionStorageKeys,
 } from "../utils/constants";
-import {
-  apiReqResLoader,
-  checkEmptyVal,
-  checkObjNullorEmpty,
-  checkStartEndDateGreater,
-  setSelectDefaultVal,
-} from "../utils/common";
+import { apiReqResLoader, checkEmptyVal } from "../utils/common";
 import { axiosPost } from "../helpers/axiosHelper";
 import config from "../config.json";
 import { GridList, LazyImage } from "../components/common/LazyComponents";
@@ -29,20 +23,17 @@ import {
 } from "../helpers/sessionStorageHelper";
 import PropertySearch from "../components/layouts/PropertySearch";
 
-const Properties = () => {
+const Agents = () => {
   let $ = window.$;
 
   const navigate = useNavigate();
 
-  /*check page search from properties page*/
   const location = useLocation();
   let showLoader = location?.state?.["search"];
   delete location?.state?.["search"];
-  /*check page search from properties page*/
 
   const [rerouteKey, setRerouteKey] = useState(0);
 
-  //list of js/css dependencies.
   let arrJsCssFiles = [
     {
       dir: "./assets/js/",
@@ -53,13 +44,12 @@ const Properties = () => {
   ];
 
   useEffect(() => {
-    //load js/css depedency files.
     let arrLoadFiles = getArrLoadFiles(arrJsCssFiles);
     let promiseLoadFiles = arrLoadFiles.map(loadFile);
     Promise.allSettled(promiseLoadFiles).then(function (responses) {});
 
     return () => {
-      unloadFile(arrJsCssFiles); //unload files.
+      unloadFile(arrJsCssFiles);
     };
   }, []);
 
@@ -112,57 +102,16 @@ const Properties = () => {
     } catch {}
   }
 
-  let formErrors = {};
-  const [assetsList, setAssetsList] = useState([]);
+  const [agentsList, setAgentsList] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [pageCount, setPageCount] = useState(0);
   const [isDataLoading, setIsDataLoading] = useState(false);
 
-  useEffect(() => {
-    if (assetsList.length > 0) {
-      try {
-        $(".prop-carousel")?.owlCarousel({
-          loop: false,
-          margin: 24,
-          nav: true,
-          dots: true,
-          smartSpeed: 500,
-          autoplay: false,
-          responsive: {
-            0: {
-              items: 1,
-            },
-            576: {
-              items: 1,
-            },
-            992: {
-              items: 1,
-            },
-            1200: {
-              items: 1,
-            },
-            1400: {
-              items: 1,
-            },
-          },
-        });
-      } catch {}
-    }
-
-    // Cleanup on unmount
-    return () => {
-      if ($(".prop-carousel").hasClass("owl-loaded")) {
-        $(".prop-carousel").trigger("destroy.owl.carousel");
-      }
-    };
-  }, [assetsList]);
-
-  const getAssets = ({
+  const getAgents = ({
     pi = GridDefaultValues.pi,
     ps = GridDefaultValues.ps,
     showPageLoader = false,
   }) => {
-    //show loader if search actions.
     if (showPageLoader) {
       apiReqResLoader("x");
     }
@@ -174,53 +123,29 @@ const Properties = () => {
     );
 
     objParams = {
-      keyword: !checkEmptyVal(propfilters?.["key"]) ? propfilters?.["key"] : "",
-      location: !checkEmptyVal(propfilters?.["loc"])
-        ? propfilters?.["loc"]
-        : "",
-      classificationtypeid: !checkEmptyVal(propfilters?.["ctid"])
-        ? propfilters?.["ctid"]
-        : 0,
-      assettypeid: !checkEmptyVal(propfilters?.["atid"])
-        ? propfilters?.["atid"]
-        : 0,
-      listingtypeid: !checkEmptyVal(propfilters?.["ltid"])
-        ? propfilters?.["ltid"]
-        : 0,
-      bedrooms: !checkEmptyVal(propfilters?.["bed"])
-        ? propfilters?.["bed"]
-        : "",
-      bathrooms: !checkEmptyVal(propfilters?.["bath"])
-        ? propfilters?.["bath"]
-        : "",
-      minarea: !checkEmptyVal(propfilters?.["misq"])
-        ? propfilters?.["misq"]
-        : 0,
-      maxarea: !checkEmptyVal(propfilters?.["masq"])
-        ? propfilters?.["masq"]
-        : 0,
+      keyword: "",
       pi: parseInt(pi),
       ps: parseInt(ps),
     };
 
-    return axiosPost(`${config.apiBaseUrl}${ApiUrls.getAssets}`, objParams)
+    return axiosPost(`${config.apiBaseUrl}${ApiUrls.getAgents}`, objParams)
       .then((response) => {
         let objResponse = response.data;
         if (objResponse.StatusCode === 200) {
           setTotalCount(objResponse.Data.TotalCount);
           setPageCount(Math.ceil(objResponse.Data.TotalCount / ps));
-          setAssetsList(objResponse.Data.Assets);
+          setAgentsList(objResponse.Data.Agents);
         } else {
           isapimethoderr = true;
-          setAssetsList([]);
+          setAgentsList([]);
           setPageCount(0);
         }
       })
       .catch((err) => {
         isapimethoderr = true;
-        setAssetsList([]);
+        setAgentsList([]);
         setPageCount(0);
-        console.error(`"API :: ${ApiUrls.getAssets}, Error ::" ${err}`);
+        console.error(`"API :: ${ApiUrls.getAgents}, Error ::" ${err}`);
       })
       .finally(() => {
         if (isapimethoderr === true) {
@@ -237,126 +162,63 @@ const Properties = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: "Property",
-        accessor: "title",
+        Header: "Agent",
         disableSortBy: true,
         Cell: ({ row }) => (
           <>
             <div
               className="item"
-              key={`prop-key-${row.id}`}
-              d-assetid={row.original.AssetId}
+              key={`user-key-${row.id}`}
+              d-profileid={row.original.ProfileId}
             >
-              <div className="property-grid-1 property-block bg-white box-shadow transation-this rounded">
-                <div className="overflow-hidden position-relative transation thumbnail-img hover-img-zoom box-shadow rounded">
-                  <div className="catart position-absolute">
-                    <span className="sale bg-secondary text-white">
-                      For {row.original.ListingType}
-                    </span>
+              <div className="property-grid-1 property-block box-shadow transation-this rounded">
+                <div className="overflow-hidden position-relative transation thumbnail-img box-sh adow ro unded py-10">
+                  <div className="nav-between-in">
+                    <div className="item flex flex-center">
+                      <Link
+                        onClick={(e) =>
+                          onAgentDetails(e, row.original.ProfileId)
+                        }
+                      >
+                        <LazyImage
+                          src={row.original.PicPath}
+                          className="img-fit-grid-contain min-h-150"
+                          placeHolderClass="min-h-150"
+                        />
+                      </Link>
+                    </div>
                   </div>
-                  <div className="prop-carousel owl-carousel single-carusel dot-disable nav-between-in">
-                    {row.original.Images?.map((i, idx) => {
-                      return (
-                        <div className="item" key={`pimg-key-${idx}`}>
-                          <Link
-                            onClick={(e) =>
-                              onPropertyDetails(e, row.original.AssetId)
-                            }
-                          >
-                            <LazyImage
-                              src={i?.ImagePath}
-                              className="img-fit-grid"
-                              placeHolderClass="min-h-200"
-                            />
-                          </Link>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <Link
-                    onClick={(e) => onPropertyDetails(e, row.original.AssetId)}
-                    className="listing-ctg"
-                  >
-                    <i className="fa-solid fa-building" />
-                    <span className="text-primary">
-                      {row.original.AssetType}
-                    </span>
-                  </Link>
                 </div>
-                <div className="property_text p-3 pb-0">
+                <div className="property_text p-10 pb-0 border-top shadow rounded">
                   <h5 className="listing-title">
                     <Link
-                      onClick={(e) =>
-                        onPropertyDetails(e, row.original.AssetId)
-                      }
+                      onClick={(e) => onAgentDetails(e, row.original.ProfileId)}
                       className="text-primary font-16"
                     >
-                      <i className="fas fa-map-marker-alt" />{" "}
-                      {row.original.AddressOne}{" "}
-                      {/* {checkEmptyVal(a.AddressTwo)
-                                    ? ""
-                                    : `, ${a.AddressTwo}`} */}
+                      {row.original.FirstName} {row.original.LastName}
                     </Link>
                   </h5>
-                  {/* <span className="listing-location mb-1">
-                    {row.original.City}, {row.original.State},{" "}
-                    {row.original.CountryShortName}
-                  </span>
-                  <span className="listing-price font-15 font-500 mb-1">
-                    {row.original.PriceDisplay}
+                  {/* <span className="font-small text-light lh-1 mb-1">
+                    {row.original.CompanyName}
                   </span> */}
-                  <ul className="d-flex font-general mb-10 mt-10 flex-sb">
-                    <li className="flex-start pr-20 listing-location mb-1">
-                      {row.original.City}, {row.original.State},{" "}
-                      {row.original.CountryShortName}
-                    </li>
-                    <li className="flex-end listing-price font-15 font-500 mb-1">
-                      {row.original.PriceDisplay}
-                    </li>
-                  </ul>
-                  <ul className="d-flex quantity font-general mb-2 flex-sb">
-                    <li title="Beds">
-                      <span>
-                        <i className="fa-solid fa-bed"></i>
-                      </span>
-                      {row.original.Bedrooms}
-                    </li>
-                    <li title="Baths">
-                      <span>
-                        <i className="fa-solid fa-shower"></i>
-                      </span>
-                      {row.original.Bathrooms}
-                    </li>
-                    <li title="Area">
-                      <span>
-                        <i className="fa-solid fa-vector-square"></i>
-                      </span>
-                      {row.original.AreaDisplay} {row.original.AreaUnitType}
+                  <ul className="d-flex font-general mt-1 flex-sb">
+                    <li className="flex-start pr-10">
+                      <i className="icons icon-location-pin pr-5" />
+                      {checkEmptyVal(row.original.AddressOne)
+                        ? "--"
+                        : row.original.AddressOne}
                     </li>
                   </ul>
-                </div>
-                <div className="d-flex align-items-center post-meta mt-2 py-3 px-3 border-top box-shadow">
-                  <div className="agent">
-                    <a
-                      href="#"
-                      className="d-flex text-general align-items-center"
-                    >
-                      <img
-                        className="rounded-circle me-2 shadow img-border-white"
-                        src={row.original.PicPath}
-                        alt={row.original.FirstName}
-                      />
-                      <span className="font-general">
-                        {row.original.FirstName} {row.original.LastName}
+                  <ul className="d-flex font-general flex-sb">
+                    <li className="flex-start pr-10 mb-1">
+                      At {row.original.ModifiedDateDisplay}
+                    </li>
+                    <li className="flex-end listing-price font-mini font-500 mb-1">
+                      <span className="text-primary rating-icon mr-0">
+                        <Rating ratingVal={row.original.Rating}></Rating>
                       </span>
-                    </a>
-                  </div>
-                  <div className="post-date ms-auto font-general">
-                    <span>
-                      <i className="fa fa-clock text-primary me-1"></i>
-                      {row.original.PostedDaysDiff}
-                    </span>
-                  </div>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -373,7 +235,7 @@ const Properties = () => {
     ({ pageIndex, pageSize }) => {
       const fetchId = ++fetchIdRef.current;
       if (fetchId === fetchIdRef.current) {
-        getAssets({
+        getAgents({
           pi: pageIndex,
           ps: pageSize,
           showPageLoader: showLoader || pageIndex > 0,
@@ -384,6 +246,12 @@ const Properties = () => {
   );
 
   //Setup Grid.
+
+  const onAgentDetails = (e, profileid) => {
+    e.preventDefault();
+    addSessionStorageItem(SessionStorageKeys.AgentDetailsId, profileid);
+    navigate(routeNames.agentdetails.path);
+  };
 
   const onPropertyDetails = (e, assetId) => {
     e.preventDefault();
@@ -401,22 +269,16 @@ const Properties = () => {
     window.scrollTo(0, 0);
   };
 
-  const onAgentDetails = (e, profileid) => {
-    e.preventDefault();
-    addSessionStorageItem(SessionStorageKeys.AgentDetailsId, profileid);
-    navigate(routeNames.agentdetails.path);
-  };
-
   return (
     <div key={rerouteKey}>
       {/*============== Page title Start ==============*/}
       <PageTitle
-        title="Properties"
+        title="Agents"
         navLinks={[{ title: "Home", url: routeNames.home.path }]}
       ></PageTitle>
       {/*============== Page title End ==============*/}
 
-      {/*============== Property Grid View Start ==============*/}
+      {/*============== Agents Grid View Start ==============*/}
       <div className="full-row py-40 bg-light">
         <div className="container">
           <div className="row">
@@ -579,12 +441,12 @@ const Properties = () => {
                           );
                         })}
                         <li className="flex-end m-0 p-0">
-                          <Link
-                            to={routeNames.agents.path}
+                          <a
+                            href="#"
                             className="btn-link font-small text-primary"
                           >
                             View more...
-                          </Link>
+                          </a>
                         </li>
                       </>
                     )}
@@ -596,26 +458,26 @@ const Properties = () => {
             <div className="col-xl-9 col-lg-8">
               <GridList
                 columns={columns}
-                data={assetsList}
+                data={agentsList}
                 loading={isDataLoading}
                 fetchData={fetchData}
                 pageCount={pageCount}
                 totalInfo={{
-                  text: "properties",
+                  text: "agents",
                   count: totalCount,
                 }}
-                noData={AppMessages.NoProperties}
-                containerClassName="row row-cols-xl-3 row-cols-lg-2 row-cols-md-2 row-cols-1 g-4 min-h-200"
-                cellclassName="col-lg-6 col-md-6"
+                noData={AppMessages.NoAgents}
+                containerClassName="row row-cols-xl-3 row-cols-lg-2 row-cols-md-2 row-cols-1 g-4 min-h-150"
+                cellclassName="col-lg-4 col-md-4 col-xl-3"
                 defaultPs={12}
               />
             </div>
           </div>
         </div>
       </div>
-      {/*============== Property Grid View End ==============*/}
+      {/*============== Agents Grid View End ==============*/}
     </div>
   );
 };
 
-export default Properties;
+export default Agents;
