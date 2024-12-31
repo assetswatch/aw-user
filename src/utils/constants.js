@@ -33,6 +33,7 @@ export const LSExpiryKey = "expires";
 export const SessionStorageKeys = {
   EditAssetId: "eassetid",
   AssetDetailsId: "assetid",
+  AgentDetailsId: "agid",
   ObjAssetfilters: "oasf",
   OwnerTenantConnectionTab: "otcontab",
   TenantCheckoutPaymentId: "tcpmid",
@@ -312,6 +313,7 @@ export let ApiUrls = {
   updateUserConnectionStatus: `users/v1/UpdateUserConnectionStatus`,
   createUserConnection: `users/v1/CreateUserConnection`,
   getUserDetails: `users/v1/GetUserDetails`,
+  getAgents: `users/v1/GetAgents`,
   getAssetTypes: `assets/v1/GetAssetTypes`,
   getAssetListingTypes: `assets/v1/GetAssetListingTypes`,
   getAssetAcccessTypes: `assets/v1/GetAssetAccessTypes`,
