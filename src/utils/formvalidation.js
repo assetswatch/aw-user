@@ -288,6 +288,22 @@ export const formCtrlTypes = {
       max: length30,
     },
   },
+  oldpwd: {
+    lbl: "Old Password:",
+    input: {
+      type: "password",
+      min: length6,
+      max: length30,
+    },
+  },
+  newpwd: {
+    lbl: "New Password:",
+    input: {
+      type: "password",
+      min: length6,
+      max: length30,
+    },
+  },
   phone: {
     lbl: "Phone number:",
     input: {
