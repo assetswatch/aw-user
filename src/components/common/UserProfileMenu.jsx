@@ -156,7 +156,7 @@ const UserProfileMenu = (styleprops) => {
           </li>
           <li className="dropdown-item">
             <a id="nav-user-info-profiles" onClick={onChangeProfile}>
-              <i className="fa fa-exchange pe-1"></i> Change Profile
+              <i className="fa fa-exchange pe-1"></i> Manage Profiles
             </a>
           </li>
           <div className="dropdown-divider" />

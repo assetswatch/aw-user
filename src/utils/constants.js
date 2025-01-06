@@ -179,6 +179,7 @@ export const AppMessages = {
   SupportTicketSuccess:
     "Your message has been sent. We will get back to you shortly.",
   ProfileDetailsNotFound: "Profile details not found...",
+  CreateProfileSuccess: "Profile created successfully...",
   UpdateProfileSuccess: "Profile details updated successfully...",
   NoAgreementTemplates: "No templates found...",
   NoDocuments: `No documents found...`,
