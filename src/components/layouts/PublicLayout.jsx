@@ -16,9 +16,14 @@ const PublicLayout = ({ children }) => {
   const path = useLocation();
 
   let routesList = routes.filter((r) => r.isprotected);
-  let isprotectedRoute = routesList.filter(
-    (rl) => rl.path.toLowerCase() == path.pathname.toLowerCase()
-  )?.[0];
+  let isprotectedRoute = false;
+  if (path.pathname.toLowerCase().indexOf("createprofile") != -1) {
+    isprotectedRoute = true;
+  } else {
+    isprotectedRoute = routesList.filter(
+      (rl) => rl.path.toLowerCase() == path.pathname.toLowerCase()
+    )?.[0];
+  }
 
   return (
     <>

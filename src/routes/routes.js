@@ -18,6 +18,11 @@ export const routeNames = {
   agents: { name: "Agents", path: "/Agents" },
   agentdetails: { name: "AgentDetails", path: "/AgentDetails" },
   dashboard: { name: "Dashboard", path: "/User/Dashboard" },
+  createprofile: {
+    name: "CreateProfile",
+    path: "/User/CreateProfile/:ProfileType",
+  },
+
   ownerprofile: {
     name: "OwnerProfile",
     path: "/User/Owner-Profile",
@@ -234,6 +239,13 @@ const routes = [
     path: routeNames.dashboard.path,
     name: routeNames.dashboard.name,
     element: lazy(() => import("../pages/User/Dashboard")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.createprofile.path,
+    name: routeNames.createprofile.name,
+    element: lazy(() => import("../pages/User/CreateProfile")),
     isexact: true,
     isprotected: true,
   },

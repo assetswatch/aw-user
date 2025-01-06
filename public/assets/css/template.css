@@ -90,6 +90,9 @@ a.hover-text-primary:hover,
 .text-primary {
   color: var(--theme-primary-color) !important;
 }
+.text-white {
+  color: var(--theme-white-color) !important;
+}
 
 a,
 a:hover,
@@ -526,6 +529,10 @@ a.hover-bg-primary:hover,
 .flat-general::before {
   font-size: 18px;
   line-height: 18px;
+}
+
+.font-100 {
+  font-size: 100px !important;
 }
 
 .font-mini {
@@ -1432,10 +1439,22 @@ a.text-dark:focus {
   padding-top: 15px !important;
 }
 
+.py-18,
+.p-18,
+.pt-18 {
+  padding-top: 18px !important;
+}
+
 .py-20,
 .p-20,
 .pt-20 {
   padding-top: 20px !important;
+}
+
+.py-25,
+.p-25,
+.pt-25 {
+  padding-top: 25px !important;
 }
 
 .py-30,
