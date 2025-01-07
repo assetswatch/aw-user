@@ -150,7 +150,7 @@ const UserProfileMenu = (styleprops) => {
             </Link>
           </li>
           <li className="dropdown-item">
-            <Link id="nav-user-info-settings" to={routeNames.comingup.path}>
+            <Link id="nav-user-info-settings" to={routeNames.settings.path}>
               <i className="fa fa-gear pe-1"></i> Settings
             </Link>
           </li>

@@ -1201,6 +1201,9 @@ a.text-dark:focus {
 ===========================================*/
 
 /* Start adding margin */
+.gap-10 {
+  gap: 10px;
+}
 .t-1 {
   top: 1px !important;
 }
@@ -1625,7 +1628,13 @@ a.text-dark:focus {
   padding-right: 15px !important;
 }
 
-.px-15,
+.py-15,
+.p-15,
+.pt-15 {
+  padding-top: 15px !important;
+}
+
+.py-15,
 .p-15,
 .pb-15 {
   padding-bottom: 15px !important;
@@ -1888,6 +1897,7 @@ input {
 .form-error {
   color: var(--theme-validation-err) !important;
   font-size: 13px !important;
+  line-height: 20px;
 }
 .form-error {
   font-size: 14px !important;

@@ -991,6 +991,9 @@ select:focus {
 .form-boder .form-control {
   border-color: var(--form-border-color);
 }
+.react_select_menu div[class$="-option"] {
+  color: var(--theme-general-color) !important;
+}
 .react_select_ctrl div[class$="-multiValue"],
 .multiValue {
   font-size: 14px !important;
@@ -3309,6 +3312,16 @@ Accordion Style Start
 }
 [class*="accordion-plus-"] .ac-toggle {
   position: relative;
+  font-weight: 500;
+  font-size: 15px;
+  cursor: pointer;
+  border-bottom: solid 1px var(--theme-gray-color);
+  overflow: hidden;
+  border-radius: 3px;
+}
+[class*="accordion-plus-"] .ac-toggle:hover,
+[class*="accordion-plus-"] .ac-toggle.active {
+  background-color: var(--theme-li-hover-bg-color);
 }
 .accordion-plus-right .ac-toggle {
   padding-right: 30px;
@@ -3318,19 +3331,22 @@ Accordion Style Start
 .accordion-plus-left .ac-toggle {
   padding-left: 30px;
 }
-[class*="accordion-plus-"] .ac-toggle::before,
+[class*="accordion-plus-"] .ac -toggle::before,
 [class*="accordion-plus-"] .ac-toggle::after {
-  content: "";
+  content: "\e606";
+  font-family: "simple-line-icons";
+  font-size: 13px;
+  color: var(--theme-primary-color);
   position: absolute;
   width: 16px;
-  height: 2px;
-  right: 0;
-  background-color: var(--theme-dark-color);
-  top: 50%;
+  height: 16px;
+  right: 20px;
+  /* background-color: var(--theme-dark-color);  */
+  top: 40%;
   transform: translateY(-50%);
 }
 .accordion-plus-left .ac-toggle.active::before {
-  content: "";
+  content: "\e606";
 }
 .accordion-plus-left .ac-toggle::before,
 .accordion-plus-left .ac-toggle::after {
@@ -3339,6 +3355,7 @@ Accordion Style Start
 [class*="accordion-plus-"] .ac-toggle:not(.active):after {
   transform: rotate(90deg);
 }
+
 /*===============================================================================
 Owl Carousel Style Start
 ==================================================================================*/
