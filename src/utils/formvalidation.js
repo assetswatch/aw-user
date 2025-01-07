@@ -57,6 +57,25 @@ export const Regex = {
     required: ValidationMessages.EmailReq,
     invalid: ValidationMessages.EmailInvalid,
   },
+  currentpwd: {
+    min: length6,
+    max: length30,
+    required: ValidationMessages.CurrentPwdReq,
+    invalid: ValidationMessages.CurrentPwdInvalid,
+  },
+  newpwd: {
+    min: length6,
+    max: length30,
+    required: ValidationMessages.NewPwdReq,
+    invalid: ValidationMessages.NewPwdInvalid,
+  },
+  confirmnewpwd: {
+    min: length6,
+    max: length30,
+    required: ValidationMessages.CNewpwdReq,
+    invalid: ValidationMessages.CNewpwdInvalid,
+    match: ValidationMessages.CNewpwdMatch,
+  },
   pwd: {
     min: length6,
     max: length30,
@@ -270,6 +289,30 @@ export const formCtrlTypes = {
     input: {
       type: "text",
       max: length100,
+    },
+  },
+  currentpwd: {
+    lbl: "Current Password:",
+    input: {
+      type: "password",
+      min: length6,
+      max: length30,
+    },
+  },
+  newpwd: {
+    lbl: "New Password:",
+    input: {
+      type: "password",
+      min: length6,
+      max: length30,
+    },
+  },
+  confirmnewpwd: {
+    lbl: "Confirm New Password:",
+    input: {
+      type: "password",
+      min: length6,
+      max: length30,
     },
   },
   pwd: {

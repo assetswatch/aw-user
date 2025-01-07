@@ -689,8 +689,8 @@ const UserHeader = () => {
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      id="nav-settings"
+                      to={routeNames.settings.path}
                     >
                       <i className="fa fa-gear flat-mini pe-2"></i>
                       Settings
@@ -821,8 +821,8 @@ const UserHeader = () => {
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      id="nav-settings"
+                      to={routeNames.settings.path}
                     >
                       <i className="fa fa-gear flat-mini pe-2"></i>
                       Settings
@@ -944,8 +944,8 @@ const UserHeader = () => {
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      id="nav-settings"
+                      to={routeNames.settings.path}
                     >
                       <i className="fa fa-gear flat-mini pe-2"></i>
                       Settings

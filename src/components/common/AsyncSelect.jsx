@@ -218,6 +218,10 @@ const AsyncSelect = (ctlProps) => {
         background: "var(--theme-primary-color)",
       },
     }),
+    menuPortal: (base) => ({
+      ...base,
+      zIndex: 9999,
+    }),
   };
 
   //no data found.
@@ -285,6 +289,7 @@ const AsyncSelect = (ctlProps) => {
           className={`react_select_ctrl ${ctlProps.className} ${
             ctlProps.errors?.[`${ctlProps.name}`] && "invalid box-shadow"
           }`}
+          menuPortalTarget={document.body}
           styles={customStyles}
           options={mapOptions}
           placeholder={ctlProps.placeHolder}
@@ -314,6 +319,7 @@ const AsyncSelect = (ctlProps) => {
           className={`react_select_ctrl ${ctlProps.className} ${
             ctlProps.errors?.[`${ctlProps.name}`] && "invalid box-shadow"
           }`}
+          menuPortalTarget={document.body}
           styles={customStyles}
           options={mapOptions}
           placeholder={ctlProps.placeHolder}

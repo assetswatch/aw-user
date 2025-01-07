@@ -56,6 +56,9 @@ export function SetPageLoaderNavLinks() {
         case routeNames.dashboard.path.toLowerCase():
           activelink = "dashboard";
           break;
+        case routeNames.settings.path.toLowerCase():
+          activelink = "settings";
+          break;
         case routeNames.connectionsowners.path.toLowerCase():
         case routeNames.connectionsagents.path.toLowerCase():
         case routeNames.connectionstenants.path.toLowerCase():
@@ -257,6 +260,70 @@ export function SetUserMenu() {
       });
     });
   }
+}
+
+export function SetAccordion() {
+  let $ = window.$;
+
+  useEffect(() => {
+    // Custom accordion useable settings for any type of accordion system
+    if (document.querySelector(".bb-accordion") !== null) {
+      $(".ac-toggle").on("click", function (e) {
+        e.preventDefault();
+
+        var $this = $(this);
+
+        if ($this.hasClass("active") && $this.next().hasClass("show")) {
+          $this.removeClass("active");
+          $this.next().removeClass("show");
+          $this.next().slideUp(350);
+        } else {
+          // Check accordion type: for single item open
+          if ($this.parent().parent().hasClass("ac-single-show")) {
+            $this
+              .parent()
+              .parent()
+              .find(".ac-card .ac-toggle")
+              .removeClass("active");
+            $this
+              .parent()
+              .parent()
+              .find(".ac-card .ac-collapse")
+              .removeClass("show");
+            $this.parent().parent().find(".ac-card .ac-collapse").slideUp(350);
+            $this.addClass("active");
+            $this.next().addClass("show");
+            $this.next().slideDown(350);
+          }
+
+          // Check accordion type: for group item open
+          else if ($this.parent().parent().hasClass("ac-group-show")) {
+            $this.addClass("active");
+            $this.next().addClass("show");
+            $this.next().slideDown(350);
+          }
+
+          // Default if not use any accordion type
+          else {
+            $this
+              .parent()
+              .parent()
+              .find(".ac-card .ac-toggle")
+              .removeClass("active");
+            $this
+              .parent()
+              .parent()
+              .find(".ac-card .ac-collapse")
+              .removeClass("show");
+            $this.parent().parent().find(".ac-card .ac-collapse").slideUp(350);
+            $this.addClass("active");
+            $this.next().addClass("show");
+            $this.next().slideDown(350);
+          }
+        }
+      });
+    }
+  }, []);
 }
 
 /** check empty val empty return true / false */

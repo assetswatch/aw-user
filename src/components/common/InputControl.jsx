@@ -39,8 +39,34 @@ const InputControl = ({
         formErrors[name] = rex.invalid;
       }
       break;
+    case formCtrlTypes.currentpwd:
+      rex = Regex.currentpwd;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (!(value.length >= rex.min && value.length <= rex.max)) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.newpwd:
+      rex = Regex.newpwd;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (!(value.length >= rex.min && value.length <= rex.max)) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
     case formCtrlTypes.confirmpwd:
       rex = Regex.confirmpwd;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (!(value.length >= rex.min && value.length <= rex.max)) {
+        formErrors[name] = rex.invalid;
+      } else if (!checkObjNullorEmpty(objProps) && value != objProps.pwdVal) {
+        formErrors[name] = rex.match;
+      }
+      break;
+    case formCtrlTypes.confirmnewpwd:
+      rex = Regex.confirmnewpwd;
       if (required && checkEmptyVal(value)) {
         formErrors[name] = rex.required;
       } else if (!(value.length >= rex.min && value.length <= rex.max)) {
