@@ -3336,13 +3336,14 @@ Accordion Style Start
   content: "\e606";
   font-family: "simple-line-icons";
   font-size: 13px;
+  font-weight: 600;
   color: var(--theme-primary-color);
   position: absolute;
   width: 16px;
   height: 16px;
   right: 20px;
   /* background-color: var(--theme-dark-color);  */
-  top: 40%;
+  top: 20%;
   transform: translateY(-50%);
 }
 .accordion-plus-left .ac-toggle.active::before {
@@ -3353,6 +3354,10 @@ Accordion Style Start
   left: 0;
 }
 [class*="accordion-plus-"] .ac-toggle:not(.active):after {
+  transform: rotate(0deg);
+}
+[class*="accordion-plus-"] .ac-toggle.active:after {
+  top: 40%;
   transform: rotate(90deg);
 }
 

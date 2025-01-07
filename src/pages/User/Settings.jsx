@@ -1013,63 +1013,65 @@ const Settings = () => {
                   {/*============== Notification settings tab end ==============*/}
 
                   {/*==============  Manage branding tab start ==============*/}
-                  <div className="ac-card rounded border p-0 mb-20">
-                    <a
-                      className="ac-toggle text-dark text-truncate text-primary p-10 px-15"
-                      onClick={() => tabsClick("managebrandingtab")}
-                      id="managebrandingtab"
-                    >
-                      <span className="text-primary">Manage Branding</span>
-                    </a>
-                    <div className="ac-collapse p-15 mt-20">
-                      <div className="col">
-                        <form noValidate>
-                          <div className="row mb-30">
-                            <div className="col-auto">
-                              <label className="form-label pt-1">
-                                Branding:
-                              </label>
+                  {loggedinProfileTypeId != config.userProfileTypes.Tenant && (
+                    <div className="ac-card rounded border p-0 mb-20">
+                      <a
+                        className="ac-toggle text-dark text-truncate text-primary p-10 px-15"
+                        onClick={() => tabsClick("managebrandingtab")}
+                        id="managebrandingtab"
+                      >
+                        <span className="text-primary">Manage Branding</span>
+                      </a>
+                      <div className="ac-collapse p-15 mt-20">
+                        <div className="col">
+                          <form noValidate>
+                            <div className="row mb-30">
+                              <div className="col-auto">
+                                <label className="form-label pt-1">
+                                  Branding:
+                                </label>
+                              </div>
+                              <div className="col-xl-4 col-lg-6 col-md-6 col pl-0">
+                                <AsyncSelect
+                                  placeHolder={AppMessages.DdlDefaultSelect}
+                                  noData={AppMessages.NoData}
+                                  options={brandingList}
+                                  dataKey="Value"
+                                  dataVal="Name"
+                                  value={null}
+                                  name="ddlbranding"
+                                  lbl={formCtrlTypes.profiletype}
+                                  lblText="Profile type"
+                                  lblClass="mb-0 lbl-req-field d-none"
+                                  required={true}
+                                  tabIndex={1}
+                                  isSearchable={false}
+                                ></AsyncSelect>
+                              </div>
                             </div>
-                            <div className="col-xl-4 col-lg-6 col-md-6 col pl-0">
-                              <AsyncSelect
-                                placeHolder={AppMessages.DdlDefaultSelect}
-                                noData={AppMessages.NoData}
-                                options={brandingList}
-                                dataKey="Value"
-                                dataVal="Name"
-                                value={null}
-                                name="ddlbranding"
-                                lbl={formCtrlTypes.profiletype}
-                                lblText="Profile type"
-                                lblClass="mb-0 lbl-req-field d-none"
-                                required={true}
-                                tabIndex={1}
-                                isSearchable={false}
-                              ></AsyncSelect>
-                            </div>
-                          </div>
-                        </form>
-                        <hr className="w-100 text-primary"></hr>
-                        <div className="container-fluid">
-                          <div className="row form-action flex-center">
-                            <div
-                              className="col-md-6 px-0 form-error"
-                              id="form-error-cpwd"
-                            ></div>
-                            <div className="col-md-6 px-0">
-                              <button
-                                className="btn btn-primary"
-                                id="btnChangePassword"
-                                onClick={() => {}}
-                              >
-                                Save
-                              </button>
+                          </form>
+                          <hr className="w-100 text-primary"></hr>
+                          <div className="container-fluid">
+                            <div className="row form-action flex-center">
+                              <div
+                                className="col-md-6 px-0 form-error"
+                                id="form-error-cpwd"
+                              ></div>
+                              <div className="col-md-6 px-0">
+                                <button
+                                  className="btn btn-primary"
+                                  id="btnChangePassword"
+                                  onClick={() => {}}
+                                >
+                                  Save
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                   {/*============== Manage branding tab end ==============*/}
                 </div>
               </div>
