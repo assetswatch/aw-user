@@ -103,7 +103,7 @@ const Services = () => {
                     type="button"
                     to={routeNames.createnewrequest.path}
                   >
-                    <i className="flaticon-envelope flat-mini position-relative me-1 t-1"></i>{" "}
+                    <i className="fa fa-screwdriver-wrench position-relative me-1 t-1"></i>{" "}
                     Create New Request
                   </Link>
                 </div>

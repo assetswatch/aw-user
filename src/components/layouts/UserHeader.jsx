@@ -782,7 +782,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.comingup.path}
+                      to={routeNames.services.path}
                     >
                       <i className="fa fa-screwdriver-wrench pe-2"></i>
                       Services
@@ -905,7 +905,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.comingup.path}
+                      to={routeNames.services.path}
                     >
                       <i className="fa fa-screwdriver-wrench pe-2"></i>
                       Services
