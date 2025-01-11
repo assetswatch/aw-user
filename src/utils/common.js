@@ -59,6 +59,10 @@ export function SetPageLoaderNavLinks() {
         case routeNames.settings.path.toLowerCase():
           activelink = "settings";
           break;
+        case routeNames.services.path.toLowerCase():
+        case routeNames.createnewrequest.path.toLowerCase():
+          activelink = "services";
+          break;
         case routeNames.connectionsowners.path.toLowerCase():
         case routeNames.connectionsagents.path.toLowerCase():
         case routeNames.connectionstenants.path.toLowerCase():

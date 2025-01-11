@@ -649,8 +649,8 @@ const UserHeader = () => {
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      id="nav-services"
+                      to={routeNames.services.path}
                     >
                       <i className="fa fa-screwdriver-wrench pe-2"></i>
                       Services
