@@ -202,7 +202,7 @@ const Settings = () => {
         setStatesData([]);
       })
       .finally(() => {
-        if (!checkObjNullorEmpty(selState)) {
+        if (!checkObjNullorEmpty(selState) && checkEmptyVal(selState?.action)) {
           handleStateChange(selState, selCity);
         } else {
           setStateSelected({});
@@ -228,7 +228,7 @@ const Settings = () => {
         setCitiesData([]);
       })
       .finally(() => {
-        if (!checkObjNullorEmpty(selCity)) {
+        if (!checkObjNullorEmpty(selCity) && checkEmptyVal(selCity?.action)) {
           handleCityChange(selCity);
         } else {
           setCitySelected({});
@@ -1046,6 +1046,7 @@ const Settings = () => {
                                   required={true}
                                   tabIndex={1}
                                   isSearchable={false}
+                                  menuPortalTarget="body"
                                 ></AsyncSelect>
                               </div>
                             </div>

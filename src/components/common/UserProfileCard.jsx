@@ -48,9 +48,7 @@ const UserProfileCard = React.memo(({ showEdit = true, cssClass = "" }) => {
         }
       })
       .catch((err) => {
-        console.error(
-          `"API :: ${ApiUrls.getUserAssetDetails}, Error ::" ${err}`
-        );
+        console.error(`"API :: ${ApiUrls.getUserDetails}, Error ::" ${err}`);
       })
       .finally(() => {});
   }, []);

@@ -41,6 +41,7 @@ const Profile = () => {
 
   const [joinedAgentsTotalCount, setJoinedAgentsTotalCount] = useState(0);
   const [joinedTenantsTotalCount, setJoinedTenantsTotalCount] = useState(0);
+  const [joinedOwnersTotalCount, setJoinedOwnersTotalCount] = useState(0);
 
   useEffect(() => {
     //Joined agents
@@ -69,6 +70,24 @@ const Profile = () => {
       })
       .finally(() => {});
 
+    //Joined owners
+    axiosPost(`${config.apiBaseUrl}${ApiUrls.getJoinedUserConnections}`, {
+      ...objParams,
+      InviteeProfileTypeId: config.userProfileTypes.Owner,
+    })
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode === 200) {
+          setJoinedOwnersTotalCount(objResponse.Data.TotalCount);
+        }
+      })
+      .catch((err) => {
+        console.error(
+          `"API :: ${ApiUrls.getJoinedUserConnections}, Error ::" ${err}`
+        );
+      })
+      .finally(() => {});
+
     //Joined tenants
     axiosPost(`${config.apiBaseUrl}${ApiUrls.getJoinedUserConnections}`, {
       ...objParams,
@@ -87,6 +106,114 @@ const Profile = () => {
       })
       .finally(() => {});
   }, []);
+
+  //Owners Grid
+  const [ownersData, setownersData] = useState([]);
+  const [ownersTotalCount, setOwnersTotalCount] = useState(0);
+  const [isOwnersDataLoading, setIsOwnersDataLoading] = useState(true);
+
+  const getOwners = ({
+    pi = GridDefaultValues.pi,
+    ps = GridDefaultValues.ps5,
+  }) => {
+    setIsOwnersDataLoading(true);
+    let objParams = {};
+    objParams = {
+      keyword: "",
+      inviteeid: profileId,
+      InviteeProfileTypeId: config.userProfileTypes.Owner,
+      InviterProfileTypeId: config.userProfileTypes.Owner,
+      pi: parseInt(pi),
+      ps: parseInt(ps),
+    };
+
+    return axiosPost(
+      `${config.apiBaseUrl}${ApiUrls.getRequestedUserConnections}`,
+      objParams
+    )
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode === 200) {
+          setOwnersTotalCount(objResponse.Data.TotalCount);
+          setownersData(objResponse.Data.UserConnections);
+        } else {
+          setownersData([]);
+        }
+      })
+      .catch((err) => {
+        setownersData([]);
+        console.error(
+          `"API :: ${ApiUrls.getRequestedUserConnections}, Error ::" ${err}`
+        );
+      })
+      .finally(() => {
+        setIsOwnersDataLoading(false);
+      });
+  };
+
+  //Setup Owners Grid.
+
+  const ownercolumns = React.useMemo(
+    () => [
+      {
+        Header: "Name",
+        accessor: "",
+        className: "w-250px",
+        disableSortBy: true,
+        Cell: ({ row }) => (
+          <>
+            <LazyImage
+              className="rounded-circle cur-pointer w-40px shadow mr-10"
+              onClick={(e) => {}}
+              src={row.original.PicPath}
+              alt={row.original.FirstName + " " + row.original.LastName}
+              placeHolderClass="pos-absolute w-40px min-h-40 fl-l"
+            ></LazyImage>
+            <div className="property-info d-flex flex-start">
+              <a href="#" onClick={(e) => {}}>
+                <h5 className="text-secondary">
+                  {row.original.FirstName + " " + row.original.LastName}
+                </h5>
+              </a>
+            </div>
+          </>
+        ),
+      },
+      {
+        Header: "Location",
+        accessor: "AddressOne",
+        disableSortBy: true,
+        className: "w-200px",
+      },
+      {
+        Header: "Email Id",
+        accessor: "Email",
+        disableSortBy: true,
+        className: "w-200px",
+      },
+      {
+        Header: "Phone Number",
+        accessor: "MobileNo",
+        disableSortBy: true,
+        className: "w-200px",
+      },
+      {
+        Header: "Requested On",
+        accessor: "InvitedDateDisplay",
+        className: "w-200px",
+      },
+    ],
+    []
+  );
+
+  let fetchOwnersData = useCallback(() => {
+    getOwners({
+      pi: GridDefaultValues.pi,
+      ps: GridDefaultValues.ps5,
+    });
+  }, []);
+
+  //Setup Owners Grid.
 
   //Agents Grid
   const [agentsData, setAgentsData] = useState([]);
@@ -316,10 +443,10 @@ const Profile = () => {
     setIsAssetsDataLoading(true);
     let objParams = {};
     objParams = {
-      ProfileId: profileId,
+      //ProfileId: profileId,
       accountid: accountId,
       keyword: "",
-      contracttypeid: 0,
+      classificationtypeid: 0,
       assettypeid: 0,
       pi: parseInt(pi),
       ps: parseInt(ps),
@@ -401,27 +528,37 @@ const Profile = () => {
   }, []);
 
   const onAssets = () => {
-    navigate(routeNames.userproperties.path);
+    navigate(routeNames.ownerproperties.path);
+  };
+
+  const onJoinedOwners = () => {
+    navigate(routeNames.connectionsowners.path);
   };
 
   const onJoinedAgents = () => {
-    navigate(routeNames.owneragents.path);
+    navigate(routeNames.connectionsagents.path);
   };
 
   const onJoinedTenants = () => {
-    navigate(routeNames.ownertenants.path);
+    navigate(routeNames.connectionstenants.path);
+  };
+
+  const onRequestedOwners = () => {
+    navigate(routeNames.connectionsowners.path);
   };
 
   const onRequestedAgents = () => {
-    navigate(routeNames.owneragents.path, {
-      state: { tab: UserConnectionTabIds.requested },
-    });
+    // navigate(routeNames.owneragents.path, {
+    //   state: { tab: UserConnectionTabIds.requested },
+    // });
+    navigate(routeNames.connectionsagents.path);
   };
 
   const onRequestedTenants = () => {
-    navigate(routeNames.ownertenants.path, {
-      state: { tab: UserConnectionTabIds.requested },
-    });
+    // navigate(routeNames.ownertenants.path, {
+    //   state: { tab: UserConnectionTabIds.requested },
+    // });
+    navigate(routeNames.connectionstenants.path);
   };
 
   //Setup Assets Grid.
@@ -560,8 +697,17 @@ const Profile = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="col cur-pointer" onClick={onJoinedAgents}>
+                    <div className="col cur-pointer" onClick={onJoinedOwners}>
                       <div className="p-3 box-shadow rounded bg-white info">
+                        <i className="flaticon-user flat-medium float-start pe-3"></i>
+                        <div className="text-right text-muted">
+                          <div className="count">{joinedOwnersTotalCount}</div>
+                          <div className="title">Owners</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col cur-pointer" onClick={onJoinedAgents}>
+                      <div className="p-3 box-shadow rounded bg-white error">
                         <i className="flaticon-user flat-medium float-start pe-3"></i>
                         <div className="text-right text-muted">
                           <div className="count">{joinedAgentsTotalCount}</div>
@@ -570,7 +716,7 @@ const Profile = () => {
                       </div>
                     </div>
                     <div className="col cur-pointer" onClick={onJoinedTenants}>
-                      <div className="p-3 box-shadow rounded bg-white error">
+                      <div className="p-3 box-shadow rounded bg-white warning">
                         <i className="flaticon-user flat-medium float-start pe-3"></i>
                         <div className="text-right text-muted">
                           <div className="count">{joinedTenantsTotalCount}</div>
@@ -578,7 +724,7 @@ const Profile = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="col">
+                    {/* <div className="col">
                       <div className="p-3 box-shadow rounded bg-white warning">
                         <i className="fa-regular fa-file-lines float-start pe-3 lh-45"></i>
                         <div className="text-right text-muted">
@@ -586,9 +732,57 @@ const Profile = () => {
                           <div className="title">Agreements</div>
                         </div>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                   {/*============== Stats End ==============*/}
+
+                  {/*============== Recent Owners Start ==============*/}
+                  <div className="full-row px-0 py-4 mb-20 bg-white box-shadow rounded min-h-250">
+                    <div className="container-fluid px-0">
+                      <div className="row">
+                        <div className="col">
+                          <div className="row mx-0 px-20">
+                            <h6 className="col mx-0 px-0 mb-4 down-line pb-1">
+                              Recent Owners Contact
+                            </h6>
+                            <div className="col-auto px-0 mx-0">
+                              <button
+                                type="button"
+                                className="btn btn-glow px-0 rounded-circle lh-1"
+                                onClick={onRequestedOwners}
+                              >
+                                <i className="icons font-18 icon-arrow-right-circle text-primary"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <div className="row">
+                            <div className="col mb-15">
+                              <Grid
+                                columns={ownercolumns}
+                                data={ownersData}
+                                loading={isOwnersDataLoading}
+                                fetchData={fetchOwnersData}
+                                pageCount={5}
+                                totalInfo={{
+                                  text: "Owner Requests",
+                                  count: ownersTotalCount,
+                                }}
+                                noData={AppMessages.NoOwnerRequests}
+                                showPaging={false}
+                                headerClass={`gr-head-bt gr-head-p12 ${
+                                  !isOwnersDataLoading && ownersData.length > 0
+                                    ? "show"
+                                    : "hide"
+                                }`}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/*============== Recent Owners End ==============*/}
+
                   {/*============== Recent Agent Start ==============*/}
                   <div className="full-row px-0 py-4 mb-20 bg-white box-shadow rounded min-h-250">
                     <div className="container-fluid px-0">

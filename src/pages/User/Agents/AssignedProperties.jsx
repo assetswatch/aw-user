@@ -26,6 +26,7 @@ import {
   UserCookie,
   API_ACTION_STATUS,
   GridDefaultValues,
+  ValidationMessages,
 } from "../../../utils/constants";
 import { useAuth } from "../../../contexts/AuthContext";
 import { axiosPost } from "../../../helpers/axiosHelper";
@@ -36,10 +37,11 @@ import {
 } from "../../../helpers/sessionStorageHelper";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 import { useGetAssetTypesGateway } from "../../../hooks/useGetAssetTypesGateway";
+import { useGetAssetListingTypesGateway } from "../../../hooks/useGetAssetListingTypesGateway";
 import { Toast } from "../../../components/common/ToastView";
 import { useAssetClassificationTypesGateway } from "../../../hooks/useAssetClassificationTypesGateway";
 
-const ConnectedProperties = () => {
+const AssignedProperties = () => {
   let $ = window.$;
 
   let formErrors = {};
@@ -57,18 +59,21 @@ const ConnectedProperties = () => {
   );
   const [selectedAssetType, setSelectedAssetType] = useState(null);
 
+  const { assetListingTypesList } = useGetAssetListingTypesGateway("", 1);
+  const [selectedListingType, setSelectedListingType] = useState(null);
+
   //Grid
   const [assetsList, setAssetsList] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [pageCount, setPageCount] = useState(0);
+  const [currPagingInfo, setCurrPagingInfo] = useState({
+    pi: GridDefaultValues.pi,
+    ps: GridDefaultValues.ps,
+  });
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [selectedGridRow, setSelectedGridRow] = useState(null);
 
-  //Modal
-  const [modalDeleteConfirmShow, setModalDeleteConfirmShow] = useState(false);
-  const [modalDeleteConfirmContent, setModalDeleteConfirmContent] = useState(
-    AppMessages.DeleteAssetConfirmationMessage
-  );
+  const [modalListPropertyShow, setModalListPropertyShow] = useState(false);
 
   const navigate = useNavigate();
 
@@ -187,6 +192,8 @@ const ConnectedProperties = () => {
         ps: parseInt(ps),
       };
 
+      setCurrPagingInfo({ pi: parseInt(pi), ps: parseInt(ps) });
+
       if (!isShowall) {
         objParams = {
           ...objParams,
@@ -293,30 +300,48 @@ const ConnectedProperties = () => {
         className: "w-200px",
       },
       {
-        Header: "Properties",
-        className: "w-200px",
+        Header: "Listing Info",
+        className: "w-220px",
         Cell: ({ row }) => (
           <>
             <div className="property-info d-table">
+              <div>Is Listed : {row.original.IsListed == 1 ? "Yes" : "No"}</div>
+              <div>
+                Listing Type :{" "}
+                {row.original.ListingType ? row.original.ListingType : "--"}
+              </div>
+            </div>
+            {/* <div className="property-info d-table text-center">
               <div>Noof Floors : {row.original.NoOfFloors}</div>
               <div>Bedrooms : {row.original.Bedrooms}</div>
-              <div>Bathrooms : {row.original.Bathrooms}</div>
-            </div>
+              <div>Bathrooms : {row.original.Bathrooms}</div> 
+            </div>*/}
           </>
         ),
       },
       {
-        Header: "Last Modified On",
-        accessor: "ModifiedDateDisplay",
+        Header: "Assigned On",
+        accessor: "AssignedModifiedDateDisplay",
         className: "w-250px",
       },
       {
         Header: "Actions",
-        className: "w-150px",
+        className: "w-130px",
+        isPropertyActionMenu: true,
         actions: [
           {
             text: "View Property",
             onclick: (e, row) => onView(e, row),
+          },
+          {
+            text: "List Property",
+            onclick: (e, row) => onListPropertyModalShow(e, row),
+            icssclass: "pr-10 pl-2px",
+          },
+          {
+            text: "Listing Information",
+            onclick: (e, row) => onListPropertyModalShow(e, row),
+            icssclass: "pr-10 pl-2px",
           },
         ],
       },
@@ -343,37 +368,104 @@ const ConnectedProperties = () => {
     navigate(routeNames.agentviewproperty.path);
   };
 
-  const onDelete = (e) => {
+  const onListProperty = (e, isupdate = false) => {
     e.preventDefault();
+    e.stopPropagation();
 
-    apiReqResLoader(
-      "btndeleteproperty",
-      "Deleting",
-      API_ACTION_STATUS.START,
-      false
-    );
+    if (checkEmptyVal(selectedListingType)) {
+      formListPropertyErrors["ddllistingtype"] =
+        ValidationMessages.ListingTypeReq;
+    }
 
+    if (Object.keys(formListPropertyErrors).length === 0) {
+      setListPropertyErrors({});
+      if (!isupdate) {
+        apiReqResLoader("btnlistproperty", "Listing", API_ACTION_STATUS.START);
+      } else {
+        apiReqResLoader(
+          "btnupdatelistinginfo",
+          "Saving",
+          API_ACTION_STATUS.START
+        );
+      }
+      let isapimethoderr = false;
+      let objBodyParams = {
+        AssetId: parseInt(selectedGridRow?.original?.AssetId),
+        ListedByProfileId: parseInt(
+          GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
+        ),
+        ListingTypeId: parseInt(setSelectDefaultVal(selectedListingType)),
+        Price: checkEmptyVal(listPropertyFormData.txtprice)
+          ? 0
+          : listPropertyFormData.txtprice,
+        Advance: checkEmptyVal(listPropertyFormData.txtadvance)
+          ? 0
+          : listPropertyFormData.txtadvance,
+      };
+
+      axiosPost(`${config.apiBaseUrl}${ApiUrls.listAsset}`, objBodyParams)
+        .then((response) => {
+          let objResponse = response.data;
+          if (objResponse.StatusCode === 200) {
+            if (objResponse.Data.Id > 0) {
+              Toast.success(
+                !isupdate
+                  ? AppMessages.AssetListSuccess
+                  : AppMessages.UpdateListingInfoSuccess
+              );
+              getAssets({ pi: currPagingInfo.pi, ps: currPagingInfo.ps });
+              onListPropertyModalHide();
+            }
+          } else {
+            isapimethoderr = true;
+          }
+        })
+        .catch((err) => {
+          isapimethoderr = true;
+          console.error(`"API :: ${ApiUrls.listAsset}, Error ::" ${err}`);
+        })
+        .finally(() => {
+          if (isapimethoderr == true) {
+            Toast.error(AppMessages.SomeProblem);
+          }
+          if (!isupdate) {
+            apiReqResLoader(
+              "btnlistproperty",
+              "List",
+              API_ACTION_STATUS.COMPLETED
+            );
+          } else {
+            apiReqResLoader(
+              "btnupdatelistinginfo",
+              "Save",
+              API_ACTION_STATUS.COMPLETED
+            );
+          }
+        });
+    } else {
+      $(`[name=${Object.keys(formListPropertyErrors)[0]}]`).focus();
+      setListPropertyErrors(formListPropertyErrors);
+    }
+  };
+
+  const onUnListProperty = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    apiReqResLoader("btnunlistproperty", "Unlisting", API_ACTION_STATUS.START);
     let isapimethoderr = false;
     let objBodyParams = {
-      ProfileId: parseInt(
-        GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
-      ),
-      AccountId: parseInt(
-        GetUserCookieValues(UserCookie.AccountId, loggedinUser)
-      ),
       AssetId: parseInt(selectedGridRow?.original?.AssetId),
     };
 
-    axiosPost(`${config.apiBaseUrl}${ApiUrls.deleteAsset}`, objBodyParams)
+    axiosPost(`${config.apiBaseUrl}${ApiUrls.unlistAsset}`, objBodyParams)
       .then((response) => {
         let objResponse = response.data;
         if (objResponse.StatusCode === 200) {
-          if (objResponse.Data.Status == 1) {
-            Toast.success(AppMessages.DeleteAssetSuccess);
-            getAssets({});
-            onDeleteConfirmModalClose();
-          } else {
-            Toast.error(objResponse.Data.Message);
+          if (objResponse.Data.Id > 0) {
+            Toast.success(AppMessages.AssetUnlistSuccess);
+            getAssets({ pi: currPagingInfo.pi, ps: currPagingInfo.ps });
+            onListPropertyModalHide();
           }
         } else {
           isapimethoderr = true;
@@ -381,49 +473,155 @@ const ConnectedProperties = () => {
       })
       .catch((err) => {
         isapimethoderr = true;
-        console.error(`"API :: ${ApiUrls.deleteAsset}, Error ::" ${err}`);
+        console.error(`"API :: ${ApiUrls.unlistAsset}, Error ::" ${err}`);
       })
       .finally(() => {
         if (isapimethoderr == true) {
           Toast.error(AppMessages.SomeProblem);
         }
         apiReqResLoader(
-          "btndeleteproperty",
-          "Yes",
-          API_ACTION_STATUS.COMPLETED,
-          false
+          "btnunlistproperty",
+          "Unlist",
+          API_ACTION_STATUS.COMPLETED
         );
       });
   };
 
   //Grid actions
 
-  //Delete confirmation Modal actions
+  //List Property Modal actions
 
-  const onDeleteConfirmModalClose = () => {
-    setModalDeleteConfirmShow(false);
+  let formListPropertyErrors = {};
+  const [listPropertyErrors, setListPropertyErrors] = useState({});
+  function setInitialListPropertyFormData() {
+    return {
+      txtprice: "",
+      txtadvance: "",
+    };
+  }
+  const [listPropertyFormData, setListPropertyFormData] = useState(
+    setInitialListPropertyFormData()
+  );
+
+  const onListPropertyModalShow = (e, row) => {
+    e?.preventDefault();
+    console.log(row);
+    if (row.original?.IsListed == 1) {
+      setListPropertyFormData({
+        txtprice: row.original?.Price,
+        txtadvance: row.original?.Advance,
+      });
+      setSelectedListingType(row.original?.ListingTypeId);
+    }
+    setSelectedGridRow(row);
+    setModalListPropertyShow(true);
+  };
+
+  const onListPropertyModalHide = (e) => {
+    e?.preventDefault();
     setSelectedGridRow(null);
+    setShowEditListingInfo(false);
+    setModalListPropertyShow(false);
+    setSelectedListingType(null);
+    setListPropertyErrors({});
+    setListPropertyFormData(setInitialListPropertyFormData());
     apiReqResLoader(
-      "btndeleteproperty",
-      "Yes",
+      "btnlistproperty",
+      "List",
       API_ACTION_STATUS.COMPLETED,
       false
     );
-    setModalDeleteConfirmContent(AppMessages.DeleteAssetConfirmationMessage);
-  };
-
-  const onDeleteConfirmModalShow = (e, row) => {
-    e.preventDefault();
-    setSelectedGridRow(row);
-    setModalDeleteConfirmContent(
-      replacePlaceHolders(modalDeleteConfirmContent, {
-        propertyname: `${row?.original?.AddressOne}`,
-      })
+    apiReqResLoader(
+      "btnupdatelistinginfo",
+      "Save",
+      API_ACTION_STATUS.COMPLETED,
+      false
     );
-    setModalDeleteConfirmShow(true);
+    apiReqResLoader(
+      "btnunlistproperty",
+      "Unlist",
+      API_ACTION_STATUS.COMPLETED,
+      false
+    );
   };
 
-  //Delete confirmation Modal actions
+  const handleListingTypeChange = (e) => {
+    setSelectedListingType(e?.value);
+  };
+
+  const handleListingTypeInputChange = (e) => {
+    const { name, value } = e?.target;
+    setListPropertyFormData({
+      ...listPropertyFormData,
+      [name]: value,
+    });
+  };
+
+  const generateModalActions = () => {
+    let actions = [];
+    if (selectedGridRow) {
+      if (selectedGridRow?.original?.IsListed == 0) {
+        actions.push({
+          id: "btnlistproperty",
+          text: "List",
+          displayOrder: 1,
+          btnClass: "btn-primary",
+          onClick: (e) => onListProperty(e),
+        });
+        actions.push({
+          text: "Cancel",
+          displayOrder: 2,
+          btnClass: "btn-secondary",
+          onClick: (e) => onListPropertyModalHide(e),
+        });
+      } else {
+        actions.push({
+          id: "btnunlistproperty",
+          text: "Unlist",
+          displayOrder: 3,
+          btnClass: "btn-danger",
+          onClick: (e) => onUnListProperty(e),
+        });
+        if (showEditListingInfo) {
+          actions.push({
+            id: "btnupdatelistinginfo",
+            text: "Save",
+            displayOrder: 1,
+            btnClass: "btn-primary",
+            onClick: (e) => onListProperty(e, true),
+          });
+          actions.push({
+            text: "Cancel",
+            displayOrder: 2,
+            btnClass: "btn-secondary",
+            onClick: (e) => toggleListingInfo(e),
+          });
+        } else {
+          actions.push({
+            id: "btnlistproperty",
+            text: "Edit",
+            displayOrder: 1,
+            btnClass: "btn-primary",
+            onClick: (e) => toggleListingInfo(e),
+          });
+          actions.push({
+            text: "Close",
+            displayOrder: 2,
+            btnClass: "btn-secondary",
+            onClick: (e) => onListPropertyModalHide(e),
+          });
+        }
+      }
+    }
+    return actions;
+  };
+
+  const [showEditListingInfo, setShowEditListingInfo] = useState(false);
+  const toggleListingInfo = (e) => {
+    setShowEditListingInfo(!showEditListingInfo);
+  };
+
+  //List Property Modal actions
 
   return (
     <>
@@ -432,7 +630,7 @@ const ConnectedProperties = () => {
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <h5 className="mb-4 down-line pb-10">Connected Properties</h5>
+              <h5 className="mb-4 down-line pb-10">Assigned Properties</h5>
               {/*============== Search Start ==============*/}
               <div className="woo-filter-bar full-row px-3 py-4 box-shadow grid-search rounded">
                 <div className="container-fluid v-center">
@@ -595,7 +793,7 @@ const ConnectedProperties = () => {
                         text: "Total Properties",
                         count: totalCount,
                       }}
-                      noData={AppMessages.NoProperties}
+                      noData={AppMessages.NoAssignedProperties}
                     />
                   </div>
                 </div>
@@ -606,34 +804,107 @@ const ConnectedProperties = () => {
         </div>
       </div>
 
-      {/*============== Delete Confirmation Modal Start ==============*/}
-      {modalDeleteConfirmShow && (
+      {/*============== List Property Modal Start ==============*/}
+      {modalListPropertyShow && (
         <>
           <ModalView
-            title={AppMessages.DeleteConfirmationTitle}
-            content={modalDeleteConfirmContent}
-            onClose={onDeleteConfirmModalClose}
-            actions={[
-              {
-                id: "btndeleteproperty",
-                text: "Yes",
-                displayOrder: 1,
-                btnClass: "btn-primary",
-                onClick: (e) => onDelete(e),
-              },
-              {
-                text: "No",
-                displayOrder: 2,
-                btnClass: "btn-secondary",
-                onClick: (e) => onDeleteConfirmModalClose(e),
-              },
-            ]}
+            title={
+              selectedGridRow?.original?.IsListed == 1
+                ? AppMessages.ListingInfoModalTitle
+                : AppMessages.ListPropertyModalTitle
+            }
+            content={
+              <>
+                {!showEditListingInfo &&
+                selectedGridRow?.original?.IsListed == 1 ? (
+                  <div className="row form-view">
+                    <div className="col-md-6 mb-15">
+                      <span>Listing type : </span>
+                      <span>{selectedGridRow?.original?.ListingType}</span>
+                    </div>
+                    <div className="col-md-6 mb-15 text-md-end">
+                      <span>Listed On : </span>
+                      <span>
+                        {selectedGridRow?.original?.ListedDateDisplay}
+                      </span>
+                    </div>
+                    <div className="col-md-6 mb-15">
+                      <span>Amount : </span>
+                      <span>{selectedGridRow?.original?.PriceDisplay}</span>
+                    </div>
+                    <div className="col-md-6 mb-0 text-md-end">
+                      <span>Advance : </span>
+                      <span>{selectedGridRow?.original?.AdvanceDisplay}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="row">
+                    <div className="col-12 mb-15">
+                      <AsyncSelect
+                        placeHolder={
+                          assetListingTypesList.length <= 0 &&
+                          selectedListingType == null
+                            ? AppMessages.DdLLoading
+                            : AppMessages.DdlDefaultSelect
+                        }
+                        noData={
+                          assetListingTypesList.length <= 0 &&
+                          selectedListingType == null
+                            ? AppMessages.DdLLoading
+                            : AppMessages.DdlNoData
+                        }
+                        options={assetListingTypesList}
+                        dataKey="ListingTypeId"
+                        dataVal="ListingType"
+                        onChange={handleListingTypeChange}
+                        value={selectedListingType}
+                        name="ddllistingtype"
+                        lbl={formCtrlTypes.assetlistingtype}
+                        lblClass="mb-0 lbl-req-field"
+                        className="ddlborder"
+                        isClearable={false}
+                        errors={listPropertyErrors}
+                        formErrors={formListPropertyErrors}
+                        tabIndex={1}
+                      ></AsyncSelect>
+                    </div>
+                    <div className="col-md-6 mb-15">
+                      <InputControl
+                        lblClass="mb-0 lbl-req-field"
+                        name="txtprice"
+                        ctlType={formCtrlTypes.amount}
+                        required={true}
+                        onChange={handleListingTypeInputChange}
+                        value={listPropertyFormData.txtprice}
+                        errors={listPropertyErrors}
+                        formErrors={formListPropertyErrors}
+                        tabIndex={2}
+                      ></InputControl>
+                    </div>
+                    <div className="col-md-6 mb-0">
+                      <InputControl
+                        lblClass="mb-0"
+                        name="txtadvance"
+                        ctlType={formCtrlTypes.advance}
+                        onChange={handleListingTypeInputChange}
+                        value={listPropertyFormData.txtadvance}
+                        errors={listPropertyErrors}
+                        formErrors={formListPropertyErrors}
+                        tabIndex={3}
+                      ></InputControl>
+                    </div>
+                  </div>
+                )}
+              </>
+            }
+            onClose={onListPropertyModalHide}
+            actions={generateModalActions()}
           ></ModalView>
         </>
       )}
-      {/*============== Delete Confirmation Modal End ==============*/}
+      {/*============== List Property Modal End ==============*/}
     </>
   );
 };
 
-export default ConnectedProperties;
+export default AssignedProperties;

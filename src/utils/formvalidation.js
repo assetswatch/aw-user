@@ -23,6 +23,7 @@ const length2000 = 2000;
 const nums = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 const phonevalidvalues = [...nums, "+", "-", "."];
 const pricevalidvalues = [...nums, ".", ","];
+
 const expirydatevalidvalues = [...nums, "/"];
 const allowedFileTypes = ["image/jpeg", "image/png", "application/pdf"];
 const uploadFileMaxSize = 10 * 1024 * 1024; //10mb
@@ -35,7 +36,7 @@ const RegexPattern = {
   email: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,})+$/,
   url: /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?(\?[^\s]*)?$/,
   date: /^(?:(0[1-9]|1[012])[\/.](0[1-9]|[12][0-9]|3[01])[\/.][0-9]{4})$/,
-  price: /^(\$|)([0-9]\d{0,2}(\,\d{3})*|([1-9]\d*))(\.\d{1,2})?$/,
+  price: /^\d{1,3}(,\d{3})*(\.\d{1,2})?$/, // /^(\$|)([0-9]\d{0,2}(\,\d{3})*|([1-9]\d*))(\.\d{1,2})?$/,
   cardexpiry: /^(0[1-9]|1[0-2])\/\d{4}$/,
 };
 
@@ -237,6 +238,18 @@ export const Regex = {
     invalid: ValidationMessages.AdvanceInvalid,
     pattern: RegexPattern.price,
   },
+  nooffloors: {
+    max: length3,
+    required: ValidationMessages.NooffloorsReq,
+    invalid: ValidationMessages.NooffloorsInvalid,
+    pattern: RegexPattern.numonly,
+  },
+  area: {
+    max: length15,
+    required: ValidationMessages.AreaReq,
+    invalid: ValidationMessages.AreaInvalid,
+    pattern: RegexPattern.price,
+  },
   sqfeet: {
     max: length15,
     required: ValidationMessages.SqfeetReq,
@@ -247,6 +260,12 @@ export const Regex = {
     max: length5,
     required: ValidationMessages.AgentPercentReq,
     invalid: ValidationMessages.AgentPercentInvalid,
+    pattern: RegexPattern.price,
+  },
+  ownershippercentage: {
+    max: length5,
+    required: ValidationMessages.OwnershipPercentReq,
+    invalid: ValidationMessages.OwnershipPercentInvalid,
     pattern: RegexPattern.price,
   },
   title: {
@@ -575,8 +594,17 @@ export const formCtrlTypes = {
   assettype: {
     lbl: "Property type:",
   },
+  ownershipstatus: {
+    lbl: "Status:",
+  },
+  areaunittype: {
+    lbl: "Unit type:",
+  },
   assetcontracttype: {
     lbl: "Contract type:",
+  },
+  assetlistingtype: {
+    lbl: "Listing type:",
   },
   assetclassificationtype: {
     lbl: "Classification type:",
@@ -644,6 +672,34 @@ export const formCtrlTypes = {
       },
     },
   },
+  nooffloors: {
+    lbl: "No.of floors:",
+    input: {
+      type: "text",
+      max: length3,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!RegexPattern.numonly.test(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
+  },
+  area: {
+    lbl: "Area:",
+    input: {
+      type: "text",
+      max: length15,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!pricevalidvalues.includes(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
+  },
   sqfeet: {
     lbl: "Square feet:",
     input: {
@@ -660,6 +716,20 @@ export const formCtrlTypes = {
   },
   brokerpercentage: {
     lbl: "Agent (%):",
+    input: {
+      type: "text",
+      max: length5,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!pricevalidvalues.includes(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
+  },
+  ownershippercentage: {
+    lbl: "Percentage:",
     input: {
       type: "text",
       max: length5,

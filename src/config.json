@@ -25,6 +25,10 @@
     "Residential": 1,
     "Commercial": 2
   },
+  "assetOwnershipStatusTypes": {
+    "Active": "A",
+    "Passive": "P"
+  },
   "paymentStatusTypes": {
     "Pending": 0,
     "Paid": 1

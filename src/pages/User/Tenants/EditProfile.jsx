@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   apiReqResLoader,
+  checkEmptyVal,
   checkObjNullorEmpty,
   GetCookieValues,
   getPagesPathByLoggedinUserProfile,
@@ -166,7 +167,7 @@ const EditProfile = () => {
         setStatesData([]);
       })
       .finally(() => {
-        if (!checkObjNullorEmpty(selState)) {
+        if (!checkObjNullorEmpty(selState) && checkEmptyVal(selState?.action)) {
           handleStateChange(selState, selCity);
         } else {
           setStateSelected({});
@@ -192,7 +193,7 @@ const EditProfile = () => {
         setCitiesData([]);
       })
       .finally(() => {
-        if (!checkObjNullorEmpty(selCity)) {
+        if (!checkObjNullorEmpty(selCity) && checkEmptyVal(selCity?.action)) {
           handleCityChange(selCity);
         } else {
           setCitySelected({});

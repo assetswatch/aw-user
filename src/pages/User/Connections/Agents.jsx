@@ -367,7 +367,7 @@ const Agents = () => {
               onStatusChange(
                 e,
                 row.original,
-                config.userConnectionStatusTypes.Accepted
+                config.userConnectionStatusTypes.Joined
               );
             },
           },
@@ -556,12 +556,7 @@ const Agents = () => {
 
     if (Object.keys(formSendInvitaionErrors).length === 0) {
       setSendInvitationErrors({});
-      apiReqResLoader(
-        "btnsendinvitation",
-        "Sending",
-        API_ACTION_STATUS.START,
-        false
-      );
+      apiReqResLoader("btnsendinvitation", "Sending", API_ACTION_STATUS.START);
 
       let isapimethoderr = false;
       let objBodyParams = {
@@ -605,8 +600,7 @@ const Agents = () => {
           apiReqResLoader(
             "btnsendinvitation",
             "Send",
-            API_ACTION_STATUS.COMPLETED,
-            false
+            API_ACTION_STATUS.COMPLETED
           );
         });
     } else {

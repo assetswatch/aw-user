@@ -243,6 +243,14 @@ const AsyncSelect = (ctlProps) => {
     }, 500);
   };
 
+  const singleValue = (props) => {
+    return (
+      <div className="css-1dimb5e-singleValue">
+        {props.data.customlabel ? props.data.customlabel : props.data.label}
+      </div>
+    );
+  };
+
   const multiValue = (props) => {
     const { data, removeProps, innerRef, innerProps } = props;
 
@@ -279,6 +287,12 @@ const AsyncSelect = (ctlProps) => {
     );
   };
 
+  const customFilterOptions = (options, { inputValue }) => {
+    return options?.filter((option) =>
+      option.label.toLowerCase().includes(inputValue.toLowerCase())
+    );
+  };
+
   return (
     <>
       <label className={ctlProps.lblClass}>
@@ -289,7 +303,7 @@ const AsyncSelect = (ctlProps) => {
           className={`react_select_ctrl ${ctlProps.className} ${
             ctlProps.errors?.[`${ctlProps.name}`] && "invalid box-shadow"
           }`}
-          menuPortalTarget={document.body}
+          menuPortalTarget={ctlProps.menuPortalTarget ? document.body : null}
           styles={customStyles}
           options={mapOptions}
           placeholder={ctlProps.placeHolder}
@@ -319,7 +333,7 @@ const AsyncSelect = (ctlProps) => {
           className={`react_select_ctrl ${ctlProps.className} ${
             ctlProps.errors?.[`${ctlProps.name}`] && "invalid box-shadow"
           }`}
-          menuPortalTarget={document.body}
+          menuPortalTarget={ctlProps.menuPortalTarget ? document.body : null}
           styles={customStyles}
           options={mapOptions}
           placeholder={ctlProps.placeHolder}
@@ -328,6 +342,16 @@ const AsyncSelect = (ctlProps) => {
             animatedComponents,
             DropdownIndicator,
             ClearIndicator,
+            SingleValue: singleValue,
+          }}
+          filterOption={(option, inputValue) => {
+            return option?.data?.customlabel
+              ? option?.data?.customlabel
+                  .toLowerCase()
+                  .includes(inputValue.toLowerCase())
+              : option?.data?.label
+                  .toLowerCase()
+                  .includes(inputValue.toLowerCase());
           }}
           isLoading={isLoading}
           noOptionsMessage={noOptionsMessage}
