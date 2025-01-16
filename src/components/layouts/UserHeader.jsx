@@ -593,19 +593,28 @@ const UserHeader = () => {
                     <ul className="dropdown-menu">
                       <li className="dropdown-item">
                         <Link
-                          id="nav-lnk-viewproperties"
-                          to={routeNames.userproperties.path}
+                          id="nav-lnk-myproperties"
+                          to={routeNames.ownerproperties.path}
                         >
-                          <i className="fa-regular fa-eye pe-1"></i> View
-                          Properties
+                          <i className="fa fa-house pe-1"></i> My Properties
                         </Link>
                       </li>
                       <li className="dropdown-item">
                         <Link
-                          id="nav-lnk-addproperty"
-                          to={routeNames.addproperty.path}
+                          id="nav-lnk-addresidentialproperty"
+                          to={routeNames.addresidentialproperty.path}
                         >
-                          <i className="fa fa-edit pe-1"></i> Add Property
+                          <i className="fa fa-house-medical pe-1"></i> Add
+                          Residential Property
+                        </Link>
+                      </li>
+                      <li className="dropdown-item">
+                        <Link
+                          id="nav-lnk-addcommercialproperty"
+                          to={routeNames.addcommercialproperty.path}
+                        >
+                          <i className="fa fa-house-medical pe-1"></i> Add
+                          Commercial Property
                         </Link>
                       </li>
                     </ul>
@@ -723,22 +732,21 @@ const UserHeader = () => {
                       Properties
                     </a>
                     <ul className="dropdown-menu">
-                      <li className="dropdown-item d-none">
+                      <li className="dropdown-item">
                         <Link
-                          id="nav-lnk-viewproperties"
-                          to={routeNames.comingup.path}
+                          id="nav-lnk-myproperties"
+                          to={routeNames.agentproperties.path}
                         >
-                          <i className="fa fa-house-medical pe-1"></i> Assigned
-                          Property
+                          <i className="fa fa-house pe-1"></i> My Properties
                         </Link>
                       </li>
                       <li className="dropdown-item">
                         <Link
-                          id="nav-lnk-connectedproperties"
-                          to={routeNames.agentconnectedproperties.path}
+                          id="nav-lnk-assignedproperties"
+                          to={routeNames.agentassignedproperties.path}
                         >
                           <i className="fa fa-house-circle-check pe-1"></i>{" "}
-                          Connected Properties
+                          Assigned Properties
                         </Link>
                       </li>
                     </ul>
@@ -855,15 +863,6 @@ const UserHeader = () => {
                       Properties
                     </a>
                     <ul className="dropdown-menu">
-                      <li className="dropdown-item d-none">
-                        <Link
-                          id="nav-lnk-viewproperties"
-                          to={routeNames.comingup.path}
-                        >
-                          <i className="fa fa-house-medical pe-1"></i> Assigned
-                          Property
-                        </Link>
-                      </li>
                       <li className="dropdown-item">
                         <Link
                           id="nav-lnk-connectedproperties"

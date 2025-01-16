@@ -30,13 +30,6 @@ export function useGetAssetTypesGateway(
         );
       })
       .finally(() => {});
-
-    // const { data: assetTypesList, isDataLoading } = useApiGateway(
-    //   `${config.apiBaseUrl}${ApiUrls.getAssetTypes}`,
-    //   "post",
-    //   objBody,
-    //   true
-    // );
   }, [classificationTypeId]);
 
   return { assetTypesList, isDataLoading: false };

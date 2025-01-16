@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   apiReqResLoader,
   checkEmptyVal,
   checkObjNullorEmpty,
+  debounce,
   GetUserCookieValues,
-  setDdlOptions,
   SetPageLoaderNavLinks,
   setSelectDefaultVal,
 } from "../../../utils/common";
 import InputControl from "../../../components/common/InputControl";
 import { formCtrlTypes } from "../../../utils/formvalidation";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import TextAreaControl from "../../../components/common/TextAreaControl";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 import { axiosPost } from "../../../helpers/axiosHelper";
@@ -18,37 +18,44 @@ import config from "../../../config.json";
 import {
   API_ACTION_STATUS,
   ApiUrls,
+  AppConstants,
   AppMessages,
   UserCookie,
   ValidationMessages,
 } from "../../../utils/constants";
 import { useGetAssetTypesGateway } from "../../../hooks/useGetAssetTypesGateway";
-import { useGetAssetListingTypesGateway } from "../../../hooks/useGetAssetListingTypesGateway";
-import { useGetAssetAccessTypesGateway } from "../../../hooks/useGetAssetAccessTypesGateway";
 import { useAssetsAppConfigGateway } from "../../../hooks/useAssetsAppConfigGateway";
-import SelectControl from "../../../components/common/SelectControl";
 import { routeNames } from "../../../routes/routes";
 import { useAuth } from "../../../contexts/AuthContext";
 import { Toast } from "../../../components/common/ToastView";
+import { useGetAreaUnitTypesGateway } from "../../../hooks/useGetAreaUnitTypesGateway";
+import { useGetAssetOwnershipStatusTypesGateway } from "../../../hooks/useGetAssetOwnershipStatusTypesGateway";
+import AsyncRemoteSelect from "../../../components/common/AsyncRemoteSelect";
+import { useDropzone } from "react-dropzone";
 
-const Add = () => {
+const AddResidentialProperty = () => {
   let $ = window.$;
   let formErrors = {};
 
   const { loggedinUser } = useAuth();
   const navigate = useNavigate();
 
+  let accountid = parseInt(
+    GetUserCookieValues(UserCookie.AccountId, loggedinUser)
+  );
+
+  let profileid = parseInt(
+    GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
+  );
+
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
-    txtpropertytitle: "",
     txtdescription: "",
     txtaddressone: "",
     txtaddresstwo: "",
     txtzip: "",
-    txtprice: "",
-    txtadvance: "",
-    txtsqfeet: "",
-    txtbrokerpercentage: "0",
+    txtarea: "",
+    txtnooffloors: "",
     owners: [],
   });
 
@@ -61,14 +68,18 @@ const Add = () => {
   const [citiesData, setCitiesData] = useState([]);
   const [citySelected, setCitySelected] = useState(null);
 
-  const { assetTypesList } = useGetAssetTypesGateway("", 1);
+  const { assetTypesList } = useGetAssetTypesGateway(
+    "",
+    1,
+    parseInt(config.assetClassificationTypes.Residential)
+  );
   const [selectedAssetType, setSelectedAssetType] = useState(null);
 
-  const { assetListingTypesList } = useGetAssetListingTypesGateway("", 1);
-  const [selectedContractType, setSelectedContractType] = useState(null);
+  const { areaUnitTypesList } = useGetAreaUnitTypesGateway("", 1);
+  const [selectedAreaUnitType, setselectedAreaUnitType] = useState(2);
 
-  const { assetAccessTypesList } = useGetAssetAccessTypesGateway("", 1);
-  const [selectedAccessType, setSelectedAccessType] = useState(null);
+  const { assetOwnershipStatusTypes } =
+    useGetAssetOwnershipStatusTypesGateway();
 
   const { assetsAppConfigList } = useAssetsAppConfigGateway();
   const [selectedBedRooms, setSelectedBedRooms] = useState(null);
@@ -82,19 +93,53 @@ const Add = () => {
 
   //Load
   useEffect(() => {
-    Promise.allSettled([getCountries()]).then(() => {
+    Promise.allSettled([getUserDetails()]).then(() => {
       setinitApisLoaded(true);
     });
     return () => {};
   }, []);
 
+  const getUserDetails = () => {
+    let objParams = {
+      // AccountId: accountId,
+      ProfileId: profileid,
+    };
+    axiosPost(`${config.apiBaseUrl}${ApiUrls.getUserDetails}`, objParams)
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode === 200) {
+          let details = objResponse.Data;
+          if (checkObjNullorEmpty(details) == false) {
+            setFormData({
+              ...formData,
+              txtaddressone: details.AddressOne,
+              txtaddresstwo: details.AddressTwo,
+              txtzip: details.Zip,
+            });
+            getCountries(details);
+          }
+        }
+      })
+      .catch((err) => {
+        console.error(`"API :: ${ApiUrls.getUserDetails}, Error ::" ${err}`);
+      })
+      .finally(() => {});
+  };
+
   //Get countries.
-  const getCountries = () => {
+  const getCountries = (userDetails) => {
     return axiosPost(`${config.apiBaseUrl}${ApiUrls.getDdlCountries}`, {})
       .then((response) => {
         let objResponse = response.data;
         if (objResponse.StatusCode == 200) {
           setCountriesData(objResponse.Data);
+          if (checkObjNullorEmpty(userDetails) == false) {
+            handleCountryChange(
+              { value: userDetails.CountryId, label: userDetails.Country },
+              { value: userDetails.StateId, label: userDetails.State },
+              { value: userDetails.CityId, label: userDetails.City }
+            );
+          }
         } else {
           setCountriesData([]);
         }
@@ -103,13 +148,11 @@ const Add = () => {
         console.error(`"API :: ${ApiUrls.getDdlCountries}, Error ::" ${err}`);
         setCountriesData([]);
       })
-      .finally(() => {
-        setCountrySelected({});
-      });
+      .finally(() => {});
   };
 
   //Get States.
-  const getStates = (countryid) => {
+  const getStates = (countryid, selState, selCity) => {
     axiosPost(`${config.apiBaseUrl}${ApiUrls.getDdlStates}`, {
       CountryId: parseInt(countryid),
     })
@@ -126,12 +169,16 @@ const Add = () => {
         setStatesData([]);
       })
       .finally(() => {
-        setStateSelected({});
+        if (!checkObjNullorEmpty(selState) && checkEmptyVal(selState?.action)) {
+          handleStateChange(selState, selCity);
+        } else {
+          setStateSelected({});
+        }
       });
   };
 
   //Get cities.
-  const getCities = (stateid) => {
+  const getCities = (stateid, selCity) => {
     axiosPost(`${config.apiBaseUrl}${ApiUrls.getDdlCities}`, {
       StateId: parseInt(stateid),
     })
@@ -148,11 +195,78 @@ const Add = () => {
         setCitiesData([]);
       })
       .finally(() => {
-        setCitySelected({});
+        if (!checkObjNullorEmpty(selCity) && checkEmptyVal(selCity?.action)) {
+          handleCityChange(selCity);
+        } else {
+          setCitySelected({});
+        }
+      });
+  };
+  //Get joined Owners
+  const getJoinedUsers = async (searchValue) => {
+    if (checkEmptyVal(searchValue)) return [];
+
+    let objParams = {
+      keyword: searchValue,
+      inviterid: profileid,
+      InviterProfileTypeId: parseInt(config.userProfileTypes.Owner),
+      InviteeProfileTypeId: parseInt(config.userProfileTypes.Owner),
+    };
+
+    return axiosPost(
+      `${config.apiBaseUrl}${ApiUrls.getDdlJoinedUserConnections}`,
+      objParams
+    )
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode == 200) {
+          return objResponse.Data.map((item) => ({
+            label: (
+              <div className="flex items-center">
+                <div className="w-40px h-40px mr-10 flex-shrink-0">
+                  <img
+                    alt=""
+                    src={item.PicPath}
+                    className="rounded cur-pointer w-40px"
+                  />
+                </div>
+                <div>
+                  <span className="text-primary lh-1 d-block">
+                    {item.FirstName + " " + item.LastName}
+                  </span>
+                  <span className="small text-light">{item.ProfileType}</span>
+                </div>
+              </div>
+            ),
+            value: item.ProfileId,
+            customlabel: item.FirstName + " " + item.LastName,
+          }));
+        } else {
+          return [];
+        }
+      })
+      .catch((err) => {
+        console.error(
+          `"API :: ${ApiUrls.getDdlJoinedUserConnections}, Error ::" ${err}`
+        );
+        return [];
       });
   };
 
-  const handleCountryChange = (selItem) => {
+  const usersProfilesOptions = useCallback(
+    debounce((inputval, callback) => {
+      if (inputval?.length >= AppConstants.DdlSearchMinLength) {
+        getJoinedUsers(inputval).then((options) => {
+          callback && callback(options);
+        });
+      } else {
+        callback && callback([]);
+      }
+    }, AppConstants.DebounceDelay),
+    []
+  );
+
+  const handleCountryChange = (selItem, selState, selCity) => {
     setStateSelected(null);
     setStatesData([]);
     setCitySelected(null);
@@ -163,11 +277,10 @@ const Add = () => {
     if (selItem == null || selItem == undefined || selItem == "") {
       return;
     }
-
-    getStates(selItem?.value);
+    getStates(selItem?.value, selState, selCity);
   };
 
-  const handleStateChange = (selItem) => {
+  const handleStateChange = (selItem, selCity) => {
     setCitySelected(null);
     setCitiesData([]);
 
@@ -177,7 +290,7 @@ const Add = () => {
       return;
     }
 
-    getCities(selItem?.value);
+    getCities(selItem?.value, selCity);
   };
 
   const handleCityChange = (selItem) => {
@@ -188,12 +301,8 @@ const Add = () => {
     setSelectedAssetType(e?.value);
   };
 
-  const handleContractTypeChange = (e) => {
-    setSelectedContractType(e?.value);
-  };
-
-  const handleAccessTypeChange = (e) => {
-    setSelectedAccessType(e?.value);
+  const handleAreaUnitTypeChange = (e) => {
+    setselectedAreaUnitType(e?.value);
   };
 
   const handleBedroomsChange = (e) => {
@@ -209,15 +318,9 @@ const Add = () => {
     setOwnerDivs([...ownerdivs, { id: Date.now() + 1 }]);
 
     const curretOwnerFormData = {
-      [`txtname${ownerdivscount}`]: "",
-      [`txtemail${ownerdivscount}`]: "",
-      [`txtmobile${ownerdivscount}`]: "",
-      [`txtaddressone${ownerdivscount}`]: "",
-      [`txtaddresstwo${ownerdivscount}`]: "",
-      [`txtzip${ownerdivscount}`]: "",
-      [`ddlcountry${ownerdivscount}`]: 0,
-      [`ddlstate${ownerdivscount}`]: 0,
-      [`ddlcity${ownerdivscount}`]: 0,
+      [`txtownerhsippercentage${ownerdivscount}`]: "0",
+      [`ddlowners${ownerdivscount}`]: 0,
+      [`ddlownershipstatus${ownerdivscount}`]: "A",
     };
 
     setOwnerFormData({
@@ -229,15 +332,10 @@ const Add = () => {
   const removeOwnersDiv = (id, idx) => {
     let idxnext = idx + 1;
     const curretOwnerFormData = {
-      [`txtname${idx}`]: ownerFormData[`txtname${idxnext}`],
-      [`txtemail${idx}`]: ownerFormData[`txtemail${idxnext}`],
-      [`txtmobile${idx}`]: ownerFormData[`txtmobile${idxnext}`],
-      [`txtaddressone${idx}`]: ownerFormData[`txtaddressone${idxnext}`],
-      [`txtaddresstwo${idx}`]: ownerFormData[`txtaddresstwo${idxnext}`],
-      [`txtzip${idx}`]: ownerFormData[`txtzip${idxnext}`],
-      [`ddlcountry${idx}`]: 0, //ownerFormData[`ddlcountry${idxnext}`],
-      [`ddlstate${idx}`]: 0,
-      [`ddlcity${idx}`]: 0,
+      [`txtownerhsippercentage${idx}`]:
+        ownerFormData[`txtownerhsippercentage${idxnext}`],
+      [`ddlowners${idx}`]: 0,
+      [`ddlownershipstatus${idx}`]: "A",
     };
 
     setOwnerDivs(ownerdivs.filter((div) => div.id !== id));
@@ -267,74 +365,26 @@ const Add = () => {
     });
   };
 
-  const handleOwnerCountryChange = (selItem, ctlidx) => {
-    setDdlOptions(`ddlstate${ctlidx}`, "loading");
-    let selCountryId = parseInt(selItem?.target?.value);
+  const handleDdlUsersProfilesChange = () => {
+    usersProfilesOptions();
+  };
+
+  const handleOwnerChange = (selItem, ctlidx) => {
+    let selOwnerId = parseInt(selItem?.value);
     setOwnerFormData({
       ...ownerFormData,
-      [`ddlcountry${ctlidx}`]: selCountryId,
-      [`ddlstate${ctlidx}`]: 0,
-      [`ddlcity${ctlidx}`]: 0,
+      [`ddlowners${ctlidx}`]: selOwnerId,
     });
 
     if (selItem == null || selItem == undefined || selItem == "") {
       return;
     }
-
-    axiosPost(`${config.apiBaseUrl}${ApiUrls.getDdlStates}`, {
-      CountryId: parseInt(selCountryId),
-    })
-      .then((response) => {
-        let objResponse = response.data;
-        if (objResponse.StatusCode === 200) {
-          setDdlOptions(`ddlstate${ctlidx}`, objResponse.Data, "Id", "Text");
-        } else {
-        }
-      })
-      .catch((err) => {
-        console.error(`"API :: ${ApiUrls.getDdlStates}, Error ::" ${err}`);
-      })
-      .finally(() => {});
   };
 
-  const handleOwnerStateChange = (selItem, ctlidx) => {
-    setDdlOptions(`ddlcity${ctlidx}`, "loading");
-    let selStateId = parseInt(selItem?.target?.value);
+  const handleOwnershipStatusChange = (selItem, ctlidx) => {
     setOwnerFormData({
       ...ownerFormData,
-      [`ddlstate${ctlidx}`]: selStateId,
-      [`ddlcity${ctlidx}`]: 0,
-    });
-
-    if (selItem == null || selItem == undefined || selItem == "") {
-      return;
-    }
-
-    axiosPost(`${config.apiBaseUrl}${ApiUrls.getDdlCities}`, {
-      StateId: parseInt(selStateId),
-    })
-      .then((response) => {
-        let objResponse = response.data;
-        if (objResponse.StatusCode === 200) {
-          setDdlOptions(`ddlcity${ctlidx}`, objResponse.Data, "Id", "Text");
-        } else {
-          objResponse.Data = { Id: 0, Text: AppMessages.NoCities };
-          setDdlOptions(`ddlcity${ctlidx}`, objResponse.Data, "Id", "Text");
-        }
-      })
-      .catch((err) => {
-        console.error(`"API :: ${ApiUrls.getDdlCities}, Error ::" ${err}`);
-        let Nodata = { Id: 0, Text: AppMessages.NoCities };
-        setDdlOptions(`ddlcity${ctlidx}`, Nodata, "Id", "Text");
-      })
-      .finally(() => {});
-  };
-
-  const handleOwnerCityChange = (selItem, ctlidx) => {
-    let selCityId = parseInt(selItem?.target?.value);
-    setOwnerFormData({
-      ...ownerFormData,
-      [`ddlcity${ctlidx}`]: selCityId,
+      [`ddlownershipstatus${ctlidx}`]: selItem?.value,
     });
 
     if (selItem == null || selItem == undefined || selItem == "") {
@@ -346,6 +396,30 @@ const Add = () => {
     const files = Array.from(event.target.files);
     setSelectedFiles((prevFiles) => [...prevFiles, ...files]);
   };
+
+  const onDrop = (acceptedFiles) => {
+    let selectedFiles = acceptedFiles.map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+    }));
+    setSelectedFiles((prevFiles) => [...selectedFiles, ...prevFiles]);
+    //const files = Array.from(event.target.files);
+    //setSelectedFiles((prevFiles) => [...prevFiles, ...files]);
+  };
+
+  const onDropRejected = (rejectedFiles) => {
+    Toast.error("Some files were rejected. Please upload valid files.");
+  };
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    onDropRejected,
+    accept: {
+      "image/*": [".jpeg", ".jpg", ".png", ".gif"],
+    },
+    multiple: true,
+    noClick: false,
+  });
 
   const handleFileRemove = (e, index) => {
     e.preventDefault();
@@ -370,25 +444,9 @@ const Add = () => {
       formErrors["ddlcities"] = ValidationMessages.CityReq;
     }
 
-    if (checkEmptyVal(selectedContractType)) {
-      formErrors["ddlcontracttype"] = ValidationMessages.ContractTypeReq;
-    }
-
-    if (checkEmptyVal(selectedAccessType)) {
-      formErrors["ddlaccesstype"] = ValidationMessages.AccessTypeReq;
-    }
-
     if (checkEmptyVal(selectedAssetType)) {
       formErrors["ddlassettype"] = ValidationMessages.AssetTypeReq;
     }
-
-    // if (checkObjNullorEmpty(selectedBedRooms)) {
-    //   formErrors["ddlbedrooms"] = ValidationMessages.BedroomsReq;
-    // }
-
-    // if (checkObjNullorEmpty(selectedBathRooms)) {
-    //   formErrors["ddlbathrooms"] = ValidationMessages.BathroomsReq;
-    // }
 
     if (Object.keys(formErrors).length === 0) {
       apiReqResLoader("btnSave", "Saving...");
@@ -400,57 +458,24 @@ const Add = () => {
 
       for (let od = 0; od <= ownerdivs.length - 1; od++) {
         let idx = od + 1;
+
         if (
-          !checkEmptyVal(ownerFormData[`txtname${idx}`]) &&
-          !checkEmptyVal(ownerFormData[`txtemail${idx}`]) &&
-          !checkEmptyVal(ownerFormData[`txtmobile${idx}`]) &&
-          !checkEmptyVal(ownerFormData[`txtaddressone${idx}`]) &&
-          !checkEmptyVal(ownerFormData[`txtzip${idx}`]) &&
-          !checkEmptyVal(ownerFormData[`ddlcountry${idx}`]) &&
-          ownerFormData[`ddlcountry${idx}`] != "0" &&
-          !checkEmptyVal(ownerFormData[`ddlstate${idx}`]) &&
-          ownerFormData[`ddlstate${idx}`] != "0" &&
-          !checkEmptyVal(ownerFormData[`ddlcity${idx}`]) &&
-          ownerFormData[`ddlcity${idx}`] != "0"
+          !checkEmptyVal(ownerFormData[`ddlownershipstatus${idx}`]) &&
+          !checkEmptyVal(ownerFormData[`ddlowners${idx}`]) &&
+          ownerFormData[`ddlowners${idx}`] != "0"
         ) {
           objBodyParams.append(`Owners[${od}].OwnerId`, 0);
           objBodyParams.append(
-            `Owners[${od}].Name`,
-            ownerFormData[`txtname${idx}`]
+            `Owners[${od}].ProfileId`,
+            parseInt(ownerFormData[`ddlowners${idx}`])
           );
           objBodyParams.append(
-            `Owners[${od}].Email`,
-            ownerFormData[`txtemail${idx}`]
+            `Owners[${od}].OwnerShipStatus`,
+            ownerFormData[`ddlownershipstatus${idx}`]
           );
           objBodyParams.append(
-            `Owners[${od}].Mobile`,
-            ownerFormData[`txtmobile${idx}`]
-          );
-          objBodyParams.append(
-            `Owners[${od}].AddressOne`,
-            ownerFormData[`txtaddressone${idx}`]
-          );
-          objBodyParams.append(
-            `Owners[${od}].AddressTwo`,
-            checkEmptyVal(ownerFormData[`txtaddresstwo${idx}`]) == true
-              ? ""
-              : ownerFormData[`txtaddresstwo${idx}`]
-          );
-          objBodyParams.append(
-            `Owners[${od}].CountryId`,
-            ownerFormData[`ddlcountry${idx}`]
-          );
-          objBodyParams.append(
-            `Owners[${od}].StateId`,
-            ownerFormData[`ddlstate${idx}`]
-          );
-          objBodyParams.append(
-            `Owners[${od}].CityId`,
-            ownerFormData[`ddlcity${idx}`]
-          );
-          objBodyParams.append(
-            `Owners[${od}].Zip`,
-            ownerFormData[`txtzip${idx}`]
+            `Owners[${od}].SharePercentage`,
+            ownerFormData[`txtownerhsippercentage${idx}`]
           );
         } else {
           ownerDivsValerror = true;
@@ -460,16 +485,8 @@ const Add = () => {
       }
       if (ownerDivsValerror == false) {
         objBodyParams.append("AssetId", 0);
-        objBodyParams.append(
-          "ProfileId",
-          parseInt(GetUserCookieValues(UserCookie.ProfileId, loggedinUser))
-        );
-        objBodyParams.append(
-          "AccountId",
-          parseInt(GetUserCookieValues(UserCookie.AccountId, loggedinUser))
-        );
-
-        objBodyParams.append("Title", formData.txtpropertytitle);
+        objBodyParams.append("ProfileId", profileid);
+        objBodyParams.append("AccountId", accountid);
         objBodyParams.append("Description", formData.txtdescription);
         objBodyParams.append("AddressOne", formData.txtaddressone);
         objBodyParams.append(
@@ -490,41 +507,32 @@ const Add = () => {
         );
         objBodyParams.append("Zip", formData.txtzip);
         objBodyParams.append(
+          "ClassificationTypeId",
+          parseInt(config.assetClassificationTypes.Residential)
+        );
+        objBodyParams.append(
           "AssetTypeId",
           parseInt(setSelectDefaultVal(selectedAssetType))
         );
+        objBodyParams.append("Area", formData.txtarea);
         objBodyParams.append(
-          "ContractTypeId",
-          parseInt(setSelectDefaultVal(selectedContractType))
+          "AreaUnitTypeId",
+          parseInt(setSelectDefaultVal(selectedAreaUnitType))
         );
-        objBodyParams.append("Price", formData.txtprice);
-
-        objBodyParams.append(
-          "Advance",
-          checkEmptyVal(formData.txtadvance) ? 0 : formData.txtadvance
-        );
-
-        objBodyParams.append(
-          "AccessTypeId",
-          parseInt(setSelectDefaultVal(selectedAccessType))
-        );
-        objBodyParams.append("Sqfeet", formData.txtsqfeet);
         objBodyParams.append("Bedrooms", setSelectDefaultVal(selectedBedRooms));
         objBodyParams.append(
           "Bathrooms",
           setSelectDefaultVal(selectedBathRooms)
         );
         objBodyParams.append(
-          "BrokerPercentage",
-          checkEmptyVal(formData.txtbrokerpercentage)
-            ? 0
-            : formData.txtbrokerpercentage
+          "NoOfFloors",
+          checkEmptyVal(formData.txtnooffloors) ? "0" : formData.txtnooffloors
         );
 
         selectedFiles.forEach((file, idx) => {
           objBodyParams.append(`Images[${idx}].Id`, 0);
           objBodyParams.append(`Images[${idx}].DisplayOrder`, idx + 1);
-          objBodyParams.append(`Images[${idx}].File`, file);
+          objBodyParams.append(`Images[${idx}].File`, file.file);
         });
 
         axiosPost(`${config.apiBaseUrl}${ApiUrls.addAsset}`, objBodyParams, {
@@ -539,7 +547,7 @@ const Add = () => {
                 objResponse.Data?.AssetId > 0
               ) {
                 Toast.success(AppMessages.AddPropertySuccess);
-                navigate(routeNames.userproperties.path);
+                navigate(routeNames.ownerproperties.path);
               } else {
                 Toast.error(objResponse.Data.Message);
                 $(errctl).html(objResponse.Data.Message);
@@ -569,7 +577,7 @@ const Add = () => {
   };
 
   const onCancel = (e) => {
-    navigate(routeNames.userproperties.path);
+    navigate(routeNames.ownerproperties.path);
   };
 
   return (
@@ -579,37 +587,9 @@ const Add = () => {
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <h5 className="mb-4 down-line">Add Property</h5>
+              <h5 className="mb-4 down-line pb-10">Residential Property</h5>
               <div className="row">
-                <div className="col-xl-3 col-lg-4">
-                  <div className="widget bg-white box-shadow rounded px-0 mb-20">
-                    <h6 className="mb-20 down-line pb-10 px-20 down-line-mx20">
-                      My Properties
-                    </h6>
-                    <ul className="nav-page-lnk">
-                      <li className="dropdown-item px-40">
-                        <Link
-                          id="page-lnk-viewproperties"
-                          to={routeNames.userproperties.path}
-                          className="page-lnk font-general"
-                        >
-                          <i className="fa fa-eye pe-1"></i> View Properties
-                        </Link>
-                      </li>
-
-                      <li className="dropdown-item px-40">
-                        <Link
-                          id="page-lnk-addproperty"
-                          to={routeNames.addproperty.path}
-                          className="page-lnk font-general"
-                        >
-                          <i className="fa fa-edit pe-1"></i> Add Property
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="col-xl-9 col-lg-8">
+                <div className="col-xl-7 col-lg-7">
                   <form noValidate>
                     {/*============== Propertyinfo Start ==============*/}
                     <div className="full-row px-3 py-4 bg-white box-shadow rounded">
@@ -620,34 +600,6 @@ const Add = () => {
                               Property Info
                             </h6>
                             <div className="row">
-                              <div className="col-md-12 mb-15">
-                                <InputControl
-                                  lblClass="mb-0 lbl-req-field"
-                                  name="txtpropertytitle"
-                                  ctlType={formCtrlTypes.propertytitle}
-                                  isFocus={true}
-                                  required={true}
-                                  onChange={handleChange}
-                                  value={formData.txtpropertytitle}
-                                  errors={errors}
-                                  formErrors={formErrors}
-                                  tabIndex={1}
-                                ></InputControl>
-                              </div>
-                              <div className="col-md-12 mb-15">
-                                <TextAreaControl
-                                  lblClass="mb-0 lbl-req-field"
-                                  name="txtdescription"
-                                  ctlType={formCtrlTypes.description}
-                                  required={true}
-                                  onChange={handleChange}
-                                  value={formData.txtdescription}
-                                  errors={errors}
-                                  formErrors={formErrors}
-                                  tabIndex={2}
-                                  rows={6}
-                                ></TextAreaControl>
-                              </div>
                               <div className="col-md-6 mb-15">
                                 <InputControl
                                   lblClass="mb-0 lbl-req-field"
@@ -658,7 +610,7 @@ const Add = () => {
                                   value={formData.txtaddressone}
                                   errors={errors}
                                   formErrors={formErrors}
-                                  tabIndex={3}
+                                  tabIndex={1}
                                 ></InputControl>
                               </div>
                               <div className="col-md-6 mb-15">
@@ -670,7 +622,7 @@ const Add = () => {
                                   value={formData.txtaddresstwo}
                                   errors={errors}
                                   formErrors={formErrors}
-                                  tabIndex={4}
+                                  tabIndex={2}
                                 ></InputControl>
                               </div>
                               {initApisLoaded && (
@@ -698,7 +650,7 @@ const Add = () => {
                                       required={true}
                                       errors={errors}
                                       formErrors={formErrors}
-                                      tabIndex={5}
+                                      tabIndex={3}
                                     ></AsyncSelect>
                                   </div>
                                   <div className="col-md-6 mb-15">
@@ -733,7 +685,7 @@ const Add = () => {
                                       required={true}
                                       errors={errors}
                                       formErrors={formErrors}
-                                      tabIndex={6}
+                                      tabIndex={4}
                                     ></AsyncSelect>
                                   </div>
                                   <div className="col-md-6 mb-15">
@@ -766,7 +718,7 @@ const Add = () => {
                                       required={true}
                                       errors={errors}
                                       formErrors={formErrors}
-                                      tabIndex={7}
+                                      tabIndex={5}
                                     ></AsyncSelect>
                                   </div>
                                 </>
@@ -781,7 +733,7 @@ const Add = () => {
                                   value={formData.txtzip}
                                   errors={errors}
                                   formErrors={formErrors}
-                                  tabIndex={8}
+                                  tabIndex={6}
                                 ></InputControl>
                               </div>
                               <div className="col-md-6 mb-15">
@@ -811,103 +763,69 @@ const Add = () => {
                                   required={true}
                                   errors={errors}
                                   formErrors={formErrors}
-                                  tabIndex={9}
+                                  tabIndex={7}
                                 ></AsyncSelect>
                               </div>
                               <div className="col-md-6 mb-15">
-                                <AsyncSelect
-                                  placeHolder={
-                                    assetListingTypesList.length <= 0 &&
-                                    selectedContractType == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlDefaultSelect
-                                  }
-                                  noData={
-                                    assetListingTypesList.length <= 0 &&
-                                    selectedContractType == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlNoData
-                                  }
-                                  options={assetListingTypesList}
-                                  dataKey="ContractTypeId"
-                                  dataVal="ContractType"
-                                  onChange={handleContractTypeChange}
-                                  value={selectedContractType}
-                                  name="ddlcontracttype"
-                                  lbl={formCtrlTypes.assetcontracttype}
-                                  lblClass="mb-0 lbl-req-field"
-                                  className="ddlborder"
-                                  isClearable={false}
+                                <div className="row">
+                                  <div className="col-7 pr-0">
+                                    <InputControl
+                                      lblClass="mb-0 lbl-req-field"
+                                      name="txtarea"
+                                      ctlType={formCtrlTypes.area}
+                                      required={true}
+                                      onChange={handleChange}
+                                      value={formData.txtarea}
+                                      errors={errors}
+                                      formErrors={formErrors}
+                                      tabIndex={8}
+                                      inputClass="bo-r-0 br-r-0"
+                                    ></InputControl>
+                                  </div>
+                                  <div className="col pl-0">
+                                    <AsyncSelect
+                                      placeHolder={
+                                        areaUnitTypesList.length <= 0 &&
+                                        selectedAreaUnitType == null
+                                          ? AppMessages.DdLLoading
+                                          : AppMessages.DdlDefaultSelect
+                                      }
+                                      noData={
+                                        areaUnitTypesList.length <= 0 &&
+                                        selectedAreaUnitType == null
+                                          ? AppMessages.DdLLoading
+                                          : AppMessages.DdlNoData
+                                      }
+                                      options={areaUnitTypesList}
+                                      dataKey="AreaUnitTypeId"
+                                      dataVal="AreaUnitType"
+                                      onChange={handleAreaUnitTypeChange}
+                                      value={selectedAreaUnitType}
+                                      name="ddlareaunittype"
+                                      lbl={formCtrlTypes.areaunittype}
+                                      lblClass="mb-0"
+                                      lblText={" "}
+                                      className="ddlborder br-l-0"
+                                      isClearable={false}
+                                      required={true}
+                                      errors={errors}
+                                      formErrors={formErrors}
+                                      tabIndex={9}
+                                    ></AsyncSelect>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="col-md-4 mb-15">
+                                <InputControl
+                                  lblClass="mb-0"
+                                  name="txtnooffloors"
+                                  ctlType={formCtrlTypes.nooffloors}
+                                  required={true}
+                                  onChange={handleChange}
+                                  value={formData.txtnooffloors}
                                   errors={errors}
                                   formErrors={formErrors}
                                   tabIndex={10}
-                                ></AsyncSelect>
-                              </div>
-                              <div className="col-md-6 mb-15">
-                                <InputControl
-                                  lblClass="mb-0 lbl-req-field"
-                                  name="txtprice"
-                                  ctlType={formCtrlTypes.amount}
-                                  required={true}
-                                  onChange={handleChange}
-                                  value={formData.txtprice}
-                                  errors={errors}
-                                  formErrors={formErrors}
-                                  tabIndex={11}
-                                ></InputControl>
-                              </div>
-                              <div className="col-md-6 mb-15">
-                                <InputControl
-                                  lblClass="mb-0"
-                                  name="txtadvance"
-                                  ctlType={formCtrlTypes.advance}
-                                  onChange={handleChange}
-                                  value={formData.txtadvance}
-                                  errors={errors}
-                                  formErrors={formErrors}
-                                  tabIndex={12}
-                                ></InputControl>
-                              </div>
-                              <div className="col-md-6 mb-15">
-                                <AsyncSelect
-                                  placeHolder={
-                                    assetAccessTypesList.length <= 0 &&
-                                    selectedAccessType == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlDefaultSelect
-                                  }
-                                  noData={
-                                    assetAccessTypesList.length <= 0 &&
-                                    selectedAccessType == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlNoData
-                                  }
-                                  options={assetAccessTypesList}
-                                  dataKey="AccessTypeId"
-                                  dataVal="AccessType"
-                                  onChange={handleAccessTypeChange}
-                                  value={selectedAccessType}
-                                  name="ddlaccesstype"
-                                  lbl={formCtrlTypes.assetaccesstype}
-                                  lblClass="mb-0 lbl-req-field"
-                                  className="ddlborder"
-                                  isClearable={false}
-                                  errors={errors}
-                                  formErrors={formErrors}
-                                  tabIndex={13}
-                                ></AsyncSelect>
-                              </div>
-                              <div className="col-md-6 mb-15">
-                                <InputControl
-                                  lblClass="mb-0 lbl-req-field"
-                                  name="txtsqfeet"
-                                  ctlType={formCtrlTypes.sqfeet}
-                                  required={true}
-                                  onChange={handleChange}
-                                  value={formData.txtsqfeet}
-                                  errors={errors}
-                                  formErrors={formErrors}
-                                  tabIndex={14}
                                 ></InputControl>
                               </div>
                               <div className="col-md-4 mb-15">
@@ -935,7 +853,7 @@ const Add = () => {
                                   isClearable={false}
                                   errors={errors}
                                   formErrors={formErrors}
-                                  tabIndex={15}
+                                  tabIndex={11}
                                 ></AsyncSelect>
                               </div>
                               <div className="col-md-4 mb-15">
@@ -963,20 +881,22 @@ const Add = () => {
                                   isClearable={false}
                                   errors={errors}
                                   formErrors={formErrors}
-                                  tabIndex={16}
+                                  tabIndex={12}
                                 ></AsyncSelect>
                               </div>
-                              <div className="col-md-4 mb-15">
-                                <InputControl
-                                  lblClass="mb-0"
-                                  name="txtbrokerpercentage"
-                                  ctlType={formCtrlTypes.brokerpercentage}
+                              <div className="col-md-12 mb-15">
+                                <TextAreaControl
+                                  lblClass="mb-0 lbl-req-field"
+                                  name="txtdescription"
+                                  ctlType={formCtrlTypes.description}
+                                  required={true}
                                   onChange={handleChange}
-                                  value={formData.txtbrokerpercentage}
+                                  value={formData.txtdescription}
                                   errors={errors}
                                   formErrors={formErrors}
-                                  tabIndex={17}
-                                ></InputControl>
+                                  tabIndex={13}
+                                  rows={4}
+                                ></TextAreaControl>
                               </div>
                             </div>
                             <hr className="w-100 text-primary my-20"></hr>
@@ -1024,132 +944,68 @@ const Add = () => {
                                   </div>
                                 </div>
                                 <div className="row">
-                                  <div className="col-md-12 mb-15">
-                                    <InputControl
+                                  <div className="col-md-6 mb-15">
+                                    <AsyncRemoteSelect
+                                      placeHolder={AppMessages.DdlTypetoSearch}
+                                      noData={AppMessages.NoOwners}
+                                      loadOptions={usersProfilesOptions}
+                                      handleInputChange={(e, val) => {
+                                        handleDdlUsersProfilesChange(
+                                          e,
+                                          val.prevInputValue
+                                        );
+                                      }}
+                                      onChange={(e) => {
+                                        handleOwnerChange(e, idx);
+                                      }}
+                                      value={ownerFormData[`ddlowners${idx}`]}
+                                      name={`ddlowners${idx}`}
+                                      lblText="Owner:"
                                       lblClass="mb-0 lbl-req-field"
-                                      name={`txtname${idx}`}
-                                      ctlType={formCtrlTypes.name}
-                                      isFocus={true}
-                                      onChange={handleOwnerControlsChange}
-                                      value={ownerFormData[`txtname${idx}`]}
+                                      required={true}
                                       errors={errors}
                                       formErrors={formErrors}
-                                    ></InputControl>
+                                      isClearable={true}
+                                    ></AsyncRemoteSelect>
                                   </div>
-                                  <div className="col-md-6 mb-15">
-                                    <InputControl
+                                  <div className="col-md-3 mb-15">
+                                    <AsyncSelect
+                                      placeHolder={AppMessages.DdlDefaultSelect}
+                                      noData={AppMessages.NoData}
+                                      options={assetOwnershipStatusTypes}
+                                      dataKey="Id"
+                                      dataVal="Type"
+                                      onChange={(e) => {
+                                        handleOwnershipStatusChange(e, idx);
+                                      }}
+                                      value={
+                                        ownerFormData[
+                                          `ddlownershipstatus${idx}`
+                                        ]
+                                      }
+                                      name={`ddlownershipstatus${idx}`}
+                                      lbl={formCtrlTypes.ownershipstatus}
                                       lblClass="mb-0 lbl-req-field"
-                                      name={`txtemail${idx}`}
-                                      ctlType={formCtrlTypes.email}
-                                      onChange={handleOwnerControlsChange}
-                                      value={ownerFormData[`txtemail${idx}`]}
+                                      className="ddlborder"
+                                      isClearable={false}
+                                      required={true}
                                       errors={errors}
                                       formErrors={formErrors}
-                                    ></InputControl>
+                                    ></AsyncSelect>
                                   </div>
-                                  <div className="col-md-6 mb-15">
+                                  <div className="col-md-3 mb-15">
                                     <InputControl
                                       lblClass="mb-0 lbl-req-field"
-                                      name={`txtmobile${idx}`}
-                                      ctlType={formCtrlTypes.mobile}
-                                      onChange={handleOwnerControlsChange}
-                                      value={ownerFormData[`txtmobile${idx}`]}
-                                      errors={errors}
-                                      formErrors={formErrors}
-                                    ></InputControl>
-                                  </div>
-                                  <div className="col-md-6 mb-15">
-                                    <InputControl
-                                      lblClass="mb-0 lbl-req-field"
-                                      name={`txtaddressone${idx}`}
-                                      ctlType={formCtrlTypes.addressone}
+                                      name={`txtownerhsippercentage${idx}`}
+                                      ctlType={
+                                        formCtrlTypes.ownershippercentage
+                                      }
                                       onChange={handleOwnerControlsChange}
                                       value={
-                                        ownerFormData[`txtaddressone${idx}`]
+                                        ownerFormData[
+                                          `txtownerhsippercentage${idx}`
+                                        ]
                                       }
-                                      errors={errors}
-                                      formErrors={formErrors}
-                                    ></InputControl>
-                                  </div>
-                                  <div className="col-md-6 mb-15">
-                                    <InputControl
-                                      lblClass="mb-0"
-                                      name={`txtaddresstwo${idx}`}
-                                      ctlType={formCtrlTypes.addresstwo}
-                                      onChange={handleOwnerControlsChange}
-                                      value={
-                                        ownerFormData[`txtaddresstwo${idx}`]
-                                      }
-                                      errors={errors}
-                                      formErrors={formErrors}
-                                    ></InputControl>
-                                  </div>
-                                  {initApisLoaded && (
-                                    <>
-                                      <div className="col-md-6 mb-15">
-                                        <SelectControl
-                                          lblClass="mb-0 lbl-req-field"
-                                          name={`ddlcountry${idx}`}
-                                          ctlType={formCtrlTypes.country}
-                                          options={[
-                                            { Id: 0, Text: "Select" },
-                                            ...countriesData,
-                                          ]}
-                                          dataKey="Text"
-                                          dataValue="Id"
-                                          onChange={(e) =>
-                                            handleOwnerCountryChange(e, idx)
-                                          }
-                                          value={
-                                            ownerFormData[`ddlcountry${idx}`]
-                                          }
-                                          errors={errors}
-                                          formErrors={formErrors}
-                                        ></SelectControl>
-                                      </div>
-                                      <div className="col-md-6 mb-15">
-                                        <SelectControl
-                                          lblClass="mb-0 lbl-req-field"
-                                          name={`ddlstate${idx}`}
-                                          ctlType={formCtrlTypes.state}
-                                          options={[{ Id: 0, Text: "Select" }]}
-                                          dataKey="Text"
-                                          dataValue="Id"
-                                          onChange={(e) =>
-                                            handleOwnerStateChange(e, idx)
-                                          }
-                                          value={
-                                            ownerFormData[`ddlstate${idx}`]
-                                          }
-                                          errors={errors}
-                                          formErrors={formErrors}
-                                        ></SelectControl>
-                                      </div>
-                                      <div className="col-md-6 mb-15">
-                                        <SelectControl
-                                          lblClass="mb-0 lbl-req-field"
-                                          name={`ddlcity${idx}`}
-                                          ctlType={formCtrlTypes.city}
-                                          options={[{ Id: 0, Text: "Select" }]}
-                                          dataKey="Text"
-                                          dataValue="Id"
-                                          onChange={(e) =>
-                                            handleOwnerCityChange(e, idx)
-                                          }
-                                          value={ownerFormData[`ddlcity${idx}`]}
-                                          errors={errors}
-                                          formErrors={formErrors}
-                                        ></SelectControl>
-                                      </div>
-                                    </>
-                                  )}
-                                  <div className="col-md-6 mb-15">
-                                    <InputControl
-                                      lblClass="mb-0 lbl-req-field"
-                                      name={`txtzip${idx}`}
-                                      ctlType={formCtrlTypes.zip}
-                                      onChange={handleOwnerControlsChange}
-                                      value={ownerFormData[`txtzip${idx}`]}
                                       errors={errors}
                                       formErrors={formErrors}
                                     ></InputControl>
@@ -1175,95 +1031,103 @@ const Add = () => {
                         </div>
                       </>
                     ))}
-
                     {/*============== Add Owners End ==============*/}
-
-                    {/*============== Propertymedia Start ==============*/}
-                    <div className="full-row px-3 py-4 mt-20 bg-white box-shadow rounded">
-                      <div className="container-fluid">
-                        <div className="row">
-                          <div className="col px-0">
-                            <h6 className="mb-4 down-line pb-10">
-                              Property Media
-                            </h6>
-                            <div className="row">
-                              {selectedFiles.length > 0 && (
-                                <div className="col-md-12 mt-0 mb-20">
-                                  <ul className="row row-cols-xl-6 row-cols-md-3 row-cols-2 media-upload">
-                                    {selectedFiles.map((file, index) => (
-                                      <li className="col bg-light border rounded m-10 p-0">
-                                        <img
-                                          src={URL.createObjectURL(file)}
-                                          className="py-0"
-                                          alt={file.name}
-                                        />
-                                        <a
-                                          href="#"
-                                          title="Remove image"
-                                          onClick={(e) =>
-                                            handleFileRemove(e, index)
-                                          }
-                                        >
-                                          <i className="fas fa-trash btn-danger" />
-                                        </a>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
-                              <div className="col-md-10 mb-20 mx-auto">
-                                <input
-                                  type="file"
-                                  id="imgupload"
-                                  className="d-none"
-                                  multiple
-                                  onChange={handleFileChange}
-                                />
-                                <label
-                                  className="fileupload_label border rounded font-large"
-                                  htmlFor="imgupload"
-                                >
-                                  <i
-                                    className="fa fa-cloud-upload mb-20 upload-icon d-flex flex-center"
-                                    aria-hidden="true"
-                                  ></i>
-                                  Drop your photos here or Click
-                                </label>
+                  </form>
+                </div>
+                <div className="col-xl-5 col-lg-5 md-mt-20">
+                  {/*============== Propertymedia Start ==============*/}
+                  <div className="full-row px-3 py-4 bg-white box-shadow rounded">
+                    <div className="container-fluid">
+                      <div className="row">
+                        <div className="col px-0">
+                          <h6 className="mb-4 down-line pb-10">
+                            Property Media
+                          </h6>
+                          <div
+                            className="row"
+                            {...getRootProps()}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }}
+                          >
+                            {selectedFiles.length > 0 && (
+                              <div className="col-md-12 mt-0 mb-20">
+                                <ul className="row row-cols-xl-6 row-cols-md-3 row-cols-2 media-upload">
+                                  {selectedFiles.map((file, index) => (
+                                    <li className="col bg-light border rounded m-10 p-0">
+                                      <img
+                                        src={file.preview}
+                                        className="py-0"
+                                        alt={file.name}
+                                      />
+                                      <a
+                                        href="#"
+                                        title="Remove image"
+                                        onClick={(e) =>
+                                          handleFileRemove(e, index)
+                                        }
+                                      >
+                                        <i className="fas fa-trash btn-danger" />
+                                      </a>
+                                    </li>
+                                  ))}
+                                </ul>
                               </div>
+                            )}
+                            <div className="col-md-10 mb-20 mx-auto d-flex flex-center">
+                              <input
+                                type="file"
+                                id="imgupload"
+                                className="d-none"
+                                multiple
+                                //onChange={handleFileChange}
+                                {...getInputProps()}
+                              />
+                              <label
+                                className="fileupload_label border rounded font-large"
+                                htmlFor="imgupload"
+                              >
+                                <i
+                                  className="fa fa-cloud-upload mb-20 upload-icon d-flex flex-center"
+                                  aria-hidden="true"
+                                ></i>
+                                Drop your photos here or Click
+                              </label>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                    {/*============== Propertymedia End ==============*/}
-
-                    <div className="full-row px-3 py-4 mt-20 bg-white box-shadow rounded">
-                      <div className="container-fluid">
-                        <div className="row form-action flex-center">
-                          <div
-                            className="col-md-6 px-0 form-error"
-                            id="form-error"
-                          ></div>
-                          <div className="col-md-6 px-0">
-                            <button
-                              className="btn btn-secondary"
-                              id="btnCancel"
-                              onClick={onCancel}
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              className="btn btn-primary"
-                              id="btnSave"
-                              onClick={onSave}
-                            >
-                              Save
-                            </button>
-                          </div>
+                  </div>
+                  {/*============== Propertymedia End ==============*/}
+                </div>
+                <div className="col-xl-7 col-lg-7">
+                  <div className="full-row px-3 py-4 mt-20 bg-white box-shadow rounded">
+                    <div className="container-fluid">
+                      <div className="row form-action flex-center">
+                        <div
+                          className="col-md-6 px-0 form-error"
+                          id="form-error"
+                        ></div>
+                        <div className="col-md-6 px-0">
+                          <button
+                            className="btn btn-secondary"
+                            id="btnCancel"
+                            onClick={onCancel}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            className="btn btn-primary"
+                            id="btnSave"
+                            onClick={onSave}
+                          >
+                            Save
+                          </button>
                         </div>
                       </div>
                     </div>
-                  </form>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1274,4 +1138,4 @@ const Add = () => {
   );
 };
 
-export default Add;
+export default AddResidentialProperty;

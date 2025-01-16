@@ -18,6 +18,7 @@ const InputControl = ({
   errors,
   formErrors = {},
   placeHolder,
+  inputClass = "",
 }) => {
   let ctl = ctlType;
 
@@ -175,6 +176,15 @@ const InputControl = ({
         formErrors[name] = rex.invalid;
       }
       break;
+    case formCtrlTypes.area:
+      rex = Regex.area;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
     case formCtrlTypes.sqfeet:
       rex = Regex.sqfeet;
       if (required && checkEmptyVal(value)) {
@@ -269,7 +279,7 @@ const InputControl = ({
           type={ctl.input.type}
           className={`form-control bg-white ${
             errors?.[`${name}`] && "invalid box-shadow"
-          }`}
+          } ${inputClass}`}
           name={name}
           autoComplete="off"
           autoFocus={isFocus ?? false}

@@ -93,6 +93,9 @@ a.hover-text-primary:hover,
 .text-white {
   color: var(--theme-white-color) !important;
 }
+.text-danger {
+  color: var(--theme-danger-color) !important;
+}
 
 a,
 a:hover,
@@ -1030,6 +1033,14 @@ a.text-dark:focus {
   top: 13px;
 }
 
+.w-0 {
+  width: 0 !important;
+}
+
+.h-0 {
+  height: 0 !important;
+}
+
 .w-mx-100 {
   width: auto;
   max-width: 100% !important;
@@ -1429,6 +1440,9 @@ a.text-dark:focus {
 } */
 .pt-2px {
   padding-top: 2px !important;
+}
+.pl-2px {
+  padding-left: 2px !important;
 }
 .py-10,
 .p-10,

@@ -6,6 +6,7 @@ const GridActionMenu = ({ row, actions }) => {
     <>
       {actions?.length > 0 && (
         <div className="dropdown gr-action">
+          {console.log(actions)}
           <button
             className="btn btn-link gr-action-btn"
             aria-expanded={false} //{isOpen}
@@ -32,7 +33,9 @@ const GridActionMenu = ({ row, actions }) => {
                     ) : a["text"].toLowerCase().indexOf("edit") != -1 ? (
                       <i className="far fa-edit pe-2 text-general" />
                     ) : a["text"].toLowerCase().indexOf("delete") != -1 ? (
-                      <i className="fas fa-trash pe-2 text-general" />
+                      <i
+                        className={`fas fa-trash pe-2 text-general ${a["icssclass"]}`}
+                      />
                     ) : a["text"].toLowerCase().indexOf("terminate") != -1 ? (
                       a["icon"].toLowerCase() == "userterminate" ? (
                         <i className="fa fa-user-times pe-2 text-general" />
@@ -47,6 +50,14 @@ const GridActionMenu = ({ row, actions }) => {
                       <i className="fa fa-comment pe-2 text-general" />
                     ) : a["text"].toLowerCase().indexOf("share") != -1 ? (
                       <i className="fa fa-share-from-square pe-2 text-general" />
+                    ) : a["text"].toLowerCase().indexOf("manage property") !=
+                      -1 ? (
+                      <i className="fa fa-house pe-2 text-general" />
+                    ) : a["text"].toLowerCase() == "list property" ||
+                      a["text"].toLowerCase() == "listing information" ? (
+                      <i
+                        className={`fas fa-list-ul pe-2 text-general ${a["icssclass"]}`}
+                      />
                     ) : (
                       ""
                     )}
@@ -126,6 +137,9 @@ export const GridDocActionMenu = ({ row, actions }) => {
                       <i
                         className={`fa fa-share-from-square pe-2 text-general ${a["icssclass"]}`}
                       />
+                    ) : a["text"].toLowerCase().indexOf("manage property") !=
+                      -1 ? (
+                      <i className="fa fa-house pe-2 text-general" />
                     ) : a["text"].toLowerCase().indexOf("reject") != -1 ? (
                       <i
                         className={`fa fa-times-circle pe-2 text-general ${a["icssclass"]}`}
@@ -213,6 +227,79 @@ export const GridUserConnectionActionMenu = ({ row, actions }) => {
                       />
                     ) : a["text"].toLowerCase().indexOf("message") != -1 ? (
                       <i className="fa fa-comment pe-2 text-general" />
+                    ) : a["text"].toLowerCase().indexOf("manage property") !=
+                      -1 ? (
+                      <i className="fa fa-house pe-2 text-general" />
+                    ) : (
+                      ""
+                    )}
+                    {a["text"]}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+    </>
+  );
+};
+
+export const GridPropertyActionMenu = ({ row, actions }) => {
+  if (row.original.IsListed == 0) {
+    actions = actions.filter(
+      (item) => item.text.toLowerCase() !== "listing information"
+    );
+  } else if (row.original.IsListed == 1) {
+    actions = actions.filter(
+      (item) => item.text.toLowerCase() !== "list property"
+    );
+  }
+  return (
+    <>
+      {actions?.length > 0 && (
+        <div className="dropdown gr-action">
+          <button
+            className="btn btn-link gr-action-btn"
+            aria-expanded={false} //{isOpen}
+          >
+            <i className="fas fa-ellipsis-vertical"></i>
+          </button>
+          <ul className="dropdown-menu gr-action-menu dropdown-menu-left  box-shadow">
+            {actions.map((a, i) => {
+              return (
+                <li key={`gr-action-menu-li${i}`}>
+                  <a
+                    className="dropdown-item"
+                    onClick={(e) => {
+                      a["onclick"](e, row);
+                    }}
+                  >
+                    {a["text"].toLowerCase().indexOf("view") != -1 ? (
+                      <i
+                        className={`far fa-eye pe-2 text-general ${a["icssclass"]}`}
+                      />
+                    ) : a["text"].toLowerCase().indexOf("delete") != -1 ||
+                      a["text"].toLowerCase().indexOf("remove") != -1 ? (
+                      <i
+                        className={`fas fa-trash pe-2 text-general ${a["icssclass"]}`}
+                      />
+                    ) : a["text"].toLowerCase().indexOf("share") != -1 ? (
+                      <i
+                        className={`fa fa-share-from-square pe-2 text-general ${a["icssclass"]}`}
+                      />
+                    ) : a["text"].toLowerCase().indexOf("manage property") !=
+                      -1 ? (
+                      <i className="fa fa-house pe-2 text-general" />
+                    ) : a["text"].toLowerCase() == "list property" ||
+                      a["text"].toLowerCase() == "listing information" ? (
+                      <i
+                        className={`fas fa-list-ul pe-2 text-general ${a["icssclass"]}`}
+                      />
+                    ) : a["text"].toLowerCase() == "unlist property" ? (
+                      <i
+                        className={`fas fa-ban pe-2 text-general ${a["icssclass"]}`}
+                      />
                     ) : (
                       ""
                     )}

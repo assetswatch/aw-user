@@ -38,14 +38,42 @@ export const routeNames = {
   profiles: { name: "Profiles", path: "/User/Profiles" },
   settings: { name: "Settings", path: "/User/Settings" },
   upgradeplan: { name: "UpgradePlan", path: "/User/UpgradePlan" },
-  userproperties: { name: "UserProperties", path: "/User/Properties/View" },
-  addproperty: {
-    name: "AddProperty",
-    path: "/User/Properties/Add",
+  ownerproperties: { name: "OwnerProperties", path: "/User/Owners/Properties" },
+  addresidentialproperty: {
+    name: "AddResidentialProperty",
+    path: "/User/Owners/AddResidentialProperty",
   },
-  editproperty: {
-    name: "EditProperty",
-    path: "/User/Properties/Edit",
+  manageresidentialproperty: {
+    name: "ManageResidentialProperty",
+    path: "/User/Owners/ManageResidentialProperty",
+  },
+  addcommercialproperty: {
+    name: "AddCommercialProperty",
+    path: "/User/Owners/AddCommercialProperty",
+  },
+  managecommercialproperty: {
+    name: "ManageCommercialProperty",
+    path: "/User/Owners/ManageCommercialProperty",
+  },
+  agentproperties: {
+    name: "AgentProperties",
+    path: "/User/Agents/Properties",
+  },
+  agentviewproperty: {
+    name: "AgentViewProperty",
+    path: "/User/Agents/ViewProperty",
+  },
+  agentassignedproperties: {
+    name: "AgentAssignedProperties",
+    path: "/User/Agents/AssignedProperties",
+  },
+  tenantconnectedproperties: {
+    name: "TenantConnectedProperties",
+    path: "/User/Tenants/ConnectedProperties",
+  },
+  tenantviewproperty: {
+    name: "TenantViewProperty",
+    path: "/User/Tenants/ViewProperty",
   },
   connectionsowners: {
     name: "ConnectionsOwners",
@@ -58,10 +86,6 @@ export const routeNames = {
   connectionstenants: {
     name: "ConnectionsOwners",
     path: "/User/Connections/Tenants",
-  },
-  tenantconnectedproperties: {
-    name: "TenantConnectedProperties",
-    path: "/User/Tenant-ConnectedProperties",
   },
   tenantprofile: {
     name: "TenantProfile",
@@ -82,10 +106,6 @@ export const routeNames = {
   tenantcheckout: {
     name: "TenantCheckout",
     path: "/User/Tenant-Checkout",
-  },
-  agentconnectedproperties: {
-    name: "AgentConnectedProperties",
-    path: "/User/Agent-ConnectedProperties",
   },
   agentprofile: {
     name: "AgentProfile",
@@ -272,23 +292,76 @@ const routes = [
     isprotected: true,
   },
   {
-    path: routeNames.userproperties.path,
-    name: routeNames.userproperties.name,
-    element: lazy(() => import("../pages/User/Properties/View")),
+    path: routeNames.ownerproperties.path,
+    name: routeNames.ownerproperties.name,
+    element: lazy(() => import("../pages/User/Owners/Properties")),
     isexact: true,
     isprotected: true,
   },
   {
-    path: routeNames.addproperty.path,
-    name: routeNames.addproperty.name,
-    element: lazy(() => import("../pages/User/Properties/Add")),
+    path: routeNames.addresidentialproperty.path,
+    name: routeNames.addresidentialproperty.name,
+    element: lazy(() => import("../pages/User/Owners/AddResidentialProperty")),
     isexact: true,
     isprotected: true,
   },
   {
-    path: routeNames.editproperty.path,
-    name: routeNames.editproperty.name,
-    element: lazy(() => import("../pages/User/Properties/Edit")),
+    path: routeNames.manageresidentialproperty.path,
+    name: routeNames.manageresidentialproperty.name,
+    element: lazy(() =>
+      import("../pages/User/Owners/ManageResidentialProperty")
+    ),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.addcommercialproperty.path,
+    name: routeNames.addcommercialproperty.name,
+    element: lazy(() => import("../pages/User/Owners/AddCommercialProperty")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.managecommercialproperty.path,
+    name: routeNames.managecommercialproperty.name,
+    element: lazy(() =>
+      import("../pages/User/Owners/ManageCommercialProperty")
+    ),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.agentproperties.path,
+    name: routeNames.agentproperties.name,
+    element: lazy(() => import("../pages/User/Agents/Properties")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.agentviewproperty.path,
+    name: routeNames.agentviewproperty.name,
+    element: lazy(() => import("../pages/User/Agents/ViewProperty")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.agentassignedproperties.path,
+    name: routeNames.agentassignedproperties.name,
+    element: lazy(() => import("../pages/User/Agents/AssignedProperties")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.tenantconnectedproperties.path,
+    name: routeNames.tenantconnectedproperties.name,
+    element: lazy(() => import("../pages/User/Tenants/ConnectedProperties")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.tenantviewproperty.path,
+    name: routeNames.tenantviewproperty.name,
+    element: lazy(() => import("../pages/User/Tenants/ViewProperty")),
     isexact: true,
     isprotected: true,
   },
@@ -335,13 +408,6 @@ const routes = [
     isprotected: true,
   },
   {
-    path: routeNames.tenantconnectedproperties.path,
-    name: routeNames.tenantconnectedproperties.name,
-    element: lazy(() => import("../pages/User/Tenants/ConnectedProperties")),
-    isexact: true,
-    isprotected: true,
-  },
-  {
     path: routeNames.tenantprofile.path,
     name: routeNames.tenantprofile.name,
     element: lazy(() => import("../pages/User/Tenants/Profile")),
@@ -373,13 +439,6 @@ const routes = [
     path: routeNames.tenantcheckout.path,
     name: routeNames.tenantcheckout.name,
     element: lazy(() => import("../pages/User/Tenants/Checkout")),
-    isexact: true,
-    isprotected: true,
-  },
-  {
-    path: routeNames.agentconnectedproperties.path,
-    name: routeNames.agentconnectedproperties.name,
-    element: lazy(() => import("../pages/User/Agents/ConnectedProperties")),
     isexact: true,
     isprotected: true,
   },

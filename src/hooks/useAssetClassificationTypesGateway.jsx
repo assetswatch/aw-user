@@ -4,7 +4,7 @@ export function useAssetClassificationTypesGateway(isShowAll = true) {
   let assetClassificationTypes = [];
 
   if (isShowAll == true) {
-    assetClassificationTypes.push({ Type: "All", Id: -1 });
+    assetClassificationTypes.push({ Type: "All", Id: 0 });
   }
 
   Object.entries(config.assetClassificationTypes).map(([key, value]) =>

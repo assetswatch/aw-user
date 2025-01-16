@@ -396,6 +396,7 @@ const Notifications = () => {
       item.ProfileTypeId !==
       parseInt(GetUserCookieValues(UserCookie.ProfileTypeId, loggedinUser))
   );
+
   const [selectedProfileType, setSelectedProfileType] = useState(null);
   const [selectedJoinedUser, setSelectedJoinedUser] = useState(null);
   function setInitialSendNotificationFormData() {

@@ -4,6 +4,7 @@ import DataLoader from "./DataLoader";
 import NoData from "./NoData";
 import GridActionMenu, {
   GridDocActionMenu,
+  GridPropertyActionMenu,
   GridUserConnectionActionMenu,
 } from "./GridActionMenu";
 import { GridDefaultValues } from "../../utils/constants";
@@ -237,6 +238,11 @@ const GridTable = ({
                               />
                             ) : cell.column.isUserConnectionActionMenu ? (
                               <GridUserConnectionActionMenu
+                                row={row}
+                                actions={cell.column.actions}
+                              />
+                            ) : cell.column.isPropertyActionMenu ? (
+                              <GridPropertyActionMenu
                                 row={row}
                                 actions={cell.column.actions}
                               />

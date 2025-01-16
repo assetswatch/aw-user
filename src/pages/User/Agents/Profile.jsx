@@ -41,6 +41,7 @@ const Profile = () => {
 
   const [joinedTenantsTotalCount, setJoinedTenantsTotalCount] = useState(0);
   const [joinedOwnersTotalCount, setJoinedOwnersTotalCount] = useState(0);
+  const [joinedAgentsTotalCount, setJoinedAgentsTotalCount] = useState(0);
 
   useEffect(() => {
     //Joined tenants
@@ -78,6 +79,24 @@ const Profile = () => {
         let objResponse = response.data;
         if (objResponse.StatusCode === 200) {
           setJoinedOwnersTotalCount(objResponse.Data.TotalCount);
+        }
+      })
+      .catch((err) => {
+        console.error(
+          `"API :: ${ApiUrls.getJoinedUserConnections}, Error ::" ${err}`
+        );
+      })
+      .finally(() => {});
+
+    //Joined agents
+    axiosPost(`${config.apiBaseUrl}${ApiUrls.getJoinedUserConnections}`, {
+      ...objParams,
+      InviteeProfileTypeId: config.userProfileTypes.Agent,
+    })
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode === 200) {
+          setJoinedAgentsTotalCount(objResponse.Data.TotalCount);
         }
       })
       .catch((err) => {
@@ -304,6 +323,114 @@ const Profile = () => {
 
   //Setup Owners Grid.
 
+  //Agents Grid
+  const [agentsData, setAgentsData] = useState([]);
+  const [agentsTotalCount, setAgentsTotalCount] = useState(0);
+  const [isAgentsDataLoading, setIsAgentsDataLoading] = useState(true);
+
+  const getAgents = ({
+    pi = GridDefaultValues.pi,
+    ps = GridDefaultValues.ps5,
+  }) => {
+    setIsAgentsDataLoading(true);
+    let objParams = {};
+    objParams = {
+      keyword: "",
+      inviteeid: profileId,
+      InviteeProfileTypeId: config.userProfileTypes.Agent,
+      InviterProfileTypeId: config.userProfileTypes.Agent,
+      pi: parseInt(pi),
+      ps: parseInt(ps),
+    };
+
+    return axiosPost(
+      `${config.apiBaseUrl}${ApiUrls.getRequestedUserConnections}`,
+      objParams
+    )
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode === 200) {
+          setAgentsTotalCount(objResponse.Data.TotalCount);
+          setAgentsData(objResponse.Data.UserConnections);
+        } else {
+          setAgentsData([]);
+        }
+      })
+      .catch((err) => {
+        setAgentsData([]);
+        console.error(
+          `"API :: ${ApiUrls.getRequestedUserConnections}, Error ::" ${err}`
+        );
+      })
+      .finally(() => {
+        setIsAgentsDataLoading(false);
+      });
+  };
+
+  //Setup Agents Grid.
+
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: "Name",
+        accessor: "",
+        className: "w-250px",
+        disableSortBy: true,
+        Cell: ({ row }) => (
+          <>
+            <LazyImage
+              className="rounded-circle cur-pointer w-40px shadow mr-10"
+              onClick={(e) => {}}
+              src={row.original.PicPath}
+              alt={row.original.FirstName + " " + row.original.LastName}
+              placeHolderClass="pos-absolute w-40px min-h-40 fl-l"
+            ></LazyImage>
+            <div className="property-info d-flex flex-start">
+              <a href="#" onClick={(e) => {}}>
+                <h5 className="text-secondary">
+                  {row.original.FirstName + " " + row.original.LastName}
+                </h5>
+              </a>
+            </div>
+          </>
+        ),
+      },
+      {
+        Header: "Location",
+        accessor: "AddressOne",
+        disableSortBy: true,
+        className: "w-200px",
+      },
+      {
+        Header: "Email Id",
+        accessor: "Email",
+        disableSortBy: true,
+        className: "w-200px",
+      },
+      {
+        Header: "Phone Number",
+        accessor: "MobileNo",
+        disableSortBy: true,
+        className: "w-200px",
+      },
+      {
+        Header: "Requested On",
+        accessor: "InvitedDateDisplay",
+        className: "w-200px",
+      },
+    ],
+    []
+  );
+
+  let fetchAgentsData = useCallback(() => {
+    getAgents({
+      pi: GridDefaultValues.pi,
+      ps: GridDefaultValues.ps5,
+    });
+  }, []);
+
+  //Setup Agents Grid.
+
   //Setup Assets Grid.
   const [assetsList, setAssetsList] = useState([]);
   const [assetsTotalCount, setAssetsTotalCount] = useState(0);
@@ -317,15 +444,16 @@ const Profile = () => {
     let objParams = {};
     objParams = {
       keyword: "",
-      inviterid: profileId,
-      InviterProfileTypeId: config.userProfileTypes.Agent,
-      InviteeProfileTypeId: config.userProfileTypes.Owner,
+      accountid: accountId,
+      profileid: profileId,
+      classificationtypeid: 0,
+      assettypeid: 0,
       pi: parseInt(pi),
       ps: parseInt(ps),
     };
 
     return axiosPost(
-      `${config.apiBaseUrl}${ApiUrls.getUserConnectedAssets}`,
+      `${config.apiBaseUrl}${ApiUrls.getUserAssignedAssets}`,
       objParams
     )
       .then((response) => {
@@ -340,7 +468,7 @@ const Profile = () => {
       .catch((err) => {
         setAssetsList([]);
         console.error(
-          `"API :: ${ApiUrls.getUserConnectedAssets}, Error ::" ${err}`
+          `"API :: ${ApiUrls.getUserAssignedAssets}, Error ::" ${err}`
         );
       })
       .finally(() => {
@@ -377,20 +505,20 @@ const Profile = () => {
         ),
       },
       {
+        Header: "Classification Type",
+        accessor: "ClassificationType",
+        disableSortBy: true,
+        className: "w-250px",
+      },
+      {
         Header: "Property Type",
         accessor: "AssetType",
         disableSortBy: true,
         className: "w-250px",
       },
       {
-        Header: "Contract Type",
-        accessor: "ContractType",
-        disableSortBy: true,
-        className: "w-200px",
-      },
-      {
-        Header: "Connected On",
-        accessor: "RepliedDateDisplay",
+        Header: "Assigned On",
+        accessor: "AssignedModifiedDateDisplay",
         className: "w-250px",
       },
     ],
@@ -405,27 +533,37 @@ const Profile = () => {
   }, []);
 
   const onAssets = () => {
-    navigate(routeNames.agentconnectedproperties.path);
+    navigate(routeNames.agentassignedproperties.path);
   };
 
   const onJoinedTenants = () => {
-    navigate(routeNames.agenttenants.path);
+    navigate(routeNames.connectionstenants.path);
   };
 
   const onJoinedOwners = () => {
-    navigate(routeNames.agentowners.path);
+    navigate(routeNames.connectionsowners.path);
+  };
+
+  const onJoinedAgents = () => {
+    navigate(routeNames.connectionsagents.path);
   };
 
   const onRequestedTenants = () => {
-    navigate(routeNames.agenttenants.path, {
-      state: { tab: UserConnectionTabIds.requested },
-    });
+    // navigate(routeNames.agenttenants.path, {
+    //   state: { tab: UserConnectionTabIds.requested },
+    // });
+    navigate(routeNames.connectionstenants.path);
   };
 
   const onRequestedOwners = () => {
-    navigate(routeNames.agentowners.path, {
-      state: { tab: UserConnectionTabIds.requested },
-    });
+    // navigate(routeNames.agentowners.path, {
+    //   state: { tab: UserConnectionTabIds.requested },
+    // });
+    navigate(routeNames.connectionsowners.path);
+  };
+
+  const onRequestedAgents = () => {
+    navigate(routeNames.connectionsagents.path);
   };
 
   //Setup Assets Grid.
@@ -564,6 +702,15 @@ const Profile = () => {
                         </div>
                       </div>
                     </div>
+                    <div className="col cur-pointer" onClick={onJoinedAgents}>
+                      <div className="p-3 box-shadow rounded bg-white info">
+                        <i className="flaticon-user flat-medium float-start pe-3"></i>
+                        <div className="text-right text-muted">
+                          <div className="count">{joinedAgentsTotalCount}</div>
+                          <div className="title">Agents</div>
+                        </div>
+                      </div>
+                    </div>
                     <div className="col cur-pointer" onClick={onJoinedOwners}>
                       <div className="p-3 box-shadow rounded bg-white error">
                         <i className="flaticon-user flat-medium float-start pe-3"></i>
@@ -574,7 +721,7 @@ const Profile = () => {
                       </div>
                     </div>
                     <div className="col cur-pointer" onClick={onJoinedTenants}>
-                      <div className="p-3 box-shadow rounded bg-white info">
+                      <div className="p-3 box-shadow rounded bg-white warning">
                         <i className="flaticon-user flat-medium float-start pe-3"></i>
                         <div className="text-right text-muted">
                           <div className="count">{joinedTenantsTotalCount}</div>
@@ -582,7 +729,7 @@ const Profile = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="col">
+                    {/* <div className="col">
                       <div className="p-3 box-shadow rounded bg-white warning">
                         <i className="fa-regular fa-file-lines float-start pe-3 lh-45"></i>
                         <div className="text-right text-muted">
@@ -590,9 +737,56 @@ const Profile = () => {
                           <div className="title">Agreements</div>
                         </div>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                   {/*============== Stats End ==============*/}
+
+                  {/*============== Recent Agent Start ==============*/}
+                  <div className="full-row px-0 py-4 mb-20 bg-white box-shadow rounded min-h-250">
+                    <div className="container-fluid px-0">
+                      <div className="row">
+                        <div className="col">
+                          <div className="row mx-0 px-20">
+                            <h6 className="col mx-0 px-0 mb-4 down-line pb-1">
+                              Recent Agent Contact
+                            </h6>
+                            <div className="col-auto px-0 mx-0">
+                              <button
+                                type="button"
+                                className="btn btn-glow px-0 rounded-circle lh-1"
+                                onClick={onRequestedAgents}
+                              >
+                                <i className="icons font-18 icon-arrow-right-circle text-primary"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <div className="row">
+                            <div className="col mb-15">
+                              <Grid
+                                columns={columns}
+                                data={agentsData}
+                                loading={isAgentsDataLoading}
+                                fetchData={fetchAgentsData}
+                                pageCount={5}
+                                totalInfo={{
+                                  text: "Agent Requests",
+                                  count: agentsTotalCount,
+                                }}
+                                noData={AppMessages.NoAgentRequests}
+                                showPaging={false}
+                                headerClass={`gr-head-bt gr-head-p12 ${
+                                  !isAgentsDataLoading && agentsData.length > 0
+                                    ? "show"
+                                    : "hide"
+                                }`}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/*============== Recent Agent End ==============*/}
 
                   {/*============== Recent Owners Start ==============*/}
                   <div className="full-row px-0 py-4 mb-20 bg-white box-shadow rounded min-h-250">
@@ -695,7 +889,7 @@ const Profile = () => {
                         <div className="col">
                           <div className="row mx-0 px-20">
                             <h6 className="col mx-0 px-0 mb-4 down-line pb-1">
-                              Recently Connected Properties
+                              Recently Assigned Properties
                             </h6>
                             <div className="col-auto px-0 mx-0">
                               <button
@@ -719,7 +913,7 @@ const Profile = () => {
                                   text: "Total Properties",
                                   count: assetsTotalCount,
                                 }}
-                                noData={AppMessages.NoConnectedProperties}
+                                noData={AppMessages.NoAssignedProperties}
                                 showPaging={false}
                                 headerClass={`gr-head-bt gr-head-p12 ${
                                   !isAssetsDataLoading && assetsList.length > 0

@@ -37,24 +37,35 @@ export function SetPageLoaderNavLinks() {
       let activelink = "";
       let activesublink = "";
       switch (current) {
-        case routeNames.userproperties.path.toLowerCase():
+        case routeNames.ownerproperties.path.toLowerCase():
+        case routeNames.agentproperties.path.toLowerCase():
           activelink = "myproperties";
-          activesublink = "viewproperties";
+          activesublink = "myproperties";
           break;
-        case routeNames.addproperty.path.toLowerCase():
-          activelink = "myproperties";
-          activesublink = "addproperty";
-          break;
-        case routeNames.editproperty.path.toLowerCase():
+        case routeNames.agentviewproperty.path.toLowerCase():
+        case routeNames.tenantviewproperty.path.toLowerCase():
           activelink = "myproperties";
           break;
-        case routeNames.agentconnectedproperties.path.toLowerCase():
+        case routeNames.addresidentialproperty.path.toLowerCase():
+          activelink = "myproperties";
+          activesublink = "addresidentialproperty";
+          break;
+        case routeNames.addcommercialproperty.path.toLowerCase():
+          activelink = "myproperties";
+          activesublink = "addcommercialproperty";
+          break;
+        case routeNames.manageresidentialproperty.path.toLowerCase():
+        case routeNames.managecommercialproperty.path.toLowerCase():
+          activelink = "myproperties";
+          activesublink = "addresidentialproperty";
+          break;
+        case routeNames.agentassignedproperties.path.toLowerCase():
+          activelink = "myproperties";
+          activesublink = "assignedproperties";
+          break;
         case routeNames.tenantconnectedproperties.path.toLowerCase():
           activelink = "myproperties";
           activesublink = "connectedproperties";
-          break;
-        case routeNames.dashboard.path.toLowerCase():
-          activelink = "dashboard";
           break;
         case routeNames.settings.path.toLowerCase():
           activelink = "settings";
