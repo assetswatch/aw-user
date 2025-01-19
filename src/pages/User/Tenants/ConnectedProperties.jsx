@@ -340,7 +340,7 @@ const ConnectedProperties = () => {
   const onView = (e, row) => {
     e.preventDefault();
     addSessionStorageItem(SessionStorageKeys.ViewAssetId, row.original.AssetId);
-    navigate(routeNames.agentviewproperty.path);
+    navigate(routeNames.tenantviewproperty.path);
   };
 
   const onDelete = (e) => {
@@ -432,7 +432,7 @@ const ConnectedProperties = () => {
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <h5 className="mb-4 down-line pb-10">Connected Properties</h5>
+              <h6 className="mb-3 down-line pb-10">Connected Properties</h6>
               {/*============== Search Start ==============*/}
               <div className="woo-filter-bar full-row px-3 py-4 box-shadow grid-search rounded">
                 <div className="container-fluid v-center">

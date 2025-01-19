@@ -81,7 +81,7 @@ const ViewProperty = () => {
             <div className="col-12">
               <div className="row">
                 <div className="col-6">
-                  <h5 className="mb-4 down-line pb-10">Property Details</h5>
+                  <h6 className="mb-3 down-line pb-10">Property Details</h6>
                 </div>
                 <div className="col-6 d-flex justify-content-end align-items-end pb-10">
                   <button
@@ -106,7 +106,7 @@ const ViewProperty = () => {
                           <div className="col px-0">
                             <div className="row mx-0">
                               <div className="col-12 px-0">
-                                <h6 className="mb-4 down-line  pb-10">
+                                <h6 className="mb-3 down-line  pb-10">
                                   Property Info
                                 </h6>
                               </div>
@@ -146,7 +146,7 @@ const ViewProperty = () => {
                               <div className="col-md-6 mb-15 text-md-end">
                                 <span>Area : </span>
                                 <span>
-                                  {assetDetails?.Area}{" "}
+                                  {assetDetails?.AreaDisplay}{" "}
                                   {assetDetails?.AreaUnitType}
                                 </span>
                               </div>
@@ -162,6 +162,24 @@ const ViewProperty = () => {
                                 <span>Bathrooms : </span>
                                 <span>{assetDetails?.Bathrooms}</span>
                               </div>
+                              {assetDetails?.IsListed == 1 && (
+                                <>
+                                  <div className="col-md-6 mb-15">
+                                    <span>Listing Type : </span>
+                                    <span>
+                                      {assetDetails?.ListingType
+                                        ? assetDetails.ListingType
+                                        : "--"}
+                                    </span>
+                                  </div>
+                                  <div className="col-md-6 mb-15 text-md-end">
+                                    <span>Listed On : </span>
+                                    <span>
+                                      {assetDetails?.ListedDateDisplay}
+                                    </span>
+                                  </div>
+                                </>
+                              )}
                               <div className="col-md-12 mb-15">
                                 <span>Description : </span>
                                 <span>{assetDetails?.Description}</span>
@@ -181,7 +199,7 @@ const ViewProperty = () => {
                           <div className="col px-0">
                             <div className="row mx-0">
                               <div className="col-12 px-0">
-                                <h6 className="mb-4 down-line  pb-10">
+                                <h6 className="mb-3 down-line  pb-10">
                                   Property Owners
                                 </h6>
                               </div>
@@ -233,7 +251,7 @@ const ViewProperty = () => {
                         <div className="col px-0">
                           <div className="row mx-0">
                             <div className="col-12 px-0">
-                              <h6 className="mb-4 down-line  pb-10">
+                              <h6 className="mb-3 down-line  pb-10">
                                 Property Media
                               </h6>
                             </div>

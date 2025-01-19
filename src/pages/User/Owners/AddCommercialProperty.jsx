@@ -370,14 +370,18 @@ const AddCommercialProperty = () => {
   };
 
   const handleOwnerChange = (selItem, ctlidx) => {
-    let selOwnerId = parseInt(selItem?.value);
-    setOwnerFormData({
-      ...ownerFormData,
-      [`ddlowners${ctlidx}`]: selOwnerId,
-    });
-
     if (selItem == null || selItem == undefined || selItem == "") {
+      setOwnerFormData({
+        ...ownerFormData,
+        [`ddlowners${ctlidx}`]: 0,
+      });
       return;
+    } else {
+      let selOwnerId = parseInt(selItem?.value);
+      setOwnerFormData({
+        ...ownerFormData,
+        [`ddlowners${ctlidx}`]: selOwnerId,
+      });
     }
   };
 
@@ -587,7 +591,7 @@ const AddCommercialProperty = () => {
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <h5 className="mb-4 down-line pb-10">Commercial Property</h5>
+              <h6 className="mb-3 down-line pb-10">Commercial Property</h6>
               <div className="row">
                 <div className="col-xl-7 col-lg-7">
                   <form noValidate>
@@ -596,7 +600,7 @@ const AddCommercialProperty = () => {
                       <div className="container-fluid">
                         <div className="row">
                           <div className="col px-0">
-                            <h6 className="mb-4 down-line  pb-10">
+                            <h6 className="mb-3 down-line  pb-10">
                               Property Info
                             </h6>
                             <div className="row">
@@ -919,7 +923,7 @@ const AddCommercialProperty = () => {
 
                     {/*============== Add Owners Start ==============*/}
                     {ownerdivs.map((div, idx) => (
-                      <>
+                      <div key={`odiv-${idx}`}>
                         <span className="d-none">{(idx = idx + 1)}</span>
                         <div
                           className="full-row px-3 py-4 mt-20 bg-white box-shadow rounded"
@@ -930,7 +934,7 @@ const AddCommercialProperty = () => {
                             <div className="row">
                               <div className="col px-0">
                                 <div className="row mx-0 px-0">
-                                  <h6 className="col mx-0 px-0 mb-4 down-line pb-10">
+                                  <h6 className="col mx-0 px-0 mb-3 down-line pb-10">
                                     Property Owner - {idx}
                                   </h6>
                                   <div className="col-auto px-0 mx-0">
@@ -945,6 +949,12 @@ const AddCommercialProperty = () => {
                                 </div>
                                 <div className="row">
                                   <div className="col-md-6 mb-15">
+                                    <InputControl
+                                      lblClass="mb-0 lbl-req-field d-none"
+                                      ctlType={formCtrlTypes.name}
+                                      isFocus={true}
+                                      inputClass="w-0 h-0 p-0"
+                                    ></InputControl>
                                     <AsyncRemoteSelect
                                       placeHolder={AppMessages.DdlTypetoSearch}
                                       noData={AppMessages.NoOwners}
@@ -1029,7 +1039,7 @@ const AddCommercialProperty = () => {
                             </div>
                           </div>
                         </div>
-                      </>
+                      </div>
                     ))}
                     {/*============== Add Owners End ==============*/}
                   </form>
@@ -1040,7 +1050,7 @@ const AddCommercialProperty = () => {
                     <div className="container-fluid">
                       <div className="row">
                         <div className="col px-0">
-                          <h6 className="mb-4 down-line pb-10">
+                          <h6 className="mb-3 down-line pb-10">
                             Property Media
                           </h6>
                           <div

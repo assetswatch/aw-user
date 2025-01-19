@@ -39,6 +39,18 @@ export const routeNames = {
   settings: { name: "Settings", path: "/User/Settings" },
   upgradeplan: { name: "UpgradePlan", path: "/User/UpgradePlan" },
   ownerproperties: { name: "OwnerProperties", path: "/User/Owners/Properties" },
+  ownerlistedproperties: {
+    name: "OwnerListedProperties",
+    path: "/User/Owners/ListedProperties",
+  },
+  ownerpartnershipproperties: {
+    name: "OwnerPartnershipProperties",
+    path: "/User/Owners/PartnershipProperties",
+  },
+  ownerviewproperty: {
+    name: "OwnerViewProperty",
+    path: "/User/Owners/ViewProperty",
+  },
   addresidentialproperty: {
     name: "AddResidentialProperty",
     path: "/User/Owners/AddResidentialProperty",
@@ -54,6 +66,10 @@ export const routeNames = {
   managecommercialproperty: {
     name: "ManageCommercialProperty",
     path: "/User/Owners/ManageCommercialProperty",
+  },
+  ownerassignproperty: {
+    name: "ManageAssignProperty",
+    path: "/User/Owners/AssignProperty",
   },
   agentproperties: {
     name: "AgentProperties",
@@ -299,6 +315,27 @@ const routes = [
     isprotected: true,
   },
   {
+    path: routeNames.ownerlistedproperties.path,
+    name: routeNames.ownerlistedproperties.name,
+    element: lazy(() => import("../pages/User/Owners/ListedProperties")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.ownerpartnershipproperties.path,
+    name: routeNames.ownerpartnershipproperties.name,
+    element: lazy(() => import("../pages/User/Owners/PartnershipProperties")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.ownerviewproperty.path,
+    name: routeNames.ownerviewproperty.name,
+    element: lazy(() => import("../pages/User/Owners/ViewProperty")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
     path: routeNames.addresidentialproperty.path,
     name: routeNames.addresidentialproperty.name,
     element: lazy(() => import("../pages/User/Owners/AddResidentialProperty")),
@@ -327,6 +364,13 @@ const routes = [
     element: lazy(() =>
       import("../pages/User/Owners/ManageCommercialProperty")
     ),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.ownerassignproperty.path,
+    name: routeNames.ownerassignproperty.name,
+    element: lazy(() => import("../pages/User/Owners/AssignProperty")),
     isexact: true,
     isprotected: true,
   },

@@ -41,7 +41,7 @@ import { useGetAssetListingTypesGateway } from "../../../hooks/useGetAssetListin
 import { Toast } from "../../../components/common/ToastView";
 import { useAssetClassificationTypesGateway } from "../../../hooks/useAssetClassificationTypesGateway";
 
-const Properties = () => {
+const ListedProperties = () => {
   let $ = window.$;
 
   let formErrors = {};
@@ -191,6 +191,7 @@ const Properties = () => {
         keyword: "",
         classificationtypeid: 0,
         assettypeid: 0,
+        islisted: 1,
         fromdate: setSearchInitialFormData.txtfromdate,
         todate: setSearchInitialFormData.txttodate,
         pi: parseInt(pi),
@@ -873,8 +874,8 @@ const Properties = () => {
 
   //Delete confirmation Modal actions
 
-  const navigateToListedProperties = () => {
-    navigate(routeNames.ownerlistedproperties.path);
+  const navigateToMyProperties = () => {
+    navigate(routeNames.ownerproperties.path);
   };
 
   const navigateToPartnershipProperties = () => {
@@ -895,17 +896,15 @@ const Properties = () => {
                   </div>
                   <div className="breadcrumb-item bc-fh ctooltip-container">
                     <span className="font-general font-500 cur-default">
-                      My Properties
+                      Listed Properties
                     </span>
                   </div>
                 </div>
               </div>
               <div className="tabw100 tab-action shadow rounded bg-white">
                 <ul className="nav-tab-line list-color-secondary d-table mb-0 d-flex box-shadow">
-                  <li className="active">My Properties</li>
-                  <li onClick={navigateToListedProperties}>
-                    Listed Properties
-                  </li>
+                  <li onClick={navigateToMyProperties}>My Properties</li>
+                  <li className="active">Listed Properties</li>
                   <li onClick={navigateToPartnershipProperties}>
                     Partnership Properties
                   </li>
@@ -1292,4 +1291,4 @@ const Properties = () => {
   );
 };
 
-export default Properties;
+export default ListedProperties;

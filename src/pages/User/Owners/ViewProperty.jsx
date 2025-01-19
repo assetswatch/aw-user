@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  checkEmptyVal,
   GetUserCookieValues,
   SetPageLoaderNavLinks,
 } from "../../../utils/common";
@@ -47,7 +48,8 @@ const ViewProperty = () => {
     if (viewAssetId > 0) {
       let objParams = {
         AccountId: accountid,
-        // ProfileId: profileid,
+        //ProfileId: profileid,
+        OwnerProfileId: profileid,
         AssetId: viewAssetId,
       };
       axiosPost(`${config.apiBaseUrl}${ApiUrls.getUserAssetDetails}`, objParams)
@@ -176,6 +178,24 @@ const ViewProperty = () => {
                                     <span>Listed On : </span>
                                     <span>
                                       {assetDetails?.ListedDateDisplay}
+                                    </span>
+                                  </div>
+                                </>
+                              )}
+                              {assetDetails?.hasOwnProperty(
+                                "OwnerShipStatus"
+                              ) && (
+                                <>
+                                  <div className="col-md-6 mb-15">
+                                    <span>Ownership status : </span>
+                                    <span>
+                                      {assetDetails?.OwnerShipStatusDisplay}
+                                    </span>
+                                  </div>
+                                  <div className="col-md-6 mb-15 text-md-end">
+                                    <span>Share percentage : </span>
+                                    <span>
+                                      {assetDetails?.SharePercentageDisplay}
                                     </span>
                                   </div>
                                 </>

@@ -36,7 +36,7 @@ const RegexPattern = {
   email: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,})+$/,
   url: /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?(\?[^\s]*)?$/,
   date: /^(?:(0[1-9]|1[012])[\/.](0[1-9]|[12][0-9]|3[01])[\/.][0-9]{4})$/,
-  price: /^\d{1,3}(,\d{3})*(\.\d{1,2})?$/, // /^(\$|)([0-9]\d{0,2}(\,\d{3})*|([1-9]\d*))(\.\d{1,2})?$/,
+  price: /^\d{1,3}(,\d{3})*(\.\d{1,2})?$|^\d+(\.\d{1,3})?$/, // /^(\$|)([0-9]\d{0,2}(\,\d{3})*|([1-9]\d*))(\.\d{1,2})?$/,
   cardexpiry: /^(0[1-9]|1[0-2])\/\d{4}$/,
 };
 
@@ -254,6 +254,12 @@ export const Regex = {
     max: length15,
     required: ValidationMessages.SqfeetReq,
     invalid: ValidationMessages.SqfeetInvalid,
+    pattern: RegexPattern.price,
+  },
+  feepercentage: {
+    max: length5,
+    required: ValidationMessages.FeePercentReq,
+    invalid: ValidationMessages.FeePercentInvalid,
     pattern: RegexPattern.price,
   },
   brokerpercentage: {
@@ -705,6 +711,20 @@ export const formCtrlTypes = {
     input: {
       type: "text",
       max: length15,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!pricevalidvalues.includes(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
+  },
+  feepercentage: {
+    lbl: "Fee (%):",
+    input: {
+      type: "text",
+      max: length5,
       keyEvents: {
         onKeyPress: (e) => {
           if (!pricevalidvalues.includes(e.key)) {
