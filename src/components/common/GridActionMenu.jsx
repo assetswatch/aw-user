@@ -6,7 +6,6 @@ const GridActionMenu = ({ row, actions }) => {
     <>
       {actions?.length > 0 && (
         <div className="dropdown gr-action">
-          {console.log(actions)}
           <button
             className="btn btn-link gr-action-btn"
             aria-expanded={false} //{isOpen}
@@ -299,6 +298,14 @@ export const GridPropertyActionMenu = ({ row, actions }) => {
                     ) : a["text"].toLowerCase() == "unlist property" ? (
                       <i
                         className={`fas fa-ban pe-2 text-general ${a["icssclass"]}`}
+                      />
+                    ) : a["text"].toLowerCase() == "assign property" ? (
+                      <i
+                        className={`fas fa-house-circle-check pe-2 text-general ${a["icssclass"]}`}
+                      />
+                    ) : a["text"].toLowerCase().indexOf("switch") != -1 ? (
+                      <i
+                        className={`fa fa-exchange pe-2 text-general ${a["icssclass"]}`}
                       />
                     ) : (
                       ""

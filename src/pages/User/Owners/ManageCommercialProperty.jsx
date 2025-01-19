@@ -1,9 +1,8 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   apiReqResLoader,
   checkEmptyVal,
   checkObjNullorEmpty,
-  debounce,
   GetUserCookieValues,
   SetPageLoaderNavLinks,
   setSelectDefaultVal,
@@ -18,7 +17,6 @@ import config from "../../../config.json";
 import {
   API_ACTION_STATUS,
   ApiUrls,
-  AppConstants,
   AppMessages,
   SessionStorageKeys,
   UserCookie,
@@ -528,14 +526,18 @@ const ManageCommercialProperty = () => {
   };
 
   const handleOwnerChange = (selItem, ctlidx) => {
-    let selOwnerId = parseInt(selItem?.value);
-    setOwnerFormData({
-      ...ownerFormData,
-      [`ddlowners${ctlidx}`]: selOwnerId,
-    });
-
     if (selItem == null || selItem == undefined || selItem == "") {
+      setOwnerFormData({
+        ...ownerFormData,
+        [`ddlowners${ctlidx}`]: 0,
+      });
       return;
+    } else {
+      let selOwnerId = parseInt(selItem?.value);
+      setOwnerFormData({
+        ...ownerFormData,
+        [`ddlowners${ctlidx}`]: selOwnerId,
+      });
     }
   };
 
@@ -935,7 +937,7 @@ const ManageCommercialProperty = () => {
           apiReqResLoader("btnSaveMedia", "Save", API_ACTION_STATUS.COMPLETED);
         });
     } else {
-      $("#form-error-media").html(AppMessages.AssetImagesRequired);
+      $("#form-error-media").html(AppMessages.AssetOwnersRequired);
     }
   };
 
@@ -952,7 +954,7 @@ const ManageCommercialProperty = () => {
             <div className="col-12">
               <div className="row">
                 <div className="col-6">
-                  <h5 className="mb-4 down-line pb-10">Commercial Property</h5>
+                  <h6 className="mb-3 down-line pb-10">Commercial Property</h6>
                 </div>
                 <div className="col-6 d-flex justify-content-end align-items-end pb-10">
                   <button
@@ -977,7 +979,7 @@ const ManageCommercialProperty = () => {
                           <div className="col px-0">
                             <div className="row mx-0">
                               <div className="col-9 px-0">
-                                <h6 className="mb-4 down-line  pb-10">
+                                <h6 className="mb-3 down-line  pb-10">
                                   Property Info
                                 </h6>
                               </div>
@@ -1028,7 +1030,7 @@ const ManageCommercialProperty = () => {
                                 <div className="col-md-6 mb-15 text-md-end">
                                   <span>Area : </span>
                                   <span>
-                                    {assetDetails?.Area}{" "}
+                                    {assetDetails?.AreaDisplay}{" "}
                                     {assetDetails?.AreaUnitType}
                                   </span>
                                 </div>
@@ -1044,6 +1046,24 @@ const ManageCommercialProperty = () => {
                                   <span>Bathrooms : </span>
                                   <span>{assetDetails?.Bathrooms}</span>
                                 </div>
+                                {assetDetails?.IsListed == 1 && (
+                                  <>
+                                    <div className="col-md-6 mb-15">
+                                      <span>Listing Type : </span>
+                                      <span>
+                                        {assetDetails?.ListingType
+                                          ? assetDetails.ListingType
+                                          : "--"}
+                                      </span>
+                                    </div>
+                                    <div className="col-md-6 mb-15 text-md-end">
+                                      <span>Listed On : </span>
+                                      <span>
+                                        {assetDetails?.ListedDateDisplay}
+                                      </span>
+                                    </div>
+                                  </>
+                                )}
                                 <div className="col-md-12 mb-15">
                                   <span>Description : </span>
                                   <span>{assetDetails?.Description}</span>
@@ -1399,7 +1419,7 @@ const ManageCommercialProperty = () => {
                               <div className="col px-0">
                                 <div className="row mx-0">
                                   <div className="col-9 px-0">
-                                    <h6 className="mb-4 down-line  pb-10">
+                                    <h6 className="mb-3 down-line  pb-10">
                                       Property Owners
                                     </h6>
                                   </div>
@@ -1425,7 +1445,10 @@ const ManageCommercialProperty = () => {
                                   </>
                                 ) : (
                                   assetDetails?.Owners?.map((o, idx) => (
-                                    <div className="row form-view">
+                                    <div
+                                      className="row form-view"
+                                      key={`ovdiv-${idx}`}
+                                    >
                                       <div className="col-md-6 mb-15">
                                         <span>Owner : </span>
                                         <span>
@@ -1452,7 +1475,7 @@ const ManageCommercialProperty = () => {
                     ) : (
                       <div className="full-row px-3 py-4 mt-20 bg-white box-shadow rounded">
                         {ownerdivs.map((div, idx) => (
-                          <>
+                          <div key={`odiv-${idx}`}>
                             <span className="d-none" key={`oispan-${idx}`}>
                               {(idx = idx + 1)}
                             </span>
@@ -1465,7 +1488,7 @@ const ManageCommercialProperty = () => {
                                 <div className="row">
                                   <div className="col px-0">
                                     <div className="row mx-0 px-0">
-                                      <h6 className="col mx-0 px-0 mb-4 down-line pb-10">
+                                      <h6 className="col mx-0 px-0 mb-3 down-line pb-10">
                                         Property Owner - {idx}
                                       </h6>
                                       <div className="col-auto px-0 mx-0">
@@ -1595,7 +1618,7 @@ const ManageCommercialProperty = () => {
                                 </div>
                               </div>
                             </div>
-                          </>
+                          </div>
                         ))}
                       </div>
                     )}
@@ -1610,7 +1633,7 @@ const ManageCommercialProperty = () => {
                         <div className="col px-0">
                           <div className="row mx-0">
                             <div className="col-9 px-0">
-                              <h6 className="mb-4 down-line  pb-10">
+                              <h6 className="mb-3 down-line  pb-10">
                                 Property Media
                               </h6>
                             </div>

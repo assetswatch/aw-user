@@ -499,7 +499,6 @@ const Properties = () => {
 
   const onListPropertyModalShow = (e, row) => {
     e?.preventDefault();
-    console.log(row);
     if (row.original?.IsListed == 1) {
       setListPropertyFormData({
         txtprice: row.original?.Price,
@@ -624,7 +623,7 @@ const Properties = () => {
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <h5 className="mb-4 down-line pb-10">Properties</h5>
+              <h6 className="mb-3 down-line pb-10">Properties</h6>
               {/*============== Search Start ==============*/}
               <div className="woo-filter-bar full-row px-3 py-4 box-shadow grid-search rounded">
                 <div className="container-fluid v-center">

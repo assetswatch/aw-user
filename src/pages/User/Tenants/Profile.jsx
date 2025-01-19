@@ -649,7 +649,7 @@ const Profile = () => {
                                   {n["Notifications"].map((ndata, idx) => {
                                     return (
                                       <div className="row" key={`tdnom-${idx}`}>
-                                        <div className="col-auto">
+                                        <div className="col-auto px-0">
                                           <img
                                             src={ndata.PicPath}
                                             alt=""

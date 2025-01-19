@@ -38,7 +38,11 @@ export function SetPageLoaderNavLinks() {
       let activesublink = "";
       switch (current) {
         case routeNames.ownerproperties.path.toLowerCase():
+        case routeNames.ownerlistedproperties.path.toLowerCase():
+        case routeNames.ownerpartnershipproperties.path.toLowerCase():
+        case routeNames.ownerviewproperty.path.toLowerCase():
         case routeNames.agentproperties.path.toLowerCase():
+        case routeNames.ownerassignproperty.path.toLowerCase():
           activelink = "myproperties";
           activesublink = "myproperties";
           break;

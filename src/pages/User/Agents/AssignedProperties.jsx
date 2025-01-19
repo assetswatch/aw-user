@@ -74,6 +74,8 @@ const AssignedProperties = () => {
   const [selectedGridRow, setSelectedGridRow] = useState(null);
 
   const [modalListPropertyShow, setModalListPropertyShow] = useState(false);
+  const [modalSwitchClassificationShow, setModalSwitchClassificationShow] =
+    useState(false);
 
   const navigate = useNavigate();
 
@@ -343,6 +345,11 @@ const AssignedProperties = () => {
             onclick: (e, row) => onListPropertyModalShow(e, row),
             icssclass: "pr-10 pl-2px",
           },
+          {
+            text: "Switch Zone",
+            onclick: (e, row) => onSwitchClassificationModalShow(e, row),
+            icssclass: "pr-10 pl-2px",
+          },
         ],
       },
     ],
@@ -487,7 +494,148 @@ const AssignedProperties = () => {
       });
   };
 
+  const onSwitchClassification = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (checkEmptyVal(switchClassificationSelectedAssetType)) {
+      formSwitchClassificationErrors["ddlswitchclassificationassettype"] =
+        ValidationMessages.AssetTypeReq;
+    }
+
+    if (Object.keys(formSwitchClassificationErrors).length === 0) {
+      setSwitchClassificationErrors({});
+      apiReqResLoader(
+        "btnswitchclassification",
+        "Saving",
+        API_ACTION_STATUS.START
+      );
+      let isapimethoderr = false;
+      let objBodyParams = {
+        AssetId: parseInt(selectedGridRow?.original?.AssetId),
+        ClassificationTypeId: parseInt(
+          selectedGridRow?.original?.ClassificationTypeId ==
+            config.assetClassificationTypes.Residential
+            ? config.assetClassificationTypes.Commercial
+            : config.assetClassificationTypes.Residential
+        ),
+        AssetTypeId: parseInt(
+          setSelectDefaultVal(switchClassificationSelectedAssetType)
+        ),
+      };
+
+      axiosPost(
+        `${config.apiBaseUrl}${ApiUrls.switchAssetClassification}`,
+        objBodyParams
+      )
+        .then((response) => {
+          let objResponse = response.data;
+          if (objResponse.StatusCode === 200) {
+            if (objResponse.Data.Status > 0) {
+              Toast.success(AppMessages.AssetSwitchClassificationSuccess);
+              getAssets({ pi: currPagingInfo.pi, ps: currPagingInfo.ps });
+              onSwitchClassificationModalHide();
+            } else {
+              Toast.error(objResponse.Data.Message);
+            }
+          } else {
+            isapimethoderr = true;
+          }
+        })
+        .catch((err) => {
+          isapimethoderr = true;
+          console.error(
+            `"API :: ${ApiUrls.switchAssetClassification}, Error ::" ${err}`
+          );
+        })
+        .finally(() => {
+          if (isapimethoderr == true) {
+            Toast.error(AppMessages.SomeProblem);
+          }
+          apiReqResLoader(
+            "btnswitchclassification",
+            "Switch",
+            API_ACTION_STATUS.COMPLETED
+          );
+        });
+    } else {
+      $(`[name=${Object.keys(formSwitchClassificationErrors)[0]}]`).focus();
+      setSwitchClassificationErrors(formSwitchClassificationErrors);
+    }
+  };
+
   //Grid actions
+
+  //Siwtch Classficiation Modal actions
+
+  let formSwitchClassificationErrors = {};
+  const [switchClassificationErrors, setSwitchClassificationErrors] = useState(
+    {}
+  );
+  const [switchClassificationAssetTypes, setSwitchClassificationAssetTypes] =
+    useState([]);
+  const [
+    switchClassificationSelectedAssetType,
+    setSwitchClassificationSelectedAssetType,
+  ] = useState(null);
+
+  const getAssetTypes = (ctid) => {
+    let objBody = {
+      ClassificationTypeId: ctid,
+      Keyword: "",
+      Status: 1,
+    };
+
+    axiosPost(`${config.apiBaseUrl}${ApiUrls.getAssetTypes}`, objBody)
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode === 200) {
+          setSwitchClassificationAssetTypes(objResponse.Data);
+        } else {
+          setSwitchClassificationAssetTypes([]);
+        }
+      })
+      .catch((err) => {
+        console.error(
+          `API :: ${config.apiBaseUrl}${ApiUrls.getAssetTypes}, Error :: ${err}`
+        );
+        setSwitchClassificationAssetTypes([]);
+      })
+      .finally(() => {});
+  };
+
+  const handleSwitchClassificationAssetTypeChange = (e) => {
+    setSwitchClassificationSelectedAssetType(e?.value);
+  };
+
+  const onSwitchClassificationModalShow = (e, row) => {
+    e?.preventDefault();
+    getAssetTypes(
+      row?.original?.ClassificationTypeId ==
+        config.assetClassificationTypes.Residential
+        ? config.assetClassificationTypes.Commercial
+        : config.assetClassificationTypes.Residential
+    );
+    setSelectedGridRow(row);
+    setModalSwitchClassificationShow(true);
+  };
+
+  const onSwitchClassificationModalHide = (e) => {
+    e?.preventDefault();
+    setSelectedGridRow(null);
+    setModalSwitchClassificationShow(false);
+    setSwitchClassificationSelectedAssetType(null);
+    setSwitchClassificationAssetTypes([]);
+    setSwitchClassificationErrors({});
+    apiReqResLoader(
+      "btnswitchclassification",
+      "Switch",
+      API_ACTION_STATUS.COMPLETED,
+      false
+    );
+  };
+
+  //Siwtch Classficiation Modal actions
 
   //List Property Modal actions
 
@@ -505,7 +653,6 @@ const AssignedProperties = () => {
 
   const onListPropertyModalShow = (e, row) => {
     e?.preventDefault();
-    console.log(row);
     if (row.original?.IsListed == 1) {
       setListPropertyFormData({
         txtprice: row.original?.Price,
@@ -630,7 +777,7 @@ const AssignedProperties = () => {
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <h5 className="mb-4 down-line pb-10">Assigned Properties</h5>
+              <h6 className="mb-3 down-line pb-10">Assigned Properties</h6>
               {/*============== Search Start ==============*/}
               <div className="woo-filter-bar full-row px-3 py-4 box-shadow grid-search rounded">
                 <div className="container-fluid v-center">
@@ -903,6 +1050,78 @@ const AssignedProperties = () => {
         </>
       )}
       {/*============== List Property Modal End ==============*/}
+
+      {/*============== Switch Classification Modal Start ==============*/}
+      {modalSwitchClassificationShow && (
+        <>
+          <ModalView
+            title={AppMessages.SwitchClassificationModalTitle}
+            content={
+              <>
+                <div className="row">
+                  <div className="col-12 mb-15">
+                    <AsyncSelect
+                      placeHolder={
+                        switchClassificationSelectedAssetType == null ||
+                        Object.keys(switchClassificationSelectedAssetType)
+                          .length === 0
+                          ? AppMessages.DdlDefaultSelect
+                          : switchClassificationAssetTypes?.length <= 0 &&
+                            switchClassificationSelectedAssetType == null
+                          ? AppMessages.DdLLoading
+                          : AppMessages.DdlDefaultSelect
+                      }
+                      noData={
+                        switchClassificationSelectedAssetType == null ||
+                        Object.keys(switchClassificationSelectedAssetType)
+                          .length === 0
+                          ? AppMessages.NoData
+                          : switchClassificationAssetTypes?.length <= 0 &&
+                            switchClassificationSelectedAssetType == null
+                          ? AppMessages.DdLLoading
+                          : AppMessages.NoData
+                      }
+                      options={switchClassificationAssetTypes}
+                      dataKey="AssetTypeId"
+                      dataVal="AssetType"
+                      onChange={(e) =>
+                        handleSwitchClassificationAssetTypeChange(e)
+                      }
+                      value={switchClassificationSelectedAssetType}
+                      name="ddlswitchclassificationassettype"
+                      lbl={formCtrlTypes.assettype}
+                      lblClass="mb-0"
+                      lblText="Property type"
+                      className="ddlborder"
+                      isClearable={false}
+                      isSearchCtl={true}
+                      errors={switchClassificationErrors}
+                      formErrors={formSwitchClassificationErrors}
+                    ></AsyncSelect>
+                  </div>
+                </div>
+              </>
+            }
+            onClose={onSwitchClassificationModalHide}
+            actions={[
+              {
+                id: "btnswitchclassification",
+                text: "Switch",
+                displayOrder: 1,
+                btnClass: "btn-primary",
+                onClick: (e) => onSwitchClassification(e),
+              },
+              {
+                text: "Cancel",
+                displayOrder: 2,
+                btnClass: "btn-secondary",
+                onClick: (e) => onSwitchClassificationModalHide(e),
+              },
+            ]}
+          ></ModalView>
+        </>
+      )}
+      {/*============== Switch Classification Modal End ==============*/}
     </>
   );
 };
