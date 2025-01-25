@@ -28,7 +28,7 @@ const DateControl = ({
 
   if (required && checkEmptyVal(value)) {
     formErrors[name] = rex.required;
-  } else if (value.length > rex.max) {
+  } else if (value?.length > rex.max) {
     formErrors[name] = rex.invalid;
   } else if (!checkObjNullorEmpty(objProps) && value != objProps.checkVal) {
   }
@@ -86,6 +86,7 @@ const DateControl = ({
             onKeyDown: disableKeyEvents,
             name: name,
             id: name,
+            value: value ? moment(value).format("MM-DD-YYYY") : "",
           }}
           closeOnSelect={true}
           closeOnClickOutside={true}
@@ -95,6 +96,7 @@ const DateControl = ({
           autoFocus={isFocus ?? false}
           tabIndex={tabIndex}
           value={value}
+          selected={value}
           onChange={onChange}
           isValidDate={constraints && validate}
           maxLength={ctl.input.max}

@@ -22,7 +22,6 @@ export const routeNames = {
     name: "CreateProfile",
     path: "/User/CreateProfile/:ProfileType",
   },
-
   ownerprofile: {
     name: "OwnerProfile",
     path: "/User/Owner-Profile",
@@ -91,16 +90,28 @@ export const routeNames = {
     name: "TenantViewProperty",
     path: "/User/Tenants/ViewProperty",
   },
+  paymentsaccounts: {
+    name: "PaymentsAccounts",
+    path: "/User/Payments/Accounts",
+  },
+  paymentscreateaccount: {
+    name: "PaymentsCreateAccount",
+    path: "/User/Payments/CreateAccount",
+  },
+  paymentsinvoices: {
+    name: "PaymentsInvoices",
+    path: "/User/Payments/Invoices",
+  },
   connectionsowners: {
     name: "ConnectionsOwners",
     path: "/User/Connections/Owners",
   },
   connectionsagents: {
-    name: "ConnectionsOwners",
+    name: "ConnectionsAgents",
     path: "/User/Connections/Agents",
   },
   connectionstenants: {
-    name: "ConnectionsOwners",
+    name: "ConnectionsTenants",
     path: "/User/Connections/Tenants",
   },
   tenantprofile: {
@@ -406,6 +417,27 @@ const routes = [
     path: routeNames.tenantviewproperty.path,
     name: routeNames.tenantviewproperty.name,
     element: lazy(() => import("../pages/User/Tenants/ViewProperty")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.paymentsaccounts.path,
+    name: routeNames.paymentsaccounts.name,
+    element: lazy(() => import("../pages/User/Payments/Accounts")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.paymentscreateaccount.path,
+    name: routeNames.paymentscreateaccount.name,
+    element: lazy(() => import("../pages/User/Payments/CreateAccount")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.paymentsinvoices.path,
+    name: routeNames.paymentsinvoices.name,
+    element: lazy(() => import("../pages/User/Payments/Invoices")),
     isexact: true,
     isprotected: true,
   },

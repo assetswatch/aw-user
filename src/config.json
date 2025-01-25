@@ -33,6 +33,12 @@
     "Pending": 0,
     "Paid": 1
   },
+  "paymentAccountCreateStatus": {
+    "Pending": 0,
+    "Active": 1,
+    "Processing": 2,
+    "Rejected": 3
+  },
   "sharedTypes": {
     "Sent": 1,
     "Received": 2
