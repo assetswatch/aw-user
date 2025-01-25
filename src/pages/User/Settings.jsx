@@ -531,7 +531,7 @@ const Settings = () => {
         <div className="container">
           <div className="row mx-auto col-lg-8 shadow">
             <div className="bg-white xs-p-20 p-30 pb-50 border rounded">
-              <h4 className="mb-2 down-line pb-10">Settings</h4>
+              <h6 className="mb-2 down-line pb-10">Settings</h6>
               <div className="row pt-20 pb-0 row-cols-1 g-4 flex-center">
                 <div className="bb-accordion ac-single-show accordion-plus-right">
                   {/*============== Profile tab start ==============*/}

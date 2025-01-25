@@ -574,7 +574,7 @@ const UserHeader = () => {
                 <>
                   <li className="nav-item">
                     <Link
-                      className="nav-link-user-profile"
+                      className="nav-link"
                       id="nav-user-profile"
                       to={onProfile()}
                     >
@@ -668,8 +668,8 @@ const UserHeader = () => {
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      id="nav-payments"
+                      to={routeNames.paymentsaccounts.path}
                     >
                       <i className="fa fa-credit-card flat-mini pe-2"></i>
                       Payments
@@ -715,7 +715,7 @@ const UserHeader = () => {
                 <>
                   <li className="nav-item">
                     <Link
-                      className="nav-link-user-profile"
+                      className="nav-link"
                       id="nav-user-profile"
                       to={onProfile()}
                     >
@@ -799,8 +799,8 @@ const UserHeader = () => {
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      id="nav-payments"
+                      to={routeNames.paymentsaccounts.path}
                     >
                       <i className="fa fa-credit-card flat-mini pe-2"></i>
                       Payments
@@ -846,7 +846,7 @@ const UserHeader = () => {
                 <>
                   <li className="nav-item">
                     <Link
-                      className="nav-link-user-profile"
+                      className="nav-link"
                       id="nav-user-profile"
                       to={onProfile()}
                     >

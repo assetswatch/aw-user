@@ -48,6 +48,7 @@ export const SessionStorageKeys = {
   ViewSharedDocRootfolderId: "vsdrfid",
   ViewSharedDocRootfolder: "vsdrf",
   ViewSharedDocUsersSharedId: "vsdusid",
+  ViewPaymentSubAccountId: "vpsaid",
 };
 /*Session storage keys*/
 
@@ -124,6 +125,7 @@ export const AppMessages = {
   NoProfiles: "No profiles found...",
   NoProfileTypes: "No profile types found...",
   NoProperties: "No properties found...",
+  NoAccounts: "No accounts found...",
   NoConnectedProperties: "No connected properties found...",
   NoAssignedProperties: "No assigned properties found...",
   NoPayments: "No payments found...",
@@ -205,6 +207,14 @@ export const AppMessages = {
   UpdateListingInfoSuccess: "Listing information saved successfully...",
   AssetUnlistSuccess: "Property unlisted successfully...",
   AssetSwitchClassificationSuccess: "Property zone switched successfully...",
+  PaymentSubaccountDetailsNotFound: "Payment account details not found...",
+  PaymentSubaccountAlreadyActivated: "Payment account already activated...",
+  PaymentSubaccountProcessing: "Payment account creation is in processing...",
+  PaymentSubaccountRejected: "Payment account has been rejected...",
+  PaymentSubaccountCreatedSuccess: "Payment account created successfully...",
+  AccountCreationRestrictedTitle: "Account Creation Restricted!",
+  AccountCreationRestrictedModalMessage:
+    "You can not create a new account while your current account is still under processing. Please wait for the current process to be completed.",
 };
 /*Common App messages*/
 
@@ -283,7 +293,7 @@ export const ValidationMessages = {
   Address2Invalid: "Address 2 is not valid.",
   DescriptionReq: "Description can not be empty.",
   DescriptionInvalid: "Description is not valid.",
-  StartEndDateGreater: "Start date should be grater than End date.",
+  StartEndDateGreater: "End date should be grater than Start date.",
   ContractTypeReq: "Contract type can not be empty.",
   ListingTypeReq: "Listing type can not be empty.",
   AssetTypeReq: "Property type can not be empty.",
@@ -385,6 +395,10 @@ export let ApiUrls = {
   getAssetPayments: `payments/v1/GetAssetPayments`,
   getAssetPaymentDetails: `payments/v1/GetAssetPaymentDetails`,
   processAssetPayment: `payments/v1/ProcessAssetPayment`,
+  getPaymentSubAccounts: `payments/v1/GetPaymentSubAccounts`,
+  getPaymentSubAccountsCountByStatus: `payments/v1/GetPaymentSubAccountsCountByStatus`,
+  getPaymentSubAccountDetails: `payments/v1/GetPaymentSubAccountDetails`,
+  createSubAccount: `payments/v1/CreateSubAccount`,
   getAgreements: `agreements/v1/GetAgreements`,
   getAgreementDetails: `agreements/v1/GetAgreementDetails`,
   getAgreementFile: `agreements/v1/GetAgreementFile`,

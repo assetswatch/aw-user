@@ -4671,6 +4671,12 @@ Newsletter Style
   justify-content: center;
   align-items: center;
 }
+.flex-jc-r {
+  justify-content: right;
+}
+.flex-ai-t {
+  align-items: start;
+}
 
 .v-center {
   align-items: center;
@@ -5100,7 +5106,7 @@ Newsletter Style
     position: absolute;
     display: block;
     bottom: 15px;
-    left: 1px;
+    /* left: 1px; */
     border: none;
     margin: 0;
   }
