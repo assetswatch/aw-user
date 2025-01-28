@@ -319,6 +319,11 @@ const Invoices = () => {
 
   //Account Creation Resitricted Modal actions
 
+  const navigateToInvoiceItems = (e) => {
+    e.preventDefault();
+    navigate(routeNames.invoiceitems.path);
+  };
+
   return (
     <>
       {SetPageLoaderNavLinks()}
@@ -327,7 +332,7 @@ const Invoices = () => {
           <div className="row">
             <div className="col-12">
               <div className="row">
-                <div className="col-6">
+                <div className="col-md-12 col-lg-6">
                   <div className="breadcrumb">
                     <div className="breadcrumb-item bc-fh">
                       <h6 className="mb-3 down-line pb-10">Payments</h6>
@@ -339,17 +344,17 @@ const Invoices = () => {
                     </div>
                   </div>
                 </div>
-                <div className="col-6 d-flex justify-content-end align-items-end pb-10">
-                  {/* <button
+                <div className="col-md-12 col-lg-6 d-flex justify-content-end align-items-end pb-10">
+                  <button
                     className="btn btn-primary btn-mini btn-glow shadow rounded"
-                    name="btncreateaccount"
-                    id="btncreateaccount"
+                    name="btnitems"
+                    id="btnitems"
                     type="button"
-                    onClick={navigateToPaymentsCreateAccount}
+                    onClick={navigateToInvoiceItems}
                   >
-                    <i className="fa fa-credit-card position-relative me-1 t-1"></i>{" "}
-                    Create Account
-                  </button> */}
+                    <i className="fa fa-list position-relative me-1 t-1"></i>{" "}
+                    Items
+                  </button>
                 </div>
               </div>
               <div className="tabw100 tab-action shadow rounded bg-white">

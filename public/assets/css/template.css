@@ -538,6 +538,10 @@ a.hover-bg-primary:hover,
   font-size: 100px !important;
 }
 
+.font-8px {
+  font-size: 8px !important;
+}
+
 .font-mini {
   font-size: 11px !important;
 }

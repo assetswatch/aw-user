@@ -159,7 +159,8 @@ const InputControl = ({
       }
       break;
     case formCtrlTypes.amount:
-      rex = Regex.amount;
+    case formCtrlTypes.price:
+      rex = formCtrlTypes.price ? Regex.price : Regex.amount;
       if (required && checkEmptyVal(value)) {
         formErrors[name] = rex.required;
       }

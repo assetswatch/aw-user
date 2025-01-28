@@ -49,6 +49,7 @@ export const SessionStorageKeys = {
   ViewSharedDocRootfolder: "vsdrf",
   ViewSharedDocUsersSharedId: "vsdusid",
   ViewPaymentSubAccountId: "vpsaid",
+  ViewInvoiceItemId: "viiid",
 };
 /*Session storage keys*/
 
@@ -215,6 +216,7 @@ export const AppMessages = {
   AccountCreationRestrictedTitle: "Account Creation Restricted!",
   AccountCreationRestrictedModalMessage:
     "You can not create a new account while your current account is still under processing. Please wait for the current process to be completed.",
+  DeleteInvoiceItemConfirmationMessage: "You want to delete {item}.",
 };
 /*Common App messages*/
 
@@ -306,6 +308,8 @@ export const ValidationMessages = {
   AdvanceInvalid: "Advance amount is not valid.",
   AmountReq: "Amount can not be empty.",
   AmountInvalid: "Amount is not valid.",
+  PriceReq: "Price can not be empty.",
+  PriceInvalid: "Price is not valid.",
   NooffloorsReq: "Nooffloors can not be empty.",
   NooffloorsInvalid: "Nooffloors is not valid.",
   AreaReq: "Area can not be empty.",
@@ -323,6 +327,9 @@ export const ValidationMessages = {
   CommentsReq: "Comments can not be empty.",
   DocumentTypeReq: "Document type can not be empty.",
   UploadFileReq: "Please select files to upload.",
+  ItemForTypeReq: "Item for type can not be empty.",
+  ItemReq: "Item can not be empty.",
+  AccountForTypeReq: "Account for type can not be empty.",
 };
 
 /*Api Urls*/
@@ -399,6 +406,13 @@ export let ApiUrls = {
   getPaymentSubAccountsCountByStatus: `payments/v1/GetPaymentSubAccountsCountByStatus`,
   getPaymentSubAccountDetails: `payments/v1/GetPaymentSubAccountDetails`,
   createSubAccount: `payments/v1/CreateSubAccount`,
+  getInvoiceItemForTypes: `payments/v1/GetInvoiceItemForTypes`,
+  getInvoiceItemAccountForTypes: `payments/v1/GetInvoiceItemAccountForTypes`,
+  getDdlInvoiceForItems: `payments/v1/GetDdlInvoiceForItems`,
+  addInvoiceItem: `payments/v1/AddInvoiceItem`,
+  getInvoiceItems: `payments/v1/GetInvoiceItems`,
+  deleteInvoiceItem: `payments/v1/DeleteInvoiceItem`,
+  getInvoiceItemDetails: `payments/v1/GetInvoiceItemDetails`,
   getAgreements: `agreements/v1/GetAgreements`,
   getAgreementDetails: `agreements/v1/GetAgreementDetails`,
   getAgreementFile: `agreements/v1/GetAgreementFile`,

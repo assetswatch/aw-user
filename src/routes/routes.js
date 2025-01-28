@@ -102,6 +102,18 @@ export const routeNames = {
     name: "PaymentsInvoices",
     path: "/User/Payments/Invoices",
   },
+  invoiceitems: {
+    name: "InvoiceItems",
+    path: "/User/Payments/InvoiceItems",
+  },
+  createinvoiceitem: {
+    name: "CreateInvoiceItem",
+    path: "/User/Payments/CreateInvoiceItem",
+  },
+  viewinvoiceitem: {
+    name: "ViewInvoiceItem",
+    path: "/User/Payments/ViewInvoiceItem",
+  },
   connectionsowners: {
     name: "ConnectionsOwners",
     path: "/User/Connections/Owners",
@@ -431,6 +443,27 @@ const routes = [
     path: routeNames.paymentscreateaccount.path,
     name: routeNames.paymentscreateaccount.name,
     element: lazy(() => import("../pages/User/Payments/CreateAccount")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.invoiceitems.path,
+    name: routeNames.invoiceitems.name,
+    element: lazy(() => import("../pages/User/Payments/InvoiceItems")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.createinvoiceitem.path,
+    name: routeNames.createinvoiceitem.name,
+    element: lazy(() => import("../pages/User/Payments/CreateInvoiceItem")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.viewinvoiceitem.path,
+    name: routeNames.viewinvoiceitem.name,
+    element: lazy(() => import("../pages/User/Payments/ViewInvoiceItem")),
     isexact: true,
     isprotected: true,
   },

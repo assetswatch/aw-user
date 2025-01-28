@@ -214,6 +214,11 @@ export const Regex = {
     required: ValidationMessages.DescriptionReq,
     invalid: ValidationMessages.DescriptionInvalid,
   },
+  description300: {
+    max: length300,
+    required: ValidationMessages.DescriptionReq,
+    invalid: ValidationMessages.DescriptionInvalid,
+  },
   file: {
     max: length250,
     required: ValidationMessages.FileReq,
@@ -224,6 +229,12 @@ export const Regex = {
     max: length15,
     required: ValidationMessages.RentReq,
     invalid: ValidationMessages.RentInvalid,
+    pattern: RegexPattern.price,
+  },
+  price: {
+    max: length15,
+    required: ValidationMessages.PriceReq,
+    invalid: ValidationMessages.PriceInvalid,
     pattern: RegexPattern.price,
   },
   amount: {
@@ -590,6 +601,13 @@ export const formCtrlTypes = {
       max: length2000,
     },
   },
+  description300: {
+    lbl: "Description:",
+    input: {
+      type: "text",
+      max: length300,
+    },
+  },
   description500: {
     lbl: "Description:",
     input: {
@@ -638,6 +656,20 @@ export const formCtrlTypes = {
   },
   rent: {
     lbl: "Rent amount ($):",
+    input: {
+      type: "text",
+      max: length15,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!pricevalidvalues.includes(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
+  },
+  price: {
+    lbl: "Price ($):",
     input: {
       type: "text",
       max: length15,
@@ -803,6 +835,15 @@ export const formCtrlTypes = {
   },
   user: {
     lbl: "User:",
+  },
+  itemfortype: {
+    lbl: "Item for:",
+  },
+  accountfortype: {
+    lbl: "Account for:",
+  },
+  select: {
+    lbl: "Select:",
   },
 };
 /*control types*/
