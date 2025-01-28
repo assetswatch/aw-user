@@ -52,6 +52,10 @@ const GridActionMenu = ({ row, actions }) => {
                     ) : a["text"].toLowerCase().indexOf("manage property") !=
                       -1 ? (
                       <i className="fa fa-house pe-2 text-general" />
+                    ) : a["text"].toLowerCase().indexOf("manage item") != -1 ? (
+                      <i
+                        className={`fa fa-list pe-2 text-general ${a["icssclass"]}`}
+                      />
                     ) : a["text"].toLowerCase() == "list property" ||
                       a["text"].toLowerCase() == "listing information" ? (
                       <i
