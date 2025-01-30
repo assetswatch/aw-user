@@ -611,7 +611,7 @@ const Profile = () => {
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <h5 className="mb-4 down-line">My Profile</h5>
+              <h5 className="mb-4 down-line pb-10">My Profile</h5>
               <div className="row">
                 <div className="col-xl-3 col-lg-4">
                   {/*============== Profile Start ==============*/}

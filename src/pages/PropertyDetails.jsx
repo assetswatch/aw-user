@@ -167,7 +167,7 @@ const PropertyDetails = () => {
             <div className="col-xl-4 order-xl-2">
               {/* Message Form */}
               <div className="widget widget_contact bg-white border p-30 rounded mb-30 box-shadow">
-                <h5 className="mb-4 down-line">Listed By</h5>
+                <h5 className="mb-4 down-line pb-10">Listed By</h5>
                 {assetDetails && (
                   <div className="media mb-3">
                     <LazyImage
@@ -271,7 +271,7 @@ const PropertyDetails = () => {
               <PropertySearch />
               {/*============== Recent Property Widget Start ==============*/}
               <div className="widget widget_recent_property rounded box-shadow pb-20">
-                <h5 className="text-secondary mb-4 down-line">
+                <h5 className="text-secondary mb-4 down-line pb-10">
                   Recent Properties
                 </h5>
                 <ul>

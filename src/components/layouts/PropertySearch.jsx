@@ -316,7 +316,7 @@ const PropertySearch = () => {
         </div>
       ) : (
         <div className="widget advance_search_widget box-shadow rounded">
-          <h5 className="mb-30 down-line">Search Property</h5>
+          <h5 className="mb-30 down-line pb-10">Search Property</h5>
           <form
             className="rounded quick-search  grid-search form-icon-right"
             action="#"

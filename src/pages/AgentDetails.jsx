@@ -399,7 +399,7 @@ const AgentDetails = () => {
               {/*============== Recent Property Widget End ==============*/}
               {/*============== Agents Widget Start ==============*/}
               <div className="widget widget_recent_property box-shadow rounded pb-20">
-                <h5 className="text-secondary mb-4 down-line">Listed Agents</h5>
+                <h5 className="text-secondary mb-4 down-line pb-10">Listed Agents</h5>
                 <ul>
                   {topAgentsList?.length > 0 && (
                     <>

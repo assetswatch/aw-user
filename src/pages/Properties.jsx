@@ -425,7 +425,7 @@ const Properties = () => {
                 <PropertySearch></PropertySearch>
                 {/*============== Recent Property Widget Start ==============*/}
                 <div className="widget property_carousel_widget box-shadow rounded pb-20">
-                  <h5 className="mb-30 down-line">Recent Properties</h5>
+                  <h5 className="mb-30 down-line pb-10">Recent Properties</h5>
                   <div
                     className="topprop-carusel owl-carousel nav-disable owl-loaded owl-drag"
                     ref={topAssetsRef}
@@ -536,7 +536,7 @@ const Properties = () => {
                 {/*============== Recent Property Widget End ==============*/}
                 {/*============== Agents Widget Start ==============*/}
                 <div className="widget widget_recent_property box-shadow rounded pb-20">
-                  <h5 className="text-secondary mb-4 down-line">
+                  <h5 className="text-secondary mb-4 down-line pb-10">
                     Listed Agents
                   </h5>
                   <ul>

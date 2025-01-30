@@ -173,6 +173,11 @@ export const routeNames = {
   },
   comingup: { name: "ComingUp", path: "/User/ComingUp" },
   notFound: { name: "NotFound", path: "/*" },
+  propertyreport: { name: "PropertyReport", path: "/User/Reports/PropertyReport" },
+  transactionreport: { name: "TransactionReport", path: "/User/Reports/TransactionReport" },
+  services: { name: "Services", path: "/User/Services" },
+  createrequest: { name: "CreateRequest", path: "/User/Services/CreateRequest" },
+  servicedetails: { name: "ServiceDetails", path: "/User/Services/ServiceDetails" },
 };
 
 const routes = [
@@ -581,6 +586,41 @@ const routes = [
     path: routeNames.notFound.path,
     name: routeNames.notFound.name,
     element: lazy(() => import("../pages/NotFound")),
+  },
+  {
+    path: routeNames.propertyreport.path,
+    name: routeNames.propertyreport.name,
+    element: lazy(() => import("../pages/User/Reports/PropertyReport")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.transactionreport.path,
+    name: routeNames.transactionreport.name,
+    element: lazy(() => import("../pages/User/Reports/TransactionReport")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.services.path,
+    name: routeNames.services.name,
+    element: lazy(() => import("../pages/User/Services/Services")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.createrequest.path,
+    name: routeNames.createrequest.name,
+    element: lazy(() => import("../pages/User/Services/CreateRequest")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.servicedetails.path,
+    name: routeNames.servicedetails.name,
+    element: lazy(() => import("../pages/User/Services/ServiceDetails")),
+    isexact: true,
+    isprotected: true,
   },
 ];
 

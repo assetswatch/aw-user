@@ -658,8 +658,8 @@ const UserHeader = () => {
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      id="nav-services"
+                      to={routeNames.services.path}
                     >
                       <i className="fa fa-screwdriver-wrench pe-2"></i>
                       Services
@@ -678,8 +678,8 @@ const UserHeader = () => {
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      id="nav-reports"
+                      to={routeNames.propertyreport.path}
                     >
                       <i className="fa fa-chart-pie flat-mini pe-2"></i>
                       Reports
@@ -789,8 +789,8 @@ const UserHeader = () => {
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      id="nav-services"
+                      to={routeNames.services.path}
                     >
                       <i className="fa fa-screwdriver-wrench pe-2"></i>
                       Services
@@ -809,8 +809,8 @@ const UserHeader = () => {
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      id="nav-reports"
+                      to={routeNames.propertyreport.path}
                     >
                       <i className="fa fa-chart-pie flat-mini pe-2"></i>
                       Reports
@@ -903,8 +903,8 @@ const UserHeader = () => {
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      id="nav-services"
+                      to={routeNames.services.path}
                     >
                       <i className="fa fa-screwdriver-wrench pe-2"></i>
                       Services
@@ -923,8 +923,8 @@ const UserHeader = () => {
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      id="nav-reports"
+                      to={routeNames.propertyreport.path}
                     >
                       <i className="fa fa-chart-pie flat-mini pe-2"></i>
                       Reports

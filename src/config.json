@@ -1,5 +1,5 @@
 {
-  "apiBaseUrl": "http://localhost:5198/api/",
+  "apiBaseUrl": "https://dev.assetswatch.com:8000/api/",
   "usioPaymentConfig": {
     "getTokenUrl": "https://checkout.usiopay.com/2.0/GenerateToken",
     "merchantAPIKey": "AEAE82F9-5A34-47C3-A61E-1E8EE37BE3AD"

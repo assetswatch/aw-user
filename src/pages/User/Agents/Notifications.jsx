@@ -566,7 +566,7 @@ const Notifications = () => {
             <div className="col-12">
               <div className="row">
                 <div className="col-6">
-                  <h5 className="mb-4 down-line">Notifications</h5>
+                  <h5 className="mb-4 down-line pb-10">Notifications</h5>
                 </div>
                 <div className="col-6 d-flex justify-content-end align-items-end pb-10">
                   <button

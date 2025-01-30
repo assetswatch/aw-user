@@ -201,7 +201,7 @@ const ContactUs = () => {
         <div className="container">
           <div className="row">
             <div className="col-md-5 order-md-2">
-              <h4 className="down-line mb-4">Get In Touch</h4>
+              <h4 className="down-line mb-4 pb-10">Get In Touch</h4>
               <p>Having issues with your Assetswatch account?</p>
               <div className="mb-10">
                 {isDataLoading && <DataLoader />}
@@ -245,7 +245,7 @@ const ContactUs = () => {
               </div>
             </div>
             <div className="col-md-7 order-md-1">
-              <h4 className="down-line mb-4">Send Message</h4>
+              <h4 className="down-line mb-4 pb-10">Send Message</h4>
               <form noValidate onSubmit={onSendMessage}>
                 <div className="row">
                   <div className="col-md-6 mb-15">

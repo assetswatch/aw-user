@@ -265,7 +265,7 @@ const Home = () => {
           <div className="row mb-4 align-items-center">
             <div className="col-md-8">
               <div className="me-auto">
-                <h2 className="d-table mb-4 down-line">Recent Properties</h2>
+                <h2 className="d-table mb-4 down-line pb-10">Recent Properties</h2>
                 <span className="d-table sub-title text-primary">
                   Be the First to See Our Latest Properties!
                 </span>
@@ -540,7 +540,7 @@ const Home = () => {
           <div className="row mb-4 align-items-center">
             <div className="col-md-8">
               <div className="me-auto">
-                <h2 className="d-table mb-4 down-line">
+                <h2 className="d-table mb-4 down-line pb-10">
                   Our Listed Property Agents
                 </h2>
                 <span className="d-table sub-title text-primary">
@@ -737,7 +737,7 @@ const Home = () => {
               <span className="text-primary tagline pb-2 d-table m-auto">
                 Testimonials
               </span>
-              <h2 className="down-line w-50 mx-auto mb-4 text-center w-sm-100">
+              <h2 className="down-line w-50 mx-auto mb-4 text-center w-sm-100 pb-10">
                 What Client Says About Us
               </h2>
             </div>
