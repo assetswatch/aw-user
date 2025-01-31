@@ -999,29 +999,23 @@ const ManageCommercialProperty = () => {
                                 className="row form-view"
                                 id="divViewPropertyInfo"
                               >
-                                <div className="col-md-6 mb-15">
-                                  <span>AddressOne : </span>
+                                <div className="col-md-12 mb-15">
+                                  <span>Address : </span>
                                   <span>{assetDetails?.AddressOne}</span>
+                                  {assetDetails?.AddressTwo &&
+                                    `, ${assetDetails?.AddressTwo}`}
+                                  {assetDetails?.City &&
+                                    `, ${assetDetails?.City}`}
+                                  {assetDetails?.State &&
+                                    `, ${assetDetails?.State}`}
+                                  {assetDetails?.Country &&
+                                    `, ${assetDetails?.Country}`}
+                                  {assetDetails?.Zip &&
+                                    `, ${assetDetails?.Zip}`}
                                 </div>
-                                <div className="col-md-6 mb-15 text-md-end">
-                                  <span>AddressTwo : </span>
-                                  <span>{assetDetails?.AddressTwo}</span>
-                                </div>
-                                <div className="col-md-6 mb-15">
-                                  <span>Country : </span>
-                                  <span>{assetDetails?.Country}</span>
-                                </div>
-                                <div className="col-md-6 mb-15 text-md-end">
-                                  <span>State : </span>
-                                  <span>{assetDetails.State}</span>
-                                </div>
-                                <div className="col-md-6 mb-15">
-                                  <span>City : </span>
-                                  <span>{assetDetails?.City}</span>
-                                </div>
-                                <div className="col-md-6 mb-15 text-md-end">
-                                  <span>Zip code : </span>
-                                  <span>{assetDetails?.Zip}</span>
+                                <div className="col-md-12 mb-15">
+                                  <span>Description : </span>
+                                  <span>{assetDetails?.Description}</span>
                                 </div>
                                 <div className="col-md-6 mb-15">
                                   <span>Property type : </span>
@@ -1064,10 +1058,6 @@ const ManageCommercialProperty = () => {
                                     </div>
                                   </>
                                 )}
-                                <div className="col-md-12 mb-15">
-                                  <span>Description : </span>
-                                  <span>{assetDetails?.Description}</span>
-                                </div>
                               </div>
                             ) : (
                               <>
