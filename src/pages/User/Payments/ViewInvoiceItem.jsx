@@ -225,7 +225,7 @@ const ViewInvoiceItem = () => {
           <div className="row mx-auto col-lg-6 shadow">
             <div className="bg-white xs-p-20 p-30 pb-30 border rounded">
               <div className="row">
-                <div className="col-9">
+                <div className="col-md-9 col-sm-12">
                   <div className="breadcrumb mb-0">
                     <div className="breadcrumb-item bc-fh">
                       <h6 className="mb-2 down-line pb-10">Invoices</h6>
@@ -255,7 +255,7 @@ const ViewInvoiceItem = () => {
                     </div>
                   </div>
                 </div>
-                <div className="col-3 d-flex flex-ai-t flex-jc-r text-end pt-2">
+                <div className="col-md-3 col-sm-12 d-flex flex-ai-t flex-jc-r text-end pt-2">
                   <button
                     type="button"
                     className="btn btn-glow px-0 rounded-circle text-primary lh-1 d-flex flex-center"
@@ -272,15 +272,15 @@ const ViewInvoiceItem = () => {
                     <>
                       <div className="row form-view" id="divViewItem">
                         <div className="col-md-6 mb-15">
-                          <span>Item for : </span>
+                          <span>Item : </span>
                           <span>{itemDetails?.ItemForType}</span>
                         </div>
                         <div className="col-md-6 mb-15 text-md-end">
-                          <span>Item : </span>
+                          <span>Item of : </span>
                           <span>{itemDetails?.Item}</span>
                         </div>
                         <div className="col-md-6 mb-15">
-                          <span>Account for : </span>
+                          <span>Account : </span>
                           <span>{itemDetails?.AccountForType}</span>
                         </div>
                         <div className="col-md-6 mb-15 text-md-end">

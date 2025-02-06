@@ -1070,7 +1070,7 @@ const MyDocuments = () => {
     setSelectedJoinedUser(null);
     setShareFolderFormData(setInitialShareFolderFormData());
     setShareFolderErrors({});
-    apiReqResLoader("btnshare", "Sharing", API_ACTION_STATUS.COMPLETED, false);
+    apiReqResLoader("btnshare", "Share", API_ACTION_STATUS.COMPLETED, false);
   };
 
   const onShareModalShow = (e, row) => {

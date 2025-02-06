@@ -85,6 +85,8 @@ export function SetPageLoaderNavLinks() {
         case routeNames.invoiceitems.path.toLowerCase():
         case routeNames.createinvoiceitem.path.toLowerCase():
         case routeNames.viewinvoiceitem.path.toLowerCase():
+        case routeNames.createinvoice.path.toLowerCase():
+        case routeNames.viewinvoice.path.toLowerCase():
           activelink = "payments";
           break;
         case routeNames.tenantpayments.path.toLowerCase():

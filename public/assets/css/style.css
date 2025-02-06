@@ -1049,6 +1049,9 @@ select:focus {
 .react_select_menu {
   z-index: 9999 !important;
 }
+.css-k3o0h2 {
+  text-overflow: ellipsis !important;
+}
 
 .fa-circle-o-notch:before {
   content: "\f1ce";
@@ -1370,6 +1373,9 @@ Header Style Start
 .lh-20 {
   line-height: 20px !important;
 }
+.lh-5 {
+  line-height: 5px !important;
+}
 .lh-18 {
   line-height: 18px !important;
 }
@@ -1388,6 +1394,9 @@ Header Style Start
 }
 .bo-r-0 {
   border-right: none !important;
+}
+.bo-b-0 {
+  border-bottom: none !important;
 }
 .bo-top {
   border-top: 1px solid #dee2e6 !important;
@@ -4277,7 +4286,10 @@ Social Media Style Start
   padding-top: 6px;
   padding-bottom: 6px;
 }
-
+.tbl-grid tbody tr td div .py-0 div {
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
 .tbl-grid tbody tr td,
 .tbl-grid tbody tr td div > * {
   line-height: 20px;
@@ -4289,6 +4301,15 @@ Social Media Style Start
 }
 .tbl-grid tbody i {
   color: var(--theme-primary-color);
+}
+.tbl-grid.row-alt-bg > tbody tr:nth-child(even) {
+  background-color: var(--theme-li-hover-bg-color) !important;
+}
+.tbl-grid tr.td-valign-top td {
+  vertical-align: top !important;
+}
+.tbl-grid.td-p10 tr td {
+  padding: 10px !important;
 }
 .grid-search .div-search > div {
   margin-top: 0.5rem !important;

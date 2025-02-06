@@ -159,10 +159,6 @@ const CreateInvoiceItem = () => {
     }
   };
 
-  const navigateToPaymentsAccounts = () => {
-    navigate(routeNames.paymentsaccounts.path);
-  };
-
   const navigateToInvoiceItems = (e) => {
     e.preventDefault();
     navigate(routeNames.invoiceitems.path);

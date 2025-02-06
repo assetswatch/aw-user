@@ -143,6 +143,17 @@ const InputControl = ({
         formErrors[name] = rex.invalid;
       }
       break;
+    case formCtrlTypes.invoicenum:
+      rex = Regex.invoicenum;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (
+        !checkEmptyVal(value) &&
+        !(value?.length >= rex.min && value?.length <= rex.max)
+      ) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
     case formCtrlTypes.searchkeyword:
       rex = Regex.searchkeyword;
       if (required && checkEmptyVal(value)) {
@@ -161,6 +172,15 @@ const InputControl = ({
     case formCtrlTypes.amount:
     case formCtrlTypes.price:
       rex = formCtrlTypes.price ? Regex.price : Regex.amount;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.invoiceitemprice:
+      rex = Regex.invoiceitemprice;
       if (required && checkEmptyVal(value)) {
         formErrors[name] = rex.required;
       }

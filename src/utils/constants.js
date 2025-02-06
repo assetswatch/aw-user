@@ -50,6 +50,7 @@ export const SessionStorageKeys = {
   ViewSharedDocUsersSharedId: "vsdusid",
   ViewPaymentSubAccountId: "vpsaid",
   ViewInvoiceItemId: "viiid",
+  ViewInvoiceId: "viid",
 };
 /*Session storage keys*/
 
@@ -126,7 +127,9 @@ export const AppMessages = {
   NoProfiles: "No profiles found...",
   NoProfileTypes: "No profile types found...",
   NoProperties: "No properties found...",
+  NoInvoices: "No invoices found...",
   NoAccounts: "No accounts found...",
+  NoItems: "No items found...",
   NoConnectedProperties: "No connected properties found...",
   NoAssignedProperties: "No assigned properties found...",
   NoPayments: "No payments found...",
@@ -217,6 +220,9 @@ export const AppMessages = {
   AccountCreationRestrictedModalMessage:
     "You can not create a new account while your current account is still under processing. Please wait for the current process to be completed.",
   DeleteInvoiceItemConfirmationMessage: "You want to delete {item}.",
+  DdlSelectItem: "Select Item",
+  SendInvoiceModalTitle: "Send Invoice",
+  UnsendInvoiceToUserMessage: "You want to unsend invoice for {name}.",
 };
 /*Common App messages*/
 
@@ -330,6 +336,10 @@ export const ValidationMessages = {
   ItemForTypeReq: "Item for type can not be empty.",
   ItemReq: "Item can not be empty.",
   AccountForTypeReq: "Account for type can not be empty.",
+  InvoiceNumReq: "Invoice number can not be empty.",
+  InvoiceNumInvalid: "Invoice number is not valid.",
+  QtyReq: "Quantity code can not be empty.",
+  QtyInvalid: "Quantity code is not valid.",
 };
 
 /*Api Urls*/
@@ -413,6 +423,14 @@ export let ApiUrls = {
   getInvoiceItems: `payments/v1/GetInvoiceItems`,
   deleteInvoiceItem: `payments/v1/DeleteInvoiceItem`,
   getInvoiceItemDetails: `payments/v1/GetInvoiceItemDetails`,
+  getDdlInvoiceItems: `payments/v1/GetDdlInvoiceItems`,
+  generateInvoiceNumber: `payments/v1/GenerateInvoiceNumber`,
+  createInvoice: `payments/v1/CreateInvoice`,
+  getInvoices: `payments/v1/GetInvoices`,
+  getInvoiceDetails: `payments/v1/GetInvoiceDetails`,
+  getInvoicePdf: `payments/v1/GetInvoicePdf`,
+  sendInvoice: `payments/v1/SendInvoice`,
+  unsendInvoice: `payments/v1/UnsendInvoice`,
   getAgreements: `agreements/v1/GetAgreements`,
   getAgreementDetails: `agreements/v1/GetAgreementDetails`,
   getAgreementFile: `agreements/v1/GetAgreementFile`,
