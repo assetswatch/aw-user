@@ -61,6 +61,14 @@ const GridActionMenu = ({ row, actions }) => {
                       <i
                         className={`fas fa-list-ul pe-2 text-general ${a["icssclass"]}`}
                       />
+                    ) : a["text"].toLowerCase().indexOf("download") != -1 ? (
+                      <i
+                        className={`fas fa-download pe-2 text-general ${a["icssclass"]}`}
+                      />
+                    ) : a["text"].toLowerCase().indexOf("send") != -1 ? (
+                      <i
+                        className={`fa fa-paper-plane pe-2 text-general ${a["icssclass"]}`}
+                      />
                     ) : (
                       ""
                     )}
@@ -146,6 +154,14 @@ export const GridDocActionMenu = ({ row, actions }) => {
                     ) : a["text"].toLowerCase().indexOf("reject") != -1 ? (
                       <i
                         className={`fa fa-times-circle pe-2 text-general ${a["icssclass"]}`}
+                      />
+                    ) : a["text"].toLowerCase().indexOf("download") != -1 ? (
+                      <i
+                        className={`fas fa-download pe-2 text-general ${a["icssclass"]}`}
+                      />
+                    ) : a["text"].toLowerCase().indexOf("send") != -1 ? (
+                      <i
+                        className={`fa fa-paper-plane pe-2 text-general ${a["icssclass"]}`}
                       />
                     ) : (
                       ""
@@ -233,6 +249,14 @@ export const GridUserConnectionActionMenu = ({ row, actions }) => {
                     ) : a["text"].toLowerCase().indexOf("manage property") !=
                       -1 ? (
                       <i className="fa fa-house pe-2 text-general" />
+                    ) : a["text"].toLowerCase().indexOf("download") != -1 ? (
+                      <i
+                        className={`fas fa-download pe-2 text-general ${a["icssclass"]}`}
+                      />
+                    ) : a["text"].toLowerCase().indexOf("send") != -1 ? (
+                      <i
+                        className={`fa fa-paper-plane pe-2 text-general ${a["icssclass"]}`}
+                      />
                     ) : (
                       ""
                     )}
@@ -310,6 +334,10 @@ export const GridPropertyActionMenu = ({ row, actions }) => {
                     ) : a["text"].toLowerCase().indexOf("switch") != -1 ? (
                       <i
                         className={`fa fa-exchange pe-2 text-general ${a["icssclass"]}`}
+                      />
+                    ) : a["text"].toLowerCase().indexOf("download") != -1 ? (
+                      <i
+                        className={`fas fa-download pe-2 text-general ${a["icssclass"]}`}
                       />
                     ) : (
                       ""

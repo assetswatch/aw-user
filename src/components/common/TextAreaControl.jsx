@@ -51,6 +51,15 @@ const TextAreaControl = ({
         formErrors[name] = rex.invalid;
       }
       break;
+    case formCtrlTypes.comments:
+      rex = Regex.comments;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      if (!checkEmptyVal(value) && value?.length > rex.max) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
     case formCtrlTypes.description:
       rex = Regex.description;
       if (required && checkEmptyVal(value)) {

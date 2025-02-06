@@ -114,6 +114,14 @@ export const routeNames = {
     name: "ViewInvoiceItem",
     path: "/User/Payments/ViewInvoiceItem",
   },
+  createinvoice: {
+    name: "CreateInvoice",
+    path: "/User/Payments/CreateInvoice",
+  },
+  viewinvoice: {
+    name: "ViewInvoice",
+    path: "/User/Payments/ViewInvoice",
+  },
   connectionsowners: {
     name: "ConnectionsOwners",
     path: "/User/Connections/Owners",
@@ -471,6 +479,20 @@ const routes = [
     path: routeNames.paymentsinvoices.path,
     name: routeNames.paymentsinvoices.name,
     element: lazy(() => import("../pages/User/Payments/Invoices")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.createinvoice.path,
+    name: routeNames.createinvoice.name,
+    element: lazy(() => import("../pages/User/Payments/CreateInvoice")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.viewinvoice.path,
+    name: routeNames.viewinvoice.name,
+    element: lazy(() => import("../pages/User/Payments/ViewInvoice")),
     isexact: true,
     isprotected: true,
   },

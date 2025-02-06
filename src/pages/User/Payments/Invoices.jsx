@@ -1,4 +1,10 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { routeNames } from "../../../routes/routes";
 import { Grid, ModalView } from "../../../components/common/LazyComponents";
@@ -10,9 +16,9 @@ import {
   checkStartEndDateGreater,
   GetUserCookieValues,
   SetPageLoaderNavLinks,
-  setSelectDefaultVal,
 } from "../../../utils/common";
 import DateControl from "../../../components/common/DateControl";
+import moment from "moment";
 import {
   ApiUrls,
   AppMessages,
@@ -20,17 +26,15 @@ import {
   GridDefaultValues,
   API_ACTION_STATUS,
   SessionStorageKeys,
+  ValidationMessages,
 } from "../../../utils/constants";
-import { useAuth } from "../../../contexts/AuthContext";
-import { axiosPost } from "../../../helpers/axiosHelper";
-import config from "../../../config.json";
-import AsyncSelect from "../../../components/common/AsyncSelect";
-import { usePaymentAccountCreateStatusGateway } from "../../../hooks/usePaymentAccountCreateStatusGateway";
-import {
-  addSessionStorageItem,
-  deletesessionStorageItem,
-} from "../../../helpers/sessionStorageHelper";
 import { Toast } from "../../../components/common/ToastView";
+import { useAuth } from "../../../contexts/AuthContext";
+import { axiosPost, fetchPost } from "../../../helpers/axiosHelper";
+import config from "../../../config.json";
+import { addSessionStorageItem } from "../../../helpers/sessionStorageHelper";
+import TextAreaControl from "../../../components/common/TextAreaControl";
+import AsyncSelect from "../../../components/common/AsyncSelect";
 
 const Invoices = () => {
   let $ = window.$;
@@ -48,29 +52,46 @@ const Invoices = () => {
     GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
   );
 
-  const { paymentAccountCreateStatusList } =
-    usePaymentAccountCreateStatusGateway();
-
-  //Modal
-  const [
-    modalAccountCreationResitrictedShow,
-    setModalAccountCreationResitrictedShow,
-  ] = useState(false);
+  let loggedinprofiletypeid = parseInt(
+    GetUserCookieValues(UserCookie.ProfileTypeId, loggedinUser)
+  );
 
   //Grid
-  const [accountsList, setAccountsList] = useState([]);
+  const [invoicesList, setInvoicesList] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [pageCount, setPageCount] = useState(0);
+  const [selectedGridRow, setSelectedGridRow] = useState(null);
 
   const [isDataLoading, setIsDataLoading] = useState(false);
+
+  const [sendInvoiceModalShow, setSendInvoiceModalShow] = useState(false);
+
+  function setInitialSendInvoiceFormData() {
+    return {
+      txtcomments: "",
+      lblinvoicenumber: "",
+      ddljoinedusers: "",
+    };
+  }
+
+  const [sendInvoiceFormData, setSendInvoiceFormData] = useState(
+    setInitialSendInvoiceFormData()
+  );
+
+  let formSendInvoiceErrors = {};
+  const [sendInvoiceErrors, setSendInvoiceErrors] = useState({});
+  const [selectedProfileType, setSelectedProfileType] = useState(
+    parseInt(config.userProfileTypes.Tenant)
+  );
+  const [joinedUsersData, setJoinedUsersData] = useState([]);
+  const [selectedJoinedUser, setSelectedJoinedUser] = useState(null);
 
   //Set search form intial data
   const setSearchInitialFormData = () => {
     return {
       txtkeyword: "",
-      txtfromdate: "",
-      txttodate: "",
-      ddlstatus: -1,
+      txtfromdate: moment().subtract(6, "month"),
+      txttodate: moment(),
     };
   };
 
@@ -78,14 +99,6 @@ const Invoices = () => {
     setSearchInitialFormData()
   );
   //Set search formdata
-
-  //Search ddl controls changes
-  const ddlChange = (e, name) => {
-    setSearchFormData({
-      ...searchFormData,
-      [name]: e?.value,
-    });
-  };
 
   //Search Date control change
   const onDateChange = (newDate, name) => {
@@ -110,19 +123,19 @@ const Invoices = () => {
 
   const onSearch = (e) => {
     e.preventDefault();
-    getAccounts({ isSearch: true });
+    getInvoices({ isSearch: true });
   };
 
   const onShowAll = (e) => {
     e.preventDefault();
     setSearchFormData(setSearchInitialFormData());
-    getAccounts({ isShowall: true });
+    getInvoices({ isShowall: true });
   };
 
   // Search events
 
-  //Get accounts list
-  const getAccounts = ({
+  //Get invoices list
+  const getInvoices = ({
     pi = GridDefaultValues.pi,
     ps = GridDefaultValues.ps,
     isSearch = false,
@@ -134,17 +147,13 @@ const Invoices = () => {
     //Add date error to form errors.
     delete formErrors["date"];
     if (!isShowall) {
-      if (
-        !checkEmptyVal(searchFormData.txtfromdate) &&
-        !checkEmptyVal(searchFormData.txttodate)
-      ) {
-        let dateCheck = checkStartEndDateGreater(
-          searchFormData.txtfromdate,
-          searchFormData.txttodate
-        );
-        if (!checkEmptyVal(dateCheck)) {
-          formErrors["date"] = dateCheck;
-        }
+      let dateCheck = checkStartEndDateGreater(
+        searchFormData.txtfromdate,
+        searchFormData.txttodate
+      );
+
+      if (!checkEmptyVal(dateCheck)) {
+        formErrors["date"] = dateCheck;
       }
     }
 
@@ -163,10 +172,8 @@ const Invoices = () => {
         keyword: "",
         AccountId: accountid,
         ProfileId: profileid,
-        ChannelId: 1,
-        fromdate: setSearchInitialFormData().txtfromdate,
-        todate: setSearchInitialFormData().txttodate,
-        status: setSearchInitialFormData().ddlstatus,
+        fromdate: setSearchInitialFormData.txtfromdate,
+        todate: setSearchInitialFormData.txttodate,
         pi: parseInt(pi),
         ps: parseInt(ps),
       };
@@ -177,33 +184,27 @@ const Invoices = () => {
           keyword: searchFormData.txtkeyword,
           fromdate: searchFormData.txtfromdate,
           todate: searchFormData.txttodate,
-          status: parseInt(setSelectDefaultVal(searchFormData.ddlstatus, -1)),
         };
       }
 
-      return axiosPost(
-        `${config.apiBaseUrl}${ApiUrls.getPaymentSubAccounts}`,
-        objParams
-      )
+      return axiosPost(`${config.apiBaseUrl}${ApiUrls.getInvoices}`, objParams)
         .then((response) => {
           let objResponse = response.data;
           if (objResponse.StatusCode === 200) {
             setTotalCount(objResponse.Data.TotalCount);
             setPageCount(Math.ceil(objResponse.Data.TotalCount / ps));
-            setAccountsList(objResponse.Data.Accounts);
+            setInvoicesList(objResponse.Data.Invoices);
           } else {
             isapimethoderr = true;
-            setAccountsList([]);
+            setInvoicesList([]);
             setPageCount(0);
           }
         })
         .catch((err) => {
           isapimethoderr = true;
-          setAccountsList([]);
+          setInvoicesList([]);
           setPageCount(0);
-          console.error(
-            `"API :: ${ApiUrls.getPaymentSubAccounts}, Error ::" ${err}`
-          );
+          console.error(`"API :: ${ApiUrls.getInvoices}, Error ::" ${err}`);
         })
         .finally(() => {
           if (isapimethoderr === true) {
@@ -222,50 +223,37 @@ const Invoices = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: "Email",
-        accessor: "Email",
+        Header: "Invoice #",
+        accessor: "",
         className: "w-250px",
         disableSortBy: true,
-      },
-      {
-        Header: "DBA Name",
-        accessor: "DbaName",
-        disableSortBy: true,
-        className: "w-200px",
-      },
-      {
-        Header: "Legal Name",
-        accessor: "LegalName",
-        disableSortBy: true,
-        className: "w-200px",
-      },
-      {
-        Header: "Status",
-        accessor: "StatusDisplay",
-        disableSortBy: true,
-        className: "w-180px",
-        Cell: ({ row }) => (
-          <>
-            <span
-              className={`badge badge-pill gr-badge-pill ${
-                row.original.Status == config.paymentAccountCreateStatus.Active
-                  ? "gr-badge-pill-suc"
-                  : row.original.Status ==
-                    config.paymentAccountCreateStatus.Pending
-                  ? "gr-badge-pill-warning"
-                  : row.original.Status ==
-                    config.paymentAccountCreateStatus.Processing
-                  ? "gr-badge-pill-info"
-                  : row.original.Status ==
-                    config.paymentAccountCreateStatus.Rejected
-                  ? "gr-badge-pill-error"
-                  : ""
-              }`}
+        Cell: ({ row }) => {
+          return (
+            <a
+              onClick={(e) => {
+                onView(e, row);
+              }}
             >
-              {row.original.StatusDisplay}
-            </span>
-          </>
-        ),
+              <span className="gr-txt-14-b">{row.original.InvoiceNumber}</span>
+            </a>
+          );
+        },
+      },
+      {
+        Header: "Total Amount",
+        accessor: "TotalAmountDisplay",
+        disableSortBy: true,
+        className: "w-200px",
+      },
+      {
+        Header: "Date",
+        accessor: "BillDateDisplay",
+        className: "w-250px",
+      },
+      {
+        Header: "Due On",
+        accessor: "DueDateDisplay",
+        className: "w-250px",
       },
       {
         Header: "Created On",
@@ -274,9 +262,25 @@ const Invoices = () => {
       },
       {
         Header: "Actions",
-        showActionMenu: false,
-        className: "w-150px gr-action",
-        Cell: ({ row }) => "",
+        className: "w-130px",
+        actions: [
+          {
+            text: "View Invoice",
+            onclick: (e, row) => onView(e, row),
+          },
+          {
+            text: "Download",
+            onclick: (e, row) => {
+              downloadPdf(e, row);
+            },
+            icssclass: "pr-10 pl-2px",
+          },
+          {
+            text: "Send",
+            onclick: (e, row) => onSendInvoiceModalShow(e, row),
+            icssclass: "pr-10 pl-2px",
+          },
+        ],
       },
     ],
     []
@@ -287,7 +291,7 @@ const Invoices = () => {
   const fetchData = useCallback(({ pageIndex, pageSize }) => {
     const fetchId = ++fetchIdRef.current;
     if (fetchId === fetchIdRef.current) {
-      getAccounts({ pi: pageIndex, ps: pageSize });
+      getInvoices({ pi: pageIndex, ps: pageSize });
     }
   }, []);
 
@@ -298,30 +302,236 @@ const Invoices = () => {
   const onView = (e, row) => {
     e.preventDefault();
     addSessionStorageItem(
-      SessionStorageKeys.ViewPaymentSubAccountId,
-      row.original.SubAccountId
+      SessionStorageKeys.ViewInvoiceId,
+      row.original.InvoiceId
     );
-    navigate(routeNames.paymentscreateaccount.path);
+    navigate(routeNames.viewinvoice.path);
+  };
+
+  const downloadPdf = async (e, row) => {
+    e.preventDefault();
+    apiReqResLoader("x", "x", API_ACTION_STATUS.START);
+    let isapimethoderr = false;
+    let objParams = {
+      InvoiceId: parseInt(row.original.InvoiceId),
+    };
+    axiosPost(`${config.apiBaseUrl}${ApiUrls.getInvoiceDetails}`, objParams)
+      .then(async (response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode === 200) {
+          const fresponse = await fetchPost(
+            `${config.apiBaseUrl}${ApiUrls.getInvoicePdf}`,
+            {
+              InvoiceId: parseInt(row.original.InvoiceId),
+            }
+          );
+          if (fresponse.ok) {
+            const blob = await fresponse.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${objResponse.Data?.InvoiceNumber}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          }
+        } else {
+          isapimethoderr = true;
+        }
+      })
+      .catch((err) => {
+        isapimethoderr = true;
+        console.error(`"API :: ${ApiUrls.getInvoiceDetails}, Error ::" ${err}`);
+      })
+      .finally(() => {
+        if (isapimethoderr == true) {
+          Toast.error(AppMessages.SomeProblem);
+        }
+        apiReqResLoader("x", "x", API_ACTION_STATUS.COMPLETED);
+      });
+  };
+
+  const onSendInvoiceModalShow = (e, row) => {
+    e.preventDefault();
+    setSelectedGridRow(row);
+    setSendInvoiceFormData({
+      ...sendInvoiceFormData,
+      lblinvoicenumber: `Invoice#: ${row.original.InvoiceNumber}`,
+    });
+
+    setSendInvoiceModalShow(true);
+  };
+
+  const onSendInvoiceModalClose = () => {
+    setSendInvoiceModalShow(false);
+    setSelectedGridRow(null);
+    setSelectedJoinedUser(null);
+    setSendInvoiceFormData(setInitialSendInvoiceFormData());
+    setSendInvoiceErrors({});
+    apiReqResLoader("btnsend", "Send", API_ACTION_STATUS.COMPLETED, false);
+  };
+
+  const onSendInvoice = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (checkEmptyVal(selectedJoinedUser)) {
+      formSendInvoiceErrors["ddljoinedusers"] = ValidationMessages.UserReq;
+    }
+
+    if (Object.keys(formSendInvoiceErrors).length === 0) {
+      setSendInvoiceErrors({});
+      apiReqResLoader("btnsend", "Sending", API_ACTION_STATUS.START);
+
+      let isapimethoderr = false;
+      let objBodyParams = new FormData();
+
+      let selectedUsers = selectedJoinedUser
+        .toString()
+        .split(",")
+        .map((u) => u.trim());
+      for (let i = 0; i <= selectedUsers.length - 1; i++) {
+        let idx = i;
+        objBodyParams.append(
+          `Profiles[${i}].ProfileId`,
+          parseInt(selectedUsers[idx])
+        );
+      }
+      objBodyParams.append(
+        "InvoiceId",
+        parseInt(selectedGridRow?.original?.InvoiceId)
+      );
+      objBodyParams.append("Comments", sendInvoiceFormData.txtcomments);
+
+      axiosPost(`${config.apiBaseUrl}${ApiUrls.sendInvoice}`, objBodyParams, {
+        "Content-Type": "multipart/form-data",
+      })
+        .then((response) => {
+          let objResponse = response.data;
+          if (objResponse.StatusCode === 200) {
+            if (objResponse.Data.Status === 1) {
+              Toast.success(objResponse.Data.Message);
+              onSendInvoiceModalClose();
+            } else {
+              Toast.error(objResponse.Data.Message);
+            }
+          } else {
+            isapimethoderr = true;
+          }
+        })
+        .catch((err) => {
+          isapimethoderr = true;
+          console.error(`"API :: ${ApiUrls.sendInvoice}, Error ::" ${err}`);
+        })
+        .finally(() => {
+          if (isapimethoderr == true) {
+            Toast.error(AppMessages.SomeProblem);
+          }
+          apiReqResLoader("btnsend", "Send", API_ACTION_STATUS.COMPLETED);
+        });
+    } else {
+      $(`[name=${Object.keys(formSendInvoiceErrors)[0]}]`).focus();
+      setSendInvoiceErrors(formSendInvoiceErrors);
+    }
   };
 
   //Grid actions
+
+  //Send invoice modal actions
+
+  const handleSendInvoiceInputChange = (e) => {
+    const { name, value } = e?.target;
+    setSendInvoiceFormData({
+      ...sendInvoiceFormData,
+      [name]: value,
+    });
+  };
+
+  const handleJoinedUserChange = (e) => {
+    setSelectedJoinedUser(
+      e.reduce((acc, curr, index) => {
+        return index === 0 ? curr.value : acc + "," + curr.value;
+      }, "")
+    );
+  };
+
+  useEffect(() => {
+    if (sendInvoiceModalShow && joinedUsersData.length == 0) {
+      const getData = () => {
+        apiReqResLoader("x", "", API_ACTION_STATUS.START);
+        let objParams = {
+          keyword: "",
+          inviterid: profileid,
+          InviterProfileTypeId: loggedinprofiletypeid,
+          InviteeProfileTypeId: parseInt(config.userProfileTypes.Tenant),
+        };
+
+        return axiosPost(
+          `${config.apiBaseUrl}${ApiUrls.getDdlJoinedUserConnections}`,
+          objParams
+        )
+          .then((response) => {
+            let objResponse = response.data;
+            if (objResponse.StatusCode == 200) {
+              let data = objResponse.Data.map((item) => ({
+                label: (
+                  <div className="flex items-center">
+                    <div className="w-40px h-40px mr-10 flex-shrink-0">
+                      <img
+                        alt=""
+                        src={item.PicPath}
+                        className="rounded cur-pointer w-40px"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-primary lh-1 d-block">
+                        {item.FirstName + " " + item.LastName}
+                      </span>
+                      <span className="small text-light">
+                        {item.ProfileType}
+                      </span>
+                    </div>
+                  </div>
+                ),
+                value: item.ProfileId,
+                customlabel: item.FirstName + " " + item.LastName,
+              }));
+              setJoinedUsersData(data);
+            } else {
+              setJoinedUsersData([]);
+            }
+          })
+          .catch((err) => {
+            console.error(
+              `"API :: ${ApiUrls.getDdlJoinedUserConnections}, Error ::" ${err}`
+            );
+            setJoinedUsersData([]);
+          })
+          .finally(() => {
+            setSelectedJoinedUser(null);
+            apiReqResLoader("x", "", API_ACTION_STATUS.COMPLETED);
+          });
+      };
+
+      getData();
+    }
+  }, [sendInvoiceModalShow]);
+
+  //Send invoice modal actions
 
   const navigateToPayments = (e) => {
     e.preventDefault();
     navigate(routeNames.paymentsaccounts.path);
   };
 
-  //Account Creation Resitricted Modal actions
-
-  const onAccountCreationResitrictedClose = () => {
-    setModalAccountCreationResitrictedShow(false);
-  };
-
-  //Account Creation Resitricted Modal actions
-
   const navigateToInvoiceItems = (e) => {
     e.preventDefault();
     navigate(routeNames.invoiceitems.path);
+  };
+
+  const navigateToGenerateInvoice = (e) => {
+    e.preventDefault();
+    navigate(routeNames.createinvoice.path);
   };
 
   return (
@@ -346,14 +556,24 @@ const Invoices = () => {
                 </div>
                 <div className="col-md-12 col-lg-6 d-flex justify-content-end align-items-end pb-10">
                   <button
-                    className="btn btn-primary btn-mini btn-glow shadow rounded"
+                    className="btn btn-primary btn-mini btn-glow shadow rounded mr-10"
                     name="btnitems"
                     id="btnitems"
                     type="button"
                     onClick={navigateToInvoiceItems}
                   >
-                    <i className="fa fa-list position-relative me-1 t-1"></i>{" "}
+                    <i className="fa fa-file-invoice position-relative me-2 t-1"></i>{" "}
                     Items
+                  </button>
+                  <button
+                    className="btn btn-primary btn-mini btn-glow shadow rounded"
+                    name="btnitems"
+                    id="btnitems"
+                    type="button"
+                    onClick={navigateToGenerateInvoice}
+                  >
+                    <i className="icons icon-plus position-relative me-2 t-2"></i>{" "}
+                    Generate Invoice
                   </button>
                 </div>
               </div>
@@ -370,10 +590,10 @@ const Invoices = () => {
                         <div className="col px-0">
                           <form noValidate>
                             <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
-                              <div className="col-lg-4 col-xl-3 col-md-6">
+                              <div className="col-lg-3 col-xl-2 col-md-4">
                                 <InputControl
                                   lblClass="mb-0"
-                                  lblText="Search by Email / Name"
+                                  lblText="Search by Invoice #"
                                   name="txtkeyword"
                                   ctlType={formCtrlTypes.searchkeyword}
                                   value={searchFormData.txtkeyword}
@@ -381,37 +601,7 @@ const Invoices = () => {
                                   formErrors={formErrors}
                                 ></InputControl>
                               </div>
-                              <div className="col-lg-2 col-xl-2 col-md-4">
-                                <AsyncSelect
-                                  placeHolder={
-                                    paymentAccountCreateStatusList.length <=
-                                      0 && searchFormData.ddlstatus == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlDefaultSelect
-                                  }
-                                  noData={
-                                    paymentAccountCreateStatusList.length <=
-                                      0 && searchFormData.ddlstatus == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlNoData
-                                  }
-                                  options={paymentAccountCreateStatusList}
-                                  dataKey="Id"
-                                  dataVal="Type"
-                                  onChange={(e) => ddlChange(e, "ddlstatus")}
-                                  value={searchFormData.ddlstatus}
-                                  defualtselected={searchFormData.ddlstatus}
-                                  name="ddlstatus"
-                                  lbl={formCtrlTypes.status}
-                                  lblClass="mb-0"
-                                  lblText="Status"
-                                  className="ddlborder"
-                                  isClearable={false}
-                                  isSearchCtl={true}
-                                  formErrors={formErrors}
-                                ></AsyncSelect>
-                              </div>
-                              <div className="col-lg-3 col-xl-2 col-md-3">
+                              <div className="col-lg-3 col-xl-2 col-md-4">
                                 <DateControl
                                   lblClass="mb-0"
                                   lblText="Start date"
@@ -422,10 +612,9 @@ const Invoices = () => {
                                   }
                                   value={searchFormData.txtfromdate}
                                   isTime={false}
-                                  formErrors={formErrors}
                                 ></DateControl>
                               </div>
-                              <div className="col-lg-3 col-xl-2 col-md-3">
+                              <div className="col-lg-3 col-xl-2 col-md-4">
                                 <DateControl
                                   lblClass="mb-0"
                                   lblText="End date"
@@ -438,11 +627,11 @@ const Invoices = () => {
                                   isTime={false}
                                   objProps={{
                                     checkVal: searchFormData.txtfromdate,
+                                    days: 7,
                                   }}
-                                  formErrors={formErrors}
                                 ></DateControl>
                               </div>
-                              <div className="col-lg-6 col-xl-3 col-md-6 grid-search-action">
+                              <div className="col-lg-3 col-xl-3 col-md-6 grid-search-action">
                                 <label
                                   className="mb-0 form-error w-100"
                                   id="search-val-err-message"
@@ -480,15 +669,15 @@ const Invoices = () => {
                       <div className="dashboard-panel bo-top br-r-0 br-l-0 bg-white rounded overflow-hidden w-100 box-shadow-top">
                         <Grid
                           columns={columns}
-                          data={accountsList}
+                          data={invoicesList}
                           loading={isDataLoading}
                           fetchData={fetchData}
                           pageCount={pageCount}
                           totalInfo={{
-                            text: "Total Accounts",
+                            text: "Total Invoices",
                             count: totalCount,
                           }}
-                          noData={AppMessages.NoAccounts}
+                          noData={AppMessages.NoInvoices}
                         />
                       </div>
                     </div>
@@ -501,31 +690,97 @@ const Invoices = () => {
         </div>
       </div>
 
-      {/*============== Account Creation Restricted Modal Start ==============*/}
-      {modalAccountCreationResitrictedShow && (
+      {/*============== Send Invoice Modal Start ==============*/}
+      {sendInvoiceModalShow && (
         <>
           <ModalView
-            title={AppMessages.AccountCreationRestrictedTitle}
+            title={AppMessages.SendInvoiceModalTitle}
             content={
               <>
-                <span className="font-general font-400">
-                  {AppMessages.AccountCreationRestrictedModalMessage}
-                </span>
+                <div className="row">
+                  <div className="col-12 mb-10">
+                    <span
+                      name="lblinvoicenumber"
+                      className="font-general font-500"
+                    >
+                      {sendInvoiceFormData.lblinvoicenumber}
+                    </span>
+                  </div>
+                  <div className="col-12 mb-15">
+                    <AsyncSelect
+                      placeHolder={
+                        selectedJoinedUser == null ||
+                        Object.keys(selectedJoinedUser).length === 0
+                          ? AppMessages.DdlDefaultSelect
+                          : joinedUsersData.length <= 0 &&
+                            selectedProfileType == null
+                          ? AppMessages.DdLLoading
+                          : AppMessages.DdlDefaultSelect
+                      }
+                      noData={
+                        selectedJoinedUser == null ||
+                        Object.keys(selectedJoinedUser).length === 0
+                          ? AppMessages.NoUsers
+                          : joinedUsersData.length <= 0 &&
+                            selectedProfileType == null &&
+                            selectedProfileType != null
+                          ? AppMessages.DdLLoading
+                          : AppMessages.NoUsers
+                      }
+                      options={joinedUsersData}
+                      onChange={(e) => {
+                        handleJoinedUserChange(e);
+                      }}
+                      value={selectedJoinedUser}
+                      name="ddljoinedusers"
+                      lblText="Users"
+                      lbl={formCtrlTypes.users}
+                      lblClass="mb-0 lbl-req-field"
+                      required={true}
+                      errors={sendInvoiceErrors}
+                      formErrors={formSendInvoiceErrors}
+                      isMulti={true}
+                      isRenderOptions={false}
+                      tabIndex={1}
+                    ></AsyncSelect>
+                  </div>
+                  <div className="col-12 mb-0">
+                    <TextAreaControl
+                      lblClass="mb-0"
+                      name={`txtcomments`}
+                      ctlType={formCtrlTypes.comments}
+                      onChange={handleSendInvoiceInputChange}
+                      value={sendInvoiceFormData.txtcomments}
+                      required={false}
+                      errors={sendInvoiceErrors}
+                      formErrors={formSendInvoiceErrors}
+                      rows={3}
+                      tabIndex={2}
+                    ></TextAreaControl>
+                  </div>
+                </div>
               </>
             }
-            onClose={onAccountCreationResitrictedClose}
+            onClose={onSendInvoiceModalClose}
             actions={[
               {
-                text: "Close",
+                id: "btnsendinvoice",
+                text: "Send",
                 displayOrder: 1,
                 btnClass: "btn-primary",
-                onClick: (e) => onAccountCreationResitrictedClose(e),
+                onClick: (e) => onSendInvoice(e),
+              },
+              {
+                text: "Cancel",
+                displayOrder: 2,
+                btnClass: "btn-secondary",
+                onClick: (e) => onSendInvoiceModalClose(e),
               },
             ]}
           ></ModalView>
         </>
       )}
-      {/*============== Delete Confirmation Modal End ==============*/}
+      {/*============== Send Invoice Modal End ==============*/}
     </>
   );
 };

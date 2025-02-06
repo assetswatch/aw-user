@@ -4,8 +4,14 @@ import { Worker, Viewer, SpecialZoomLevel } from "@react-pdf-viewer/core";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
 import { themePlugin } from "@react-pdf-viewer/theme";
 import { thumbnailPlugin } from "@react-pdf-viewer/thumbnail";
+import config from "../../config.json";
 
-const PdfViewer = ({ file, cssclass, showThumbnail = true }) => {
+const PdfViewer = ({
+  file,
+  cssclass,
+  showThumbnail = true,
+  pageWidth = config.pdfViewerWidth.PageWidth,
+}) => {
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
   const thumbnailPluginInstance = thumbnailPlugin({
@@ -29,7 +35,15 @@ const PdfViewer = ({ file, cssclass, showThumbnail = true }) => {
         <Viewer
           fileUrl={file}
           plugins={[defaultLayoutPluginInstance, thumbnailPluginInstance]}
-          defaultScale={SpecialZoomLevel.PageWidth}
+          defaultScale={
+            pageWidth === config.pdfViewerWidth.PageWidth
+              ? SpecialZoomLevel.PageWidth
+              : (pageWidth = config.pdfViewerWidth.Actual
+                  ? SpecialZoomLevel.ActualSize
+                  : (pageWidth = config.pdfViewerWidth.PageFit
+                      ? SpecialZoomLevel.PageFit
+                      : SpecialZoomLevel.PageWidth))
+          }
           onDocumentLoad={handleDocumentLoad}
         />
       </Worker>

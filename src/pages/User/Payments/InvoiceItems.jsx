@@ -596,10 +596,10 @@ const InvoiceItems = () => {
                           fetchData={fetchData}
                           pageCount={pageCount}
                           totalInfo={{
-                            text: "Total Accounts",
+                            text: "Total Items",
                             count: totalCount,
                           }}
-                          noData={AppMessages.NoAccounts}
+                          noData={AppMessages.NoItems}
                         />
                       </div>
                     </div>

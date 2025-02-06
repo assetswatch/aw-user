@@ -96,6 +96,9 @@ a.hover-text-primary:hover,
 .text-danger {
   color: var(--theme-danger-color) !important;
 }
+.bg-li-hover-color {
+  background-color: var(--theme-li-hover-bg-color) !important;
+}
 
 a,
 a:hover,
@@ -1339,6 +1342,12 @@ a.text-dark:focus {
 .m-15,
 .mb-15 {
   margin-bottom: 15px !important;
+}
+
+.my-15,
+.m-15,
+.mt-15 {
+  margin-top: 15px !important;
 }
 
 .my-20,
@@ -4653,6 +4662,9 @@ Newsletter Style
 
 .flex-vc {
   align-self: center;
+}
+.flex-vb {
+  align-self: end;
 }
 
 .flex {

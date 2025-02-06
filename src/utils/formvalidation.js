@@ -1,6 +1,7 @@
 import { ValidationMessages } from "./constants";
 
 /*Validation constraints*/
+const length1 = 1;
 const length3 = 3;
 const length4 = 4;
 const length5 = 5;
@@ -23,6 +24,8 @@ const length2000 = 2000;
 const nums = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 const phonevalidvalues = [...nums, "+", "-", "."];
 const pricevalidvalues = [...nums, ".", ","];
+const pricenegitivevalidvalues = [...pricevalidvalues, "-"];
+const numvalidvalues = [...nums];
 
 const expirydatevalidvalues = [...nums, "/"];
 const allowedFileTypes = ["image/jpeg", "image/png", "application/pdf"];
@@ -32,11 +35,13 @@ const uploadFileMaxSizeMB = 10; //10mb
 /* Regex patterns */
 const RegexPattern = {
   numonly: /[0-9]/,
+  alphanum: /^[a-zA-Z0-9]+$/,
   phone: /^(?:\+[0-9])?\s?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/,
   email: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,})+$/,
   url: /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?(\?[^\s]*)?$/,
   date: /^(?:(0[1-9]|1[012])[\/.](0[1-9]|[12][0-9]|3[01])[\/.][0-9]{4})$/,
   price: /^\d{1,3}(,\d{3})*(\.\d{1,2})?$|^\d+(\.\d{1,3})?$/, // /^(\$|)([0-9]\d{0,2}(\,\d{3})*|([1-9]\d*))(\.\d{1,2})?$/,
+  pricenegitive: /^-?[0-9]+(?:[.,][0-9]*)?$/,
   cardexpiry: /^(0[1-9]|1[0-2])\/\d{4}$/,
 };
 
@@ -237,6 +242,12 @@ export const Regex = {
     invalid: ValidationMessages.PriceInvalid,
     pattern: RegexPattern.price,
   },
+  invoiceitemprice: {
+    max: length15,
+    required: ValidationMessages.PriceReq,
+    invalid: ValidationMessages.PriceInvalid,
+    pattern: RegexPattern.pricenegitive,
+  },
   amount: {
     max: length15,
     required: ValidationMessages.AmountReq,
@@ -293,6 +304,20 @@ export const Regex = {
   comments: {
     max: length500,
     required: ValidationMessages.CommentsReq,
+  },
+  invoicenum: {
+    min: length5,
+    max: length15,
+    pattern: RegexPattern.alphanum,
+    required: ValidationMessages.InvoiceNumReq,
+    invalid: ValidationMessages.InvoiceNumInvalid,
+  },
+  zqtyip: {
+    min: length1,
+    max: length5,
+    pattern: RegexPattern.numonly,
+    required: ValidationMessages.QtyReq,
+    invalid: ValidationMessages.QtyInvalid,
   },
 };
 /*Regex */
@@ -682,6 +707,20 @@ export const formCtrlTypes = {
       },
     },
   },
+  invoiceitemprice: {
+    lbl: "Price ($):",
+    input: {
+      type: "text",
+      max: length15,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!pricenegitivevalidvalues.includes(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
+  },
   amount: {
     lbl: "Total amount ($):",
     input: {
@@ -836,14 +875,47 @@ export const formCtrlTypes = {
   user: {
     lbl: "User:",
   },
+  item: {
+    lbl: "Item:",
+  },
   itemfortype: {
-    lbl: "Item for:",
+    lbl: "Item:",
   },
   accountfortype: {
-    lbl: "Account for:",
+    lbl: "Account:",
   },
   select: {
     lbl: "Select:",
+  },
+  invoicenum: {
+    lbl: "Invoice #:",
+    input: {
+      type: "text",
+      min: length5,
+      max: length15,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!RegexPattern.alphanum.test(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
+  },
+  qty: {
+    lbl: "Quantity:",
+    input: {
+      type: "text",
+      min: length1,
+      max: length5,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!RegexPattern.numonly.test(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
   },
 };
 /*control types*/
