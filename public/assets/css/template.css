@@ -214,6 +214,9 @@ h6 a,
   border-radius: 0.25rem;
   line-height: 1.75rem;
 }
+.breadcrumb-item.bc-fh > label {
+  padding-top: 0.1em;
+}
 .breadcrumb-item.bc-fh .dropdown-toggle.ddmenu-toggle::after {
   display: inline !important;
   position: absolute !important;

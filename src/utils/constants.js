@@ -129,12 +129,14 @@ export const AppMessages = {
   NoProperties: "No properties found...",
   NoInvoices: "No invoices found...",
   NoAccounts: "No accounts found...",
+  NoServiceRequests: "No service requests found...",
   NoItems: "No items found...",
   NoConnectedProperties: "No connected properties found...",
   NoAssignedProperties: "No assigned properties found...",
   NoPayments: "No payments found...",
   NoPropertyDetails: "Property details not found...",
   NoConnection: `No connections found...`,
+  NoReports: `No reports found...`,
   NoTenants: `No ${Object.keys(config.userProfileTypes)
     .find(
       (key) => config.userProfileTypes[key] === config.userProfileTypes.Tenant
@@ -191,6 +193,7 @@ export const AppMessages = {
   CreateProfileSuccess: "Profile created successfully...",
   UpdateProfileSuccess: "Profile details updated successfully...",
   NoAgreementTemplates: "No templates found...",
+  NoAgreements: "No agreements found...",
   NoDocuments: `No documents found...`,
   DeleteDocumentMessage: "You want to delete the {name}.",
   EditFolderModalTitle: "Edit folder",

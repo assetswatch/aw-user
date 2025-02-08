@@ -166,17 +166,21 @@ export const routeNames = {
     name: "AgentNotifications",
     path: "/User/Agent-Notifications",
   },
-  owneragreementtemplates: {
-    name: "OwnerAgreementTemplates",
-    path: "/User/Owner-Agreement-Templates",
+  myagreements: {
+    name: "MyAgreements",
+    path: "/User/Agreements/MyAgreements",
   },
-  ownersendagreement: {
-    name: "OwnerSendAgreement",
-    path: "/User/Owner-Send-Agreement",
+  agreementtemplates: {
+    name: "AgreementTemplates",
+    path: "/User/Agreements/Templates",
   },
-  ownerpreviewagreement: {
-    name: "OwnerPreviewAgreement",
-    path: "/User/Owner-Agreement-Preview",
+  sendagreement: {
+    name: "SendAgreement",
+    path: "/User/Agreements/SendAgreement",
+  },
+  previewagreement: {
+    name: "PreviewAgreement",
+    path: "/User/Agreements/PreviewAgreement",
   },
   mydocuments: {
     name: "MyDocuments",
@@ -202,7 +206,23 @@ export const routeNames = {
     name: "SharedUsers",
     path: "/User/Documents/SharedUsers",
   },
-  comingup: { name: "ComingUp", path: "/User/ComingUp" },
+  propertyreport: {
+    name: "PropertyReport",
+    path: "/User/Reports/PropertyReport",
+  },
+  transactionreport: {
+    name: "TransactionReport",
+    path: "/User/Reports/TransactionReport",
+  },
+  services: { name: "Services", path: "/User/Services" },
+  createservicerequest: {
+    name: "CreateServiceRequest",
+    path: "/User/Services/CreateRequest",
+  },
+  servicedetails: {
+    name: "ServiceDetails",
+    path: "/User/Services/ServiceDetails",
+  },
   notFound: { name: "NotFound", path: "/*" },
 };
 
@@ -595,23 +615,30 @@ const routes = [
     isprotected: true,
   },
   {
-    path: routeNames.owneragreementtemplates.path,
-    name: routeNames.owneragreementtemplates.name,
-    element: lazy(() => import("../pages/User/Owners/AgreementTemplates")),
+    path: routeNames.myagreements.path,
+    name: routeNames.myagreements.name,
+    element: lazy(() => import("../pages/User/Agreements/MyAgreements")),
     isexact: true,
     isprotected: true,
   },
   {
-    path: routeNames.ownersendagreement.path,
-    name: routeNames.ownersendagreement.name,
-    element: lazy(() => import("../pages/User/Owners/SendAgreement")),
+    path: routeNames.agreementtemplates.path,
+    name: routeNames.agreementtemplates.name,
+    element: lazy(() => import("../pages/User/Agreements/AgreementTemplates")),
     isexact: true,
     isprotected: true,
   },
   {
-    path: routeNames.ownerpreviewagreement.path,
-    name: routeNames.ownerpreviewagreement.name,
-    element: lazy(() => import("../pages/User/Owners/AgreementPreview")),
+    path: routeNames.sendagreement.path,
+    name: routeNames.sendagreement.name,
+    element: lazy(() => import("../pages/User/Agreements/SendAgreement")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.previewagreement.path,
+    name: routeNames.previewagreement.name,
+    element: lazy(() => import("../pages/User/Agreements/PreviewAgreement")),
     isexact: true,
     isprotected: true,
   },
@@ -658,9 +685,37 @@ const routes = [
     isprotected: true,
   },
   {
-    path: routeNames.comingup.path,
-    name: routeNames.comingup.name,
-    element: lazy(() => import("../pages/User/ComingUp")),
+    path: routeNames.propertyreport.path,
+    name: routeNames.propertyreport.name,
+    element: lazy(() => import("../pages/User/Reports/PropertyReport")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.transactionreport.path,
+    name: routeNames.transactionreport.name,
+    element: lazy(() => import("../pages/User/Reports/TransactionReport")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.services.path,
+    name: routeNames.services.name,
+    element: lazy(() => import("../pages/User/Services/Services")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.createservicerequest.path,
+    name: routeNames.createservicerequest.name,
+    element: lazy(() => import("../pages/User/Services/CreateRequest")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.servicedetails.path,
+    name: routeNames.servicedetails.name,
+    element: lazy(() => import("../pages/User/Services/ServiceDetails")),
     isexact: true,
     isprotected: true,
   },

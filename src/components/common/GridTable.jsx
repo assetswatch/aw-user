@@ -197,7 +197,7 @@ const GridTable = ({
                     position: "relative",
                   }}
                 >
-                  <NoData className="py-50" message={noData}></NoData>
+                  <NoData className="py-100" message={noData}></NoData>
                 </td>
               </tr>
             ) : (

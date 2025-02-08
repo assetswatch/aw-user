@@ -43,6 +43,7 @@ const RegexPattern = {
   price: /^\d{1,3}(,\d{3})*(\.\d{1,2})?$|^\d+(\.\d{1,3})?$/, // /^(\$|)([0-9]\d{0,2}(\,\d{3})*|([1-9]\d*))(\.\d{1,2})?$/,
   pricenegitive: /^-?[0-9]+(?:[.,][0-9]*)?$/,
   cardexpiry: /^(0[1-9]|1[0-2])\/\d{4}$/,
+  alphanumhyphendotspace: /^[a-zA-Z0-9 _.-]+$/,
 };
 
 const checkPriceValue = (value) => {
@@ -306,9 +307,9 @@ export const Regex = {
     required: ValidationMessages.CommentsReq,
   },
   invoicenum: {
-    min: length5,
+    min: length1,
     max: length15,
-    pattern: RegexPattern.alphanum,
+    pattern: RegexPattern.alphanumhyphendotspace,
     required: ValidationMessages.InvoiceNumReq,
     invalid: ValidationMessages.InvoiceNumInvalid,
   },
@@ -891,11 +892,11 @@ export const formCtrlTypes = {
     lbl: "Invoice #:",
     input: {
       type: "text",
-      min: length5,
+      min: length1,
       max: length15,
       keyEvents: {
         onKeyPress: (e) => {
-          if (!RegexPattern.alphanum.test(e.key)) {
+          if (!RegexPattern.alphanumhyphendotspace.test(e.key)) {
             e.preventDefault();
           }
         },

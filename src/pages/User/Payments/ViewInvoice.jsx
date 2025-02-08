@@ -165,6 +165,8 @@ const ViewInvoice = () => {
               const blob = await fresponse.blob();
               const url = URL.createObjectURL(blob);
               setFileUrl(url);
+            } else {
+              isapimethoderr = true;
             }
           } else {
             isapimethoderr = true;
@@ -178,6 +180,7 @@ const ViewInvoice = () => {
         })
         .finally(() => {
           if (isapimethoderr == true) {
+            setFileUrl("File load Error");
             Toast.error(AppMessages.SomeProblem);
           }
           setIsDataLoading(false);

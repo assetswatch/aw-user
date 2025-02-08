@@ -30,6 +30,7 @@ import { thumbnailPlugin } from "@react-pdf-viewer/thumbnail";
 import { routeNames } from "../../../routes/routes";
 import { useNavigate } from "react-router-dom";
 import { Toast } from "../../../components/common/ToastView";
+import PdfViewer from "../../../components/common/PdfViewer";
 
 const AgreementPreview = () => {
   let $ = window.$;
@@ -41,7 +42,7 @@ const AgreementPreview = () => {
   const { loggedinUser } = useAuth();
 
   let agreementId = parseInt(
-    getsessionStorageItem(SessionStorageKeys.SendAgreementId, 0)
+    getsessionStorageItem(SessionStorageKeys.ViewAgreementId, 0)
   );
 
   let accountid = parseInt(
@@ -112,6 +113,41 @@ const AgreementPreview = () => {
 
   //PdfViewer
 
+  const onDownload = async (e, fileId, fileName) => {
+    e.preventDefault();
+    apiReqResLoader("x", "x", API_ACTION_STATUS.START);
+    let isapimethoderr = false;
+    try {
+      const fresponse = await fetchPost(
+        `${config.apiBaseUrl}${ApiUrls.getAgreementFile}`,
+        {
+          AgreementId: agreementId,
+          FileId: fileId,
+        }
+      );
+      if (fresponse.ok) {
+        const blob = await fresponse.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${fileName}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        isapimethoderr = true;
+      }
+    } catch (err) {
+      isapimethoderr = true;
+      console.error(`"API :: ${ApiUrls.getAgreementFile}, Error ::" ${err}`);
+    } finally {
+      if (isapimethoderr == true) {
+        Toast.error(AppMessages.SomeProblem);
+      }
+      apiReqResLoader("x", "x", API_ACTION_STATUS.COMPLETED);
+    }
+  };
+
   const onSend = (e) => {
     e.preventDefault();
 
@@ -158,7 +194,7 @@ const AgreementPreview = () => {
   const navigateToTemplates = () => {
     deletesessionStorageItem(SessionStorageKeys.SendAgreementId);
     deletesessionStorageItem(SessionStorageKeys.ObjSendAgreement);
-    navigate(routeNames.owneragreementtemplates.path);
+    navigate(routeNames.agreementtemplates.path);
   };
 
   const onCancel = (e) => {
@@ -171,89 +207,75 @@ const AgreementPreview = () => {
       {SetPageLoaderNavLinks()}
       <div className="full-row  bg-light">
         <div className="container">
-          <div className="row mx-auto col-12 shadow">
+          <div className="row mx-auto col-xl-10 col-md-12 shadow">
             <div className="bg-white xs-p-20 p-30 pb-30 border rounded">
-              <ol className="breadcrumb mb-0 bg-transparent p-0">
-                <li className="breadcrumb-item" aria-current="page">
-                  <h6 className="mb-4 down-line pb-10">Send Agreement</h6>
-                </li>
-                {!checkObjNullorEmpty(agreementDetails) && (
-                  <li
-                    className="breadcrumb-item active text-primary"
-                    aria-current="page"
-                  >
-                    <span className="higlight-font text-primary font-700 font-15">
-                      {agreementDetails?.Title}
-                    </span>
-                  </li>
-                )}
-              </ol>
-              {/*============== Preview Agreement Start ==============*/}
-              {isDataLoading && <DataLoader />}
-              {!isDataLoading &&
-                (checkEmptyVal(fileUrl) || fileUrl.length == 0) && <NoData />}
-              {!isDataLoading && !checkEmptyVal(fileUrl) ? (
-                <>
-                  {/* <h6 class="mb-4 down-line  pb-10">
+              <div className="row">
+                <div className="col-md-6 col-lg-6 col-xl-4 mb-15">
+                  <h6 className="mb-2 down-line pb-10">
                     {agreementDetails?.Title}
-                  </h6> */}
-                  <div
-                    style={{ height: "600px" }}
-                    className="rounded box-shadow pb-20"
-                  >
-                    <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-                      <Viewer
-                        fileUrl={fileUrl}
-                        plugins={[
-                          defaultLayoutPluginInstance,
-                          thumbnailPluginInstance,
-                        ]}
-                        defaultScale={1.5}
-                        onDocumentLoad={handleDocumentLoad}
-                      />
-                    </Worker>
+                  </h6>
+                </div>
+                <div className="col-md-3 col-lg-3 col-xl-4 mb-15 text-md-center">
+                  <span className="font-500 font-general">
+                    Fee Type: {agreementDetails?.FeeTypeDisplay}
+                  </span>
+                </div>
+                <div className="col-md-3 col-lg-3 col-xl-4 mb-15 text-md-end">
+                  <span className="font-500 font-general">
+                    Fee: {agreementDetails?.AmountDisplay}
+                  </span>
+                </div>
+              </div>
+              {/*============== Preview Agreement Start ==============*/}
+
+              <div className="col px-0">
+                {fileUrl ? (
+                  <div className="min-h-300">
+                    <PdfViewer
+                      file={fileUrl}
+                      cssclass="mt-10"
+                      pageWidth={config.pdfViewerWidth.Actual}
+                    ></PdfViewer>
                   </div>
-                  <hr className="w-100 text-primary my-20"></hr>
-                  <div className="row form-action flex-end">
-                    <div
-                      className="col-md-6 px-0 form-error"
-                      id="form-error"
-                    ></div>
-                    <div className="col-md-6 px-0">
-                      <button
-                        className="btn btn-secondary"
-                        id="btncancel"
-                        onClick={onCancel}
-                      >
-                        Cancel
-                      </button>
-                      <button
+                ) : (
+                  <DataLoader />
+                )}
+              </div>
+
+              <hr className="w-100 text-primary my-20"></hr>
+              <div className="row form-action flex-end mx-0">
+                <div className="col-md-6 px-0 form-error" id="form-error"></div>
+                <div className="col-md-6 px-0">
+                  <button
+                    className="btn btn-secondary"
+                    id="btncancel"
+                    onClick={onCancel}
+                  >
+                    Back
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    id="btndownload"
+                    onClick={(e) => {
+                      onDownload(
+                        e,
+                        agreementDetails.FileId,
+                        agreementDetails.Title
+                      );
+                    }}
+                  >
+                    <i className="fas fa-download position-relative me-1 t-1"></i>{" "}
+                    Download
+                  </button>
+                  {/* <button
                         className="btn btn-primary"
                         id="btnsend"
                         onClick={onSend}
                       >
                         Send
-                      </button>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="row form-action flex-end min-h-300">
-                  <div
-                    className="col-md-6 px-0 form-error"
-                    id="form-error"
-                  ></div>
-                  <div className="col-md-6 px-0">
-                    <button
-                      className="btn btn-secondary"
-                      id="btncancel"
-                      onClick={onCancel}
-                    >
-                      Cancel
-                    </button>
-                  </div>
+                      </button> */}
                 </div>
-              )}
+              </div>
               {/*============== Preview Agreement End ==============*/}
             </div>
           </div>
