@@ -16,11 +16,12 @@ import {
   SessionStorageKeys,
 } from "../../../utils/constants";
 import { useAuth } from "../../../contexts/AuthContext";
-import { axiosPost } from "../../../helpers/axiosHelper";
+import { axiosPost, fetchPost } from "../../../helpers/axiosHelper";
 import config from "../../../config.json";
 import { addSessionStorageItem } from "../../../helpers/sessionStorageHelper";
 import { routeNames } from "../../../routes/routes";
 import { useNavigate } from "react-router-dom";
+import { Toast } from "../../../components/common/ToastView";
 
 const AgreementTemplates = () => {
   let $ = window.$;
@@ -173,32 +174,50 @@ const AgreementTemplates = () => {
         className: "w-200px",
       },
       {
-        Header: "Manage",
-        showActionMenu: false,
-        className: "w-150px gr-action",
-        Cell: ({ row }) =>
-          row.original.IsPaid == 0 &&
-          row.original.FeeType.toUpperCase() == "P" ? (
-            <button
-              className="btn btn-primary btn-xs btn-glow shadow rounded lh-26 px-10"
-              name="btnsendnotificationmodal"
-              id="btnsendnotificationmodal"
-              type="button"
-            >
-              <i className="fa fa-credit-card position-relative me-1 t-1 text-white"></i>{" "}
-              Buy{" "}
-            </button>
-          ) : (
-            <>
-              <a className="pr-10" title="view" onClick={(e) => onView(e, row)}>
-                <i className="far fa-eye pe-2 text-general font-15 hovertxt-primary" />
-              </a>
-              <a className="pr-10" title="send" onClick={(e) => onSend(e, row)}>
-                <i className="icons font-16 icon-action-redo text-general hovertxt-primary"></i>
-              </a>
-            </>
-          ),
+        Header: "Actions",
+        className: "w-130px",
+        actions: [
+          {
+            text: "View Agreement",
+            onclick: (e, row) => onView(e, row),
+          },
+          {
+            text: "Download",
+            onclick: (e, row) => {
+              downloadAgreement(e, row);
+            },
+            icssclass: "pr-10 pl-2px",
+          },
+        ],
       },
+      // {
+      //   Header: "Actions",
+      //   showActionMenu: false,
+      //   className: "w-150px gr-action",
+      //   Cell: ({ row }) => (
+      //     // row.original.IsPaid == 0 &&
+      //     // row.original.FeeType.toUpperCase() == "P" ? (
+      //     //   <button
+      //     //     className="btn btn-primary btn-xs btn-glow shadow rounded lh-26 px-10"
+      //     //     name="btnsendnotificationmodal"
+      //     //     id="btnsendnotificationmodal"
+      //     //     type="button"
+      //     //   >
+      //     //     <i className="fa fa-credit-card position-relative me-1 t-1 text-white"></i>{" "}
+      //     //     Buy{" "}
+      //     //   </button>
+      //     // ) : (
+      //     <>
+      //       <a className="pr-10" title="view" onClick={(e) => onView(e, row)}>
+      //         <i className="far fa-eye pe-2 text-general font-15 hovertxt-primary" />
+      //       </a>
+      //       <a className="pr-10" title="send" onClick={(e) => onSend(e, row)}>
+      //         <i className="icons font-16 icon-action-redo text-general hovertxt-primary"></i>
+      //       </a>
+      //     </>
+      //   ),
+      //   // ),
+      // },
     ],
     []
   );
@@ -222,7 +241,7 @@ const AgreementTemplates = () => {
       SessionStorageKeys.ViewAgreementId,
       row.original.AgreementId
     );
-    navigate(routeNames.ownersendagreement.path);
+    navigate(routeNames.previewagreement.path);
   };
 
   const onSend = (e, row) => {
@@ -231,7 +250,55 @@ const AgreementTemplates = () => {
       SessionStorageKeys.SendAgreementId,
       row.original.AgreementId
     );
-    navigate(routeNames.ownersendagreement.path);
+    navigate(routeNames.sendagreement.path);
+  };
+
+  const downloadAgreement = async (e, row) => {
+    e.preventDefault();
+    apiReqResLoader("x", "x", API_ACTION_STATUS.START);
+    let isapimethoderr = false;
+    let objParams = {
+      AgreementId: parseInt(row.original.AgreementId),
+    };
+    axiosPost(`${config.apiBaseUrl}${ApiUrls.getAgreementDetails}`, objParams)
+      .then(async (response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode === 200) {
+          const fresponse = await fetchPost(
+            `${config.apiBaseUrl}${ApiUrls.getAgreementFile}`,
+            {
+              ...objParams,
+              FileId: objResponse.Data.FileId,
+            }
+          );
+          if (fresponse.ok) {
+            const blob = await fresponse.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${objResponse.Data?.Title}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          } else {
+            isapimethoderr = true;
+          }
+        } else {
+          isapimethoderr = true;
+        }
+      })
+      .catch((err) => {
+        isapimethoderr = true;
+        console.error(
+          `"API :: ${ApiUrls.getAgreementDetails}, Error ::" ${err}`
+        );
+      })
+      .finally(() => {
+        if (isapimethoderr == true) {
+          Toast.error(AppMessages.SomeProblem);
+        }
+        apiReqResLoader("x", "x", API_ACTION_STATUS.COMPLETED);
+      });
   };
 
   //Grid actions
@@ -243,7 +310,18 @@ const AgreementTemplates = () => {
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <h5 className="mb-4 down-line">Agreement Templates</h5>
+              <div className="row">
+                <div className="col-6">
+                  <div className="breadcrumb">
+                    <div className="breadcrumb-item bc-fh">
+                      <h6 className="mb-3 down-line pb-10">
+                        Agreement Templates
+                      </h6>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-6 d-flex justify-content-end align-items-end pb-10"></div>
+              </div>
               {/*============== Search Start ==============*/}
               <div className="woo-filter-bar full-row px-3 py-4 box-shadow grid-search rounded">
                 <div className="container-fluid v-center">

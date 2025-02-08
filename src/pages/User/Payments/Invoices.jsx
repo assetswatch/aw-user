@@ -334,6 +334,8 @@ const Invoices = () => {
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+          } else {
+            isapimethoderr = true;
           }
         } else {
           isapimethoderr = true;

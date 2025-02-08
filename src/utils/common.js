@@ -101,11 +101,15 @@ export function SetPageLoaderNavLinks() {
         case routeNames.ownerprofileedit.path.toLowerCase():
           activelink = "user-profile";
           break;
-        case routeNames.owneragreementtemplates.path.toLowerCase():
-        case routeNames.ownersendagreement.path.toLowerCase():
-        case routeNames.ownerpreviewagreement.path.toLowerCase():
+        case routeNames.myagreements.path.toLowerCase():
           activelink = "agreements";
-          activesublink = "owner-agreement-templates";
+          activesublink = "myagreements";
+          break;
+        case routeNames.sendagreement.path.toLowerCase():
+        case routeNames.previewagreement.path.toLowerCase():
+        case routeNames.agreementtemplates.path.toLowerCase():
+          activelink = "agreements";
+          activesublink = "agreementtemplates";
           break;
         case routeNames.mydocuments.path.toLowerCase():
         case routeNames.viewdocument.path.toLowerCase():
@@ -115,6 +119,15 @@ export function SetPageLoaderNavLinks() {
         case routeNames.sharedusers.path.toLowerCase():
           activelink = "agreements";
           activesublink = "documents";
+          break;
+        case routeNames.propertyreport.path.toLowerCase():
+        case routeNames.transactionreport.path.toLowerCase():
+          activelink = "reports";
+          break;
+        case routeNames.services.path.toLowerCase():
+        case routeNames.createservicerequest.path.toLowerCase():
+        case routeNames.servicedetails.path.toLowerCase():
+          activelink = "services";
           break;
       }
 

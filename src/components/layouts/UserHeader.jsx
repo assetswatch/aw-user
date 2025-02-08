@@ -627,11 +627,20 @@ const UserHeader = () => {
                     <ul className="dropdown-menu">
                       <li className="dropdown-item">
                         <Link
-                          id="nav-lnk-owner-send-agreement"
-                          to={routeNames.comingup.path}
+                          id="nav-lnk-myagreements"
+                          to={routeNames.myagreements.path}
                         >
                           <i className="fa-regular fa-file-lines pe-1"></i> My
                           Agreements
+                        </Link>
+                      </li>
+                      <li className="dropdown-item">
+                        <Link
+                          id="nav-lnk-agreementtemplates"
+                          to={routeNames.agreementtemplates.path}
+                        >
+                          <i className="fa-regular fa-file-lines pe-1"></i>{" "}
+                          Agreement Templates
                         </Link>
                       </li>
                       <li className="dropdown-item">
@@ -643,23 +652,13 @@ const UserHeader = () => {
                           Documents
                         </Link>
                       </li>
-                      <li className="dropdown-item">
-                        <Link
-                          className="nav-link-owner-agreement-templates"
-                          id="nav-lnk-owner-agreement-templates"
-                          to={routeNames.owneragreementtemplates.path}
-                        >
-                          <i className="fa-regular fa-file-lines pe-1"></i>{" "}
-                          Agreement Templates
-                        </Link>
-                      </li>
                     </ul>
                   </li>
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      id="nav-services"
+                      to={routeNames.services.path}
                     >
                       <i className="fa fa-screwdriver-wrench pe-2"></i>
                       Services
@@ -678,8 +677,8 @@ const UserHeader = () => {
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      id="nav-reports"
+                      to={routeNames.propertyreport.path}
                     >
                       <i className="fa fa-chart-pie flat-mini pe-2"></i>
                       Reports
@@ -759,11 +758,20 @@ const UserHeader = () => {
                     <ul className="dropdown-menu">
                       <li className="dropdown-item">
                         <Link
-                          id="nav-lnk-myagreement"
-                          to={routeNames.comingup.path}
+                          id="nav-lnk-myagreements"
+                          to={routeNames.myagreements.path}
                         >
                           <i className="fa-regular fa-file-lines pe-1"></i> My
                           Agreements
+                        </Link>
+                      </li>
+                      <li className="dropdown-item">
+                        <Link
+                          id="nav-lnk-agreementtemplates"
+                          to={routeNames.agreementtemplates.path}
+                        >
+                          <i className="fa-regular fa-file-lines pe-1"></i>{" "}
+                          Agreement Templates
                         </Link>
                       </li>
                       <li className="dropdown-item">
@@ -775,22 +783,13 @@ const UserHeader = () => {
                           Documents
                         </Link>
                       </li>
-                      <li className="dropdown-item">
-                        <Link
-                          id="nav-lnk-agreementtemplates"
-                          to={routeNames.comingup.path}
-                        >
-                          <i className="fa-regular fa-file-lines pe-1"></i>{" "}
-                          Agreement Templates
-                        </Link>
-                      </li>
                     </ul>
                   </li>
                   <li className="nav-item">
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.comingup.path}
+                      to={routeNames.services.path}
                     >
                       <i className="fa fa-screwdriver-wrench pe-2"></i>
                       Services
@@ -809,8 +808,8 @@ const UserHeader = () => {
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      id="nav-reports"
+                      to={routeNames.propertyreport.path}
                     >
                       <i className="fa fa-chart-pie flat-mini pe-2"></i>
                       Reports
@@ -882,8 +881,8 @@ const UserHeader = () => {
                     <ul className="dropdown-menu">
                       <li className="dropdown-item">
                         <Link
-                          id="nav-lnk-myagreement"
-                          to={routeNames.comingup.path}
+                          id="nav-lnk-myagreements"
+                          to={routeNames.myagreements.path}
                         >
                           <i className="fa-regular fa-file-lines pe-1"></i> My
                           Agreements
@@ -904,7 +903,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-home"
-                      to={routeNames.comingup.path}
+                      to={routeNames.services.path}
                     >
                       <i className="fa fa-screwdriver-wrench pe-2"></i>
                       Services
@@ -923,8 +922,8 @@ const UserHeader = () => {
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      id="nav-home"
-                      to={routeNames.comingup.path}
+                      id="nav-reports"
+                      to={routeNames.propertyreport.path}
                     >
                       <i className="fa fa-chart-pie flat-mini pe-2"></i>
                       Reports

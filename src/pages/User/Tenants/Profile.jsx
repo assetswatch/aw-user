@@ -615,7 +615,16 @@ const Profile = () => {
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <h5 className="mb-4 down-line">My Profile</h5>
+              <div className="row">
+                <div className="col-6">
+                  <div className="breadcrumb">
+                    <div className="breadcrumb-item bc-fh">
+                      <h6 className="mb-3 down-line pb-10">My Profile</h6>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-6 d-flex justify-content-end align-items-end pb-10"></div>
+              </div>
               <div className="row">
                 <div className="col-xl-3 col-lg-4">
                   {/*============== Profile Start ==============*/}
