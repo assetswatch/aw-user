@@ -553,25 +553,53 @@ const ManageCommercialProperty = () => {
   };
 
   const onDrop = (acceptedFiles) => {
-    let selectedFiles = acceptedFiles.map((file) => ({
-      file,
-      preview: URL.createObjectURL(file),
-    }));
-    setSelectedFiles((prevFiles) => [...selectedFiles, ...prevFiles]);
-    //const files = Array.from(event.target.files);
-    //setSelectedFiles((prevFiles) => [...prevFiles, ...files]);
+    // Calculate total file size
+    const totalAccepetedFileSize = acceptedFiles.reduce(
+      (sum, file) => sum + file.size,
+      0
+    );
+    let totalSelectedFilesSize = 0;
+    if (selectedFiles.length > 0 && selectedFiles[0].hasOwnProperty("file")) {
+      totalSelectedFilesSize = selectedFiles.reduce((sum, file) => {
+        if (file.hasOwnProperty("file")) {
+          return sum + file.file.size;
+        }
+        return sum;
+      }, 0);
+    }
+
+    if (
+      totalAccepetedFileSize + totalSelectedFilesSize >
+      config.fileUploadLimitations.maxUploadTotalSize
+    ) {
+      Toast.error(ValidationMessages.MaxFileSizeReached);
+      return;
+    }
+
+    if (
+      acceptedFiles.length + selectedFiles.length <=
+      config.fileUploadLimitations.filesLimit
+    ) {
+      let selectedFiles = acceptedFiles.map((file) => ({
+        file,
+        preview: URL.createObjectURL(file),
+      }));
+      setSelectedFiles((prevFiles) => [...selectedFiles, ...prevFiles]);
+      //const files = Array.from(event.target.files);
+      //setSelectedFiles((prevFiles) => [...prevFiles, ...files]);
+    } else {
+      Toast.error(ValidationMessages.MaxFileLimitReaced);
+    }
   };
 
   const onDropRejected = (rejectedFiles) => {
-    Toast.error("Some files were rejected. Please upload valid files.");
+    Toast.error(ValidationMessages.UploadValidFiles);
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     onDropRejected,
-    accept: {
-      "image/*": [".jpeg", ".jpg", ".png", ".gif"],
-    },
+    accept: config.fileUploadLimitations.validImgTypes,
     multiple: true,
     noClick: false,
   });
@@ -937,7 +965,7 @@ const ManageCommercialProperty = () => {
           apiReqResLoader("btnSaveMedia", "Save", API_ACTION_STATUS.COMPLETED);
         });
     } else {
-      $("#form-error-media").html(AppMessages.AssetOwnersRequired);
+      $("#form-error-media").html(AppMessages.AssetImagesRequired);
     }
   };
 

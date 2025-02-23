@@ -51,6 +51,7 @@ export const SessionStorageKeys = {
   ViewPaymentSubAccountId: "vpsaid",
   ViewInvoiceItemId: "viiid",
   ViewInvoiceId: "viid",
+  TenantCheckoutInvoiceId: "tciid",
 };
 /*Session storage keys*/
 
@@ -231,6 +232,16 @@ export const AppMessages = {
 
 export const ValidationMessages = {
   NameReq: "Name can not be empty.",
+  DBANameReq: "DBA Name can not be empty.",
+  DBANameInvalid: "DBA Name should be minimum 2 to 50 characters.",
+  LegalNameReq: "Legal Name can not be empty.",
+  LegalNameInvalid: "Legal Name should be minimum 2 to 50 characters.",
+  AccountNumberReq: "Account Number can not be empty.",
+  AccountNumberInvalid: "Account Number should be minimum 4 to 17 characters.",
+  RoutingNumberReq: "Routing Number can not be empty.",
+  RoutingNumberInvalid: "Routing Number should be 9 characters.",
+  BusinessDescriptionReq: "Description can not be empty.",
+  BusinessNameOnAccountReq: "Business Name on Account can not be empty.",
   FNameReq: "Firstname can not be empty.",
   LNameReq: "Lastname can not be empty.",
   EmailReq: "Emailid can not be empty.",
@@ -258,6 +269,10 @@ export const ValidationMessages = {
   WebsiteInvalid: "Website is not valid.",
   ZipReq: "Zip code can not be empty.",
   ZipInvalid: "Zip code is not valid.",
+  Last4SSNReq: "Last 4 SSN can not be empty.",
+  Last4SSNInvalid: "Last 4 SSN is not valid.",
+  FederalTaxIDReq: "Federal Tax ID can not be empty.",
+  FederalTaxIDInvalid: "Federal Tax ID is not valid.",
   CardNumberReq: "Card number can not be empty.",
   CardNumberInvalid: "Card number is not valid.",
   CardExpiryReq: "Card expiry date can not be empty.",
@@ -339,10 +354,14 @@ export const ValidationMessages = {
   ItemForTypeReq: "Item for type can not be empty.",
   ItemReq: "Item can not be empty.",
   AccountForTypeReq: "Account for type can not be empty.",
+  AccountTypeReq: "Account type can not be empty.",
   InvoiceNumReq: "Invoice number can not be empty.",
   InvoiceNumInvalid: "Invoice number is not valid.",
   QtyReq: "Quantity code can not be empty.",
   QtyInvalid: "Quantity code is not valid.",
+  MaxFileSizeReached: "Maximum file size reached.",
+  MaxFileLimitReaced: "Maximum files limit reached.",
+  UploadValidFiles: "Some files were rejected. Please upload valid files.",
 };
 
 /*Api Urls*/
@@ -434,6 +453,9 @@ export let ApiUrls = {
   getInvoicePdf: `payments/v1/GetInvoicePdf`,
   sendInvoice: `payments/v1/SendInvoice`,
   unsendInvoice: `payments/v1/UnsendInvoice`,
+  getSentInvoices: `payments/v1/GetSentInvoices`,
+  createPaymentTransaction: `payments/v1/CreatePaymentTransaction`,
+  calculatePaymentAmount: `payments/v1/CalculatePaymentAmount`,
   getAgreements: `agreements/v1/GetAgreements`,
   getAgreementDetails: `agreements/v1/GetAgreementDetails`,
   getAgreementFile: `agreements/v1/GetAgreementFile`,

@@ -56,6 +56,12 @@ const Footer = () => {
                     >
                       <i className="fab fa-linkedin-in" />
                     </a>
+                    <a
+                      href="https://www.instagram.com/assetswatch/"
+                      target="_blank"
+                    >
+                      <i className="fab fa-instagram" />
+                    </a>
                   </div>
                 </div>
                 <div className="col">

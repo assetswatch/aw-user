@@ -272,19 +272,19 @@ const Accounts = () => {
         accessor: "CreatedDateDisplay",
         className: "w-250px",
       },
-      {
-        Header: "Actions",
-        showActionMenu: false,
-        className: "w-150px gr-action",
-        Cell: ({ row }) =>
-          row.original.Status == 0 ? (
-            <a className="pr-10" title="view" onClick={(e) => onView(e, row)}>
-              <i className="far fa-eye pe-2 text-general font-15 hovertxt-primary" />
-            </a>
-          ) : (
-            ""
-          ),
-      },
+      // {
+      //   Header: "Actions",
+      //   showActionMenu: false,
+      //   className: "w-150px gr-action",
+      //   Cell: ({ row }) =>
+      //     row.original.Status == 0 ? (
+      //       <a className="pr-10" title="view" onClick={(e) => onView(e, row)}>
+      //         <i className="far fa-eye pe-2 text-general font-15 hovertxt-primary" />
+      //       </a>
+      //     ) : (
+      //       ""
+      //     ),
+      // },
     ],
     []
   );
@@ -308,7 +308,7 @@ const Accounts = () => {
       SessionStorageKeys.ViewPaymentSubAccountId,
       row.original.SubAccountId
     );
-    navigate(routeNames.paymentscreateaccount.path);
+    navigate(routeNames.paymentsaccountagreement.path);
   };
 
   //Grid actions

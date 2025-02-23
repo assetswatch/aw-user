@@ -402,25 +402,49 @@ const AddResidentialProperty = () => {
   };
 
   const onDrop = (acceptedFiles) => {
-    let selectedFiles = acceptedFiles.map((file) => ({
-      file,
-      preview: URL.createObjectURL(file),
-    }));
-    setSelectedFiles((prevFiles) => [...selectedFiles, ...prevFiles]);
-    //const files = Array.from(event.target.files);
-    //setSelectedFiles((prevFiles) => [...prevFiles, ...files]);
+    // Calculate total file size
+    const totalAccepetedFileSize = acceptedFiles.reduce(
+      (sum, file) => sum + file.size,
+      0
+    );
+
+    const totalSelectedFilesSize = selectedFiles.reduce(
+      (sum, file) => sum + file.file.size,
+      0
+    );
+
+    if (
+      totalAccepetedFileSize + totalSelectedFilesSize >
+      config.fileUploadLimitations.maxUploadTotalSize
+    ) {
+      Toast.error(ValidationMessages.MaxFileSizeReached);
+      return;
+    }
+
+    if (
+      acceptedFiles.length + selectedFiles.length <=
+      config.fileUploadLimitations.filesLimit
+    ) {
+      let selectedFiles = acceptedFiles.map((file) => ({
+        file,
+        preview: URL.createObjectURL(file),
+      }));
+      setSelectedFiles((prevFiles) => [...selectedFiles, ...prevFiles]);
+      //const files = Array.from(event.target.files);
+      //setSelectedFiles((prevFiles) => [...prevFiles, ...files]);
+    } else {
+      Toast.error(ValidationMessages.MaxFileLimitReaced);
+    }
   };
 
   const onDropRejected = (rejectedFiles) => {
-    Toast.error("Some files were rejected. Please upload valid files.");
+    Toast.error(ValidationMessages.UploadValidFiles);
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     onDropRejected,
-    accept: {
-      "image/*": [".jpeg", ".jpg", ".png", ".gif"],
-    },
+    accept: config.fileUploadLimitations.validImgTypes,
     multiple: true,
     noClick: false,
   });

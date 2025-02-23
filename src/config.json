@@ -47,5 +47,12 @@
     "PageWidth": "pagewidth",
     "Actual": "actualsize",
     "PageFit": "pagefit"
+  },
+  "fileUploadLimitations": {
+    "validImgTypes": {
+      "image/*": [".jpeg", ".jpg", ".png", ".gif"]
+    },
+    "maxUploadTotalSize": 15728640,
+    "filesLimit": 10
   }
 }

@@ -6,7 +6,7 @@ export function useGetDdlUserAssetsGateway(keyword, accountid, profileid) {
   let objBody = {
     Keyword: keyword,
     AccountId: accountid,
-    ProfileId: profileid,
+    //ProfileId: profileid,
   };
 
   const { data: userAssetsList, isDataLoading } = useApiGateway(

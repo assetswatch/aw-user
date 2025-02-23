@@ -728,7 +728,7 @@ const Notifications = () => {
                   <h5 className="mb-4 down-line">Notifications</h5>
                 </div>
                 <div className="col-6 d-flex justify-content-end align-items-end pb-10">
-                  {/* <button
+                  <button
                     className="btn btn-primary btn-mini btn-glow shadow rounded"
                     name="btnsendnotificationmodal"
                     id="btnsendnotificationmodal"
@@ -737,9 +737,9 @@ const Notifications = () => {
                   >
                     <i className="flaticon-envelope flat-mini position-relative me-1 t-1"></i>{" "}
                     Send Notification
-                  </button> */}
+                  </button>
 
-                  <div className="dropdown">
+                  {/* <div className="dropdown">
                     <div
                       className="btn btn-primary btn-mini btn-glow shadow rounded dropdown-toggle ddmenu-toggle"
                       data-bs-toggle="collapse"
@@ -775,7 +775,7 @@ const Notifications = () => {
                         </a>
                       </li>
                     </ul>
-                  </div>
+                  </div> */}
                 </div>
               </div>
               {/*============== Search Start ==============*/}

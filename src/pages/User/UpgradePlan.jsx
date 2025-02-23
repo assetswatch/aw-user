@@ -4,6 +4,7 @@ import {
   apiReqResLoader,
   checkObjNullorEmpty,
   GetCookieValues,
+  getPagesPathByLoggedinUserProfile,
   GetUserCookieValues,
 } from "../../utils/common";
 import { ApiUrls, AppMessages, UserCookie } from "../../utils/constants";
@@ -42,7 +43,12 @@ const UpgradePlan = () => {
           let respData = objResponse.Data;
 
           updateUserPlan({ PlanId: respData?.PlanId, Plan: respData?.Plan });
-          navigate(routeNames.dashboard.path);
+          navigate(
+            getPagesPathByLoggedinUserProfile(
+              GetCookieValues(UserCookie.ProfileTypeId),
+              "profile"
+            )
+          );
         } else {
           isapimethoderr = true;
         }
@@ -171,7 +177,10 @@ const UpgradePlan = () => {
                             <div className="d-flex flex-center flex-1 form-error"></div>
                             <Link
                               className="font-500 font-general d-flex flex-end text-primary"
-                              to={routeNames.dashboard.path}
+                              to={getPagesPathByLoggedinUserProfile(
+                                GetCookieValues(UserCookie.ProfileTypeId),
+                                "profile"
+                              )}
                             >
                               <u>
                                 Skip

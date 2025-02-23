@@ -4,11 +4,20 @@ import PageTitle from "../components/layouts/PageTitle";
 import { routeNames } from "../routes/routes";
 import { formCtrlTypes } from "../utils/formvalidation";
 import InputControl from "../components/common/InputControl";
-import { AppDetails, ApiUrls, AppMessages } from "../utils/constants";
+import {
+  AppDetails,
+  ApiUrls,
+  AppMessages,
+  UserCookie,
+} from "../utils/constants";
 import getuuid from "../helpers/uuidHelper";
 import { axiosPost } from "../helpers/axiosHelper";
 import config from "../config.json";
-import { apiReqResLoader } from "../utils/common";
+import {
+  apiReqResLoader,
+  GetCookieValues,
+  getPagesPathByLoggedinUserProfile,
+} from "../utils/common";
 import { useAuth } from "../contexts/AuthContext";
 
 const Login = () => {
@@ -79,7 +88,13 @@ const Login = () => {
               if (respData.Profiles.length > 1) {
                 navigate(routeNames.profiles.path, { replace: true });
               } else {
-                navigate(routeNames.dashboard.path, { replace: true });
+                navigate(
+                  getPagesPathByLoggedinUserProfile(
+                    GetCookieValues(UserCookie.ProfileTypeId),
+                    "profile"
+                  ),
+                  { replace: true }
+                );
               }
             } else {
               $(errctl).html(objResponse.Data.StatusMessage);
@@ -107,7 +122,13 @@ const Login = () => {
   return (
     <>
       {isAuthenticated() == true ? (
-        <Navigate to={routeNames.dashboard.path} replace />
+        <Navigate
+          to={getPagesPathByLoggedinUserProfile(
+            GetCookieValues(UserCookie.ProfileTypeId),
+            "profile"
+          )}
+          replace
+        />
       ) : (
         <>
           {/*============== Page title Start ==============*/}

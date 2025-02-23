@@ -98,6 +98,10 @@ export const routeNames = {
     name: "PaymentsCreateAccount",
     path: "/User/Payments/CreateAccount",
   },
+  paymentsaccountagreement: {
+    name: "PaymentsAccountAgreement",
+    path: "/User/Payments/AccountAgreement",
+  },
   paymentsinvoices: {
     name: "PaymentsInvoices",
     path: "/User/Payments/Invoices",
@@ -121,6 +125,18 @@ export const routeNames = {
   viewinvoice: {
     name: "ViewInvoice",
     path: "/User/Payments/ViewInvoice",
+  },
+  tenantpaymentsinvoices: {
+    name: "TenantPaymentsInvoices",
+    path: "/User/Tenants/Invoices",
+  },
+  tenantviewinvoice: {
+    name: "TenantViewInvoice",
+    path: "/User/Tenants/ViewInvoice",
+  },
+  tenantinvoicecheckout: {
+    name: "TenantInvoiceCheckout",
+    path: "/User/Tenants/InvoiceCheckout",
   },
   connectionsowners: {
     name: "ConnectionsOwners",
@@ -149,10 +165,6 @@ export const routeNames = {
   tenantpayments: {
     name: "TenantPayments",
     path: "/User/Tenant-Payments",
-  },
-  tenantcheckout: {
-    name: "TenantCheckout",
-    path: "/User/Tenant-Checkout",
   },
   agentprofile: {
     name: "AgentProfile",
@@ -475,6 +487,13 @@ const routes = [
     isprotected: true,
   },
   {
+    path: routeNames.paymentsaccountagreement.path,
+    name: routeNames.paymentsaccountagreement.name,
+    element: lazy(() => import("../pages/User/Payments/AccountAgreement")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
     path: routeNames.invoiceitems.path,
     name: routeNames.invoiceitems.name,
     element: lazy(() => import("../pages/User/Payments/InvoiceItems")),
@@ -513,6 +532,27 @@ const routes = [
     path: routeNames.viewinvoice.path,
     name: routeNames.viewinvoice.name,
     element: lazy(() => import("../pages/User/Payments/ViewInvoice")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.tenantpaymentsinvoices.path,
+    name: routeNames.tenantpaymentsinvoices.name,
+    element: lazy(() => import("../pages/User/Tenants/Invoices")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.tenantviewinvoice.path,
+    name: routeNames.tenantviewinvoice.name,
+    element: lazy(() => import("../pages/User/Tenants/ViewInvoice")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.tenantinvoicecheckout.path,
+    name: routeNames.tenantinvoicecheckout.name,
+    element: lazy(() => import("../pages/User/Tenants/InvoiceCheckout")),
     isexact: true,
     isprotected: true,
   },
@@ -583,13 +623,6 @@ const routes = [
     path: routeNames.tenantpayments.path,
     name: routeNames.tenantpayments.name,
     element: lazy(() => import("../pages/User/Tenants/Payments")),
-    isexact: true,
-    isprotected: true,
-  },
-  {
-    path: routeNames.tenantcheckout.path,
-    name: routeNames.tenantcheckout.name,
-    element: lazy(() => import("../pages/User/Tenants/Checkout")),
     isexact: true,
     isprotected: true,
   },

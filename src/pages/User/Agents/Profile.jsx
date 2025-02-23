@@ -50,13 +50,12 @@ const Profile = () => {
       inviterid: profileId,
       InviterProfileTypeId: config.userProfileTypes.Agent,
       InviteeProfileTypeId: config.userProfileTypes.Tenant,
+      status: -1,
+      requesttypeid: -1,
       pi: 1,
       ps: 0,
     };
-    axiosPost(
-      `${config.apiBaseUrl}${ApiUrls.getJoinedUserConnections}`,
-      objParams
-    )
+    axiosPost(`${config.apiBaseUrl}${ApiUrls.getUserConnections}`, objParams)
       .then((response) => {
         let objResponse = response.data;
         if (objResponse.StatusCode === 200) {
@@ -65,13 +64,13 @@ const Profile = () => {
       })
       .catch((err) => {
         console.error(
-          `"API :: ${ApiUrls.getJoinedUserConnections}, Error ::" ${err}`
+          `"API :: ${ApiUrls.getUserConnections}, Error ::" ${err}`
         );
       })
       .finally(() => {});
 
     //Joined owners
-    axiosPost(`${config.apiBaseUrl}${ApiUrls.getJoinedUserConnections}`, {
+    axiosPost(`${config.apiBaseUrl}${ApiUrls.getUserConnections}`, {
       ...objParams,
       InviteeProfileTypeId: config.userProfileTypes.Owner,
     })
@@ -83,13 +82,13 @@ const Profile = () => {
       })
       .catch((err) => {
         console.error(
-          `"API :: ${ApiUrls.getJoinedUserConnections}, Error ::" ${err}`
+          `"API :: ${ApiUrls.getUserConnections}, Error ::" ${err}`
         );
       })
       .finally(() => {});
 
     //Joined agents
-    axiosPost(`${config.apiBaseUrl}${ApiUrls.getJoinedUserConnections}`, {
+    axiosPost(`${config.apiBaseUrl}${ApiUrls.getUserConnections}`, {
       ...objParams,
       InviteeProfileTypeId: config.userProfileTypes.Agent,
     })
@@ -101,7 +100,7 @@ const Profile = () => {
       })
       .catch((err) => {
         console.error(
-          `"API :: ${ApiUrls.getJoinedUserConnections}, Error ::" ${err}`
+          `"API :: ${ApiUrls.getUserConnections}, Error ::" ${err}`
         );
       })
       .finally(() => {});
@@ -458,7 +457,7 @@ const Profile = () => {
     )
       .then((response) => {
         let objResponse = response.data;
-        if (objResponse.StatusCode === 200) {
+        if (objResponse.StatusCode === 200 && objResponse.Data != null) {
           setAssetsTotalCount(objResponse.Data.TotalCount);
           setAssetsList(objResponse.Data.Assets);
         } else {
