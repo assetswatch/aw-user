@@ -24,7 +24,7 @@ import {
 import moment from "moment";
 import DateControl from "../../../components/common/DateControl";
 import InputControl from "../../../components/common/InputControl";
-import { formCtrlTypes } from "../../../utils/formvalidation";
+import { formCtrlTypes, Regex } from "../../../utils/formvalidation";
 import { useUserConnectionStatusTypesGateway } from "../../../hooks/useUserConnectionStatusTypesGateway";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 import { axiosPost } from "../../../helpers/axiosHelper";
@@ -552,6 +552,12 @@ const Owners = () => {
       checkEmptyVal(inputProfileValue)
     ) {
       formSendInvitaionErrors["ddlusersprofiles"] = ValidationMessages.OwnerReq;
+    } else if (
+      !checkEmptyVal(inputProfileValue) &&
+      !Regex.email.pattern.test(inputProfileValue)
+    ) {
+      formSendInvitaionErrors["ddlusersprofiles"] =
+        ValidationMessages.EmailInvalid;
     }
 
     if (Object.keys(formSendInvitaionErrors).length === 0) {
@@ -563,7 +569,7 @@ const Owners = () => {
         InviterId: profileid,
         InviteeId: parseInt(setSelectDefaultVal(selectedUsersProfile)),
         ConnectionForProfileTypeId: config.userProfileTypes.Owner,
-        Email: inputProfileValue,
+        Email: inputProfileValue.trim(),
         Message: sendInvitationFormData.txtmessage,
       };
 

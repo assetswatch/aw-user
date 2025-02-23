@@ -1,18 +1,30 @@
 import React from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import PageTitle from "../components/layouts/PageTitle";
 import { routeNames } from "../routes/routes";
 import { useAuth } from "../contexts/AuthContext";
+import {
+  GetCookieValues,
+  getPagesPathByLoggedinUserProfile,
+} from "../utils/common";
+import { UserCookie } from "../utils/constants";
 
 const ForgotPassword = () => {
   let $ = window.$;
 
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <>
       {isAuthenticated() == true ? (
-        <Navigate to={routeNames.dashboard.path} replace />
+        <Navigate
+          to={getPagesPathByLoggedinUserProfile(
+            GetCookieValues(UserCookie.ProfileTypeId),
+            "profile"
+          )}
+          replace
+        />
       ) : (
         <>
           {/*============== Page title Start ==============*/}

@@ -305,7 +305,7 @@ const Payments = () => {
       SessionStorageKeys.TenantCheckoutPaymentId,
       row.original.PaymentId
     );
-    navigate(routeNames.tenantcheckout.path);
+    navigate(routeNames.tenantinvoicecheckout.path);
   };
 
   //Setup Grid.

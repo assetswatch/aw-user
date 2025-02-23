@@ -88,6 +88,28 @@ const InputControl = ({
         formErrors[name] = rex.required;
       }
       break;
+    case formCtrlTypes.paymentsubaccountfname:
+      rex = Regex.paymentsubaccountfname;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (
+        !checkEmptyVal(value) &&
+        !(value?.length >= rex.min && value?.length <= rex.max)
+      ) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.paymentsubaccountlname:
+      rex = Regex.paymentsubaccountlname;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (
+        !checkEmptyVal(value) &&
+        !(value?.length >= rex.min && value?.length <= rex.max)
+      ) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
     case formCtrlTypes.name:
       rex = Regex.name;
       if (required && checkEmptyVal(value)) {
@@ -129,6 +151,32 @@ const InputControl = ({
       if (required && checkEmptyVal(value)) {
         formErrors[name] = rex.required;
       } else if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.last4ssn:
+      rex = Regex.last4ssn;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      } else if (
+        !checkEmptyVal(value) &&
+        !(value?.length >= rex.min && value?.length <= rex.max)
+      ) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.federaltaxid:
+      rex = Regex.federaltaxid;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      } else if (
+        !checkEmptyVal(value) &&
+        !(value?.length >= rex.min && value?.length <= rex.max)
+      ) {
         formErrors[name] = rex.invalid;
       }
       break;
@@ -259,6 +307,50 @@ const InputControl = ({
         formErrors[name] = rex.invalid;
       }
       break;
+    case formCtrlTypes.txtcity:
+      rex = Regex.txtcity;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      if (!checkEmptyVal(value) && value?.length > rex.max) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.accountnum:
+      rex = Regex.accountnum;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      } else if (
+        !checkEmptyVal(value) &&
+        !(value?.length >= rex.min && value?.length <= rex.max)
+      ) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.routingnum:
+      rex = Regex.routingnum;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      } else if (
+        !checkEmptyVal(value) &&
+        !(value?.length >= rex.min && value?.length <= rex.max)
+      ) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.address50:
+      rex = Regex.address50;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      if (!checkEmptyVal(value) && value?.length > rex.max) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
     case formCtrlTypes.addressone:
       rex = Regex.addressone;
       if (required && checkEmptyVal(value)) {
@@ -281,6 +373,54 @@ const InputControl = ({
       rex = Regex.title;
       if (required && checkEmptyVal(value)) {
         formErrors[name] = rex.required;
+      }
+      break;
+    case formCtrlTypes.dbaname:
+      rex = Regex.dbaname;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      } else if (
+        !checkEmptyVal(value) &&
+        !(value?.length >= rex.min && value?.length <= rex.max)
+      ) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.legalname:
+      rex = Regex.legalname;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      } else if (
+        !checkEmptyVal(value) &&
+        !(value?.length >= rex.min && value?.length <= rex.max)
+      ) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.businessdescription:
+      rex = Regex.businessdescription;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (
+        !checkEmptyVal(value) &&
+        !(value?.length >= rex.min && value?.length <= rex.max)
+      ) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.businessnameonaccount:
+      rex = Regex.businessnameonaccount;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (
+        !checkEmptyVal(value) &&
+        !(value?.length >= rex.min && value?.length <= rex.max)
+      ) {
+        formErrors[name] = rex.invalid;
       }
       break;
   }

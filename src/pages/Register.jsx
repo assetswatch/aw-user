@@ -5,6 +5,7 @@ import {
   ApiUrls,
   AppDetails,
   AppMessages,
+  UserCookie,
   ValidationMessages,
 } from "../utils/constants";
 import { formCtrlTypes } from "../utils/formvalidation";
@@ -15,6 +16,8 @@ import {
   setSelectDefaultVal,
   checkObjNullorEmpty,
   checkEmptyVal,
+  getPagesPathByLoggedinUserProfile,
+  GetCookieValues,
 } from "../utils/common";
 import config from "../config.json";
 import { axiosPost, axiosGet } from "../helpers/axiosHelper";
@@ -353,7 +356,13 @@ const Register = () => {
   return (
     <>
       {isAuthenticated() == true ? (
-        <Navigate to={routeNames.dashboard.path} replace />
+        <Navigate
+          to={getPagesPathByLoggedinUserProfile(
+            GetCookieValues(UserCookie.ProfileTypeId),
+            "profile"
+          )}
+          replace
+        />
       ) : (
         <>
           {/*============== Page title Start ==============*/}

@@ -156,7 +156,10 @@ const Profiles = () => {
                           <div className="w-100 pt-10 pr-10 d-flex flex-end mt-0">
                             <Link
                               className="font-500 font-general text-primary"
-                              to={routeNames.dashboard.path}
+                              to={getPagesPathByLoggedinUserProfile(
+                                GetCookieValues(UserCookie.ProfileTypeId),
+                                "profile"
+                              )}
                             >
                               <u>
                                 Skip

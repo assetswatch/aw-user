@@ -1,5 +1,5 @@
 import config from "../../config.json";
-import { checkEmptyVal } from "../../utils/common";
+import { checkEmptyVal, checkObjNullorEmpty } from "../../utils/common";
 
 const GridActionMenu = ({ row, actions }) => {
   return (
@@ -17,6 +17,7 @@ const GridActionMenu = ({ row, actions }) => {
             // style={{ display: `${isOpen ? "block" : "none"}` }}
           >
             {actions.map((a, i) => {
+              if (a["isconditionalshow"]?.(row) == false) return "";
               return (
                 <li key={`gr-action-menu-li${i}`}>
                   <a
@@ -68,6 +69,10 @@ const GridActionMenu = ({ row, actions }) => {
                     ) : a["text"].toLowerCase().indexOf("send") != -1 ? (
                       <i
                         className={`fa fa-paper-plane pe-2 text-general ${a["icssclass"]}`}
+                      />
+                    ) : a["text"].toLowerCase().indexOf("pay") != -1 ? (
+                      <i
+                        className={`fa fa-credit-card pe-2 text-general ${a["icssclass"]}`}
                       />
                     ) : (
                       ""
@@ -163,6 +168,10 @@ export const GridDocActionMenu = ({ row, actions }) => {
                       <i
                         className={`fa fa-paper-plane pe-2 text-general ${a["icssclass"]}`}
                       />
+                    ) : a["text"].toLowerCase().indexOf("pay") != -1 ? (
+                      <i
+                        className={`fa fa-credit-card pe-2 text-general ${a["icssclass"]}`}
+                      />
                     ) : (
                       ""
                     )}
@@ -257,6 +266,10 @@ export const GridUserConnectionActionMenu = ({ row, actions }) => {
                       <i
                         className={`fa fa-paper-plane pe-2 text-general ${a["icssclass"]}`}
                       />
+                    ) : a["text"].toLowerCase().indexOf("pay") != -1 ? (
+                      <i
+                        className={`fa fa-credit-card pe-2 text-general ${a["icssclass"]}`}
+                      />
                     ) : (
                       ""
                     )}
@@ -338,6 +351,10 @@ export const GridPropertyActionMenu = ({ row, actions }) => {
                     ) : a["text"].toLowerCase().indexOf("download") != -1 ? (
                       <i
                         className={`fas fa-download pe-2 text-general ${a["icssclass"]}`}
+                      />
+                    ) : a["text"].toLowerCase().indexOf("pay") != -1 ? (
+                      <i
+                        className={`fa fa-credit-card pe-2 text-general ${a["icssclass"]}`}
                       />
                     ) : (
                       ""

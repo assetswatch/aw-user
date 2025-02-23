@@ -2,15 +2,19 @@ import { ValidationMessages } from "./constants";
 
 /*Validation constraints*/
 const length1 = 1;
+const length2 = 2;
 const length3 = 3;
 const length4 = 4;
 const length5 = 5;
 const length6 = 6;
 const length7 = 7;
+const length8 = 8;
+const length9 = 9;
 const length10 = 10;
 const length13 = 13;
 const length15 = 15;
 const length16 = 16;
+const length17 = 17;
 const length20 = 20;
 const length30 = 30;
 const length50 = 50;
@@ -53,10 +57,58 @@ const checkPriceValue = (value) => {
 /*Regex */
 export const Regex = {
   name: { max: length50, required: ValidationMessages.NameReq },
+  dbaname: {
+    min: length2,
+    max: length50,
+    pattern: RegexPattern.alphanumhyphendotspace,
+    required: ValidationMessages.DBANameReq,
+    invalid: ValidationMessages.DBANameInvalid,
+  },
+  legalname: {
+    min: length2,
+    max: length50,
+    pattern: RegexPattern.alphanumhyphendotspace,
+    required: ValidationMessages.LegalNameReq,
+    invalid: ValidationMessages.LegalNameInvalid,
+  },
+  businessdescription: {
+    min: length2,
+    max: length50,
+    required: ValidationMessages.BusinessDescriptionReq,
+  },
+  businessnameonaccount: {
+    min: length2,
+    max: length100,
+    required: ValidationMessages.BusinessNameOnAccountReq,
+  },
+  paymentsubaccountfname: {
+    min: length2,
+    max: length20,
+    required: ValidationMessages.FNameReq,
+  },
+  paymentsubaccountlname: {
+    min: length2,
+    max: length20,
+    required: ValidationMessages.LNameReq,
+  },
   fname: { max: length50, required: ValidationMessages.FNameReq },
   lname: {
     max: length50,
     required: ValidationMessages.LNameReq,
+  },
+  accountnum: {
+    min: length4,
+    max: length17,
+    pattern: RegexPattern.numonly,
+    required: ValidationMessages.AccountNumberReq,
+    invalid: ValidationMessages.AccountNumberInvalid,
+  },
+  routingnum: {
+    min: length9,
+    max: length9,
+    pattern: RegexPattern.numonly,
+    required: ValidationMessages.RoutingNumberReq,
+    invalid: ValidationMessages.RoutingNumberInvalid,
   },
   email: {
     max: length100,
@@ -127,6 +179,20 @@ export const Regex = {
     required: ValidationMessages.WebsiteReq,
     invalid: ValidationMessages.WebsiteInvalid,
   },
+  last4ssn: {
+    min: length4,
+    max: length4,
+    pattern: RegexPattern.numonly,
+    required: ValidationMessages.Last4SSNReq,
+    invalid: ValidationMessages.Last4SSNInvalid,
+  },
+  federaltaxid: {
+    min: length9,
+    max: length9,
+    pattern: RegexPattern.numonly,
+    required: ValidationMessages.FederalTaxIDReq,
+    invalid: ValidationMessages.FederalTaxIDInvalid,
+  },
   zip: {
     min: length5,
     max: length30,
@@ -194,6 +260,17 @@ export const Regex = {
     max: length50,
     required: ValidationMessages.PropertyTitleReq,
     invalid: ValidationMessages.PropertyTitleInvalid,
+  },
+  txtcity: {
+    min: length2,
+    max: length30,
+    required: ValidationMessages.CityReq,
+    invalid: ValidationMessages.CityInvalid,
+  },
+  address50: {
+    max: length500,
+    required: ValidationMessages.AddressReq,
+    invalid: ValidationMessages.AddressInvalid,
   },
   address: {
     max: length100,
@@ -332,6 +409,76 @@ export const formCtrlTypes = {
       max: length50,
     },
   },
+  dbaname: {
+    lbl: "DBA Name:",
+    input: {
+      type: "text",
+      min: length2,
+      max: length50,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!RegexPattern.alphanumhyphendotspace.test(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
+  },
+  legalname: {
+    lbl: "Legal Name:",
+    input: {
+      type: "text",
+      min: length2,
+      max: length50,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!RegexPattern.alphanumhyphendotspace.test(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
+  },
+  businessdescription: {
+    lbl: "Description:",
+    input: {
+      type: "text",
+      min: length2,
+      max: length50,
+    },
+  },
+  businessnameonaccount: {
+    lbl: "Business Name on Account:",
+    input: {
+      type: "text",
+      min: length2,
+      max: length100,
+    },
+  },
+  currentpwd: {
+    lbl: "Description:",
+    input: {
+      type: "text",
+      min: length2,
+      max: length50,
+    },
+  },
+  paymentsubaccountfname: {
+    lbl: "First Name:",
+    input: {
+      type: "text",
+      min: length2,
+      max: length20,
+    },
+  },
+  paymentsubaccountlname: {
+    lbl: "Last Name:",
+    input: {
+      type: "text",
+      min: length2,
+      max: length20,
+    },
+  },
   fname: {
     lbl: "First name:",
     input: {
@@ -344,6 +491,36 @@ export const formCtrlTypes = {
     input: {
       type: "text",
       max: length50,
+    },
+  },
+  accountnum: {
+    lbl: "Account Number:",
+    input: {
+      type: "text",
+      min: length4,
+      max: length17,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!RegexPattern.numonly.test(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
+  },
+  routingnum: {
+    lbl: "Routing Number:",
+    input: {
+      type: "text",
+      min: length9,
+      max: length9,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!RegexPattern.numonly.test(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
     },
   },
   email: {
@@ -452,6 +629,36 @@ export const formCtrlTypes = {
       max: length250,
     },
   },
+  last4ssn: {
+    lbl: "Last 4 SSN:",
+    input: {
+      type: "text",
+      min: length4,
+      max: length4,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!RegexPattern.numonly.test(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
+  },
+  federaltaxid: {
+    lbl: "Federal Tax ID:",
+    input: {
+      type: "text",
+      min: length9,
+      max: length9,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!RegexPattern.numonly.test(e.key)) {
+            e.preventDefault();
+          }
+        },
+      },
+    },
+  },
   zip: {
     lbl: "Zip code:",
     input: {
@@ -527,11 +734,22 @@ export const formCtrlTypes = {
   rentpaidto: {
     lbl: "Rent paid to:",
   },
+  accounttype: {
+    lbl: "Account Type:",
+  },
   state: {
     lbl: "State:",
   },
   city: {
     lbl: "City:",
+  },
+  txtcity: {
+    lbl: "City:",
+    input: {
+      type: "text",
+      min: length2,
+      max: length30,
+    },
   },
   contactfor: {
     lbl: "Contact for:",
@@ -594,6 +812,13 @@ export const formCtrlTypes = {
   },
   propertytitle: {
     lbl: "Property Title:",
+    input: {
+      type: "text",
+      max: length50,
+    },
+  },
+  address50: {
+    lbl: "Address:",
     input: {
       type: "text",
       max: length50,

@@ -104,21 +104,21 @@ const Checkout = () => {
             if (objResponse.Data.Status == 0) {
               setPaymentDetails(objResponse.Data);
             } else {
-              navigate(routeNames.tenantpayments.path);
+              //  navigate(routeNames.tenantpaymentsinvoices.path);
             }
           } else {
-            navigate(routeNames.tenantpayments.path);
+            //  navigate(routeNames.tenantpaymentsinvoices.path);
           }
         })
         .catch((err) => {
-          navigate(routeNames.tenantpayments.path);
+          //  navigate(routeNames.tenantpaymentsinvoices.path);
           console.error(
             `"API :: ${ApiUrls.getAssetPaymentDetails}, Error ::" ${err}`
           );
         })
         .finally(() => {});
     } else {
-      navigate(routeNames.tenantpayments.path);
+      // navigate(routeNames.tenantpaymentsinvoices.path);
     }
   };
 
@@ -328,7 +328,7 @@ const Checkout = () => {
               setStateSelected(null);
               setCitySelected(null);
               apiReqResLoader("btnpay", "Pay", API_ACTION_STATUS.COMPLETED);
-              navigate(routeNames.tenantpayments.path);
+              // navigate(routeNames.tenantpayments.path);
             });
         })
         .catch((err) => {
@@ -341,17 +341,12 @@ const Checkout = () => {
   };
 
   const onCancel = (e) => {
-    navigate(routeNames.tenantpayments.path);
+    // navigate(routeNames.tenantpayments.path);
   };
 
   return (
     <>
       {SetPageLoaderNavLinks()}
-      {parseInt(
-        getsessionStorageItem(SessionStorageKeys.TenantCheckoutPaymentId, 0)
-      ) == 0
-        ? navigate(routeNames.tenantpayments.path)
-        : ""}
       <div className="full-row bg-light">
         <div className="container">
           <div className="row">
