@@ -126,7 +126,7 @@ const AboutUs = () => {
         <div className="container">
           <div className="row">
             <div className="col">
-              <h1 className="main-title w-50 mx-auto mb-4 text-center w-sm-100 base-line down-line">
+              <h1 className="main-title w-50 mx-auto mb-4 text-center w-sm-100 base-line down-line pb-10">
                 Why US?
               </h1>
             </div>
@@ -176,7 +176,7 @@ const AboutUs = () => {
         <div className="container">
           <div className="row">
             <div className="col text-center">
-              <h1 className="main-title w-50 mx-auto mb-4 text-center w-sm-100 base-line down-line">
+              <h1 className="main-title w-50 mx-auto mb-4 text-center w-sm-100 base-line down-line pb-10">
                 Our Services
               </h1>
               Assetswatch offers a great marketplace so you can grow your

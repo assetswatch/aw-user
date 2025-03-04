@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   apiReqResLoader,
   checkEmptyVal,
-  checkObjNullorEmpty,
   convertImageToBase64,
   GetUserCookieValues,
   SetPageLoaderNavLinks,
@@ -27,7 +26,7 @@ import PdfViewer from "../../../components/common/PdfViewer";
 import DataLoader from "../../../components/common/DataLoader";
 import html2pdf from "html2pdf.js";
 
-const ViewInvoice = () => {
+const ViewReceipt = () => {
   let $ = window.$;
   const navigate = useNavigate();
 
@@ -218,36 +217,20 @@ const ViewInvoice = () => {
                     Received On : {recieverUserDetails[0]?.SentDateDisplay}
                   </span>
                 </div>
-                <div className="col-md-3 col-lg-3 col-xl-3 mb-15">
+                <div className="col-md-4 col-lg-4 col-xl-4 mb-15">
                   <span className="font-500 font-general">
                     Total Due : {invoiceDetails?.TotalAmountDisplay}
                   </span>
                 </div>
-                <div className="col-md-3 col-lg-3 col-xl-3 mb-15 text-md-center">
+                <div className="col-md-4 col-lg-4 col-xl-4 mb-15 text-md-center">
                   {" "}
                   <span className="font-500 font-general">
                     Date On : {invoiceDetails?.BillDateDisplay}
                   </span>
                 </div>
-                <div className="col-md-3 col-lg-3 col-xl-3 mb-15 text-md-center">
+                <div className="col-md-4 col-lg-4 col-xl-4 mb-15 text-md-end">
                   <span className="font-500 font-general">
                     Due On : {invoiceDetails?.DueDateDisplay}
-                  </span>
-                </div>
-                <div className="col-md-3 col-lg-3 col-xl-3 mb-15 text-md-end">
-                  <span
-                    className={`${
-                      !checkObjNullorEmpty(recieverUserDetails[0])
-                        ? recieverUserDetails[0]?.PaymentId > 0
-                          ? "text-success"
-                          : "text-danger"
-                        : ""
-                    } font-500 font-general`}
-                  >
-                    Payment Status :{" "}
-                    {!checkObjNullorEmpty(recieverUserDetails[0])
-                      ? recieverUserDetails[0]?.UserPaymentStatus
-                      : "--"}
                   </span>
                 </div>
               </div>
@@ -300,4 +283,4 @@ const ViewInvoice = () => {
   );
 };
 
-export default ViewInvoice;
+export default ViewReceipt;

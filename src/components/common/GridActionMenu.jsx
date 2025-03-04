@@ -13,7 +13,7 @@ const GridActionMenu = ({ row, actions }) => {
             <i className="fas fa-ellipsis-vertical"></i>
           </button>
           <ul
-            className="dropdown-menu gr-action-menu dropdown-menu-left  box-shadow"
+            className="dropdown-menu gr-action-menu dropdown-menu-left  box-shadow bg-white"
             // style={{ display: `${isOpen ? "block" : "none"}` }}
           >
             {actions.map((a, i) => {
@@ -120,7 +120,7 @@ export const GridDocActionMenu = ({ row, actions }) => {
             <i className="fas fa-ellipsis-vertical"></i>
           </button>
           <ul
-            className="dropdown-menu gr-action-menu dropdown-menu-left  box-shadow"
+            className="dropdown-menu gr-action-menu dropdown-menu-left  box-shadow bg-white"
             // style={{ display: `${isOpen ? "block" : "none"}` }}
           >
             {actions.map((a, i) => {
@@ -220,7 +220,7 @@ export const GridUserConnectionActionMenu = ({ row, actions }) => {
           >
             <i className="fas fa-ellipsis-vertical"></i>
           </button>
-          <ul className="dropdown-menu gr-action-menu dropdown-menu-left  box-shadow">
+          <ul className="dropdown-menu gr-action-menu dropdown-menu-left  box-shadow bg-white">
             {actions.map((a, i) => {
               return (
                 <li key={`gr-action-menu-li${i}`}>
@@ -305,7 +305,7 @@ export const GridPropertyActionMenu = ({ row, actions }) => {
           >
             <i className="fas fa-ellipsis-vertical"></i>
           </button>
-          <ul className="dropdown-menu gr-action-menu dropdown-menu-left  box-shadow">
+          <ul className="dropdown-menu gr-action-menu dropdown-menu-left  box-shadow bg-white">
             {actions.map((a, i) => {
               return (
                 <li key={`gr-action-menu-li${i}`}>

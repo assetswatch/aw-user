@@ -338,20 +338,24 @@ const Properties = () => {
                 <div className="d-flex align-items-center post-meta mt-2 py-3 px-3 border-top box-shadow">
                   <div className="agent">
                     <a
-                      href="#"
-                      className="d-flex text-general align-items-center"
+                      onClick={(e) => onAssetProfileDetails(e, row.original)}
+                      className="d-flex text-general align-items-center lh-18 font-general hovertxt-decnone"
                     >
                       <img
-                        className="rounded-circle me-2 shadow img-border-white"
+                        className="rounded-circle me-1 shadow img-border-white"
                         src={row.original.PicPath}
                         alt={row.original.FirstName}
                       />
                       <span className="font-general">
                         {row.original.FirstName} {row.original.LastName}
+                        <br />
+                        <span className="mt-1 small text-light">
+                          {row.original.ListedByProfileType}
+                        </span>
                       </span>
                     </a>
                   </div>
-                  <div className="post-date ms-auto font-general">
+                  <div className="post-date ms-auto font-small">
                     <span>
                       <i className="fa fa-clock text-primary me-1"></i>
                       {row.original.PostedDaysDiff}
@@ -387,8 +391,7 @@ const Properties = () => {
 
   const onPropertyDetails = (e, assetId) => {
     e.preventDefault();
-    addSessionStorageItem(SessionStorageKeys.AssetDetailsId, assetId);
-    navigate(routeNames.propertyDetails.path);
+    navigate(routeNames.property.path.replace(":id", assetId));
   };
 
   const onProperties = (e) => {
@@ -403,8 +406,16 @@ const Properties = () => {
 
   const onAgentDetails = (e, profileid) => {
     e.preventDefault();
-    addSessionStorageItem(SessionStorageKeys.AgentDetailsId, profileid);
-    navigate(routeNames.agentdetails.path);
+    navigate(routeNames.agent.path.replace(":id", profileid));
+  };
+
+  const onAssetProfileDetails = (e, p) => {
+    e.preventDefault();
+    if (p.ListedByProfileTypeId == config.userProfileTypes.Agent) {
+      navigate(routeNames.agent.path.replace(":id", p.ListedByProfileId));
+    } else if (p.ListedByProfileTypeId == config.userProfileTypes.Owner) {
+      navigate(routeNames.owner.path.replace(":id", p.ListedByProfileId));
+    }
   };
 
   return (
@@ -425,7 +436,7 @@ const Properties = () => {
                 <PropertySearch></PropertySearch>
                 {/*============== Recent Property Widget Start ==============*/}
                 <div className="widget property_carousel_widget box-shadow rounded pb-20">
-                  <h5 className="mb-30 down-line">Recent Properties</h5>
+                  <h5 className="mb-30 down-line pb-10">Recent Properties</h5>
                   <div
                     className="topprop-carusel owl-carousel nav-disable owl-loaded owl-drag"
                     ref={topAssetsRef}
@@ -536,7 +547,7 @@ const Properties = () => {
                 {/*============== Recent Property Widget End ==============*/}
                 {/*============== Agents Widget Start ==============*/}
                 <div className="widget widget_recent_property box-shadow rounded pb-20">
-                  <h5 className="text-secondary mb-4 down-line">
+                  <h5 className="text-secondary mb-4 down-line pb-10">
                     Listed Agents
                   </h5>
                   <ul>

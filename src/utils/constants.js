@@ -22,6 +22,48 @@ export const AppDetails = {
   devicetypeid: 3, //web
 };
 
+/*pdf Settings*/
+export const html2PdfSettings = {
+  margin: [5, 10, 30, 10],
+  html2canvas: {
+    backgroundColor: null,
+    scale: 4,
+    dpi: 300,
+    allowTaint: true,
+    useCORS: true,
+    logging: false,
+  },
+  jsPDF: {
+    unit: "mm",
+    format: "a4",
+    orientation: "portrait",
+    compress: true,
+    debug: false,
+  },
+  pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+};
+
+export const pdfHFWMSettings = {
+  wmWidth: 100,
+  wmHeight: 100,
+  wmOpacity: { opacity: 0.4 },
+  wmyOffSet: 10,
+  fLineColor: "#71b862",
+  fLinex1OffSet: 8,
+  fLiney1OffSet: 20,
+  fTextyOffSet: 15,
+  fFontSize: 9,
+  fFontFamily: ["helvetica", "italic"],
+  fFontColor: "#bdbdbd",
+  fCenter: { align: "center" },
+  fRight: { align: "right" },
+  fPixOffSet: 15,
+  fPiyOffSet: 8,
+  scaleFactor: 2,
+  pageHalf: 2,
+};
+/*pdf Settings*/
+
 /*Local storage keys*/
 export const LSApiTokenKey = "apitoken";
 export const LSDeviceIdKey = "deviceid";
@@ -33,8 +75,6 @@ export const LSExpiryKey = "expires";
 export const SessionStorageKeys = {
   EditAssetId: "eassetid",
   ViewAssetId: "vassetid",
-  AssetDetailsId: "assetid",
-  AgentDetailsId: "agid",
   ObjAssetfilters: "oasf",
   OwnerTenantConnectionTab: "otcontab",
   TenantCheckoutPaymentId: "tcpmid",
@@ -451,6 +491,8 @@ export let ApiUrls = {
   getInvoices: `payments/v1/GetInvoices`,
   getInvoiceDetails: `payments/v1/GetInvoiceDetails`,
   getInvoicePdf: `payments/v1/GetInvoicePdf`,
+  getInvoicePdfDetails: `payments/v1/GetInvoicePdfDetails`,
+  getReceiptPdfDetails: `payments/v1/GetReceiptPdfDetails`,
   sendInvoice: `payments/v1/SendInvoice`,
   unsendInvoice: `payments/v1/UnsendInvoice`,
   getSentInvoices: `payments/v1/GetSentInvoices`,

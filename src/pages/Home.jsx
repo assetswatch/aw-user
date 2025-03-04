@@ -2,13 +2,12 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { loadFile, unloadFile, getArrLoadFiles } from "../utils/loadFiles";
 import { routeNames } from "../routes/routes";
 import { Link, useNavigate } from "react-router-dom";
-import { checkEmptyVal, SetPageLoaderNavLinks } from "../utils/common";
+import { SetPageLoaderNavLinks } from "../utils/common";
 import { useGetTopAssetsGateWay } from "../hooks/useGetTopAssetsGateWay";
 import { useGetTopAgentsGateWay } from "../hooks/useGetTopAgentsGateWay";
 import Rating from "../components/common/Rating";
 import LazyImage from "../components/common/LazyImage";
-import { SessionStorageKeys } from "../utils/constants";
-import { addSessionStorageItem } from "../helpers/sessionStorageHelper";
+import config from "../config.json";
 import PropertySearch from "../components/layouts/PropertySearch";
 
 const Home = () => {
@@ -187,14 +186,21 @@ const Home = () => {
 
   const onPropertyDetails = (e, assetId) => {
     e.preventDefault();
-    addSessionStorageItem(SessionStorageKeys.AssetDetailsId, assetId);
-    navigate(routeNames.propertyDetails.path);
+    navigate(routeNames.property.path.replace(":id", assetId));
   };
 
   const onAgentDetails = (e, profileid) => {
     e.preventDefault();
-    addSessionStorageItem(SessionStorageKeys.AgentDetailsId, profileid);
-    navigate(routeNames.agentdetails.path);
+    navigate(routeNames.agent.path.replace(":id", profileid));
+  };
+
+  const onAssetProfileDetails = (e, p) => {
+    e.preventDefault();
+    if (p.ListedByProfileTypeId == config.userProfileTypes.Agent) {
+      navigate(routeNames.agent.path.replace(":id", p.ListedByProfileId));
+    } else if (p.ListedByProfileTypeId == config.userProfileTypes.Owner) {
+      navigate(routeNames.owner.path.replace(":id", p.ListedByProfileId));
+    }
   };
 
   return (
@@ -265,7 +271,9 @@ const Home = () => {
           <div className="row mb-4 align-items-center">
             <div className="col-md-8">
               <div className="me-auto">
-                <h2 className="d-table mb-4 down-line">Recent Properties</h2>
+                <h3 className="d-table mb-4 down-line pb-10">
+                  Recent Properties
+                </h3>
                 <span className="d-table sub-title text-primary">
                   Be the First to See Our Latest Properties!
                 </span>
@@ -389,20 +397,24 @@ const Home = () => {
                             <div className="d-flex align-items-center post-meta mt-2 py-3 px-3 border-top shadow">
                               <div className="agent">
                                 <a
-                                  href="#"
-                                  className="d-flex text-general align-items-center"
+                                  onClick={(e) => onAssetProfileDetails(e, a)}
+                                  className="d-flex text-general align-items-center lh-18 font-general hovertxt-decnone"
                                 >
                                   <img
-                                    className="rounded-circle me-2 shadow img-border-white"
+                                    className="rounded-circle me-1 shadow img-border-white"
                                     src={a.PicPath}
                                     alt={a.FirstName}
                                   />
                                   <span className="font-general">
                                     {a.FirstName} {a.LastName}
+                                    <br />
+                                    <span className="mt-1 small text-light">
+                                      {a.ListedByProfileType}
+                                    </span>
                                   </span>
                                 </a>
                               </div>
-                              <div className="post-date ms-auto font-general">
+                              <div className="post-date ms-auto font-small">
                                 <span>
                                   <i className="fa fa-clock text-primary me-1"></i>
                                   {a.PostedDaysDiff}
@@ -540,7 +552,7 @@ const Home = () => {
           <div className="row mb-4 align-items-center">
             <div className="col-md-8">
               <div className="me-auto">
-                <h2 className="d-table mb-4 down-line">
+                <h2 className="d-table mb-4 down-line pb-10">
                   Our Listed Property Agents
                 </h2>
                 <span className="d-table sub-title text-primary">
@@ -737,7 +749,7 @@ const Home = () => {
               <span className="text-primary tagline pb-2 d-table m-auto">
                 Testimonials
               </span>
-              <h2 className="down-line w-50 mx-auto mb-4 text-center w-sm-100">
+              <h2 className="down-line pb-10 w-50 mx-auto mb-4 text-center w-sm-100">
                 What Client Says About Us
               </h2>
             </div>

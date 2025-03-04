@@ -1,53 +1,32 @@
 import React, { useEffect, useRef, useState } from "react";
-import { loadFile, unloadFile, getArrLoadFiles } from "../utils/loadFiles";
-
 import PageTitle from "../components/layouts/PageTitle";
 import { routeNames } from "../routes/routes";
-import {
-  apiReqResLoader,
-  checkEmptyVal,
-  checkObjNullorEmpty,
-} from "../utils/common";
-import {
-  API_ACTION_STATUS,
-  ApiUrls,
-  AppMessages,
-  SessionStorageKeys,
-} from "../utils/constants";
+import { checkEmptyVal, checkObjNullorEmpty, isInt } from "../utils/common";
+import { ApiUrls } from "../utils/constants";
 import config from "../config.json";
 import { axiosPost } from "../helpers/axiosHelper";
 import { useGetTopAssetsGateWay } from "../hooks/useGetTopAssetsGateWay";
-import { Link, useNavigate } from "react-router-dom";
-import {
-  DataLoader,
-  LazyImage,
-  NoData,
-} from "../components/common/LazyComponents";
-import {
-  addSessionStorageItem,
-  getsessionStorageItem,
-} from "../helpers/sessionStorageHelper";
-import PropertySearch from "../components/layouts/PropertySearch";
-import { deleteLocalStorageItem } from "../helpers/localStorageHelper";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { LazyImage } from "../components/common/LazyComponents";
 import Rating from "../components/common/Rating";
 import { useGetTopAgentsGateWay } from "../hooks/useGetTopAgentsGateWay";
 
-const AgentDetails = () => {
+const Owner = () => {
   let $ = window.$;
 
   const navigate = useNavigate();
   const [rerouteKey, setRerouteKey] = useState(0);
 
-  let agentId = parseInt(
-    getsessionStorageItem(SessionStorageKeys.AgentDetailsId, 0)
-  );
+  const { id } = useParams();
+
+  let ownerId = parseInt(isInt(Number(id)) ? id : 0);
 
   const { topAssetsList } = useGetTopAssetsGateWay("recent", 5);
   const topAssetsRef = useRef(null);
 
   const { topAgentsList } = useGetTopAgentsGateWay("rating", 4);
 
-  const [agentDetails, setAgentDetails] = useState(null);
+  const [ownerDetails, setOwnerDetails] = useState(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
 
   useEffect(() => {
@@ -63,7 +42,11 @@ const AgentDetails = () => {
   }, [topAssetsList, rerouteKey]);
 
   useEffect(() => {
-    getAgentDetails();
+    if (ownerId == 0) {
+      navigate(routeNames.home.path);
+    } else {
+      getOwnerDetails();
+    }
   }, [rerouteKey]);
 
   //set carousel
@@ -97,19 +80,23 @@ const AgentDetails = () => {
     } catch {}
   }
 
-  //Get agent details
-  const getAgentDetails = () => {
+  //Get owner details
+  const getOwnerDetails = () => {
     setIsDataLoading(true);
     let isapimethoderr = false;
     let objParams = {
-      ProfileId: agentId,
+      ProfileId: ownerId,
     };
 
     axiosPost(`${config.apiBaseUrl}${ApiUrls.getUserDetails}`, objParams)
       .then((response) => {
         let objResponse = response.data;
         if (objResponse.StatusCode === 200) {
-          setAgentDetails(objResponse.Data);
+          if (checkObjNullorEmpty(objResponse.Data)) {
+            navigate(routeNames.home.path);
+          } else {
+            setOwnerDetails(objResponse.Data);
+          }
         } else {
           isapimethoderr = true;
         }
@@ -120,43 +107,32 @@ const AgentDetails = () => {
       })
       .finally(() => {
         if (isapimethoderr === true) {
-          setAgentDetails(null);
+          setOwnerDetails(null);
+          navigate(routeNames.home.path);
         }
         setIsDataLoading(false);
       });
   };
 
-  const onAgentDetails = (e, profileId) => {
+  const onownerDetails = (e, profileId) => {
     e.preventDefault();
     setRerouteKey(rerouteKey + 1);
-    addSessionStorageItem(SessionStorageKeys.AgentDetailsId, profileId);
-    navigate(routeNames.agentdetails.path, {
-      state: { timestamp: Date.now() },
-      replace: true,
-    });
+    navigate(routeNames.agent.path.replace(":id", profileId));
     window.scrollTo(0, 0);
   };
 
   const onPropertyDetails = (e, assetId) => {
     e.preventDefault();
     setRerouteKey(rerouteKey + 1);
-    addSessionStorageItem(SessionStorageKeys.AssetDetailsId, assetId);
-    navigate(routeNames.propertyDetails.path);
+    navigate(routeNames.property.path.replace(":id", assetId));
   };
 
   return (
     <div key={rerouteKey}>
-      {parseInt(getsessionStorageItem(SessionStorageKeys.AgentDetailsId, 0)) ==
-      0
-        ? navigate(routeNames.agents.path)
-        : ""}
       {/*============== Page title Start ==============*/}
       <PageTitle
-        title="Agent Details"
-        navLinks={[
-          { title: "Home", url: routeNames.home.path },
-          { title: "Agents", url: routeNames.agents.path },
-        ]}
+        title="Owner Details"
+        navLinks={[{ title: "Home", url: routeNames.home.path }]}
       ></PageTitle>
       {/*============== Page title End ==============*/}
 
@@ -170,9 +146,9 @@ const AgentDetails = () => {
                   <div className="entry-thumbnail-wrapper transation hover-img-zoom p-20 shadow rounded border bg-primary div-agdetails-img">
                     <LazyImage
                       className="rounded-circle mr-10 shadow img-border-white"
-                      src={agentDetails?.PicPath}
+                      src={ownerDetails?.PicPath}
                       alt={
-                        agentDetails?.FirstName + " " + agentDetails?.LastName
+                        ownerDetails?.FirstName + " " + ownerDetails?.LastName
                       }
                       placeHolderClass="pos-absolute w-150px min-h-150 fl-l"
                     ></LazyImage>
@@ -182,58 +158,61 @@ const AgentDetails = () => {
                     <div className="entry-header d-flex flex-sb pb-2">
                       <div className="me-auto">
                         <h6 className="agent-name  text-primary mb-0">
-                          {agentDetails?.FirstName} {agentDetails?.LastName}
+                          {ownerDetails?.FirstName} {ownerDetails?.LastName}
                         </h6>
                         <span className="text-primary font-fifteen">
-                          {agentDetails?.CompanyName}
+                          {ownerDetails?.CompanyName}
                         </span>
                       </div>
                       <div className="entry-meta text-right">
                         {/* <span title="Feedback Score">
-                            {agentDetails?.Rating} / 5
+                            {ownerDetails?.Rating} / 5
                           </span> */}
                         <div className="text-primary rating-icon mr-0">
-                          <Rating ratingVal={agentDetails?.Rating}></Rating>
+                          <Rating ratingVal={ownerDetails?.Rating}></Rating>
                         </div>
                         <div className="text-primary font-fifteen">
-                          From {agentDetails?.ModifiedDateDisplay}
+                          From {ownerDetails?.ModifiedDateDisplay}
                         </div>
                       </div>
                     </div>
                     <div className="enrey-content pb-10 pt-10">
-                      {/* <p>{agentDetails?.AboutUs}</p> */}
+                      {/* <p>{ownerDetails?.AboutUs}</p> */}
                       <ul className="row pb-20">
                         <li className="col-xl-4 col-md-6">
                           <span className="font-500">Mobile: </span>
                           {"  "}
-                          {agentDetails?.MobileNo}
+                          {ownerDetails?.MobileNo}
                         </li>
                         <li className="col-xl-4 col-md-6 text-lg-end text-xl-center">
-                          <span className="font-500">Landline: </span>
-                          {"  "}
-                          {checkEmptyVal(agentDetails?.LandlineNo)
-                            ? "--"
-                            : agentDetails?.LandlineNo}
+                          {checkEmptyVal(ownerDetails?.LandLineNo) ? (
+                            ""
+                          ) : (
+                            <>
+                              <span className="font-500">Office: </span>
+                              {ownerDetails?.LandLineNo}
+                            </>
+                          )}
                         </li>
                         <li className="col-xl-4 col-md-6 text-xl-end">
                           <span className="font-500">Email: </span>
                           {"  "}
-                          {agentDetails?.Email}
+                          {ownerDetails?.Email}
                         </li>
                       </ul>
                       <ul className="row">
                         <li className="col-xl-7 col-md-12">
                           <span className="font-500">Address: </span>
                           {"  "}
-                          {agentDetails?.AddressOne}, {agentDetails?.City},{" "}
-                          {agentDetails?.State}, {agentDetails?.Country}.
+                          {ownerDetails?.AddressOne}, {ownerDetails?.City},{" "}
+                          {ownerDetails?.State}, {ownerDetails?.Country}.
                         </li>
                         <li className="col-xl-5 col-md-12 text-xl-end">
                           <span className="font-500">Website: </span>
                           {"  "}
-                          {checkEmptyVal(agentDetails?.Website)
+                          {checkEmptyVal(ownerDetails?.Website)
                             ? "--"
-                            : agentDetails?.Website}
+                            : ownerDetails?.Website}
                         </li>
                       </ul>
                     </div>
@@ -248,7 +227,7 @@ const AgentDetails = () => {
               <div className="widget widget_send_message mb-30 box-shadow rounded">
                 <h6 className="mb-4 text-primary">
                   {!isDataLoading &&
-                    agentDetails?.FirstName + " " + agentDetails.LastName}
+                    ownerDetails?.FirstName + " " + ownerDetails.LastName}
                 </h6>
                 <form
                   className="quick-search form-icon-right"
@@ -399,7 +378,9 @@ const AgentDetails = () => {
               {/*============== Recent Property Widget End ==============*/}
               {/*============== Agents Widget Start ==============*/}
               <div className="widget widget_recent_property box-shadow rounded pb-20">
-                <h5 className="text-secondary mb-4 down-line">Listed Agents</h5>
+                <h5 className="text-secondary mb-4 down-line pb-10">
+                  Listed Agents
+                </h5>
                 <ul>
                   {topAgentsList?.length > 0 && (
                     <>
@@ -414,13 +395,13 @@ const AgentDetails = () => {
                               alt={a.FirstName}
                               className="img-fit-grid cur-pointer rounded-circle shadow img-border-white"
                               placeHolderClass="min-h-80 w-80px"
-                              onClick={(e) => onAgentDetails(e, a.ProfileId)}
+                              onClick={(e) => onownerDetails(e, a.ProfileId)}
                             />
                             <div className="thumb-body">
                               <h5 className="listing-title">
                                 <a
                                   onClick={(e) =>
-                                    onAgentDetails(e, a.ProfileId)
+                                    onownerDetails(e, a.ProfileId)
                                   }
                                   className="text-primary font-16 font-500"
                                 >
@@ -455,10 +436,10 @@ const AgentDetails = () => {
             </div>
             <div className="col-xl-8 order-xl-1">
               <div className="entry-wrapper">
-                {/* Agent Overview */}
+                {/* Owner Overview */}
                 <div className="agent-overview p-30 bg-white mb-50 border px-0 box-shadow rounded">
-                  <h6 className="mb-4 text-primary">Agent Overview</h6>
-                  <p> {!isDataLoading && agentDetails?.AboutUs}</p>
+                  <h6 className="mb-4 text-primary">Overview</h6>
+                  <p> {!isDataLoading && ownerDetails?.AboutUs}</p>
                 </div>
               </div>
             </div>
@@ -470,4 +451,4 @@ const AgentDetails = () => {
   );
 };
 
-export default AgentDetails;
+export default Owner;
