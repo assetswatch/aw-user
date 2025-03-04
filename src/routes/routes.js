@@ -14,9 +14,10 @@ export const routeNames = {
   register: { name: "Register", path: "/Register" },
   forgotPwd: { name: "ForgotPwd", path: "/ForgotPassword" },
   properties: { name: "Properties", path: "/Properties" },
-  propertyDetails: { name: "PropertyDetails", path: "/PropertyDetails" },
+  property: { name: "Property", path: "/Property/:id" },
   agents: { name: "Agents", path: "/Agents" },
-  agentdetails: { name: "AgentDetails", path: "/AgentDetails" },
+  agent: { name: "Agent", path: "/Agent/:id" },
+  owner: { name: "Agent", path: "/Owner/:id" },
   dashboard: { name: "Dashboard", path: "/User/Dashboard" },
   createprofile: {
     name: "CreateProfile",
@@ -318,9 +319,9 @@ const routes = [
     isexact: true,
   },
   {
-    path: routeNames.propertyDetails.path,
-    name: routeNames.propertyDetails.name,
-    element: lazy(() => import("../pages/PropertyDetails")),
+    path: routeNames.property.path,
+    name: routeNames.property.name,
+    element: lazy(() => import("../pages/Property")),
     isexact: true,
   },
   {
@@ -330,9 +331,15 @@ const routes = [
     isexact: true,
   },
   {
-    path: routeNames.agentdetails.path,
-    name: routeNames.agentdetails.name,
-    element: lazy(() => import("../pages/AgentDetails")),
+    path: routeNames.agent.path,
+    name: routeNames.agent.name,
+    element: lazy(() => import("../pages/Agent")),
+    isexact: true,
+  },
+  {
+    path: routeNames.owner.path,
+    name: routeNames.owner.name,
+    element: lazy(() => import("../pages/Owner")),
     isexact: true,
   },
   {

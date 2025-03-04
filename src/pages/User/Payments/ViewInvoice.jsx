@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   apiReqResLoader,
   checkEmptyVal,
   checkObjNullorEmpty,
+  convertImageToBase64,
   GetUserCookieValues,
   replacePlaceHolders,
   SetPageLoaderNavLinks,
@@ -14,9 +15,11 @@ import {
   AppMessages,
   API_ACTION_STATUS,
   ValidationMessages,
+  html2PdfSettings,
+  pdfHFWMSettings,
 } from "../../../utils/constants";
 import { useAuth } from "../../../contexts/AuthContext";
-import { axiosPost, fetchPost } from "../../../helpers/axiosHelper";
+import { axiosPost } from "../../../helpers/axiosHelper";
 import config from "../../../config.json";
 import { Toast } from "../../../components/common/ToastView";
 import { getsessionStorageItem } from "../../../helpers/sessionStorageHelper";
@@ -26,7 +29,7 @@ import PdfViewer from "../../../components/common/PdfViewer";
 import DataLoader from "../../../components/common/DataLoader";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 import { formCtrlTypes } from "../../../utils/formvalidation";
-import TextAreaControl from "../../../components/common/TextAreaControl";
+import html2pdf from "html2pdf.js";
 import InputControl from "../../../components/common/InputControl";
 import {
   Grid,
@@ -86,6 +89,7 @@ const ViewInvoice = () => {
 
   //PdfViewer
   const [fileUrl, setFileUrl] = useState(null);
+  const [pdfBlob, setPdfBlob] = useState(null);
 
   useEffect(() => {
     getInvoiceDetails();
@@ -144,6 +148,81 @@ const ViewInvoice = () => {
       });
   };
 
+  const generatePDF = async (pdfDetails, invoiceDetails) => {
+    const watermarkImage = pdfDetails.BrandingDetails.WatermarkUrl;
+    const base64Watermark = await convertImageToBase64(watermarkImage);
+
+    const pdf = await html2pdf()
+      .from(pdfDetails.PdfHtml)
+      .set(
+        { ...html2PdfSettings },
+        {
+          filename: `${invoiceDetails?.InvoiceNumner}.pdf`,
+        }
+      )
+      .toPdf()
+      .get("pdf")
+      .then((pdf) => {
+        const totalPages = pdf.internal.getNumberOfPages();
+        const pageHeight = pdf.internal.pageSize.height;
+        const pageWidth = pdf.internal.pageSize.width;
+
+        for (let i = 1; i <= totalPages; i++) {
+          pdf.setPage(i);
+
+          pdf.setDrawColor(pdfHFWMSettings.fLineColor);
+          pdf.line(
+            pdfHFWMSettings.fLinex1OffSet,
+            pageHeight - pdfHFWMSettings.fLiney1OffSet,
+            pageWidth - pdfHFWMSettings.fLinex1OffSet,
+            pageHeight - pdfHFWMSettings.fLiney1OffSet
+          );
+
+          pdf.setFontSize(pdfHFWMSettings.fFontSize);
+          pdf.setFont(...pdfHFWMSettings.fFontFamily);
+          pdf.setTextColor(pdfHFWMSettings.fFontColor);
+          pdf.text(
+            pdfDetails?.BrandingDetails?.Footer,
+            pageWidth / pdfHFWMSettings.pageHalf,
+            pageHeight - pdfHFWMSettings.fTextyOffSet,
+            pdfHFWMSettings.fCenter
+          );
+
+          pdf.text(
+            `Page ${i} of ${totalPages}`,
+            pageWidth - pdfHFWMSettings.fPixOffSet,
+            pageHeight - pdfHFWMSettings.fPiyOffSet,
+            pdfHFWMSettings.fRight
+          );
+
+          pdf.setGState(new pdf.GState(pdfHFWMSettings.wmOpacity));
+          pdf.addImage(
+            base64Watermark,
+            "PNG",
+            (pageWidth - pdfHFWMSettings.wmWidth) / pdfHFWMSettings.pageHalf,
+            (pageHeight -
+              (pdfHFWMSettings.wmHeight - pdfHFWMSettings.wmyOffSet)) /
+              pdfHFWMSettings.pageHalf,
+            pdfHFWMSettings.wmWidth,
+            pdfHFWMSettings.wmHeight,
+            "",
+            "FAST"
+          );
+          pdf.setGState(new pdf.GState({ opacity: 1 }));
+        }
+
+        pdf.internal.scaleFactor = pdfHFWMSettings.scaleFactor;
+      })
+      .outputPdf("blob")
+      .then((pdf) => {
+        setPdfBlob(pdf);
+        const pdfBlobUrl = URL.createObjectURL(pdf);
+        setFileUrl(pdfBlobUrl);
+
+        // pdf.save("StyledPDF.pdf");
+      });
+  };
+
   const getInvoiceDetails = async () => {
     if (inoviceId > 0) {
       let isapimethoderr = false;
@@ -155,19 +234,16 @@ const ViewInvoice = () => {
           let objResponse = response.data;
           if (objResponse.StatusCode === 200) {
             setInvoiceDetails(objResponse.Data);
-            const fresponse = await fetchPost(
-              `${config.apiBaseUrl}${ApiUrls.getInvoicePdf}`,
-              {
-                InvoiceId: inoviceId,
+            axiosPost(`${config.apiBaseUrl}${ApiUrls.getInvoicePdfDetails}`, {
+              InvoiceId: inoviceId,
+            }).then(async (presponse) => {
+              let objPResponse = presponse.data;
+              if (objPResponse.StatusCode === 200) {
+                generatePDF(objPResponse.Data, objResponse.Data);
+              } else {
+                isapimethoderr = true;
               }
-            );
-            if (fresponse.ok) {
-              const blob = await fresponse.blob();
-              const url = URL.createObjectURL(blob);
-              setFileUrl(url);
-            } else {
-              isapimethoderr = true;
-            }
+            });
           } else {
             isapimethoderr = true;
           }
@@ -208,7 +284,7 @@ const ViewInvoice = () => {
     );
   };
 
-  const onSendInvoice = (e) => {
+  const onSendInvoice = async (e) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -236,6 +312,13 @@ const ViewInvoice = () => {
       }
       objBodyParams.append("InvoiceId", inoviceId);
       objBodyParams.append("Comments", sendInvoiceFormData.txtcomments);
+
+      const arrayBuffer = await pdfBlob.arrayBuffer();
+      objBodyParams.append(
+        "PdfBytes",
+        new Blob([arrayBuffer], { type: "application/pdf" }),
+        `${invoiceDetails?.InvoiceNumber}.pdf`
+      );
 
       axiosPost(`${config.apiBaseUrl}${ApiUrls.sendInvoice}`, objBodyParams, {
         "Content-Type": "multipart/form-data",
@@ -406,21 +489,52 @@ const ViewInvoice = () => {
           <div className="row mx-auto col-md-12 col-lg-10 shadow">
             <div className="bg-white xs-p-20 p-30 pb-30 border rounded">
               <div className="row">
-                <div className="col-md-4 col-lg-4 col-xl-4 mb-15">
+                <div
+                  className={`${
+                    invoiceDetails?.PaymentStatus == 0
+                      ? "col-md-4 col-lg-4 col-xl-4 mb-15"
+                      : "col-md-3 col-lg-3 col-xl-3 mb-15"
+                  }`}
+                >
                   <h6 className="mb-2 down-line pb-10">
                     Invoice#: {invoiceDetails?.InvoiceNumber}
                   </h6>
                 </div>
-                <div className="col-md-4 col-lg-4 col-xl-4 mb-15 text-md-center">
+                <div
+                  className={`${
+                    invoiceDetails?.PaymentStatus == 0
+                      ? "col-md-4 col-lg-4 col-xl-4 mb-15 text-md-center"
+                      : "col-md-3 col-lg-3 col-xl-3 mb-15 text-md-center"
+                  }`}
+                >
                   <span className="font-500 font-general">
                     Date On : {invoiceDetails?.BillDateDisplay}
                   </span>
                 </div>
-                <div className="col-md-4 col-lg-4 col-xl-4 mb-15 text-md-end">
+                <div
+                  className={`${
+                    invoiceDetails?.PaymentStatus == 0
+                      ? "col-md-4 col-lg-4 col-xl-4 mb-15 text-md-end"
+                      : "col-md-3 col-lg-3 col-xl-3 mb-15 text-md-center"
+                  }`}
+                >
                   <span className="font-500 font-general">
                     Due On : {invoiceDetails?.DueDateDisplay}
                   </span>
                 </div>
+                {invoiceDetails?.PaymentStatus > 0 && (
+                  <div className="col-md-3 col-lg-3 col-xl-3 mb-15 text-md-end">
+                    <span
+                      className={`${
+                        invoiceDetails?.PaymentStatus == 1
+                          ? "text-success"
+                          : "text-danger"
+                      } font-500 font-general`}
+                    >
+                      Payment Status : {invoiceDetails?.PaymentStatusDisplay}
+                    </span>
+                  </div>
+                )}
               </div>
               <div className="container-fluid">
                 <div className="row">
@@ -430,7 +544,7 @@ const ViewInvoice = () => {
                         <PdfViewer
                           file={fileUrl}
                           cssclass="mt-10"
-                          pageWidth={config.pdfViewerWidth.Actual}
+                          pageWidth={config.pdfViewerWidth.PageWidth}
                         ></PdfViewer>
                       </div>
                     ) : (
@@ -529,6 +643,16 @@ const ViewInvoice = () => {
                   </div>
                 </div>
               </form>
+
+              {/*============== Pdf Content ==============*/}
+              {/* <div
+                id="pdf-content"
+                ref={contentRef}
+                className="d-none"
+                style={{ background: "#fff" }}
+                dangerouslySetInnerHTML={{ __html: htmlContent }}
+              ></div> */}
+              {/*============== Pdf Content ==============*/}
 
               {/*============== Sent Invoice users grid ==============*/}
               {invoiceDetails?.SentProfiles?.length > 0 && (

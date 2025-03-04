@@ -23,7 +23,7 @@ const HowItWorks = () => {
         <div className="container">
           <div className="row">
             <div className="col-lg-12 mb-5">
-              <h3 className="mb-4 text-center w-50 w-sm-100 mx-auto down-line">
+              <h3 className="mb-4 text-center w-50 w-sm-100 mx-auto down-line pb-10">
                 Our Motivation
               </h3>
               <span className="text-secondary w-75 d-table text-center w-sm-100 mx-auto pb-4">
@@ -41,7 +41,7 @@ const HowItWorks = () => {
           </div>
           <div className="row">
             <div className="col-lg-12 mb-5">
-              <h3 className="mb-4 text-center w-50 w-sm-100 mx-auto down-line">
+              <h3 className="mb-4 text-center w-50 w-sm-100 mx-auto down-line pb-10">
                 Quick Overview of AssetsWatch
               </h3>
               <span className="text-secondary w-75 d-table text-center w-sm-100 mx-auto pb-4">

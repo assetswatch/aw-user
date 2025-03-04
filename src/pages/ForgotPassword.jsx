@@ -41,7 +41,7 @@ const ForgotPassword = () => {
                 <div className="col-xl-5 col-lg-6 mx-auto">
                   <div className="bg-white xs-p-20 p-30 border rounded shadow">
                     <div className="form-icon-left rounded form-boder">
-                      <h4 className="mb-4 down-line">Forgot Password</h4>
+                      <h4 className="mb-4 down-line pb-10">Forgot Password</h4>
                       <form action="#" method="post">
                         <div className="row row-cols-1 g-3">
                           <div className="col">

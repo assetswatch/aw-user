@@ -1,49 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { loadFile, unloadFile, getArrLoadFiles } from "../utils/loadFiles";
-
 import PageTitle from "../components/layouts/PageTitle";
 import { routeNames } from "../routes/routes";
-import {
-  apiReqResLoader,
-  checkEmptyVal,
-  checkObjNullorEmpty,
-} from "../utils/common";
-import {
-  API_ACTION_STATUS,
-  ApiUrls,
-  AppMessages,
-  SessionStorageKeys,
-} from "../utils/constants";
+import { checkEmptyVal, checkObjNullorEmpty, isInt } from "../utils/common";
+import { ApiUrls, AppMessages } from "../utils/constants";
 import config from "../config.json";
 import { axiosPost } from "../helpers/axiosHelper";
 import { useGetTopAssetsGateWay } from "../hooks/useGetTopAssetsGateWay";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   DataLoader,
   LazyImage,
   NoData,
 } from "../components/common/LazyComponents";
-import {
-  addSessionStorageItem,
-  getsessionStorageItem,
-} from "../helpers/sessionStorageHelper";
 import PropertySearch from "../components/layouts/PropertySearch";
-import { deleteLocalStorageItem } from "../helpers/localStorageHelper";
 
-const PropertyDetails = () => {
+const Property = () => {
   let $ = window.$;
 
   const navigate = useNavigate();
   const [rerouteKey, setRerouteKey] = useState(0);
 
-  let assetDetailId = parseInt(
-    getsessionStorageItem(SessionStorageKeys.AssetDetailsId, 0)
-  );
+  const { id } = useParams();
+
+  let assetDetailId = parseInt(isInt(Number(id)) ? id : 0);
 
   //list of js/css dependencies.
   let arrJsCssFiles = [
     {
-      dir: "./assets/js/",
+      dir: "/assets/js/",
       pos: "body",
       type: "js",
       files: ["layerslider.js", "owl.js"],
@@ -51,13 +36,16 @@ const PropertyDetails = () => {
   ];
 
   useEffect(() => {
-    //load js/css depedency files.
-    let arrLoadFiles = getArrLoadFiles(arrJsCssFiles);
-    let promiseLoadFiles = arrLoadFiles.map(loadFile);
-    Promise.allSettled(promiseLoadFiles).then(function (responses) {});
+    if (assetDetailId == 0) {
+      navigate(routeNames.properties.path);
+    } else {
+      //load js/css depedency files.
+      let arrLoadFiles = getArrLoadFiles(arrJsCssFiles);
+      let promiseLoadFiles = arrLoadFiles.map(loadFile);
+      Promise.allSettled(promiseLoadFiles).then(function (responses) {});
 
-    getAssetDetails();
-
+      getAssetDetails();
+    }
     return () => {
       unloadFile(arrJsCssFiles); //unload files.
     };
@@ -99,9 +87,7 @@ const PropertyDetails = () => {
         height: 700,
         skinsPath: "/assets/skins/",
       });
-    } catch (e) {
-      console.error(e.message);
-    }
+    } catch {}
   }, [assetDetails]);
 
   //Get asset details
@@ -116,7 +102,14 @@ const PropertyDetails = () => {
       .then((response) => {
         let objResponse = response.data;
         if (objResponse.StatusCode === 200) {
-          setAssetDetails(objResponse.Data);
+          if (
+            objResponse.Data?.IsListed == 0 ||
+            checkObjNullorEmpty(objResponse.Data)
+          ) {
+            navigate(routeNames.properties.path);
+          } else {
+            setAssetDetails(objResponse.Data);
+          }
         } else {
           isapimethoderr = true;
         }
@@ -128,6 +121,7 @@ const PropertyDetails = () => {
       .finally(() => {
         if (isapimethoderr === true) {
           setAssetDetails(null);
+          navigate(routeNames.properties.path);
         }
         setIsDataLoading(false);
       });
@@ -136,8 +130,7 @@ const PropertyDetails = () => {
   const onPropertyDetails = (e, assetId) => {
     e.preventDefault();
     setRerouteKey(rerouteKey + 1);
-    addSessionStorageItem(SessionStorageKeys.AssetDetailsId, assetId);
-    navigate(routeNames.propertyDetails.path, {
+    navigate(routeNames.property.path.replace(":id", assetId), {
       state: { timestamp: Date.now() },
       replace: true,
     });
@@ -146,10 +139,6 @@ const PropertyDetails = () => {
 
   return (
     <div key={rerouteKey}>
-      {parseInt(getsessionStorageItem(SessionStorageKeys.AssetDetailsId, 0)) ==
-      0
-        ? navigate(routeNames.properties.path)
-        : ""}
       {/*============== Page title Start ==============*/}
       <PageTitle
         title="Property Details"
@@ -167,46 +156,35 @@ const PropertyDetails = () => {
             <div className="col-xl-4 order-xl-2">
               {/* Message Form */}
               <div className="widget widget_contact bg-white border p-30 rounded mb-30 box-shadow">
-                <h5 className="mb-4 down-line">Listed By</h5>
+                <h5 className="mb-4 down-line pb-10">Listed By</h5>
                 {assetDetails && (
                   <div className="media mb-3">
                     <LazyImage
                       className="rounded-circle me-3 shadow img-border-white w-80px"
-                      src={
-                        assetDetails.IsAssigned == 1
-                          ? assetDetails.AssignedProfiles[0].PicPath
-                          : assetDetails.PicPath
-                      }
-                      alt={
-                        assetDetails.IsAssigned == 1
-                          ? assetDetails.AssignedProfiles[0].FirstName
-                          : assetDetails.FirstName
-                      }
+                      src={assetDetails.PicPath}
+                      alt={assetDetails.FirstName}
                       placeHolderClass="min-h-80 w-80px"
                     />
                     <div className="media-body">
-                      <div className="h6 mt-0 mb-1 text-primary">
-                        {assetDetails.IsAssigned == 1
-                          ? `${assetDetails.AssignedProfiles[0].FirstName} ${assetDetails.AssignedProfiles[0].LastName}`
-                          : `${assetDetails.FirstName} ${assetDetails.LastName}`}
+                      <div className="font-xl font-500 text-primary">
+                        {assetDetails.FirstName} {assetDetails.LastName}
                       </div>
+                      <span className="d-block small mt-0 mb-1 text-light lh-1">
+                        {assetDetails.ListedByProfileType}
+                      </span>
                       <span className="d-block">
                         <i
                           className="flat-mini flaticon-phone-call me-2"
                           aria-hidden="true"
                         ></i>
-                        {assetDetails.IsAssigned == 1
-                          ? assetDetails.AssignedProfiles[0].MobileNo
-                          : assetDetails.MobileNo}{" "}
+                        {assetDetails.MobileNo}
                       </span>
                       <span className="d-block">
                         <i
                           className="flat-mini flaticon-email me-2"
                           aria-hidden="true"
                         ></i>
-                        {assetDetails.IsAssigned == 1
-                          ? assetDetails.AssignedProfiles[0].Email
-                          : assetDetails.Email}{" "}
+                        {assetDetails.Email}
                       </span>
                     </div>
                   </div>
@@ -271,7 +249,7 @@ const PropertyDetails = () => {
               <PropertySearch />
               {/*============== Recent Property Widget Start ==============*/}
               <div className="widget widget_recent_property rounded box-shadow pb-20">
-                <h5 className="text-secondary mb-4 down-line">
+                <h5 className="text-secondary mb-4 down-line pb-10">
                   Recent Properties
                 </h5>
                 <ul>
@@ -734,4 +712,4 @@ const PropertyDetails = () => {
   );
 };
 
-export default PropertyDetails;
+export default Property;

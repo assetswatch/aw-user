@@ -379,11 +379,15 @@ const Register = () => {
                 <div className="col-xl-8 col-lg-10 mx-auto">
                   <div className="bg-white xs-p-20 p-30 border rounded shadow">
                     <div className="form-icon-left rounded form-boder">
-                      <h4 className="mb-4 down-line">Create New Account</h4>
+                      <h4 className="mb-4 down-line pb-10">
+                        Create New Account
+                      </h4>
                       <form noValidate onSubmit={register}>
                         <div className="row">
                           <div className="col-md-12 mb-20 mt-10">
-                            <h5 className="down-line">Login Information</h5>
+                            <h5 className="down-line pb-10">
+                              Login Information
+                            </h5>
                           </div>
                           <div className="row mb-15" tabIndex={0}>
                             {initApisLoaded &&
@@ -503,7 +507,9 @@ const Register = () => {
                             ></InputControl>
                           </div>
                           <div className="col-md-12 mb-20 mt-20">
-                            <h5 className="down-line">Contact Information</h5>
+                            <h5 className="down-line pb-10">
+                              Contact Information
+                            </h5>
                           </div>
                           <div className="col-md-6 mb-15">
                             <InputControl

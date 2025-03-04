@@ -8,6 +8,7 @@ import moment from "moment";
 import config from "../config.json";
 import CryptoJS from "crypto-js";
 import { axiosPost } from "../helpers/axiosHelper";
+import { Container } from "react-bootstrap";
 
 /** set page loader on mounting and unmounitng and nav links active.inactive */
 export function SetPageLoaderNavLinks() {
@@ -142,6 +143,8 @@ export function SetPageLoaderNavLinks() {
       )
         .parent("li")
         .addClass("active");
+    } else if (current.indexOf("/property/") != -1) {
+      $("#nav-properties").parent("li").addClass("active");
     } else {
       let path = current.substring(current.lastIndexOf("/") + 1);
       switch (path.toLowerCase()) {
@@ -165,7 +168,6 @@ export function SetPageLoaderNavLinks() {
           path = "register";
           break;
         case "properties":
-        case "propertydetails":
           path = "properties";
           break;
         case "plans":
@@ -216,6 +218,7 @@ export function SetUserMenu() {
       document.querySelectorAll(".collapse").forEach(function (collapse) {
         var bsCollapse = new window.bootstrap.Collapse(collapse, {
           toggle: false,
+          //container: "body",
         });
         bsCollapse.hide();
       });
@@ -254,6 +257,7 @@ export function SetUserMenu() {
             if (collapse !== target) {
               var bsCollapse = new window.bootstrap.Collapse(collapse, {
                 toggle: false,
+                //container: "body",
               });
               bsCollapse.hide();
             }
@@ -676,3 +680,17 @@ export const formatBytes = (bytes) => {
 export const trimCommas = (str) => {
   return str.replace(/^,+|,+$/g, "");
 };
+
+export async function convertImageToBase64(url) {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.readAsDataURL(blob);
+  });
+}
+
+export function isInt(value) {
+  return typeof value === "number" && Number.isInteger(value);
+}

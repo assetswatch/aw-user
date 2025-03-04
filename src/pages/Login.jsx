@@ -145,7 +145,7 @@ const Login = () => {
                 <div className="col-xl-5 col-lg-6 mx-auto">
                   <div className="bg-white xs-p-20 p-30 border rounded shadow">
                     <div className="form-icon-left rounded form-boder">
-                      <h4 className="mb-4 down-line">User Login</h4>
+                      <h4 className="mb-4 down-line pb-10">User Login</h4>
                       <div className="row row-cols-1 g-3">
                         <form noValidate onSubmit={onLogin}>
                           <div className="col mb-15">

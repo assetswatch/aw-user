@@ -438,7 +438,9 @@ const Blog = () => {
           <div className="row mb-5 align-items-center">
             <div className="col-md-8">
               <div className="me-auto">
-                <h2 className="d-table mb-4 down-line">Recent Properties</h2>
+                <h2 className="d-table mb-4 down-line pb-10">
+                  Recent Properties
+                </h2>
                 <span className="d-table sub-title text-secondary">
                   Mauris primis turpis Laoreet magna felis mi amet quam enim
                   curae. Sodales semper tempor dictum.
@@ -1083,7 +1085,7 @@ const Blog = () => {
           <div className="row mb-5 align-items-center">
             <div className="col-md-8">
               <div className="me-auto">
-                <h2 className="d-table mb-4 down-line">
+                <h2 className="d-table mb-4 down-line pb-10">
                   Our Listed Property Agents
                 </h2>
                 <span className="d-table sub-title text-secondary">
@@ -1454,7 +1456,7 @@ const Blog = () => {
               <span className="text-primary tagline pb-2 d-table m-auto">
                 Testimonials
               </span>
-              <h2 className="down-line w-50 mx-auto mb-4 text-center w-sm-100">
+              <h2 className="down-line pb-10 w-50 mx-auto mb-4 text-center w-sm-100">
                 What Client Says About Us
               </h2>
             </div>

@@ -46,7 +46,7 @@ const Plans = () => {
                   return (
                     <div className="col" key={`plan-${pidx}`}>
                       <div className="px-2 sm-px-0 mb-5">
-                        <h4 className="text-start font-500 down-line text-primary">
+                        <h4 className="text-start font-500 down-line pb-10 text-primary">
                           {p.Plan}
                         </h4>
 

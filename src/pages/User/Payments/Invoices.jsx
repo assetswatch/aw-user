@@ -14,6 +14,7 @@ import {
   apiReqResLoader,
   checkEmptyVal,
   checkStartEndDateGreater,
+  convertImageToBase64,
   GetUserCookieValues,
   SetPageLoaderNavLinks,
 } from "../../../utils/common";
@@ -27,6 +28,8 @@ import {
   API_ACTION_STATUS,
   SessionStorageKeys,
   ValidationMessages,
+  pdfHFWMSettings,
+  html2PdfSettings,
 } from "../../../utils/constants";
 import { Toast } from "../../../components/common/ToastView";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -35,6 +38,7 @@ import config from "../../../config.json";
 import { addSessionStorageItem } from "../../../helpers/sessionStorageHelper";
 import TextAreaControl from "../../../components/common/TextAreaControl";
 import AsyncSelect from "../../../components/common/AsyncSelect";
+import html2pdf from "html2pdf.js";
 
 const Invoices = () => {
   let $ = window.$;
@@ -338,24 +342,16 @@ const Invoices = () => {
       .then(async (response) => {
         let objResponse = response.data;
         if (objResponse.StatusCode === 200) {
-          const fresponse = await fetchPost(
-            `${config.apiBaseUrl}${ApiUrls.getInvoicePdf}`,
-            {
-              InvoiceId: parseInt(row.original.InvoiceId),
+          axiosPost(`${config.apiBaseUrl}${ApiUrls.getInvoicePdfDetails}`, {
+            InvoiceId: parseInt(row.original.InvoiceId),
+          }).then(async (presponse) => {
+            let objPResponse = presponse.data;
+            if (objPResponse.StatusCode === 200) {
+              generatePDF(objPResponse.Data, objResponse.Data);
+            } else {
+              isapimethoderr = true;
             }
-          );
-          if (fresponse.ok) {
-            const blob = await fresponse.blob();
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `${objResponse.Data?.InvoiceNumber}.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-          } else {
-            isapimethoderr = true;
-          }
+          });
         } else {
           isapimethoderr = true;
         }
@@ -379,7 +375,6 @@ const Invoices = () => {
       ...sendInvoiceFormData,
       lblinvoicenumber: `Invoice#: ${row.original.InvoiceNumber}`,
     });
-
     setSendInvoiceModalShow(true);
   };
 
@@ -424,36 +419,195 @@ const Invoices = () => {
       );
       objBodyParams.append("Comments", sendInvoiceFormData.txtcomments);
 
-      axiosPost(`${config.apiBaseUrl}${ApiUrls.sendInvoice}`, objBodyParams, {
-        "Content-Type": "multipart/form-data",
-      })
-        .then((response) => {
-          let objResponse = response.data;
-          if (objResponse.StatusCode === 200) {
-            if (objResponse.Data.Status === 1) {
-              Toast.success(objResponse.Data.Message);
-              onSendInvoiceModalClose();
-            } else {
-              Toast.error(objResponse.Data.Message);
-            }
-          } else {
-            isapimethoderr = true;
-          }
-        })
-        .catch((err) => {
-          isapimethoderr = true;
-          console.error(`"API :: ${ApiUrls.sendInvoice}, Error ::" ${err}`);
-        })
-        .finally(() => {
-          if (isapimethoderr == true) {
-            Toast.error(AppMessages.SomeProblem);
-          }
-          apiReqResLoader("btnsend", "Send", API_ACTION_STATUS.COMPLETED);
-        });
+      axiosPost(`${config.apiBaseUrl}${ApiUrls.getInvoicePdfDetails}`, {
+        InvoiceId: parseInt(selectedGridRow?.original?.InvoiceId),
+      }).then(async (presponse) => {
+        let objPResponse = presponse.data;
+        if (objPResponse.StatusCode === 200) {
+          let pdfDetails = objPResponse.Data;
+          const watermarkImage = pdfDetails.BrandingDetails.WatermarkUrl;
+          const base64Watermark = await convertImageToBase64(watermarkImage);
+
+          const pdf = await html2pdf()
+            .from(pdfDetails.PdfHtml)
+            .set(
+              { ...html2PdfSettings },
+              {
+                filename: `${selectedGridRow?.original?.InvoiceNumner}.pdf`,
+              }
+            )
+            .toPdf()
+            .get("pdf")
+            .then((pdf) => {
+              const totalPages = pdf.internal.getNumberOfPages();
+              const pageHeight = pdf.internal.pageSize.height;
+              const pageWidth = pdf.internal.pageSize.width;
+
+              for (let i = 1; i <= totalPages; i++) {
+                pdf.setPage(i);
+
+                pdf.setDrawColor(pdfHFWMSettings.fLineColor);
+                pdf.line(
+                  pdfHFWMSettings.fLinex1OffSet,
+                  pageHeight - pdfHFWMSettings.fLiney1OffSet,
+                  pageWidth - pdfHFWMSettings.fLinex1OffSet,
+                  pageHeight - pdfHFWMSettings.fLiney1OffSet
+                );
+
+                pdf.setFontSize(pdfHFWMSettings.fFontSize);
+                pdf.setFont(...pdfHFWMSettings.fFontFamily);
+                pdf.setTextColor(pdfHFWMSettings.fFontColor);
+                pdf.text(
+                  pdfDetails?.BrandingDetails?.Footer,
+                  pageWidth / pdfHFWMSettings.pageHalf,
+                  pageHeight - pdfHFWMSettings.fTextyOffSet,
+                  pdfHFWMSettings.fCenter
+                );
+
+                pdf.text(
+                  `Page ${i} of ${totalPages}`,
+                  pageWidth - pdfHFWMSettings.fPixOffSet,
+                  pageHeight - pdfHFWMSettings.fPiyOffSet,
+                  pdfHFWMSettings.fRight
+                );
+
+                pdf.setGState(new pdf.GState(pdfHFWMSettings.wmOpacity));
+                pdf.addImage(
+                  base64Watermark,
+                  "PNG",
+                  (pageWidth - pdfHFWMSettings.wmWidth) /
+                    pdfHFWMSettings.pageHalf,
+                  (pageHeight -
+                    (pdfHFWMSettings.wmHeight - pdfHFWMSettings.wmyOffSet)) /
+                    pdfHFWMSettings.pageHalf,
+                  pdfHFWMSettings.wmWidth,
+                  pdfHFWMSettings.wmHeight,
+                  "",
+                  "FAST"
+                );
+                pdf.setGState(new pdf.GState({ opacity: 1 }));
+              }
+
+              pdf.internal.scaleFactor = pdfHFWMSettings.scaleFactor;
+            })
+            .outputPdf("blob")
+            .then((pdf) => {
+              objBodyParams.append(
+                "PdfBytes",
+                new Blob([pdf], { type: "application/pdf" }),
+                `${selectedGridRow?.original?.InvoiceNumber}.pdf`
+              );
+              axiosPost(
+                `${config.apiBaseUrl}${ApiUrls.sendInvoice}`,
+                objBodyParams,
+                {
+                  "Content-Type": "multipart/form-data",
+                }
+              )
+                .then((response) => {
+                  let objResponse = response.data;
+                  if (objResponse.StatusCode === 200) {
+                    if (objResponse.Data.Status === 1) {
+                      Toast.success(objResponse.Data.Message);
+                      onSendInvoiceModalClose();
+                    } else {
+                      Toast.error(objResponse.Data.Message);
+                    }
+                  } else {
+                    isapimethoderr = true;
+                  }
+                })
+                .catch((err) => {
+                  isapimethoderr = true;
+                  console.error(
+                    `"API :: ${ApiUrls.sendInvoice}, Error ::" ${err}`
+                  );
+                })
+                .finally(() => {
+                  if (isapimethoderr == true) {
+                    Toast.error(AppMessages.SomeProblem);
+                  }
+                  apiReqResLoader(
+                    "btnsend",
+                    "Send",
+                    API_ACTION_STATUS.COMPLETED
+                  );
+                });
+            });
+        }
+      });
     } else {
       $(`[name=${Object.keys(formSendInvoiceErrors)[0]}]`).focus();
       setSendInvoiceErrors(formSendInvoiceErrors);
     }
+  };
+
+  const generatePDF = async (pdfDetails, invoiceDetails) => {
+    const watermarkImage = pdfDetails.BrandingDetails.WatermarkUrl;
+    const base64Watermark = await convertImageToBase64(watermarkImage);
+
+    const pdf = await html2pdf()
+      .from(pdfDetails.PdfHtml)
+      .set(
+        { ...html2PdfSettings },
+        {
+          filename: `${invoiceDetails?.InvoiceNumber}.pdf`,
+        }
+      )
+      .toPdf()
+      .get("pdf")
+      .then((pdf) => {
+        const totalPages = pdf.internal.getNumberOfPages();
+        const pageHeight = pdf.internal.pageSize.height;
+        const pageWidth = pdf.internal.pageSize.width;
+
+        for (let i = 1; i <= totalPages; i++) {
+          pdf.setPage(i);
+
+          pdf.setDrawColor(pdfHFWMSettings.fLineColor);
+          pdf.line(
+            pdfHFWMSettings.fLinex1OffSet,
+            pageHeight - pdfHFWMSettings.fLiney1OffSet,
+            pageWidth - pdfHFWMSettings.fLinex1OffSet,
+            pageHeight - pdfHFWMSettings.fLiney1OffSet
+          );
+
+          pdf.setFontSize(pdfHFWMSettings.fFontSize);
+          pdf.setFont(...pdfHFWMSettings.fFontFamily);
+          pdf.setTextColor(pdfHFWMSettings.fFontColor);
+          pdf.text(
+            pdfDetails?.BrandingDetails?.Footer,
+            pageWidth / pdfHFWMSettings.pageHalf,
+            pageHeight - pdfHFWMSettings.fTextyOffSet,
+            pdfHFWMSettings.fCenter
+          );
+
+          pdf.text(
+            `Page ${i} of ${totalPages}`,
+            pageWidth - pdfHFWMSettings.fPixOffSet,
+            pageHeight - pdfHFWMSettings.fPiyOffSet,
+            pdfHFWMSettings.fRight
+          );
+
+          pdf.setGState(new pdf.GState(pdfHFWMSettings.wmOpacity));
+          pdf.addImage(
+            base64Watermark,
+            "PNG",
+            (pageWidth - pdfHFWMSettings.wmWidth) / pdfHFWMSettings.pageHalf,
+            (pageHeight -
+              (pdfHFWMSettings.wmHeight - pdfHFWMSettings.wmyOffSet)) /
+              pdfHFWMSettings.pageHalf,
+            pdfHFWMSettings.wmWidth,
+            pdfHFWMSettings.wmHeight,
+            "",
+            "FAST"
+          );
+          pdf.setGState(new pdf.GState({ opacity: 1 }));
+        }
+
+        pdf.internal.scaleFactor = pdfHFWMSettings.scaleFactor;
+        pdf.save(`${invoiceDetails?.InvoiceNumber}.pdf`);
+      });
   };
 
   //Grid actions
