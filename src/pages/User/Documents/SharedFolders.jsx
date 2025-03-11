@@ -317,6 +317,7 @@ const SharedFolders = () => {
           fromdate: searchFormData.txtfromdate,
           todate: searchFormData.txttodate,
           documenttypeid: 0,
+          isshared: 1,
           // parseInt(
           //   setSelectDefaultVal(searchFormData.ddldocumenttype)
           // ),

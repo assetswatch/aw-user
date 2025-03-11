@@ -11,29 +11,33 @@ import {
   UserCookie,
   SessionStorageKeys,
   AppMessages,
-  API_ACTION_STATUS,
   html2PdfSettings,
   pdfHFWMSettings,
+  API_ACTION_STATUS,
 } from "../../../utils/constants";
 import { useAuth } from "../../../contexts/AuthContext";
 import { axiosPost } from "../../../helpers/axiosHelper";
 import config from "../../../config.json";
 import { Toast } from "../../../components/common/ToastView";
-import { getsessionStorageItem } from "../../../helpers/sessionStorageHelper";
+import {
+  deletesessionStorageItem,
+  getsessionStorageItem,
+} from "../../../helpers/sessionStorageHelper";
 import { routeNames } from "../../../routes/routes";
 import { useNavigate } from "react-router-dom";
 import PdfViewer from "../../../components/common/PdfViewer";
 import DataLoader from "../../../components/common/DataLoader";
 import html2pdf from "html2pdf.js";
+import { ModalView } from "../../../components/common/LazyComponents";
 
-const ViewReceipt = () => {
+const ViewInvoice = () => {
   let $ = window.$;
   const navigate = useNavigate();
 
   const { loggedinUser } = useAuth();
 
-  let inoviceId = parseInt(
-    getsessionStorageItem(SessionStorageKeys.ViewInvoiceId, 0)
+  let invoiceId = parseInt(
+    getsessionStorageItem(SessionStorageKeys.PreviewInvoiceId, 0)
   );
 
   let accountid = parseInt(
@@ -50,14 +54,28 @@ const ViewReceipt = () => {
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [invoiceDetails, setInvoiceDetails] = useState({});
 
-  const [recieverUserDetails, setRecieverUserDetails] = useState({});
+  //Modal
+  const [
+    modalInvoiceSendConfirmationShow,
+    setModalInvoiceSendConfirmationShow,
+  ] = useState(false);
 
   //PdfViewer
   const [fileUrl, setFileUrl] = useState(null);
+  const [pdfBlob, setPdfBlob] = useState(null);
 
   useEffect(() => {
     getInvoiceDetails();
   }, []);
+
+  const deleteTempInvoice = () => {
+    if (invoiceId > 0)
+      axiosPost(`${config.apiBaseUrl}${ApiUrls.deleteInvoice}`, {
+        ProfileId: profileid,
+        AccountId: accountid,
+        InvoiceId: invoiceId,
+      });
+  };
 
   const generatePDF = async (pdfDetails, invoiceDetails) => {
     const watermarkImage = pdfDetails.BrandingDetails.WatermarkUrl;
@@ -126,6 +144,7 @@ const ViewReceipt = () => {
       })
       .outputPdf("blob")
       .then((pdf) => {
+        setPdfBlob(pdf);
         const pdfBlobUrl = URL.createObjectURL(pdf);
         setFileUrl(pdfBlobUrl);
 
@@ -134,29 +153,18 @@ const ViewReceipt = () => {
   };
 
   const getInvoiceDetails = async () => {
-    if (inoviceId > 0) {
+    if (invoiceId > 0) {
       let isapimethoderr = false;
       let objParams = {
-        InvoiceId: inoviceId,
+        InvoiceId: invoiceId,
       };
       axiosPost(`${config.apiBaseUrl}${ApiUrls.getInvoiceDetails}`, objParams)
         .then(async (response) => {
           let objResponse = response.data;
           if (objResponse.StatusCode === 200) {
             setInvoiceDetails(objResponse.Data);
-            if (
-              objResponse.Data?.SentProfiles !== null &&
-              objResponse.Data?.SentProfiles.length > 0
-            ) {
-              setRecieverUserDetails(
-                objResponse.Data?.SentProfiles?.filter(
-                  (p) => p.ProfileId == profileid
-                )
-              );
-            }
-
             axiosPost(`${config.apiBaseUrl}${ApiUrls.getInvoicePdfDetails}`, {
-              InvoiceId: inoviceId,
+              InvoiceId: invoiceId,
             }).then(async (presponse) => {
               let objPResponse = presponse.data;
               if (objPResponse.StatusCode === 200) {
@@ -189,8 +197,114 @@ const ViewReceipt = () => {
 
   //PdfViewer
 
+  const onSend = async () => {
+    apiReqResLoader("btnsend", "Sending...", API_ACTION_STATUS.START);
+    apiReqResLoader("btnsendproceed", "Sending...", API_ACTION_STATUS.START);
+
+    let isapimethoderr = false;
+    let objBodyParams = new FormData();
+    objBodyParams.append("InvoiceId", invoiceId);
+    objBodyParams.append("AccountId", accountid);
+    objBodyParams.append("ProfileId", profileid);
+
+    const arrayBuffer = await pdfBlob.arrayBuffer();
+    objBodyParams.append(
+      "PdfBytes",
+      new Blob([arrayBuffer], { type: "application/pdf" }),
+      `${invoiceDetails?.InvoiceNumber}.pdf`
+    );
+    axiosPost(
+      `${config.apiBaseUrl}${ApiUrls.setInvoiceTempToActive}`,
+      objBodyParams,
+      {
+        "Content-Type": "multipart/form-data",
+      }
+    )
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode === 200) {
+          if (objResponse.Data != null && objResponse.Data?.Status == 1) {
+            Toast.success(objResponse.Data.Message);
+            deletesessionStorageItem(SessionStorageKeys.PreviewInvoiceId);
+            setModalInvoiceSendConfirmationShow(false);
+            navigate(routeNames.paymentsinvoices.path);
+          } else {
+            Toast.error(objResponse.Data.Message);
+          }
+        } else {
+          isapimethoderr = true;
+        }
+      })
+      .catch((err) => {
+        isapimethoderr = true;
+        console.error(
+          `"API :: ${ApiUrls.setInvoiceTempToActive}, Error ::" ${err}`
+        );
+      })
+      .finally(() => {
+        if (isapimethoderr == true) {
+          Toast.error(AppMessages.SomeProblem);
+        }
+        apiReqResLoader("btnsend", "Save & Send", API_ACTION_STATUS.COMPLETED);
+        apiReqResLoader(
+          "btnsendproceed",
+          "Proceed",
+          API_ACTION_STATUS.COMPLETED
+        );
+      });
+  };
+
+  const onSendInvoice = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    let isapimethoderr = false;
+    apiReqResLoader("btnsend", "Saving...", API_ACTION_STATUS.START);
+    let objSubAccountsParams = {
+      AccountId: accountid,
+      ProfileId: profileid,
+      Status: `${config.paymentAccountCreateStatus.Active}`,
+    };
+    axiosPost(
+      `${config.apiBaseUrl}${ApiUrls.getPaymentSubAccountsCountByStatus}`,
+      objSubAccountsParams
+    )
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode === 200) {
+          if (objResponse.Data.TotalCount > 0) {
+            onSend();
+          } else {
+            setModalInvoiceSendConfirmationShow(true);
+          }
+        } else {
+          isapimethoderr = true;
+        }
+      })
+      .catch((err) => {
+        isapimethoderr = true;
+        console.error(
+          `"API :: ${ApiUrls.getPaymentSubAccountsCountByStatus}, Error ::" ${err}`
+        );
+      })
+      .finally(() => {
+        if (isapimethoderr == true) {
+          Toast.error(AppMessages.SomeProblem);
+        }
+        apiReqResLoader("btnsend", "Save & Send", API_ACTION_STATUS.COMPLETED);
+      });
+  };
+
+  //Account Creation Resitricted Modal actions
+
+  const onInvoiceSendConfirmationModalClose = () => {
+    setModalInvoiceSendConfirmationShow(false);
+  };
+
   const navigateToInvoices = () => {
-    navigate(routeNames.tenantpaymentsinvoices.path);
+    deletesessionStorageItem(SessionStorageKeys.PreviewInvoiceId);
+    deleteTempInvoice();
+    navigate(routeNames.paymentsinvoices.path);
   };
 
   const onCancel = (e) => {
@@ -206,24 +320,12 @@ const ViewReceipt = () => {
           <div className="row mx-auto col-md-12 col-lg-10 shadow">
             <div className="bg-white xs-p-20 p-30 pb-30 border rounded">
               <div className="row">
-                <div className="col-md-6 mb-15">
+                <div className="col-md-4 col-lg-4 col-xl-4 mb-15">
                   <h6 className="mb-2 down-line pb-10">
                     Invoice#: {invoiceDetails?.InvoiceNumber}
                   </h6>
                 </div>
-                <div className="col-md-6 mb-15 text-md-end">
-                  {" "}
-                  <span className="font-500 font-general">
-                    Received On : {recieverUserDetails[0]?.SentDateDisplay}
-                  </span>
-                </div>
-                <div className="col-md-4 col-lg-4 col-xl-4 mb-15">
-                  <span className="font-500 font-general">
-                    Total Due : {invoiceDetails?.TotalAmountDisplay}
-                  </span>
-                </div>
                 <div className="col-md-4 col-lg-4 col-xl-4 mb-15 text-md-center">
-                  {" "}
                   <span className="font-500 font-general">
                     Date On : {invoiceDetails?.BillDateDisplay}
                   </span>
@@ -248,29 +350,46 @@ const ViewReceipt = () => {
                     ) : (
                       <DataLoader />
                     )}
-                    {!checkEmptyVal(invoiceDetails.Message) && (
+                  </div>
+                  <div className="row mt-20 px-0 mx-0">
+                    <div className="col-md-6 px-0 col-lg-6 col-xl-6 mb-15">
                       <span className="font-500 font-general">
-                        Message : {invoiceDetails?.Message}
+                        Bill To : {invoiceDetails?.BillToUser?.FirstName}{" "}
+                        {invoiceDetails?.BillToUser?.LastName},{" "}
+                        {invoiceDetails?.BillToUser?.ProfileType}
                       </span>
+                    </div>
+                    {!checkEmptyVal(invoiceDetails.Message) && (
+                      <div className="col-md-6 px-0 col-lg-6 col-xl-6 mb-15 text-md-end">
+                        <span className="font-500 font-general">
+                          Message : {invoiceDetails?.Message}
+                        </span>
+                      </div>
                     )}
                   </div>
-                </div>
-              </div>
-              <div className="container-fluid">
-                <hr className="text-primary my-20 row"></hr>
-                <div className="row form-action flex-center">
-                  <div
-                    className="col-md-6 px-0 form-error"
-                    id="form-error"
-                  ></div>
-                  <div className="col-md-6 px-0">
-                    <button
-                      className="btn btn-secondary"
-                      id="btnCancel"
-                      onClick={onCancel}
-                    >
-                      Back
-                    </button>
+                  <hr className="w-100 text-primary mb-20 px-0 mx-0 mt-20"></hr>
+                  <div className="row form-action d-flex flex-center px-0 mx-0 my-15">
+                    <div className="col-md-6 form-error" id="form-error"></div>
+                    <div className="col-md-6  px-0">
+                      <button
+                        className="btn btn-secondary"
+                        id="btncancel"
+                        onClick={(e) => {
+                          onCancel(e);
+                        }}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        className="btn btn-primary"
+                        id="btnsend"
+                        onClick={(e) => {
+                          onSendInvoice(e);
+                        }}
+                      >
+                        Save & Send
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -278,9 +397,41 @@ const ViewReceipt = () => {
           </div>
         </div>
       </div>
-      {/*============== Sent Invoice users grid ==============*/}
+
+      {/*============== Invoice Send Restricted Modal Start ==============*/}
+      {modalInvoiceSendConfirmationShow && (
+        <>
+          <ModalView
+            title={AppMessages.InvoiceSendNoSubAccountAlertTitle}
+            content={
+              <>
+                <span className="font-general font-400">
+                  {AppMessages.InvoiceSendNoSubAccountMessage}
+                </span>
+              </>
+            }
+            onClose={onInvoiceSendConfirmationModalClose}
+            actions={[
+              {
+                text: "Close",
+                displayOrder: 2,
+                btnClass: "btn-secondary",
+                onClick: (e) => onInvoiceSendConfirmationModalClose(e),
+              },
+              {
+                text: "Proceed",
+                displayOrder: 1,
+                id: "btnsendproceed",
+                btnClass: "btn-primary",
+                onClick: (e) => onSend(e),
+              },
+            ]}
+          ></ModalView>
+        </>
+      )}
+      {/*============== Invoice Send Restricted Modal End ==============*/}
     </>
   );
 };
 
-export default ViewReceipt;
+export default ViewInvoice;

@@ -88,10 +88,9 @@ export function SetPageLoaderNavLinks() {
         case routeNames.createinvoiceitem.path.toLowerCase():
         case routeNames.viewinvoiceitem.path.toLowerCase():
         case routeNames.createinvoice.path.toLowerCase():
+        case routeNames.previewinvoice.path.toLowerCase():
         case routeNames.viewinvoice.path.toLowerCase():
-        case routeNames.tenantpaymentsinvoices.path.toLowerCase():
-        case routeNames.tenantviewinvoice.path.toLowerCase():
-        case routeNames.tenantinvoicecheckout.path.toLowerCase():
+        case routeNames.checkout.path.toLowerCase():
           activelink = "payments";
           break;
         case routeNames.tenantprofile.path.toLowerCase():
@@ -607,15 +606,6 @@ export function getPagesPathByLoggedinUserProfile(
           ? routeNames.agentnotifications.path
           : loggedinProfileTypeId == config.userProfileTypes.Tenant
           ? routeNames.tenantnotifications.path
-          : path;
-    } else if (page?.toLowerCase() == "payments") {
-      path =
-        loggedinProfileTypeId == config.userProfileTypes.Owner
-          ? routeNames.ownerpayments.path
-          : loggedinProfileTypeId == config.userProfileTypes.Agent
-          ? routeNames.agentpayments.path
-          : loggedinProfileTypeId == config.userProfileTypes.Tenant
-          ? routeNames.tenantpayments.path
           : path;
     } else if (page?.toLowerCase() == "profile") {
       path =

@@ -116,9 +116,15 @@ const AsyncSelect = (ctlProps) => {
   };
 
   //Menu list
-  const Menu = (props) => (
-    <components.Menu {...props} className="react_select_menu" />
-  );
+  const Menu = (props) =>
+    ctlProps.menuFooter ? (
+      <components.Menu {...props} className="react_select_menu">
+        {props.children}
+        <ctlProps.menuFooter></ctlProps.menuFooter>
+      </components.Menu>
+    ) : (
+      <components.Menu {...props} className="react_select_menu" />
+    );
 
   //styles
   const customStyles = {
