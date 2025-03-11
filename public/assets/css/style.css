@@ -4435,6 +4435,69 @@ Social Media Style Start
   text-decoration: none !important;
 }
 
+.imgs-ol-container {
+  display: flex;
+  align-items: center;
+}
+
+.imgs-ol-container .div-img {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.imgs-ol-container .div-img .img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid var(--theme-white-color);
+  margin-left: -25px;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
+}
+
+.imgs-ol-container .div-img:first-child img {
+  margin-left: 0;
+}
+
+.imgs-ol-container .tooltip {
+  visibility: hidden;
+  background-color: var(--theme-secondary-opacity-color);
+  color: var(--theme-white-color);
+  font: var(--theme-general-font);
+  text-align: center;
+  padding: 5px 10px;
+  border-radius: 5px;
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.imgs-ol-container .div-img:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.imgs-ol-container .more {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: var(--theme-primary-color);
+  color: var(--theme-white-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+  border: 2px solid white;
+  margin-left: -25px;
+}
+
 /*modal*/
 .modal {
   z-index: 10001 !important;
@@ -4674,7 +4737,7 @@ Social Media Style Start
 
 /*badges*/
 .gr-badge-pill {
-  padding: 0.3rem 0.65rem !important;
+  padding: 0.3rem 0.65rem;
   min-width: 93px;
   position: relative;
   text-align: left;

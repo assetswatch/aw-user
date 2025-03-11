@@ -91,7 +91,8 @@ export const SessionStorageKeys = {
   ViewPaymentSubAccountId: "vpsaid",
   ViewInvoiceItemId: "viiid",
   ViewInvoiceId: "viid",
-  TenantCheckoutInvoiceId: "tciid",
+  PreviewInvoiceId: "pviid",
+  CheckoutInvoiceId: "ciid",
 };
 /*Session storage keys*/
 
@@ -267,6 +268,13 @@ export const AppMessages = {
   DdlSelectItem: "Select Item",
   SendInvoiceModalTitle: "Send Invoice",
   UnsendInvoiceToUserMessage: "You want to unsend invoice for {name}.",
+  InvoiceSendNoSubAccountAlertTitle: "Warning: No Payment Account Created!",
+  InvoiceSendNoSubAccountMessage:
+    "You do not have a created payment account. We cannot process payments without a payment account. Are you sure you want to continue?",
+  CheckoutNoSubAccountAlertTitle: "Warning: No Active Payment Account!",
+  CheckoutNoSubAccountMessage:
+    "Payment cannot be initiated, Because the invoice creator does not have an active payment account.",
+  AddInvocieItemModalTitle: "Add New Item",
 };
 /*Common App messages*/
 
@@ -434,6 +442,7 @@ export let ApiUrls = {
   updateUserConnectionStatus: `users/v1/UpdateUserConnectionStatus`,
   createUserConnection: `users/v1/CreateUserConnection`,
   getUserDetails: `users/v1/GetUserDetails`,
+  getUserBrandingDetails: `users/v1/GetUserBrandingDetails`,
   getAgents: `users/v1/GetAgents`,
   getAssetTypes: `assets/v1/GetAssetTypes`,
   getAssetListingTypes: `assets/v1/GetAssetListingTypes`,
@@ -488,6 +497,8 @@ export let ApiUrls = {
   getDdlInvoiceItems: `payments/v1/GetDdlInvoiceItems`,
   generateInvoiceNumber: `payments/v1/GenerateInvoiceNumber`,
   createInvoice: `payments/v1/CreateInvoice`,
+  setInvoiceTempToActive: `payments/v1/SetInvoiceTempToActive`,
+  deleteInvoice: `payments/v1/DeleteInvoice`,
   getInvoices: `payments/v1/GetInvoices`,
   getInvoiceDetails: `payments/v1/GetInvoiceDetails`,
   getInvoicePdf: `payments/v1/GetInvoicePdf`,

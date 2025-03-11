@@ -913,7 +913,7 @@ const UserHeader = () => {
                     <Link
                       className="nav-link"
                       id="nav-payments"
-                      to={routeNames.tenantpaymentsinvoices.path}
+                      to={routeNames.paymentsaccounts.path}
                     >
                       <i className="fa fa-credit-card flat-mini pe-2"></i>
                       Payments

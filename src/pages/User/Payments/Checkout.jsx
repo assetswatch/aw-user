@@ -11,7 +11,6 @@ import {
 import InputControl from "../../../components/common/InputControl";
 import { formCtrlTypes } from "../../../utils/formvalidation";
 import { useNavigate } from "react-router-dom";
-import TextAreaControl from "../../../components/common/TextAreaControl";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 import { axiosPost } from "../../../helpers/axiosHelper";
 import config from "../../../config.json";
@@ -30,9 +29,8 @@ import {
   getsessionStorageItem,
 } from "../../../helpers/sessionStorageHelper";
 import { Toast } from "../../../components/common/ToastView";
-import { LazyImage } from "../../../components/common/LazyComponents";
 
-const InvoiceCheckout = () => {
+const Checkout = () => {
   let $ = window.$;
   let formErrors = {};
 
@@ -40,8 +38,8 @@ const InvoiceCheckout = () => {
   const navigate = useNavigate();
 
   const [paymentTypes, setPaymentTypes] = useState([
-    { PaymentTypeId: "CreditCard", PaymentType: "Credit Card" },
     { PaymentTypeId: "ACH", PaymentType: "ACH Payment" },
+    { PaymentTypeId: "CreditCard", PaymentType: "Credit Card" },
   ]);
   const [selectedPaymentType, setSelectedPaymentType] = useState(
     paymentTypes[0].PaymentTypeId
@@ -51,7 +49,6 @@ const InvoiceCheckout = () => {
   const [formData, setFormData] = useState(setInitFormData());
   const [amountFormData, setAmountFormData] = useState({});
   const [invoiceDetails, setInvoiceDetails] = useState({});
-  const [recieverUserDetails, setRecieverUserDetails] = useState({});
   const [countriesData, setCountriesData] = useState([]);
   const [countrySelected, setCountrySelected] = useState(null);
 
@@ -64,7 +61,7 @@ const InvoiceCheckout = () => {
   const [initApisLoaded, setinitApisLoaded] = useState(false);
 
   let inoviceId = parseInt(
-    getsessionStorageItem(SessionStorageKeys.TenantCheckoutInvoiceId, 0)
+    getsessionStorageItem(SessionStorageKeys.CheckoutInvoiceId, 0)
   );
   let accountId = parseInt(
     GetUserCookieValues(UserCookie.AccountId, loggedinUser)
@@ -109,7 +106,7 @@ const InvoiceCheckout = () => {
       setinitApisLoaded(true);
     });
     return () => {
-      // deletesessionStorageItem(SessionStorageKeys.TenantCheckoutInvoiceId);
+      deletesessionStorageItem(SessionStorageKeys.CheckoutInvoiceId);
     };
   }, []);
 
@@ -118,6 +115,8 @@ const InvoiceCheckout = () => {
       let isapimethoderr = false;
       let objParams = {
         InvoiceId: inoviceId,
+        IsGetSentUsers: 0,
+        IsGetItems: 0,
       };
       axiosPost(`${config.apiBaseUrl}${ApiUrls.getInvoiceDetails}`, objParams)
         .then(async (response) => {
@@ -128,16 +127,6 @@ const InvoiceCheckout = () => {
               ...objResponse.Data.TaxDetails,
               TotalAmountBeforeEdit: objResponse.Data.TaxDetails.TotalAmount,
             });
-            if (
-              objResponse.Data?.SentProfiles !== null &&
-              objResponse.Data?.SentProfiles.length > 0
-            ) {
-              setRecieverUserDetails(
-                objResponse.Data?.SentProfiles?.filter(
-                  (p) => p.ProfileId == profileId
-                )
-              );
-            }
           } else {
             isapimethoderr = true;
           }
@@ -374,6 +363,7 @@ const InvoiceCheckout = () => {
         };
         axiosPost(`${config.apiBaseUrl}${ApiUrls.createPaymentTransaction}`, {
           InvoiceNumber: invoiceDetails.InvoiceNumber,
+          InvoiceId: invoiceDetails.InvoiceId,
           FromId: profileId,
           Tax: !checkObjNullorEmpty(amountFormData)
             ? amountFormData?.Tax
@@ -413,7 +403,7 @@ const InvoiceCheckout = () => {
             setStateSelected(null);
             setCitySelected(null);
             apiReqResLoader("btnpay", "Pay", API_ACTION_STATUS.COMPLETED);
-            navigate(routeNames.tenantpaymentsinvoices.path);
+            navigate(routeNames.paymentsinvoices.path);
           });
       } else {
         usioGetToken({
@@ -490,7 +480,7 @@ const InvoiceCheckout = () => {
                 setStateSelected(null);
                 setCitySelected(null);
                 apiReqResLoader("btnpay", "Pay", API_ACTION_STATUS.COMPLETED);
-                navigate(routeNames.tenantpaymentsinvoices.path);
+                navigate(routeNames.paymentsinvoices.path);
               });
           })
           .catch((err) => {
@@ -580,7 +570,7 @@ const InvoiceCheckout = () => {
   };
 
   const navigateToInvoices = () => {
-    navigate(routeNames.tenantpaymentsinvoices.path);
+    navigate(routeNames.paymentsinvoices.path);
   };
 
   return (
@@ -606,126 +596,6 @@ const InvoiceCheckout = () => {
                 <div className="col-6 d-flex justify-content-end align-items-end pb-10"></div>
               </div>
               <div className="row">
-                <div className="col-xl-4 col-lg-4">
-                  <div className="widget bg-white box-shadow rounded px-0 mb-20">
-                    <h6 className="mb-3 down-line pb-10 px-20 down-line-mx20">
-                      Payment Summary
-                    </h6>
-                    {!checkObjNullorEmpty(invoiceDetails) && (
-                      <div className="px-20">
-                        <div className="post-content pb-0">
-                          <div className="row listing-location mb-2 font-general font-500">
-                            <span className="col text-left">
-                              Invoice#: {invoiceDetails.InvoiceNumber}
-                            </span>
-                          </div>
-                          <div className="row listing-location mb-2 font-general font-500">
-                            <span className="col text-left">Amount</span>
-                            <span className="col text-right">
-                              {!showEditAmount ? (
-                                <>
-                                  <i
-                                    className="fa fa-pen font-small text-primary px-2 cur-pointer"
-                                    onClick={(e) => toggleEditAmount(e)}
-                                  />
-                                  {!checkObjNullorEmpty(amountFormData)
-                                    ? amountFormData.TotalAmountDisplay
-                                    : invoiceDetails.TotalAmountDisplay}
-                                </>
-                              ) : (
-                                <div className="d-flex grid-search">
-                                  <InputControl
-                                    lblClass="mb-0 lbl-req-field d-none"
-                                    name="txtprice"
-                                    ctlType={formCtrlTypes.amount}
-                                    required={true}
-                                    onChange={handleAmountInputChange}
-                                    value={amountFormData.TotalAmount}
-                                    inputClass="w-120px px-2 py-0 h-30px"
-                                  ></InputControl>
-                                  <i
-                                    className="fa fa-check-circle d-flex flex-center font-general text-primary px-2 cur-pointer"
-                                    onClick={(e) => onAmountChange(e)}
-                                  />
-                                  <i
-                                    className="fa fa-times-circle d-flex flex-center font-general text-error px-0 cur-pointer"
-                                    onClick={(e) => onCancelAmountChange(e)}
-                                  />
-                                </div>
-                              )}
-                            </span>
-                          </div>
-                          <div className="row listing-location mb-2 font-general font-500">
-                            {checkObjNullorEmpty(amountFormData) ? (
-                              <>
-                                <span className="col text-left">
-                                  {selectedPaymentType.toLowerCase() ==
-                                  "creditcard" ? (
-                                    <>
-                                      CC Charges (
-                                      {
-                                        invoiceDetails.TaxDetails
-                                          ?.ChargesPercentageDisplay
-                                      }
-                                      )
-                                    </>
-                                  ) : (
-                                    <>Fee</>
-                                  )}
-                                </span>
-                                <span className="col text-right">
-                                  {
-                                    invoiceDetails.TaxDetails
-                                      ?.ChargesAmountDisplay
-                                  }
-                                </span>
-                              </>
-                            ) : (
-                              <>
-                                <span className="col text-left">
-                                  {selectedPaymentType.toLowerCase() ==
-                                  "creditcard" ? (
-                                    <>
-                                      CC Charges (
-                                      {
-                                        invoiceDetails.TaxDetails
-                                          ?.ChargesPercentageDisplay
-                                      }
-                                      )
-                                    </>
-                                  ) : (
-                                    <>Fee</>
-                                  )}
-                                </span>
-                                <span className="col text-right">
-                                  {amountFormData?.ChargesAmountDisplay}
-                                </span>
-                              </>
-                            )}
-                          </div>
-                          <div className="row listing-location mb-2 font-general font-500">
-                            <span className="col text-left">Tax</span>
-                            <span className="col text-right">
-                              {checkObjNullorEmpty(amountFormData)
-                                ? invoiceDetails.TaxDetails?.TaxDisplay
-                                : amountFormData?.TaxDisplay}
-                            </span>
-                          </div>
-                          <hr className="w-100 text-primary my-10"></hr>
-                          <div className="row listing-location mb-2 text-primary font-general font-500">
-                            <span className="col text-left">Total Amount</span>
-                            <span className="col text-right">
-                              {checkObjNullorEmpty(amountFormData)
-                                ? invoiceDetails.TaxDetails
-                                    ?.TotalPaymentAmountDisplay
-                                : amountFormData?.TotalPaymentAmountDisplay}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
                 <div className="col-xl-8 col-lg-8">
                   <form noValidate>
                     {/*============== Carddetails Start ==============*/}
@@ -1114,6 +984,126 @@ const InvoiceCheckout = () => {
                     </div>
                   </form>
                 </div>
+                <div className="col-xl-4 col-lg-4">
+                  <div className="widget bg-white box-shadow rounded px-0 mb-20">
+                    <h6 className="mb-3 down-line pb-10 px-20 down-line-mx20">
+                      Payment Summary
+                    </h6>
+                    {!checkObjNullorEmpty(invoiceDetails) && (
+                      <div className="px-20">
+                        <div className="post-content pb-0">
+                          <div className="row listing-location mb-2 font-general font-500">
+                            <span className="col text-left">
+                              Invoice#: {invoiceDetails.InvoiceNumber}
+                            </span>
+                          </div>
+                          <div className="row listing-location mb-2 font-general font-500">
+                            <span className="col text-left">Amount</span>
+                            <span className="col text-right">
+                              {!showEditAmount ? (
+                                <>
+                                  <i
+                                    className="fa fa-pen font-small text-primary px-2 cur-pointer"
+                                    onClick={(e) => toggleEditAmount(e)}
+                                  />
+                                  {!checkObjNullorEmpty(amountFormData)
+                                    ? amountFormData.TotalAmountDisplay
+                                    : invoiceDetails.TotalAmountDisplay}
+                                </>
+                              ) : (
+                                <div className="d-flex grid-search">
+                                  <InputControl
+                                    lblClass="mb-0 lbl-req-field d-none"
+                                    name="txtprice"
+                                    ctlType={formCtrlTypes.amount}
+                                    required={true}
+                                    onChange={handleAmountInputChange}
+                                    value={amountFormData.TotalAmount}
+                                    inputClass="w-120px px-2 py-0 h-30px"
+                                  ></InputControl>
+                                  <i
+                                    className="fa fa-check-circle d-flex flex-center font-general text-primary px-2 cur-pointer"
+                                    onClick={(e) => onAmountChange(e)}
+                                  />
+                                  <i
+                                    className="fa fa-times-circle d-flex flex-center font-general text-error px-0 cur-pointer"
+                                    onClick={(e) => onCancelAmountChange(e)}
+                                  />
+                                </div>
+                              )}
+                            </span>
+                          </div>
+                          <div className="row listing-location mb-2 font-general font-500">
+                            {checkObjNullorEmpty(amountFormData) ? (
+                              <>
+                                <span className="col text-left">
+                                  {selectedPaymentType.toLowerCase() ==
+                                  "creditcard" ? (
+                                    <>
+                                      CC Charges (
+                                      {
+                                        invoiceDetails.TaxDetails
+                                          ?.ChargesPercentageDisplay
+                                      }
+                                      )
+                                    </>
+                                  ) : (
+                                    <>Fee</>
+                                  )}
+                                </span>
+                                <span className="col text-right">
+                                  {
+                                    invoiceDetails.TaxDetails
+                                      ?.ChargesAmountDisplay
+                                  }
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="col text-left">
+                                  {selectedPaymentType.toLowerCase() ==
+                                  "creditcard" ? (
+                                    <>
+                                      CC Charges (
+                                      {
+                                        invoiceDetails.TaxDetails
+                                          ?.ChargesPercentageDisplay
+                                      }
+                                      )
+                                    </>
+                                  ) : (
+                                    <>Fee</>
+                                  )}
+                                </span>
+                                <span className="col text-right">
+                                  {amountFormData?.ChargesAmountDisplay}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                          <div className="row listing-location mb-2 font-general font-500">
+                            <span className="col text-left">Tax</span>
+                            <span className="col text-right">
+                              {checkObjNullorEmpty(amountFormData)
+                                ? invoiceDetails.TaxDetails?.TaxDisplay
+                                : amountFormData?.TaxDisplay}
+                            </span>
+                          </div>
+                          <hr className="w-100 text-primary my-10"></hr>
+                          <div className="row listing-location mb-2 text-primary font-general font-500">
+                            <span className="col text-left">Total Amount</span>
+                            <span className="col text-right">
+                              {checkObjNullorEmpty(amountFormData)
+                                ? invoiceDetails.TaxDetails
+                                    ?.TotalPaymentAmountDisplay
+                                : amountFormData?.TotalPaymentAmountDisplay}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1123,4 +1113,4 @@ const InvoiceCheckout = () => {
   );
 };
 
-export default InvoiceCheckout;
+export default Checkout;

@@ -100,8 +100,8 @@ const ViewInvoice = () => {
     let objParams = {
       keyword: "",
       inviterid: profileid,
-      InviterProfileTypeId: loggedinprofiletypeid,
-      InviteeProfileTypeId: parseInt(config.userProfileTypes.Tenant),
+      InviterProfileTypeId: 0, //loggedinprofiletypeid
+      InviteeProfileTypeId: 0, //parseInt(config.userProfileTypes.Tenant)
     };
 
     return axiosPost(

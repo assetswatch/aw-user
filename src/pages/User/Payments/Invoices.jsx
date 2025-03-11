@@ -7,7 +7,11 @@ import React, {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import { routeNames } from "../../../routes/routes";
-import { Grid, ModalView } from "../../../components/common/LazyComponents";
+import {
+  Grid,
+  LazyImage,
+  ModalView,
+} from "../../../components/common/LazyComponents";
 import InputControl from "../../../components/common/InputControl";
 import { formCtrlTypes } from "../../../utils/formvalidation";
 import {
@@ -33,9 +37,13 @@ import {
 } from "../../../utils/constants";
 import { Toast } from "../../../components/common/ToastView";
 import { useAuth } from "../../../contexts/AuthContext";
-import { axiosPost, fetchPost } from "../../../helpers/axiosHelper";
+import { axiosPost } from "../../../helpers/axiosHelper";
 import config from "../../../config.json";
-import { addSessionStorageItem } from "../../../helpers/sessionStorageHelper";
+import {
+  addSessionStorageItem,
+  deletesessionStorageItem,
+  getsessionStorageItem,
+} from "../../../helpers/sessionStorageHelper";
 import TextAreaControl from "../../../components/common/TextAreaControl";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 import html2pdf from "html2pdf.js";
@@ -48,6 +56,10 @@ const Invoices = () => {
   let formErrors = {};
   const { loggedinUser } = useAuth();
 
+  let tempInvoiceId = parseInt(
+    getsessionStorageItem(SessionStorageKeys.PreviewInvoiceId, 0)
+  );
+
   let accountid = parseInt(
     GetUserCookieValues(UserCookie.AccountId, loggedinUser)
   );
@@ -55,6 +67,19 @@ const Invoices = () => {
   let profileid = parseInt(
     GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
   );
+
+  //check any temp invoice id exists in session storage and delete it.
+  if (tempInvoiceId > 0) {
+    deletesessionStorageItem(SessionStorageKeys.PreviewInvoiceId);
+    axiosPost(`${config.apiBaseUrl}${ApiUrls.deleteInvoice}`, {
+      ProfileId: profileid,
+      AccountId: accountid,
+      InvoiceId: tempInvoiceId,
+    });
+  }
+
+  //Delete any checkout invoiceid
+  deletesessionStorageItem(SessionStorageKeys.CheckoutInvoiceId);
 
   let loggedinprofiletypeid = parseInt(
     GetUserCookieValues(UserCookie.ProfileTypeId, loggedinUser)
@@ -69,6 +94,7 @@ const Invoices = () => {
   const [isDataLoading, setIsDataLoading] = useState(false);
 
   const [sendInvoiceModalShow, setSendInvoiceModalShow] = useState(false);
+  const [modalPayWarningShow, setModalPayWarningShow] = useState(false);
 
   function setInitialSendInvoiceFormData() {
     return {
@@ -224,7 +250,7 @@ const Invoices = () => {
 
   //Setup Grid.
 
-  const columns = React.useMemo(
+  const columns = useMemo(
     () => [
       {
         Header: "Invoice #",
@@ -239,49 +265,190 @@ const Invoices = () => {
               }}
             >
               <span className="gr-txt-14-b">{row.original.InvoiceNumber}</span>
+              {row.original.InvoiceDirection !=
+                config.directionTypes.Created && (
+                <>
+                  <i
+                    className={`mdi font-20 min-w-30px w-30px ctooltip-container gr-badge-pill px-1 ${
+                      row.original.InvoiceDirection ==
+                      config.directionTypes.Sent
+                        ? "gr-badge-pill-suc mdi-arrow-right-bold"
+                        : "gr-badge-pill-error mdi-arrow-left-bold"
+                    } nocnt bo-0 bg-none`}
+                  >
+                    <div
+                      className={`ctooltip opa9 shadow ${
+                        row.original.InvoiceDirection ==
+                        config.directionTypes.Sent
+                          ? "bg-primary"
+                          : "bg-danger"
+                      }`}
+                    >
+                      {row.original.InvoiceDirectionDisplay}
+                    </div>
+                  </i>
+                </>
+              )}
             </a>
           );
         },
       },
       {
-        Header: "Total Amount",
-        accessor: "TotalAmountDisplay",
+        Header: "Bill To",
+        accessor: "",
         disableSortBy: true,
-        className: "w-200px",
+        className: "w-300px",
+        Cell: ({ row }) => (
+          <div className="row px-5">
+            {row.original.BillToProfileId > 0 ? (
+              <div
+                className="cur-pointer"
+                onClick={(e) => {
+                  onView(e, row);
+                }}
+              >
+                <div className="col-auto px-0">
+                  <LazyImage
+                    className="rounded cur-pointer w-50px mx-1"
+                    src={row.original.BillToPicPath}
+                    placeHolderClass="pos-absolute w-50px min-h-50 fl-l"
+                  ></LazyImage>
+                </div>
+                <div className="col property-info flex v-center pb-0 min-h-50 px-5">
+                  <h5 className="text-secondary">
+                    {checkEmptyVal(row.original.BillToCompanyName)
+                      ? row.original.BillToFirstName +
+                        " " +
+                        row.original.BillToFirstName
+                      : row.original.BillToCompanyName}
+
+                    <div className="mt-0 py-0 small text-light">
+                      {row.original.BillToProfileType}
+                    </div>
+                  </h5>
+                </div>
+              </div>
+            ) : (
+              ""
+            )}
+          </div>
+        ),
       },
       {
-        Header: "Payment Status",
-        accessor: "PaymentStatus",
+        Header: "Sent To",
+        accessor: "",
         disableSortBy: true,
-        className: "w-180px",
+        className: "w-400px",
         Cell: ({ row }) => (
           <>
-            <span
-              className={`badge badge-pill gr-badge-pill ${
-                row.original.PaymentStatus == 2
-                  ? "gr-badge-pill-warning w-100px"
-                  : "gr-badge-pill-suc"
-              }`}
-            >
-              {row.original.PaymentStatusDisplay}
-            </span>
+            {row.original.SentProfiles.length == 1 ? (
+              <div
+                className="cur-pointer"
+                onClick={(e) => {
+                  onView(e, row);
+                }}
+              >
+                <div className="col-auto px-0">
+                  <LazyImage
+                    className="rounded cur-pointer w-50px mx-1"
+                    src={row.original.SentProfiles[0].PicPath}
+                    placeHolderClass="pos-absolute w-50px min-h-50 fl-l"
+                  ></LazyImage>
+                </div>
+                <div className="col property-info flex v-center pb-0 min-h-50 px-5">
+                  <h5 className="text-secondary">
+                    {checkEmptyVal(row.original.SentProfiles[0].CompanyName)
+                      ? row.original.SentProfiles[0].FirstName +
+                        " " +
+                        row.original.SentProfiles[0].LastName
+                      : row.original.SentProfiles[0].CompanyName}
+
+                    <div className="mt-0 py-0 small text-light">
+                      {row.original.SentProfiles[0].ProfileType}
+                    </div>
+                  </h5>
+                </div>
+              </div>
+            ) : (
+              <div className="imgs-ol-container">
+                {row.original.SentProfiles.slice(0, 6).map((sp, idx) => {
+                  return (
+                    <div
+                      className="div-img"
+                      key={`${"sp-" + idx}`}
+                      style={{ zIndex: 100 - idx }}
+                      onClick={(e) => {
+                        onView(e, row);
+                      }}
+                    >
+                      {idx <= 5 ? (
+                        <>
+                          <LazyImage
+                            className={`rounded-circle cur-pointer w-50px img`}
+                            src={sp.PicPath}
+                            placeHolderClass="pos-absolute w-50px min-h-50 fl-l"
+                          ></LazyImage>
+                          <span className="tooltip lh-1">
+                            {" "}
+                            {checkEmptyVal(sp.CompanyName)
+                              ? sp.FirstName + " " + sp.LastName
+                              : sp.CompanyName}
+                            <br />
+                            <span className="mt-0 font-mini">
+                              {sp.ProfileType}
+                            </span>
+                          </span>
+                        </>
+                      ) : (
+                        <div class="more">
+                          +{row.original.SentProfiles.length - 5}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </>
         ),
       },
       {
-        Header: "Date",
-        accessor: "BillDateDisplay",
-        className: "w-20px",
-      },
-      {
-        Header: "Due On",
-        accessor: "DueDateDisplay",
-        className: "w-20px",
-      },
-      {
-        Header: "Created On",
-        accessor: "CreatedDateDisplay",
-        className: "w-250px",
+        Header: "Payment Info",
+        className: "w-220px",
+        Cell: ({ row }) => (
+          <>
+            <div className="property-info d-table">
+              <div>Amount: {row.original.TotalAmountDisplay}</div>
+              {/* <div>Date: {row.original.BillDateDisplay}</div> */}
+              <div>Due On: {row.original.DueDateDisplay}</div>
+              {row.original.InvoiceDirection !=
+                config.directionTypes.Created && (
+                <span>
+                  <span
+                    className={`badge badge-pill gr-badge-pill mt-2 ${
+                      row.original.PaymentStatus == 2
+                        ? "gr-badge-pill-info w-100px"
+                        : row.original.PaymentStatus == 0
+                        ? "gr-badge-pill-warning w-100px"
+                        : "gr-badge-pill-suc"
+                    }`}
+                  >
+                    {row.original.PaymentStatusDisplay}
+                  </span>
+                </span>
+              )}
+              {/* {checkEmptyVal(row.original.PaymentId == 0) ? (
+                ""
+              ) : (
+                <>
+                  <div>Payment Ref#: {row.original.PaymentRefNumber}</div>
+                  <div>Paid On#: {row.original.PaidDateDisplay}</div>
+                  <div>Paid Amount#: {row.original.PaidAmountDisplay}</div>
+                </>
+              )} */}
+            </div>
+          </>
+        ),
       },
       {
         Header: "Actions",
@@ -292,16 +459,40 @@ const Invoices = () => {
             onclick: (e, row) => onView(e, row),
           },
           {
-            text: "Download",
+            text: "Download Invoice",
             onclick: (e, row) => {
               downloadPdf(e, row);
             },
             icssclass: "pr-10 pl-2px",
           },
           {
+            text: "Download Receipt",
+            onclick: (e, row) => {
+              downloadReceiptPdf(e, row);
+            },
+            icssclass: "pr-10 pl-2px",
+            isconditionalshow: (row) => {
+              return (
+                row?.original?.PaymentId > 0 &&
+                row?.original?.InvoiceDirection == 2
+              );
+            },
+          },
+          {
             text: "Send",
             onclick: (e, row) => onSendInvoiceModalShow(e, row),
             icssclass: "pr-10 pl-2px",
+          },
+          {
+            text: "Pay Now",
+            onclick: (e, row) => onPayNow(e, row),
+            icssclass: "pr-10 pl-2px",
+            isconditionalshow: (row) => {
+              return (
+                row?.original?.PaymentId == 0 &&
+                row?.original?.InvoiceDirection == 2
+              );
+            },
           },
         ],
       },
@@ -347,7 +538,7 @@ const Invoices = () => {
           }).then(async (presponse) => {
             let objPResponse = presponse.data;
             if (objPResponse.StatusCode === 200) {
-              generatePDF(objPResponse.Data, objResponse.Data);
+              generatePDF(objPResponse.Data, objResponse.Data, "Invoice");
             } else {
               isapimethoderr = true;
             }
@@ -542,16 +733,26 @@ const Invoices = () => {
     }
   };
 
-  const generatePDF = async (pdfDetails, invoiceDetails) => {
+  const generatePDF = async (pdfDetails, invoiceDetails, receiptType) => {
     const watermarkImage = pdfDetails.BrandingDetails.WatermarkUrl;
     const base64Watermark = await convertImageToBase64(watermarkImage);
+
+    const pdfFileName = `${
+      receiptType +
+      "-" +
+      invoiceDetails?.AccountId +
+      "-" +
+      invoiceDetails?.ProfileId +
+      "-" +
+      invoiceDetails?.InvoiceNumber
+    }.pdf`;
 
     const pdf = await html2pdf()
       .from(pdfDetails.PdfHtml)
       .set(
         { ...html2PdfSettings },
         {
-          filename: `${invoiceDetails?.InvoiceNumber}.pdf`,
+          filename: pdfFileName,
         }
       )
       .toPdf()
@@ -606,7 +807,44 @@ const Invoices = () => {
         }
 
         pdf.internal.scaleFactor = pdfHFWMSettings.scaleFactor;
-        pdf.save(`${invoiceDetails?.InvoiceNumber}.pdf`);
+        pdf.save(`${pdfFileName}`);
+      });
+  };
+
+  const downloadReceiptPdf = async (e, row) => {
+    e.preventDefault();
+    apiReqResLoader("x", "x", API_ACTION_STATUS.START);
+    let isapimethoderr = false;
+    let objParams = {
+      InvoiceId: parseInt(row.original.InvoiceId),
+    };
+    axiosPost(`${config.apiBaseUrl}${ApiUrls.getInvoiceDetails}`, objParams)
+      .then(async (response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode === 200) {
+          axiosPost(`${config.apiBaseUrl}${ApiUrls.getReceiptPdfDetails}`, {
+            InvoiceId: row.original.InvoiceId,
+          }).then(async (presponse) => {
+            let objPResponse = presponse.data;
+            if (objPResponse.StatusCode === 200) {
+              generatePDF(objPResponse.Data, objResponse.Data, "Receipt");
+            } else {
+              isapimethoderr = true;
+            }
+          });
+        } else {
+          isapimethoderr = true;
+        }
+      })
+      .catch((err) => {
+        isapimethoderr = true;
+        console.error(`"API :: ${ApiUrls.getInvoiceDetails}, Error ::" ${err}`);
+      })
+      .finally(() => {
+        if (isapimethoderr == true) {
+          Toast.error(AppMessages.SomeProblem);
+        }
+        apiReqResLoader("x", "x", API_ACTION_STATUS.COMPLETED);
       });
   };
 
@@ -637,8 +875,8 @@ const Invoices = () => {
         let objParams = {
           keyword: "",
           inviterid: profileid,
-          InviterProfileTypeId: loggedinprofiletypeid,
-          InviteeProfileTypeId: parseInt(config.userProfileTypes.Tenant),
+          InviterProfileTypeId: 0, //loggedinprofiletypeid
+          InviteeProfileTypeId: 0, //parseInt(config.userProfileTypes.Tenant)
         };
 
         return axiosPost(
@@ -707,6 +945,52 @@ const Invoices = () => {
   const navigateToGenerateInvoice = (e) => {
     e.preventDefault();
     navigate(routeNames.createinvoice.path);
+  };
+
+  const onPayNow = (e, row) => {
+    e.preventDefault();
+
+    let isapimethoderr = false;
+    let objSubAccountsParams = {
+      AccountId: accountid,
+      ProfileId: profileid,
+      Status: `${config.paymentAccountCreateStatus.Active}`,
+    };
+    axiosPost(
+      `${config.apiBaseUrl}${ApiUrls.getPaymentSubAccountsCountByStatus}`,
+      objSubAccountsParams
+    )
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode === 200) {
+          if (objResponse.Data.TotalCount > 0) {
+            addSessionStorageItem(
+              SessionStorageKeys.CheckoutInvoiceId,
+              row.original.InvoiceId
+            );
+            navigate(routeNames.checkout.path);
+          } else {
+            setModalPayWarningShow(true);
+          }
+        } else {
+          isapimethoderr = true;
+        }
+      })
+      .catch((err) => {
+        isapimethoderr = true;
+        console.error(
+          `"API :: ${ApiUrls.getPaymentSubAccountsCountByStatus}, Error ::" ${err}`
+        );
+      })
+      .finally(() => {
+        if (isapimethoderr == true) {
+          Toast.error(AppMessages.SomeProblem);
+        }
+      });
+  };
+
+  const onPayWarningModalClose = () => {
+    setModalPayWarningShow(false);
   };
 
   return (
@@ -956,6 +1240,32 @@ const Invoices = () => {
         </>
       )}
       {/*============== Send Invoice Modal End ==============*/}
+
+      {/*============== Pay Warning Modal Start ==============*/}
+      {modalPayWarningShow && (
+        <>
+          <ModalView
+            title={AppMessages.CheckoutNoSubAccountAlertTitle}
+            content={
+              <>
+                <span className="font-general font-400">
+                  {AppMessages.CheckoutNoSubAccountMessage}
+                </span>
+              </>
+            }
+            onClose={onPayWarningModalClose}
+            actions={[
+              {
+                text: "Close",
+                displayOrder: 1,
+                btnClass: "btn-primary",
+                onClick: (e) => onPayWarningModalClose(e),
+              },
+            ]}
+          ></ModalView>
+        </>
+      )}
+      {/*============== Pay Warning Modal End ==============*/}
     </>
   );
 };

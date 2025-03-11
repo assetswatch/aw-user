@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
 import {
@@ -11,8 +11,8 @@ import {
 import {
   API_ACTION_STATUS,
   ApiUrls,
-  AppConstants,
   AppMessages,
+  SessionStorageKeys,
   UserCookie,
   ValidationMessages,
 } from "../../../utils/constants";
@@ -26,6 +26,15 @@ import AsyncSelect from "../../../components/common/AsyncSelect";
 import { formCtrlTypes } from "../../../utils/formvalidation";
 import DateControl from "../../../components/common/DateControl";
 import { useGetDdlInvoiceItemsGateway } from "../../../hooks/useGetDdlInvoiceItemsGateway";
+import {
+  addSessionStorageItem,
+  deletesessionStorageItem,
+  getsessionStorageItem,
+} from "../../../helpers/sessionStorageHelper";
+import { ModalView } from "../../../components/common/LazyComponents";
+import { useGetInvoiceItemAccountForTypesGateway } from "../../../hooks/usegetInvoiceItemAccountForTypesGateway";
+import { useGetInvoiceItemForTypesGateway } from "../../../hooks/useGetInvoiceItemForTypesGateway";
+import { useGetDdlInvoiceForItemsGateway } from "../../../hooks/useGetDdlInvoiceForItemsGateway";
 import TextAreaControl from "../../../components/common/TextAreaControl";
 
 const CreateInvoice = () => {
@@ -35,6 +44,10 @@ const CreateInvoice = () => {
 
   const { loggedinUser } = useAuth();
 
+  let tempInvoiceId = parseInt(
+    getsessionStorageItem(SessionStorageKeys.PreviewInvoiceId, 0)
+  );
+
   let accountId = parseInt(
     GetUserCookieValues(UserCookie.AccountId, loggedinUser)
   );
@@ -42,6 +55,18 @@ const CreateInvoice = () => {
   let profileId = parseInt(
     GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
   );
+
+  //check any temp invoice id exists in session storage and delete it.
+  const deleteTempInvoice = () => {
+    if (tempInvoiceId > 0) {
+      deletesessionStorageItem(SessionStorageKeys.PreviewInvoiceId);
+      axiosPost(`${config.apiBaseUrl}${ApiUrls.deleteInvoice}`, {
+        ProfileId: profileId,
+        AccountId: accountId,
+        InvoiceId: tempInvoiceId,
+      });
+    }
+  };
 
   let formErrors = {};
   const [errors, setErrors] = useState({});
@@ -64,6 +89,8 @@ const CreateInvoice = () => {
   const [newItem, setNewItem] = useState(objInitItems());
   const [editingItemId, setEditingItemId] = useState(null);
   const [editItem, setEditItem] = useState(objInitItems());
+  const [joinedUsersData, setJoinedUsersData] = useState([]);
+  const [selectedJoinedUser, setSelectedJoinedUser] = useState(null);
 
   function objInitItems() {
     return {
@@ -81,32 +108,99 @@ const CreateInvoice = () => {
     profileId
   );
 
+  const [ddlInvoiceItems, setDdlInvoiceItems] = useState([]);
+
+  useEffect(() => {
+    setDdlInvoiceItems(invoiceItemsList);
+  }, [invoiceItemsList]);
+
   //Load
   useEffect(() => {
-    Promise.allSettled([getGeneratedInvoiceNumber()]).then(() => {});
+    Promise.allSettled([getGeneratedInvoiceNumber(), getJoinedUsers()]).then(
+      () => {}
+    );
   }, []);
 
-  const getGeneratedInvoiceNumber = () => {
-    axiosPost(`${config.apiBaseUrl}${ApiUrls.generateInvoiceNumber}`, {
-      AccountId: accountId,
-      ProfileId: profileId,
-    })
+  const getJoinedUsers = async () => {
+    let objParams = {
+      keyword: "",
+      inviterid: profileId,
+      InviterProfileTypeId: 0, //loggedinprofiletypeid
+      InviteeProfileTypeId: 0, //parseInt(config.userProfileTypes.Tenant)
+    };
+
+    return axiosPost(
+      `${config.apiBaseUrl}${ApiUrls.getDdlJoinedUserConnections}`,
+      objParams
+    )
       .then((response) => {
         let objResponse = response.data;
-        if (objResponse.StatusCode === 200) {
-          setFormData({
-            ...formData,
-            generateInvoiceNumber: objResponse.Data?.InvoiceNumber || "",
-            txtinvoicenumber: objResponse.Data?.InvoiceNumber || "",
-          });
+        if (objResponse.StatusCode == 200) {
+          let data = objResponse.Data.map((item) => ({
+            label: (
+              <div className="flex items-center">
+                <div className="w-40px h-40px mr-10 flex-shrink-0">
+                  <img
+                    alt=""
+                    src={item.PicPath}
+                    className="rounded cur-pointer w-40px"
+                  />
+                </div>
+                <div>
+                  <span className="text-primary lh-1 d-block">
+                    {item.FirstName + " " + item.LastName}
+                  </span>
+                  <span className="small text-light">{item.ProfileType}</span>
+                </div>
+              </div>
+            ),
+            value: item.ProfileId,
+            customlabel: item.FirstName + " " + item.LastName,
+          }));
+          setJoinedUsersData(data);
+        } else {
+          setJoinedUsersData([]);
         }
       })
       .catch((err) => {
         console.error(
-          `API :: ${config.apiBaseUrl}${ApiUrls.generateInvoiceNumber}, Error :: ${err}`
+          `"API :: ${ApiUrls.getDdlJoinedUserConnections}, Error ::" ${err}`
         );
+        setJoinedUsersData([]);
       })
-      .finally(() => {});
+      .finally(() => {
+        setSelectedJoinedUser(null);
+      });
+  };
+
+  const getGeneratedInvoiceNumber = () => {
+    const promise = new Promise((resolve, reject) => {
+      deleteTempInvoice();
+      resolve();
+      reject();
+    });
+    promise.then(() => {
+      axiosPost(`${config.apiBaseUrl}${ApiUrls.generateInvoiceNumber}`, {
+        AccountId: accountId,
+        ProfileId: profileId,
+      })
+        .then((response) => {
+          let objResponse = response.data;
+          if (objResponse.StatusCode === 200) {
+            setFormData({
+              ...formData,
+              generateInvoiceNumber: objResponse.Data?.InvoiceNumber || "",
+              txtinvoicenumber: objResponse.Data?.InvoiceNumber || "",
+            });
+          }
+        })
+        .catch((err) => {
+          console.error(
+            `API :: ${config.apiBaseUrl}${ApiUrls.generateInvoiceNumber}, Error :: ${err}`
+          );
+        })
+        .finally(() => {});
+    });
   };
 
   const handleChange = (e) => {
@@ -172,11 +266,19 @@ const CreateInvoice = () => {
     return cal == "NaN" ? "0.00" : cal;
   };
 
-  const onCreate = (e) => {
+  const handleJoinedUserChange = (e) => {
+    setSelectedJoinedUser(e);
+  };
+
+  const onPreview = (e) => {
     e.preventDefault();
     e.stopPropagation();
     let errctl = "#form-error";
     $(errctl).html("");
+
+    if (checkObjNullorEmpty(selectedJoinedUser)) {
+      formErrors["ddljoinedusers"] = ValidationMessages.UserReq;
+    }
 
     if (Object.keys(formErrors).length === 0) {
       apiReqResLoader("btnCreate", "Creating...");
@@ -237,6 +339,10 @@ const CreateInvoice = () => {
           "DueDate",
           formData.txtduedate.format("MM/DD/YYYY")
         );
+        objBodyParams.append(
+          "BillToProfileId",
+          parseInt(selectedJoinedUser?.value)
+        );
         objBodyParams.append("Message", formData.txtmessage);
         objBodyParams.append(
           "IsCustomInvNum",
@@ -255,9 +361,11 @@ const CreateInvoice = () => {
             if (objResponse.StatusCode === 200) {
               if (objResponse.Data != null && objResponse.Data?.Status > 0) {
                 if (objResponse.Data?.Id > 0) {
-                  //Checks any duplicate inovice number
-                  Toast.success(objResponse.Data.Message);
-                  navigateToInvoices();
+                  addSessionStorageItem(
+                    SessionStorageKeys.PreviewInvoiceId,
+                    objResponse.Data?.Id
+                  );
+                  navigate(routeNames.previewinvoice.path);
                 } else {
                   Toast.error(objResponse.Data.Message);
                 }
@@ -292,6 +400,175 @@ const CreateInvoice = () => {
   const navigateToInvoices = (e) => {
     e?.preventDefault();
     navigate(routeNames.paymentsinvoices.path);
+  };
+
+  const AddNewItem = () => {
+    return (
+      <div
+        onClick={handleAddNewItem}
+        className="bg-light text-center cur-pointer font-general font-500 py-10"
+      >
+        + Create New Item
+      </div>
+    );
+  };
+
+  const [addNewItemModalShow, setAddNewItemModalShow] = useState(false);
+
+  function setAddNewItemInitialFormData() {
+    return {
+      txtaddnewitemdescription: "",
+      txtaddnewitemprice: "",
+      ddladdnewitemitemfortype: null,
+      ddladdnewitemaccountfortype: null,
+      ddladdnewitemforitem: null,
+    };
+  }
+
+  const [addNewItemFormData, setAddNewItemFormData] = useState(
+    setAddNewItemInitialFormData()
+  );
+
+  const { invoiceItemForTypesList } = useGetInvoiceItemForTypesGateway("", 1);
+  const { invoiceForItems } = useGetDdlInvoiceForItemsGateway(
+    "",
+    addNewItemFormData.ddladdnewitemitemfortype?.value
+  );
+
+  const { invoiceItemAccountForTypesList } =
+    useGetInvoiceItemAccountForTypesGateway("", 1);
+
+  let addNewItemformErrors = {};
+  const [addNewItemerrors, setAddNewItemErrors] = useState({});
+
+  const handleAddNewItem = () => {
+    setAddNewItemModalShow(true);
+  };
+
+  const onAddNewItemModalClose = () => {
+    setAddNewItemModalShow(false);
+    addNewItemformErrors = {};
+    setAddNewItemErrors({});
+    setAddNewItemFormData(setAddNewItemInitialFormData());
+  };
+
+  const addNewItemHandleChange = (e) => {
+    const { name, value } = e?.target;
+    setAddNewItemFormData({
+      ...addNewItemFormData,
+      [name]: value,
+    });
+  };
+
+  const addNewItemDdlChange = (e, name) => {
+    let updateFormData = {
+      ...addNewItemFormData,
+      [name]: e,
+    };
+    if (name === "ddladdnewitemitemfortype") {
+      updateFormData = {
+        ...updateFormData,
+        ddladdnewitemforitem: null,
+        txtaddnewitemdescription: "",
+      };
+    }
+    if (name === "ddladdnewitemforitem") {
+      updateFormData = {
+        ...updateFormData,
+        txtaddnewitemdescription: e?.label,
+      };
+    }
+    setAddNewItemFormData({ ...updateFormData });
+  };
+
+  const onCreateNewItem = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (checkEmptyVal(addNewItemFormData.ddladdnewitemitemfortype)) {
+      addNewItemformErrors["ddladdnewitemitemfortype"] =
+        ValidationMessages.ItemForTypeReq;
+    }
+
+    if (checkEmptyVal(addNewItemFormData.ddladdnewitemforitem)) {
+      addNewItemformErrors["ddladdnewitemforitem"] = ValidationMessages.ItemReq;
+    }
+
+    if (checkEmptyVal(addNewItemFormData.ddladdnewitemaccountfortype)) {
+      addNewItemformErrors["ddladdnewitemaccountfortype"] =
+        ValidationMessages.AccountForTypeReq;
+    }
+
+    if (Object.keys(addNewItemformErrors).length === 0) {
+      setErrors({});
+      apiReqResLoader("btncreatenewitem", "Creating", API_ACTION_STATUS.START);
+      let isapimethoderr = false;
+      let objBodyParams = {
+        ItemId: 0,
+        AccountId: accountId,
+        ProfileId: profileId,
+        ItemForTypeId: parseInt(
+          addNewItemFormData.ddladdnewitemitemfortype?.value
+        ),
+        ItemForId: parseInt(addNewItemFormData.ddladdnewitemforitem?.value),
+        Item: addNewItemFormData.ddladdnewitemforitem?.label,
+        AccountForTypeId: parseInt(
+          addNewItemFormData.ddladdnewitemaccountfortype?.value
+        ),
+        Description: addNewItemFormData.txtaddnewitemdescription,
+        Price: checkEmptyVal(addNewItemFormData.txtaddnewitemprice)
+          ? 0
+          : addNewItemFormData.txtaddnewitemprice,
+      };
+
+      axiosPost(`${config.apiBaseUrl}${ApiUrls.addInvoiceItem}`, objBodyParams)
+        .then((response) => {
+          let objResponse = response.data;
+          if (objResponse.StatusCode === 200) {
+            if (objResponse.Data.Id > 0) {
+              onAddNewItemModalClose();
+              Toast.success(objResponse.Data.Message);
+              axiosPost(`${config.apiBaseUrl}${ApiUrls.getDdlInvoiceItems}`, {
+                Keyword: "",
+                AccountId: accountId,
+                ProfileId: profileId,
+              })
+                .then((invoceitemslistresponse) => {
+                  let objInvoceItemsListResponse = invoceitemslistresponse.data;
+                  if (objInvoceItemsListResponse.StatusCode === 200) {
+                    setDdlInvoiceItems(objInvoceItemsListResponse.Data);
+                  }
+                })
+                .catch((err) => {
+                  console.error(
+                    `"API :: ${ApiUrls.getDdlInvoiceItems}, Error ::" ${err}`
+                  );
+                });
+            } else {
+              Toast.error(objResponse.Data.Message);
+            }
+          } else {
+            isapimethoderr = true;
+          }
+        })
+        .catch((err) => {
+          isapimethoderr = true;
+          console.error(`"API :: ${ApiUrls.addInvoiceItem}, Error ::" ${err}`);
+        })
+        .finally(() => {
+          if (isapimethoderr == true) {
+            Toast.error(AppMessages.SomeProblem);
+          }
+          apiReqResLoader(
+            "btncreatenewitem",
+            "Create",
+            API_ACTION_STATUS.COMPLETED
+          );
+        });
+    } else {
+      $(`[name=${Object.keys(addNewItemformErrors)[0]}]`).focus();
+      setAddNewItemErrors(addNewItemformErrors);
+    }
   };
 
   return (
@@ -371,6 +648,7 @@ const CreateInvoice = () => {
                         ></DateControl>
                       </div>
                       <div className="col-md-12 my-15">
+                        <h6 className="mb-3 down-line  pb-10">Items</h6>
                         {/*============== Add Items Start ==============*/}
                         <div className="row">
                           <div className="col">
@@ -404,18 +682,18 @@ const CreateInvoice = () => {
                                               <div>
                                                 <AsyncSelect
                                                   placeHolder={
-                                                    invoiceItemsList.length <=
+                                                    ddlInvoiceItems.length <=
                                                       0 && editItem.item == null
                                                       ? AppMessages.DdLLoading
                                                       : AppMessages.DdlSelectItem
                                                   }
                                                   noData={
-                                                    invoiceItemsList.length <=
+                                                    ddlInvoiceItems.length <=
                                                       0 && editItem.item == null
                                                       ? AppMessages.DdLLoading
                                                       : AppMessages.NoItems
                                                   }
-                                                  options={invoiceItemsList}
+                                                  options={ddlInvoiceItems}
                                                   dataKey="ItemId"
                                                   dataVal="Item"
                                                   onChange={(e) => {
@@ -423,7 +701,7 @@ const CreateInvoice = () => {
                                                       objInitItems();
                                                     if (e != null) {
                                                       selectedItem =
-                                                        invoiceItemsList.filter(
+                                                        ddlInvoiceItems.filter(
                                                           (i) =>
                                                             i.ItemId === e.value
                                                         )?.[0];
@@ -605,25 +883,27 @@ const CreateInvoice = () => {
                                       <td className="w-350px">
                                         <AsyncSelect
                                           placeHolder={
-                                            invoiceItemsList.length <= 0 &&
-                                            newItem.item == null
-                                              ? AppMessages.DdLLoading
-                                              : AppMessages.DdlSelectItem
+                                            AppMessages.DdlSelectItem
                                           }
-                                          noData={
-                                            invoiceItemsList.length <= 0 &&
-                                            newItem.item == null
-                                              ? AppMessages.DdLLoading
-                                              : AppMessages.NoItems
-                                          }
-                                          options={invoiceItemsList}
+                                          // ddlInvoiceItems.length <= 0 &&
+                                          // newItem.item == null
+                                          //   ? AppMessages.DdLLoading
+                                          //   : AppMessages.DdlSelectItem
+
+                                          noData={AppMessages.NoItems}
+                                          // ddlInvoiceItems.length <= 0 &&
+                                          // newItem.item == null
+                                          //   ? AppMessages.DdLLoading
+                                          //   : AppMessages.NoItems
+
+                                          options={ddlInvoiceItems}
                                           dataKey="ItemId"
                                           dataVal="Item"
                                           onChange={(e) => {
                                             let selectedItem = objInitItems();
                                             if (e != null) {
                                               selectedItem =
-                                                invoiceItemsList.filter(
+                                                ddlInvoiceItems.filter(
                                                   (i) => i.ItemId === e.value
                                                 )?.[0];
                                             }
@@ -648,6 +928,7 @@ const CreateInvoice = () => {
                                           errors={addItemerrors}
                                           formErrors={formAddItemErrors}
                                           menuPortalTarget="body"
+                                          menuFooter={AddNewItem}
                                         ></AsyncSelect>
                                       </td>
                                       <td className="w-300px">
@@ -731,51 +1012,256 @@ const CreateInvoice = () => {
                         </div>
                         {/*============== Add Items End ==============*/}
                       </div>
+                      <div className="col-md-12 my-15">
+                        <h6 className="mb-3 down-line  pb-10">Bill To</h6>
+                        <div className="row">
+                          <div className="col-md-6 mb-15">
+                            <AsyncSelect
+                              placeHolder={
+                                selectedJoinedUser == null ||
+                                Object.keys(selectedJoinedUser).length === 0
+                                  ? AppMessages.DdlDefaultSelect
+                                  : joinedUsersData.length <= 0
+                                  ? AppMessages.DdLLoading
+                                  : AppMessages.DdlDefaultSelect
+                              }
+                              noData={
+                                selectedJoinedUser == null ||
+                                Object.keys(selectedJoinedUser).length === 0
+                                  ? AppMessages.NoUsers
+                                  : joinedUsersData.length <= 0
+                                  ? AppMessages.DdLLoading
+                                  : AppMessages.NoUsers
+                              }
+                              options={joinedUsersData}
+                              onChange={(e) => {
+                                handleJoinedUserChange(e);
+                              }}
+                              value={selectedJoinedUser}
+                              name="ddljoinedusers"
+                              lblText="Users"
+                              lbl={formCtrlTypes.users}
+                              lblClass="mb-0 lbl-req-field"
+                              required={true}
+                              errors={errors}
+                              formErrors={formErrors}
+                              //isMulti={true}
+                              isRenderOptions={false}
+                              tabIndex={1}
+                            ></AsyncSelect>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0"
+                              name="txtmessage"
+                              ctlType={formCtrlTypes.message}
+                              required={false}
+                              onChange={handleChange}
+                              value={formData.txtmessage}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={2}
+                            ></InputControl>
+                          </div>
+                        </div>
+
+                        <hr className="w-100 text-primary my-20"></hr>
+                        <div className="row form-action d-flex flex-end mt-20">
+                          <div
+                            className="col-md-6 form-error"
+                            id="form-error"
+                          ></div>
+                          <div className="col-md-6">
+                            <button
+                              className="btn btn-secondary"
+                              id="btnCancel"
+                              onClick={navigateToInvoices}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              className="btn btn-primary"
+                              id="btnPreview"
+                              onClick={onPreview}
+                            >
+                              Preview
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </form>
-                  <hr className="w-100 text-primary my-20"></hr>
-
-                  <div className="row form-action flex-center mx-0">
-                    <div className="col-md-6 col-lg-4 px-0 text-left mb-15">
-                      <TextAreaControl
-                        lblClass="mb-0"
-                        name="txtmessage"
-                        ctlType={formCtrlTypes.message}
-                        required={false}
-                        onChange={handleChange}
-                        value={formData.txtmessage}
-                        errors={errors}
-                        formErrors={formErrors}
-                        rows={2}
-                      ></TextAreaControl>
-                    </div>
-                    <div className="col-md-6 col-lg-8 px-0 my-15 flex-vb">
-                      <button
-                        className="btn btn-secondary"
-                        id="btnCancel"
-                        onClick={navigateToInvoices}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        className="btn btn-primary"
-                        id="btnCreate"
-                        onClick={onCreate}
-                      >
-                        Create
-                      </button>
-                    </div>
-                    <div
-                      className="col-md-12 px-0 form-error text-right"
-                      id="form-error"
-                    ></div>
-                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/*============== Add New Item Modal Start ==============*/}
+      {addNewItemModalShow && (
+        <>
+          <ModalView
+            title={AppMessages.AddInvocieItemModalTitle}
+            content={
+              <>
+                <form noValidate>
+                  <div className="row">
+                    <div className="col-md-6 mb-15">
+                      <AsyncSelect
+                        placeHolder={
+                          invoiceItemForTypesList.length <= 0 &&
+                          addNewItemFormData.ddladdnewitemitemfortype == null
+                            ? AppMessages.DdLLoading
+                            : AppMessages.DdlDefaultSelect
+                        }
+                        noData={
+                          invoiceItemForTypesList.length <= 0 &&
+                          addNewItemFormData.ddladdnewitemitemfortype == null
+                            ? AppMessages.DdLLoading
+                            : AppMessages.DdlNoData
+                        }
+                        options={invoiceItemForTypesList}
+                        dataKey="ItemForTypeId"
+                        dataVal="ItemForType"
+                        onChange={(e) =>
+                          addNewItemDdlChange(e, "ddladdnewitemitemfortype")
+                        }
+                        value={addNewItemFormData.ddladdnewitemitemfortype}
+                        name="ddladdnewitemitemfortype"
+                        lbl={formCtrlTypes.itemfortype}
+                        lblClass="mb-0 lbl-req-field"
+                        className="ddlborder"
+                        isClearable={true}
+                        required={true}
+                        errors={addNewItemerrors}
+                        formErrors={addNewItemformErrors}
+                        tabIndex={1}
+                      ></AsyncSelect>
+                    </div>
+                    <div className="col-md-6 mb-15">
+                      <AsyncSelect
+                        placeHolder={
+                          addNewItemFormData.ddladdnewitemforitem == null ||
+                          Object.keys(addNewItemFormData.ddladdnewitemforitem)
+                            .length === 0
+                            ? AppMessages.DdlDefaultSelect
+                            : invoiceForItems?.length <= 0 &&
+                              addNewItemFormData.ddladdnewitemforitem == null
+                            ? AppMessages.DdLLoading
+                            : AppMessages.DdlDefaultSelect
+                        }
+                        noData={
+                          addNewItemFormData.ddladdnewitemforitem == null ||
+                          Object.keys(addNewItemFormData.ddladdnewitemforitem)
+                            .length === 0
+                            ? AppMessages.NoData
+                            : invoiceForItems?.length <= 0 &&
+                              addNewItemFormData.ddladdnewitemforitem == null
+                            ? AppMessages.DdLLoading
+                            : AppMessages.NoData
+                        }
+                        options={invoiceForItems}
+                        dataKey="Id"
+                        dataVal="Name"
+                        onChange={(e) =>
+                          addNewItemDdlChange(e, "ddladdnewitemforitem")
+                        }
+                        value={addNewItemFormData.ddladdnewitemforitem}
+                        name="ddladdnewitemforitem"
+                        lbl={formCtrlTypes.select}
+                        lblClass="mb-0 lbl-req-field"
+                        lblText="Item:"
+                        className="ddlborder"
+                        isClearable={false}
+                        errors={addNewItemerrors}
+                        formErrors={addNewItemformErrors}
+                        tabIndex={2}
+                      ></AsyncSelect>
+                    </div>
+                    <div className="col-md-6 mb-15">
+                      <AsyncSelect
+                        placeHolder={
+                          invoiceItemAccountForTypesList.length <= 0 &&
+                          addNewItemFormData.ddladdnewitemaccountfortype == null
+                            ? AppMessages.DdLLoading
+                            : AppMessages.DdlDefaultSelect
+                        }
+                        noData={
+                          invoiceItemAccountForTypesList.length <= 0 &&
+                          addNewItemFormData.ddladdnewitemaccountfortype == null
+                            ? AppMessages.DdLLoading
+                            : AppMessages.DdlNoData
+                        }
+                        options={invoiceItemAccountForTypesList}
+                        dataKey="AccountForTypeId"
+                        dataVal="AccountForType"
+                        onChange={(e) =>
+                          addNewItemDdlChange(e, "ddladdnewitemaccountfortype")
+                        }
+                        value={addNewItemFormData.ddladdnewitemaccountfortype}
+                        name="ddladdnewitemaccountfortype"
+                        lbl={formCtrlTypes.accountfortype}
+                        lblClass="mb-0 lbl-req-field"
+                        className="ddlborder"
+                        isClearable={false}
+                        required={true}
+                        errors={addNewItemerrors}
+                        formErrors={addNewItemformErrors}
+                        tabIndex={3}
+                      ></AsyncSelect>
+                    </div>
+                    <div className="col-md-6 mb-15">
+                      <InputControl
+                        lblClass="mb-0 lbl-req-field"
+                        name="txtaddnewitemprice"
+                        ctlType={formCtrlTypes.price}
+                        required={true}
+                        onChange={addNewItemHandleChange}
+                        value={addNewItemFormData.txtaddnewitemprice}
+                        errors={addNewItemerrors}
+                        formErrors={addNewItemformErrors}
+                        tabIndex={4}
+                      ></InputControl>
+                    </div>
+                    <div className="col-md-12 mb-15">
+                      <TextAreaControl
+                        lblClass="mb-0"
+                        name="txtaddnewitemdescription"
+                        ctlType={formCtrlTypes.description300}
+                        required={false}
+                        onChange={addNewItemHandleChange}
+                        value={addNewItemFormData.txtaddnewitemdescription}
+                        errors={addNewItemerrors}
+                        formErrors={addNewItemformErrors}
+                        tabIndex={5}
+                        rows={2}
+                      ></TextAreaControl>
+                    </div>
+                  </div>
+                </form>
+              </>
+            }
+            onClose={onAddNewItemModalClose}
+            actions={[
+              {
+                id: "btncreatenewitem",
+                text: "Create",
+                displayOrder: 1,
+                btnClass: "btn-primary",
+                onClick: (e) => onCreateNewItem(e),
+              },
+              {
+                text: "Cancel",
+                displayOrder: 2,
+                btnClass: "btn-secondary",
+                onClick: (e) => onAddNewItemModalClose(e),
+              },
+            ]}
+          ></ModalView>
+        </>
+      )}
+      {/*============== Add New Item Modal End ==============*/}
     </>
   );
 };
