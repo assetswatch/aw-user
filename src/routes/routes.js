@@ -19,6 +19,10 @@ export const routeNames = {
   agent: { name: "Agent", path: "/Agent/:id" },
   owner: { name: "Agent", path: "/Owner/:id" },
   dashboard: { name: "Dashboard", path: "/User/Dashboard" },
+  checkout: {
+    name: "Checkout",
+    path: "/Checkout/:id",
+  },
   createprofile: {
     name: "CreateProfile",
     path: "/User/CreateProfile/:ProfileType",
@@ -131,8 +135,8 @@ export const routeNames = {
     name: "ViewInvoice",
     path: "/User/Payments/ViewInvoice",
   },
-  checkout: {
-    name: "Checkout",
+  usercheckout: {
+    name: "UserCheckout",
     path: "/User/Payments/Checkout",
   },
   connectionsowners: {
@@ -332,6 +336,12 @@ const routes = [
     path: routeNames.owner.path,
     name: routeNames.owner.name,
     element: lazy(() => import("../pages/Owner")),
+    isexact: true,
+  },
+  {
+    path: routeNames.checkout.path,
+    name: routeNames.checkout.name,
+    element: lazy(() => import("../pages/Checkout")),
     isexact: true,
   },
   {
@@ -542,11 +552,10 @@ const routes = [
     isprotected: true,
   },
   {
-    path: routeNames.checkout.path,
-    name: routeNames.checkout.name,
+    path: routeNames.usercheckout.path,
+    name: routeNames.usercheckout.name,
     element: lazy(() => import("../pages/User/Payments/Checkout")),
     isexact: true,
-    isprotected: true,
   },
   {
     path: routeNames.connectionsowners.path,

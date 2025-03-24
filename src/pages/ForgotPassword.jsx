@@ -61,7 +61,7 @@ const ForgotPassword = () => {
                               Send
                             </button>
                           </div>
-                          <div className="col">
+                          <div className="col pb-25">
                             <Link
                               to={routeNames.login.path}
                               className="text-dark d-table py-1"

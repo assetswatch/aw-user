@@ -10,7 +10,7 @@ import {
   GridDefaultValues,
   SessionStorageKeys,
 } from "../utils/constants";
-import { apiReqResLoader, checkEmptyVal } from "../utils/common";
+import { aesCtrEncrypt, apiReqResLoader, checkEmptyVal } from "../utils/common";
 import { axiosPost } from "../helpers/axiosHelper";
 import config from "../config.json";
 import { GridList, LazyImage } from "../components/common/LazyComponents";
@@ -249,12 +249,16 @@ const Agents = () => {
 
   const onAgentDetails = (e, profileid) => {
     e.preventDefault();
-    navigate(routeNames.agent.path.replace(":id", profileid));
+    aesCtrEncrypt(profileid.toString()).then((encId) => {
+      navigate(routeNames.agent.path.replace(":id", encId));
+    });
   };
 
   const onPropertyDetails = (e, assetId) => {
     e.preventDefault();
-    navigate(routeNames.property.path.replace(":id", assetId));
+    aesCtrEncrypt(assetId.toString()).then((encId) => {
+      navigate(routeNames.property.path.replace(":id", encId));
+    });
   };
 
   const onProperties = (e) => {

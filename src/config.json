@@ -36,7 +36,8 @@
   },
   "paymentStatusTypes": {
     "UnPaid": 0,
-    "Paid": 1
+    "Paid": 1,
+    "PartiallyPaid": 2
   },
   "paymentAccountCreateStatus": {
     "Pending": 0,

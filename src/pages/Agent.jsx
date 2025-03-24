@@ -1,7 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import PageTitle from "../components/layouts/PageTitle";
 import { routeNames } from "../routes/routes";
-import { checkEmptyVal, checkObjNullorEmpty, isInt } from "../utils/common";
+import {
+  aesCtrDecrypt,
+  aesCtrEncrypt,
+  checkEmptyVal,
+  checkObjNullorEmpty,
+  isInt,
+} from "../utils/common";
 import { ApiUrls } from "../utils/constants";
 import config from "../config.json";
 import { axiosPost } from "../helpers/axiosHelper";
@@ -19,7 +25,7 @@ const Agent = () => {
 
   const { id } = useParams();
 
-  let agentId = parseInt(isInt(Number(id)) ? id : 0);
+  let agentId = 0; //parseInt(isInt(Number(id)) ? id : 0);
 
   const { topAssetsList } = useGetTopAssetsGateWay("recent", 5);
   const topAssetsRef = useRef(null);
@@ -42,11 +48,15 @@ const Agent = () => {
   }, [topAssetsList, rerouteKey]);
 
   useEffect(() => {
-    if (agentId == 0) {
-      navigate(routeNames.agents.path);
-    } else {
-      getAgentDetails();
-    }
+    aesCtrDecrypt(id).then((decId) => {
+      agentId = decId.toString().substring(0, decId.toString().indexOf(":"));
+
+      if (agentId == 0) {
+        navigate(routeNames.agents.path);
+      } else {
+        getAgentDetails();
+      }
+    });
   }, [rerouteKey]);
 
   //set carousel
@@ -117,9 +127,11 @@ const Agent = () => {
   const onAgentDetails = (e, profileId) => {
     e.preventDefault();
     setRerouteKey(rerouteKey + 1);
-    navigate(routeNames.agent.path.replace(":id", profileId), {
-      state: { timestamp: Date.now() },
-      replace: true,
+    aesCtrEncrypt(profileId.toString()).then((encId) => {
+      navigate(routeNames.agent.path.replace(":id", encId), {
+        state: { timestamp: Date.now() },
+        replace: true,
+      });
     });
     window.scrollTo(0, 0);
   };
@@ -127,7 +139,9 @@ const Agent = () => {
   const onPropertyDetails = (e, assetId) => {
     e.preventDefault();
     setRerouteKey(rerouteKey + 1);
-    navigate(routeNames.property.path.replace(":id", assetId));
+    aesCtrEncrypt(assetId.toString()).then((encId) => {
+      navigate(routeNames.property.path.replace(":id", encId));
+    });
   };
 
   return (

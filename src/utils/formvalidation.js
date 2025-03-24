@@ -1,3 +1,4 @@
+import { Placeholder } from "react-bootstrap";
 import { ValidationMessages } from "./constants";
 
 /*Validation constraints*/
@@ -695,11 +696,19 @@ export const formCtrlTypes = {
       type: "text",
       min: length7,
       max: length7,
+      placeHolder: "MM/YYYY",
       keyEvents: {
         onKeyPress: (e) => {
           if (!expirydatevalidvalues.includes(e.key)) {
             e.preventDefault();
           }
+        },
+        onInput: (e) => {
+          let value = e.target.value.replace(/\D/g, "");
+          if (value.length > 1) {
+            value = value.slice(0, 2) + "/" + value.slice(2, 6);
+          }
+          e.target.value = value;
         },
       },
     },

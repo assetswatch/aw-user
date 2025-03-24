@@ -406,7 +406,7 @@ const CreateInvoice = () => {
     return (
       <div
         onClick={handleAddNewItem}
-        className="bg-light text-center cur-pointer font-general font-500 py-10"
+        className="bg-light text-center cur-pointer font-general font-500 my-1 py-2 text-primary underline"
       >
         + Create New Item
       </div>

@@ -80,8 +80,11 @@ const ViewReceipt = () => {
 
         for (let i = 1; i <= totalPages; i++) {
           pdf.setPage(i);
-
-          pdf.setDrawColor(pdfHFWMSettings.fLineColor);
+          pdf.setDrawColor(
+            pdfHFWMSettings.fLineColor.r,
+            pdfHFWMSettings.fLineColor.g,
+            pdfHFWMSettings.fLineColor.b
+          );
           pdf.line(
             pdfHFWMSettings.fLinex1OffSet,
             pageHeight - pdfHFWMSettings.fLiney1OffSet,
@@ -91,7 +94,11 @@ const ViewReceipt = () => {
 
           pdf.setFontSize(pdfHFWMSettings.fFontSize);
           pdf.setFont(...pdfHFWMSettings.fFontFamily);
-          pdf.setTextColor(pdfHFWMSettings.fFontColor);
+          pdf.setTextColor(
+            pdfHFWMSettings.fFontColor.r,
+            pdfHFWMSettings.fFontColor.g,
+            pdfHFWMSettings.fFontColor.b
+          );
           pdf.text(
             pdfDetails?.BrandingDetails?.Footer,
             pageWidth / pdfHFWMSettings.pageHalf,

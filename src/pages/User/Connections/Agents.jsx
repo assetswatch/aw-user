@@ -5,6 +5,7 @@ import {
   checkStartEndDateGreater,
   debounce,
   GetUserCookieValues,
+  replacePlaceHolders,
   SetPageLoaderNavLinks,
   setSelectDefaultVal,
 } from "../../../utils/common";
@@ -76,11 +77,18 @@ const Agents = () => {
     setInitialSendInvitationFormData()
   );
 
+  //Modal
+  const [modalDeleteConfirmShow, setModalDeleteConfirmShow] = useState(false);
+  const [modalDeleteConfirmContent, setModalDeleteConfirmContent] = useState(
+    AppMessages.DeleteInvitationConfirmationMessage
+  );
+
   //Grid
   const [usersData, setUsersData] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [pageCount, setPageCount] = useState(0);
   const [isDataLoading, setIsDataLoading] = useState(false);
+  const [selectedGridRow, setSelectedGridRow] = useState(null);
 
   //Set search form intial data
   const setSearchInitialFormData = () => {
@@ -255,23 +263,31 @@ const Agents = () => {
               alt={row.original.FirstName + " " + row.original.LastName}
               placeHolderClass="pos-absolute w-50px min-h-50 fl-l"
             ></LazyImage>
-            <div className="property-info d-table">
-              <h6
-                className={`${
-                  row.original.RequestTypeId ==
-                  config.userConnectionRequestTypes.Sent
-                    ? "text-primary"
-                    : "text-error"
-                }  font-general font-400 mb-0 pb-0`}
-              >
-                {row.original.FirstName + " " + row.original.LastName}
+            <div
+              className={`property-info ${
+                row.original.ProfileId == 0 ? "d-flex" : "d-table"
+              }`}
+            >
+              <div className="d-flex">
+                <h6
+                  className={`${
+                    row.original.RequestTypeId ==
+                    config.userConnectionRequestTypes.Sent
+                      ? "text-primary"
+                      : "text-error"
+                  }  font-general font-400 mb-0 pb-0 pr-1`}
+                >
+                  {row.original.ProfileId != 0
+                    ? row.original.FirstName + " " + row.original.LastName
+                    : row.original.Email}
+                </h6>
                 <i
-                  className={`mdi font-20 min-w-30px w-30px ctooltip-container gr-badge-pill ${
+                  className={`mdi font-20 min-w-30px w-30px ctooltip-container gr-badge-pill px-1 ${
                     row.original.RequestTypeId ==
                     config.userConnectionRequestTypes.Sent
                       ? "gr-badge-pill-suc mdi-arrow-right-bold"
                       : "gr-badge-pill-error mdi-arrow-left-bold"
-                  } nocnt bo-0 bg-none`}
+                  } nocnt bo-0 bg-none py-0`}
                 >
                   <div
                     className={`ctooltip opa9 shadow ${
@@ -284,15 +300,19 @@ const Agents = () => {
                     {row.original.RequestType}
                   </div>
                 </i>
-              </h6>
-              <div className="py-1">
-                <i className="far fa-envelope font-13 p-r-5" />
-                {row.original.Email}
               </div>
-              <div className="py-1">
-                <i className="flat-mini flaticon-phone-call font-13 p-r-5" />
-                {row.original.MobileNo}
-              </div>
+              {row.original.ProfileId != 0 && (
+                <>
+                  <div className="py-1">
+                    <i className="far fa-envelope font-13 p-r-5" />
+                    {row.original.Email}
+                  </div>
+                  <div className="py-1">
+                    <i className="flat-mini flaticon-phone-call font-13 p-r-5" />
+                    {row.original.MobileNo}
+                  </div>
+                </>
+              )}
             </div>
           </>
         ),
@@ -348,6 +368,15 @@ const Agents = () => {
             text: "Send Message",
             onclick: (e, row) => {
               onSendMessageModalShow(e, row.original);
+            },
+          },
+          {
+            text: "Delete Invitaion",
+            isconditionalshow: (row) => {
+              return row?.original?.ProfileId == 0;
+            },
+            onclick: (e, row) => {
+              onDeleteConfirmModalShow(e, row.original);
             },
           },
           {
@@ -442,6 +471,81 @@ const Agents = () => {
   };
 
   //Grid Actions
+
+  //Delete confirmation Modal actions
+
+  const onDeleteConfirmModalShow = (e, row) => {
+    e.preventDefault();
+    setSelectedGridRow(row);
+    setModalDeleteConfirmContent(
+      replacePlaceHolders(modalDeleteConfirmContent, {
+        email: `${row?.Email}`,
+      })
+    );
+    setModalDeleteConfirmShow(true);
+  };
+
+  const onDeleteConfirmModalClose = () => {
+    setModalDeleteConfirmShow(false);
+    setSelectedGridRow(null);
+    apiReqResLoader(
+      "btndeleteinvitation",
+      "Yes",
+      API_ACTION_STATUS.COMPLETED,
+      false
+    );
+    setModalDeleteConfirmContent(
+      AppMessages.DeleteInvitationConfirmationMessage
+    );
+  };
+
+  const onDelete = (e) => {
+    e.preventDefault();
+
+    apiReqResLoader("btndeleteinvitation", "Deleting", API_ACTION_STATUS.START);
+
+    let isapimethoderr = false;
+    let objBodyParams = {
+      Id: parseInt(selectedGridRow?.Id),
+    };
+
+    axiosPost(
+      `${config.apiBaseUrl}${ApiUrls.deleteRegistrationInvitation}`,
+      objBodyParams
+    )
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode === 200) {
+          if (objResponse.Data.Status == 1) {
+            Toast.success(AppMessages.DeleteInvitationSuccess);
+            getUsers({});
+            onDeleteConfirmModalClose();
+          } else {
+            Toast.error(objResponse.Data.Message);
+          }
+        } else {
+          isapimethoderr = true;
+        }
+      })
+      .catch((err) => {
+        isapimethoderr = true;
+        console.error(
+          `"API :: ${ApiUrls.deleteRegistrationInvitation}, Error ::" ${err}`
+        );
+      })
+      .finally(() => {
+        if (isapimethoderr == true) {
+          Toast.error(AppMessages.SomeProblem);
+        }
+        apiReqResLoader(
+          "btndeleteinvitation",
+          "Yes",
+          API_ACTION_STATUS.COMPLETED
+        );
+      });
+  };
+
+  //Delete confirmation Modal actions
 
   // Send invite modal
 
@@ -638,7 +742,9 @@ const Agents = () => {
     e?.preventDefault();
     setSendMessageFormData({
       ...sendMessageFormData,
-      lbltoname: `Agent: ${row.FirstName} ${row.LastName}`,
+      lbltoname: `Agent: ${
+        row.ProfileId > 0 ? row.FirstName + " " + row.LastName : row.Email
+      }`,
       toid:
         parseInt(row.InviterId) ==
         parseInt(GetUserCookieValues(UserCookie.ProfileId, loggedinUser))
@@ -680,47 +786,97 @@ const Agents = () => {
       );
 
       let isapimethoderr = false;
-      let objBodyParams = {
-        FromId: parseInt(
-          GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
-        ),
-        ToId: parseInt(sendMessageFormData.toid),
-        NotificationTypeId: NotificationTypes.Message,
-        Message: sendMessageFormData.txtmessage,
-      };
+      if (sendMessageFormData.toid != 0) {
+        let objBodyParams = {
+          FromId: parseInt(
+            GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
+          ),
+          ToId: parseInt(sendMessageFormData.toid),
+          NotificationTypeId: NotificationTypes.Message,
+          Message: sendMessageFormData.txtmessage,
+        };
 
-      axiosPost(
-        `${config.apiBaseUrl}${ApiUrls.createNotification}`,
-        objBodyParams
-      )
-        .then((response) => {
-          let objResponse = response.data;
-          if (objResponse.StatusCode === 200) {
-            if (objResponse.Data.Id > 0) {
-              Toast.success(objResponse.Data.Message);
-              onSendMessageModalHide();
+        axiosPost(
+          `${config.apiBaseUrl}${ApiUrls.createNotification}`,
+          objBodyParams
+        )
+          .then((response) => {
+            let objResponse = response.data;
+            if (objResponse.StatusCode === 200) {
+              if (objResponse.Data.Id > 0) {
+                Toast.success(objResponse.Data.Message);
+                onSendMessageModalHide();
+              }
+            } else {
+              isapimethoderr = true;
             }
-          } else {
+          })
+          .catch((err) => {
             isapimethoderr = true;
-          }
-        })
-        .catch((err) => {
-          isapimethoderr = true;
-          console.error(
-            `"API :: ${ApiUrls.createNotification}, Error ::" ${err}`
-          );
-        })
-        .finally(() => {
-          if (isapimethoderr == true) {
-            Toast.error(AppMessages.SomeProblem);
-          }
-          apiReqResLoader(
-            "btnsendmessage",
-            "Send",
-            API_ACTION_STATUS.COMPLETED,
-            false
-          );
-        });
+            console.error(
+              `"API :: ${ApiUrls.createNotification}, Error ::" ${err}`
+            );
+          })
+          .finally(() => {
+            if (isapimethoderr == true) {
+              Toast.error(AppMessages.SomeProblem);
+            }
+            apiReqResLoader(
+              "btnsendmessage",
+              "Send",
+              API_ACTION_STATUS.COMPLETED,
+              false
+            );
+          });
+      } else {
+        let objBodyParams = {
+          InviterId: profileid,
+          InviteeId: 0,
+          ConnectionForProfileTypeId: config.userProfileTypes.Owner,
+          Email: document
+            .getElementById("lbltoname")
+            .innerText.split(":")[1]
+            .trim(),
+          Message: sendMessageFormData.txtmessage,
+        };
+
+        axiosPost(
+          `${config.apiBaseUrl}${ApiUrls.createUserConnection}`,
+          objBodyParams
+        )
+          .then((response) => {
+            let objResponse = response.data;
+            if (objResponse.StatusCode === 200) {
+              if (objResponse.Data.Id > 0) {
+                if (objResponse.Data.Status === 200) {
+                  Toast.success(objResponse.Data.Message);
+                  onSendMessageModalHide();
+                } else {
+                  Toast.info(objResponse.Data.Message);
+                }
+              }
+            } else {
+              isapimethoderr = true;
+            }
+          })
+          .catch((err) => {
+            isapimethoderr = true;
+            console.error(
+              `"API :: ${ApiUrls.createConnection}, Error ::" ${err}`
+            );
+          })
+          .finally(() => {
+            if (isapimethoderr == true) {
+              Toast.error(AppMessages.SomeProblem);
+            }
+            apiReqResLoader(
+              "btnsendmessage",
+              "Send",
+              API_ACTION_STATUS.COMPLETED,
+              false
+            );
+          });
+      }
     } else {
       $(`[name=${Object.keys(formSendMessageErrors)[0]}]`).focus();
       setSendMessageErrors(formSendMessageErrors);
@@ -1050,7 +1206,11 @@ const Agents = () => {
               <>
                 <div className="row">
                   <div className="col-12 mb-10">
-                    <span name="lbltoname" className="font-general font-500">
+                    <span
+                      name="lbltoname"
+                      className="font-general font-500"
+                      id="lbltoname"
+                    >
                       {sendMessageFormData.lbltoname}
                     </span>
                   </div>
@@ -1091,6 +1251,33 @@ const Agents = () => {
         </>
       )}
       {/*============== Send Message Modal End ==============*/}
+
+      {/*============== Delete Confirmation Modal Start ==============*/}
+      {modalDeleteConfirmShow && (
+        <>
+          <ModalView
+            title={AppMessages.DeleteConfirmationTitle}
+            content={modalDeleteConfirmContent}
+            onClose={onDeleteConfirmModalClose}
+            actions={[
+              {
+                id: "btndeleteinvitation",
+                text: "Yes",
+                displayOrder: 1,
+                btnClass: "btn-primary",
+                onClick: (e) => onDelete(e),
+              },
+              {
+                text: "No",
+                displayOrder: 2,
+                btnClass: "btn-secondary",
+                onClick: (e) => onDeleteConfirmModalClose(e),
+              },
+            ]}
+          ></ModalView>
+        </>
+      )}
+      {/*============== Delete Confirmation Modal End ==============*/}
     </>
   );
 };

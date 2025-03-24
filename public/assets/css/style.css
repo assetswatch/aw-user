@@ -939,8 +939,9 @@ select:focus {
   color: #495057;
 }
 .form-control::placeholder {
-  color: #495057 !important;
+  color: #6c757d !important;
   font-size: 15px !important;
+  opacity: 0.5;
 }
 .form-control::-webkit-input-placeholder {
   font-size: 15px;
@@ -1379,6 +1380,9 @@ Header Style Start
 .lh-18 {
   line-height: 18px !important;
 }
+.lh-30 {
+  line-height: 30px !important;
+}
 .lh-38 {
   line-height: 38px !important;
 }
@@ -1400,6 +1404,12 @@ Header Style Start
 }
 .bo-top {
   border-top: 1px solid #dee2e6 !important;
+}
+.bo-t1-primary {
+  border-top: 1px solid var(--theme-primary-color) !important;
+}
+.bo-b1-primary {
+  border-bottom: 1px solid var(--theme-primary-color) !important;
 }
 .fixed-column {
   position: fixed;
@@ -4245,6 +4255,9 @@ Social Media Style Start
 }
 .w-220px {
   width: 220px !important;
+}
+.min-w-250px {
+  min-width: 250px !important;
 }
 .w-250px {
   width: 250px !important;

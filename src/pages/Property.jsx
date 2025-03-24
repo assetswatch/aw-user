@@ -2,7 +2,13 @@ import React, { useEffect, useState } from "react";
 import { loadFile, unloadFile, getArrLoadFiles } from "../utils/loadFiles";
 import PageTitle from "../components/layouts/PageTitle";
 import { routeNames } from "../routes/routes";
-import { checkEmptyVal, checkObjNullorEmpty, isInt } from "../utils/common";
+import {
+  aesCtrDecrypt,
+  aesCtrEncrypt,
+  checkEmptyVal,
+  checkObjNullorEmpty,
+  isInt,
+} from "../utils/common";
 import { ApiUrls, AppMessages } from "../utils/constants";
 import config from "../config.json";
 import { axiosPost } from "../helpers/axiosHelper";
@@ -23,7 +29,7 @@ const Property = () => {
 
   const { id } = useParams();
 
-  let assetDetailId = parseInt(isInt(Number(id)) ? id : 0);
+  let assetDetailId = 0; //parseInt(isInt(Number(id)) ? id : 0);
 
   //list of js/css dependencies.
   let arrJsCssFiles = [
@@ -36,16 +42,23 @@ const Property = () => {
   ];
 
   useEffect(() => {
-    if (assetDetailId == 0) {
-      navigate(routeNames.properties.path);
-    } else {
-      //load js/css depedency files.
-      let arrLoadFiles = getArrLoadFiles(arrJsCssFiles);
-      let promiseLoadFiles = arrLoadFiles.map(loadFile);
-      Promise.allSettled(promiseLoadFiles).then(function (responses) {});
+    aesCtrDecrypt(id).then((decId) => {
+      assetDetailId = decId
+        .toString()
+        .substring(0, decId.toString().indexOf(":"));
 
-      getAssetDetails();
-    }
+      if (assetDetailId == 0) {
+        navigate(routeNames.properties.path);
+      } else {
+        //load js/css depedency files.
+        let arrLoadFiles = getArrLoadFiles(arrJsCssFiles);
+        let promiseLoadFiles = arrLoadFiles.map(loadFile);
+        Promise.allSettled(promiseLoadFiles).then(function (responses) {});
+
+        getAssetDetails();
+      }
+    });
+
     return () => {
       unloadFile(arrJsCssFiles); //unload files.
     };
@@ -130,9 +143,11 @@ const Property = () => {
   const onPropertyDetails = (e, assetId) => {
     e.preventDefault();
     setRerouteKey(rerouteKey + 1);
-    navigate(routeNames.property.path.replace(":id", assetId), {
-      state: { timestamp: Date.now() },
-      replace: true,
+    aesCtrEncrypt(assetId.toString()).then((encId) => {
+      navigate(routeNames.property.path.replace(":id", encId), {
+        state: { timestamp: Date.now() },
+        replace: true,
+      });
     });
     window.scrollTo(0, 0);
   };

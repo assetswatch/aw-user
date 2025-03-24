@@ -25,10 +25,13 @@ export const AppDetails = {
 /*pdf Settings*/
 export const html2PdfSettings = {
   margin: [5, 10, 30, 10],
+  //image: { type: "jpeg", quality: 0.98 },
+  enableLinks: true,
   html2canvas: {
     backgroundColor: null,
-    scale: 4,
+    scale: 3,
     dpi: 300,
+    letterRendering: true,
     allowTaint: true,
     useCORS: true,
     logging: false,
@@ -48,13 +51,13 @@ export const pdfHFWMSettings = {
   wmHeight: 100,
   wmOpacity: { opacity: 0.4 },
   wmyOffSet: 10,
-  fLineColor: "#71b862",
+  fLineColor: { r: 113, g: 184, b: 95 },
   fLinex1OffSet: 8,
   fLiney1OffSet: 20,
   fTextyOffSet: 15,
   fFontSize: 9,
   fFontFamily: ["helvetica", "italic"],
-  fFontColor: "#bdbdbd",
+  fFontColor: { r: 189, g: 189, b: 189 },
   fCenter: { align: "center" },
   fRight: { align: "right" },
   fPixOffSet: 15,
@@ -275,6 +278,12 @@ export const AppMessages = {
   CheckoutNoSubAccountMessage:
     "Payment cannot be initiated, Because the invoice creator does not have an active payment account.",
   AddInvocieItemModalTitle: "Add New Item",
+  DeleteInvitationConfirmationMessage:
+    "You want to delete the invitation request for {email}.",
+  DeleteInvitationSuccess: "Invitation deleted successfully...",
+  DeleteInvoiceConfirmationMessage:
+    "You want to delete the invoice#: {invoicenumber}.",
+  DeleteInvoiceSuccess: "Invoice deleted successfully...",
 };
 /*Common App messages*/
 
@@ -441,6 +450,7 @@ export let ApiUrls = {
   getUserConnectedAssets: `users/v1/GetUserConnectedAssets`,
   updateUserConnectionStatus: `users/v1/UpdateUserConnectionStatus`,
   createUserConnection: `users/v1/CreateUserConnection`,
+  deleteRegistrationInvitation: `users/v1/DeleteRegistrationInvitation`,
   getUserDetails: `users/v1/GetUserDetails`,
   getUserBrandingDetails: `users/v1/GetUserBrandingDetails`,
   getAgents: `users/v1/GetAgents`,

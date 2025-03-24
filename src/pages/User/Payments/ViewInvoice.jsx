@@ -169,8 +169,11 @@ const ViewInvoice = () => {
 
         for (let i = 1; i <= totalPages; i++) {
           pdf.setPage(i);
-
-          pdf.setDrawColor(pdfHFWMSettings.fLineColor);
+          pdf.setDrawColor(
+            pdfHFWMSettings.fLineColor.r,
+            pdfHFWMSettings.fLineColor.g,
+            pdfHFWMSettings.fLineColor.b
+          );
           pdf.line(
             pdfHFWMSettings.fLinex1OffSet,
             pageHeight - pdfHFWMSettings.fLiney1OffSet,
@@ -180,7 +183,11 @@ const ViewInvoice = () => {
 
           pdf.setFontSize(pdfHFWMSettings.fFontSize);
           pdf.setFont(...pdfHFWMSettings.fFontFamily);
-          pdf.setTextColor(pdfHFWMSettings.fFontColor);
+          pdf.setTextColor(
+            pdfHFWMSettings.fFontColor.r,
+            pdfHFWMSettings.fFontColor.g,
+            pdfHFWMSettings.fFontColor.b
+          );
           pdf.text(
             pdfDetails?.BrandingDetails?.Footer,
             pageWidth / pdfHFWMSettings.pageHalf,
@@ -375,6 +382,9 @@ const ViewInvoice = () => {
             <div className="col property-info flex v-center pb-0 min-h-50 px-5">
               <h5 className="text-secondary">
                 {row.original.FirstName + " " + row.original.LastName}
+                <div className="mt-0 py-0 small text-light">
+                  {row.original?.ProfileType}
+                </div>
               </h5>
             </div>
           </div>
