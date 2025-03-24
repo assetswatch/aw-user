@@ -3,40 +3,95 @@ import {
   apiReqResLoader,
   checkObjNullorEmpty,
   GetUserCookieValues,
-  SetPageLoaderNavLinks,
   Encrypt,
   usioGetToken,
   checkEmptyVal,
   maskNumber,
-} from "../../../utils/common";
-import InputControl from "../../../components/common/InputControl";
-import { formCtrlTypes } from "../../../utils/formvalidation";
-import { useNavigate } from "react-router-dom";
-import AsyncSelect from "../../../components/common/AsyncSelect";
-import { axiosPost } from "../../../helpers/axiosHelper";
-import config from "../../../config.json";
+  aesCtrDecrypt,
+} from "../utils/common";
+import InputControl from "../components/common/InputControl";
+import { formCtrlTypes } from "../utils/formvalidation";
+import { useNavigate, useParams } from "react-router-dom";
+import AsyncSelect from "../components/common/AsyncSelect";
+import { axiosPost } from "../helpers/axiosHelper";
+import config from "../config.json";
 import {
   API_ACTION_STATUS,
   ApiUrls,
+  AppDetails,
   AppMessages,
   SessionStorageKeys,
   UserCookie,
   ValidationMessages,
-} from "../../../utils/constants";
-import { routeNames } from "../../../routes/routes";
-import { useAuth } from "../../../contexts/AuthContext";
-import {
-  deletesessionStorageItem,
-  getsessionStorageItem,
-} from "../../../helpers/sessionStorageHelper";
-import { Toast } from "../../../components/common/ToastView";
+} from "../utils/constants";
+import { routeNames } from "../routes/routes";
+import { useAuth } from "../contexts/AuthContext";
+import { deletesessionStorageItem } from "../helpers/sessionStorageHelper";
+import { Toast } from "../components/common/ToastView";
+import PageTitle from "../components/layouts/PageTitle";
+import moment from "moment";
 
 const Checkout = () => {
   let $ = window.$;
   let formErrors = {};
 
-  const { loggedinUser } = useAuth();
+  const { isAuthenticated, loggedinUser, logoutUser } = useAuth();
   const navigate = useNavigate();
+  const { id } = useParams();
+
+  let inoviceId = 0;
+  let accountId = 0;
+  let profileId = 0;
+
+  let isLoggedinUser = false;
+
+  const checkLoggedInUser = new Promise(async (resolve) => {
+    let decrpytedId = await aesCtrDecrypt(id);
+    [inoviceId, accountId, profileId] = decrpytedId.split(":");
+    inoviceId = parseInt(inoviceId);
+    accountId = parseInt(accountId);
+    profileId = parseInt(profileId);
+
+    //check any previous invoice id in session storage.
+    deletesessionStorageItem(SessionStorageKeys.CheckoutInvoiceId);
+
+    if (isAuthenticated() == true) {
+      let loggedinUserAccountId = parseInt(
+        GetUserCookieValues(UserCookie.AccountId, loggedinUser)
+      );
+      let loggedinUserProfileId = parseInt(
+        GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
+      );
+
+      if (
+        loggedinUserAccountId != accountId &&
+        loggedinUserProfileId != profileId
+      ) {
+        apiReqResLoader("x");
+        let objBodyParams = {
+          accountid: accountId,
+          devicetypeid: AppDetails.devicetypeid,
+          sessionid: GetUserCookieValues(UserCookie.SessionId, loggedinUser),
+        };
+        axiosPost(`${config.apiBaseUrl}${ApiUrls.logout}`, objBodyParams)
+          .then(() => {})
+          .catch((err) => {
+            console.error(`"API :: ${ApiUrls.logout}, Error ::" ${err}`);
+          })
+          .finally(() => {
+            logoutUser();
+            resolve("continue");
+            //window.location.reload();
+            apiReqResLoader("x", "", "completed");
+          });
+      } else {
+        isLoggedinUser = true;
+        resolve("continue");
+      }
+    } else {
+      resolve("continue");
+    }
+  });
 
   const [paymentTypes, setPaymentTypes] = useState([
     { PaymentTypeId: "ACH", PaymentType: "ACH Payment" },
@@ -60,16 +115,6 @@ const Checkout = () => {
   const [citySelected, setCitySelected] = useState(null);
 
   const [initApisLoaded, setinitApisLoaded] = useState(false);
-
-  let inoviceId = parseInt(
-    getsessionStorageItem(SessionStorageKeys.CheckoutInvoiceId, 0)
-  );
-  let accountId = parseInt(
-    GetUserCookieValues(UserCookie.AccountId, loggedinUser)
-  );
-  let profileId = parseInt(
-    GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
-  );
 
   const [accountTypes, setAccountTypes] = useState([
     { Text: "Checking", Id: "27" },
@@ -99,16 +144,15 @@ const Checkout = () => {
 
   //Load
   useEffect(() => {
-    Promise.allSettled([
-      getInvoiceDetails(),
-      getUserDetails(),
-      //getCountries(),
-    ]).then(() => {
-      setinitApisLoaded(true);
+    checkLoggedInUser.then((response) => {
+      if (response == "stop") {
+        return;
+      } else {
+        Promise.allSettled([getInvoiceDetails()]).then(() => {
+          setinitApisLoaded(true);
+        });
+      }
     });
-    return () => {
-      deletesessionStorageItem(SessionStorageKeys.CheckoutInvoiceId);
-    };
   }, []);
 
   const getInvoiceDetails = async () => {
@@ -123,11 +167,25 @@ const Checkout = () => {
         .then(async (response) => {
           let objResponse = response.data;
           if (objResponse.StatusCode === 200) {
-            setInvoiceDetails(objResponse.Data);
-            setAmountFormData({
-              ...objResponse.Data.TaxDetails,
-              TotalAmountBeforeEdit: objResponse.Data.TaxDetails.TotalAmount,
-            });
+            let currDate = moment().utc();
+            let dueDate = moment(objResponse.Data.DueDate).utc();
+
+            if (
+              objResponse.Data.PaymentStatus ==
+                config.paymentStatusTypes.Paid ||
+              currDate.isAfter(dueDate)
+            ) {
+              isLoggedinUser == true
+                ? navigate(routeNames.paymentsinvoices.path)
+                : navigateToHome();
+            } else {
+              setInvoiceDetails(objResponse.Data);
+              setAmountFormData({
+                ...objResponse.Data.TaxDetails,
+                TotalAmountBeforeEdit: objResponse.Data.TaxDetails.TotalAmount,
+              });
+              getUserDetails();
+            }
           } else {
             isapimethoderr = true;
           }
@@ -141,10 +199,13 @@ const Checkout = () => {
         .finally(() => {
           if (isapimethoderr == true) {
             Toast.error(AppMessages.SomeProblem);
+            isLoggedinUser == true
+              ? navigate(routeNames.paymentsinvoices.path)
+              : navigateToHome();
           }
         });
     } else {
-      navigateToInvoices();
+      // navigateToInvoices();
     }
   };
 
@@ -390,7 +451,6 @@ const Checkout = () => {
             if (objResponse.StatusCode === 200) {
               if (objResponse.Data.Id > 0) {
                 Toast.success("Payment processed sucessfully...");
-                deletesessionStorageItem(SessionStorageKeys.CheckoutInvoiceId);
               } else {
                 isapiresponsefailed = true;
                 Toast.error(objResponse.Data.Message);
@@ -484,9 +544,6 @@ const Checkout = () => {
                   if (objResponse.StatusCode === 200) {
                     if (objResponse.Data.Id > 0) {
                       Toast.success("Payment processed sucessfully...");
-                      deletesessionStorageItem(
-                        SessionStorageKeys.CheckoutInvoiceId
-                      );
                     } else {
                       isapiresponsefailed = true;
                       Toast.error(objResponse.Data.Message);
@@ -702,9 +759,20 @@ const Checkout = () => {
     }`;
   };
 
+  const navigateToHome = () => {
+    navigate(routeNames.home.path, { replace: true });
+  };
+
   return (
     <>
-      {SetPageLoaderNavLinks()}
+      {/*============== Page title Start ==============*/}
+      <PageTitle
+        title="Checkout"
+        navLinks={[
+          { title: "Home", url: routeNames.home.path, isReplace: true },
+        ]}
+      ></PageTitle>
+      {/*============== Page title End ==============*/}
       <div className="full-row bg-light">
         <div className="container">
           <div className="row">
@@ -712,7 +780,7 @@ const Checkout = () => {
             <div className="mx-auto col-md-12 col-xl-10">
               {checkObjNullorEmpty(paymentResponse) ? (
                 <>
-                  <div className="row">
+                  {/* <div className="row">
                     <div className="col-6">
                       <div className="breadcrumb mb-0">
                         <div className="breadcrumb-item bc-fh">
@@ -726,7 +794,7 @@ const Checkout = () => {
                       </div>
                     </div>
                     <div className="col-6 d-flex justify-content-end align-items-end pb-10"></div>
-                  </div>
+                  </div> */}
                   {!showPaymentSummary ? (
                     <div className="row">
                       <div className="col-xl-4 col-lg-4 order-1 order-lg-2">
@@ -1572,13 +1640,23 @@ const Checkout = () => {
                         {paymentResponse?.Data?.PaymentRefNumber}
                       </p>
                       <div className="form-action text-center mt-4">
-                        <button
-                          className="btn btn-primary"
-                          id="btninvoices"
-                          onClick={navigateToInvoices}
-                        >
-                          Back to Invoices
-                        </button>
+                        {isLoggedinUser ? (
+                          <button
+                            className="btn btn-primary"
+                            id="btninvoices"
+                            onClick={navigateToInvoices}
+                          >
+                            Go to Invoices
+                          </button>
+                        ) : (
+                          <button
+                            className="btn btn-primary"
+                            id="btnhome"
+                            onClick={navigateToHome}
+                          >
+                            Home
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1612,13 +1690,23 @@ const Checkout = () => {
                         >
                           Retry Payment
                         </button>
-                        <button
-                          className="btn btn-primary"
-                          id="btninvoices"
-                          onClick={navigateToInvoices}
-                        >
-                          Back to Invoices
-                        </button>
+                        {isLoggedinUser ? (
+                          <button
+                            className="btn btn-primary"
+                            id="btninvoices"
+                            onClick={navigateToInvoices}
+                          >
+                            Go to Invoices
+                          </button>
+                        ) : (
+                          <button
+                            className="btn btn-primary"
+                            id="btnhome"
+                            onClick={navigateToHome}
+                          >
+                            Home
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>

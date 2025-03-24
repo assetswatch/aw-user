@@ -98,8 +98,11 @@ const ViewInvoice = () => {
 
         for (let i = 1; i <= totalPages; i++) {
           pdf.setPage(i);
-
-          pdf.setDrawColor(pdfHFWMSettings.fLineColor);
+          pdf.setDrawColor(
+            pdfHFWMSettings.fLineColor.r,
+            pdfHFWMSettings.fLineColor.g,
+            pdfHFWMSettings.fLineColor.b
+          );
           pdf.line(
             pdfHFWMSettings.fLinex1OffSet,
             pageHeight - pdfHFWMSettings.fLiney1OffSet,
@@ -109,7 +112,11 @@ const ViewInvoice = () => {
 
           pdf.setFontSize(pdfHFWMSettings.fFontSize);
           pdf.setFont(...pdfHFWMSettings.fFontFamily);
-          pdf.setTextColor(pdfHFWMSettings.fFontColor);
+          pdf.setTextColor(
+            pdfHFWMSettings.fFontColor.r,
+            pdfHFWMSettings.fFontColor.g,
+            pdfHFWMSettings.fFontColor.b
+          );
           pdf.text(
             pdfDetails?.BrandingDetails?.Footer,
             pageWidth / pdfHFWMSettings.pageHalf,
@@ -197,8 +204,9 @@ const ViewInvoice = () => {
 
   //PdfViewer
 
-  const onSend = async () => {
+  const onSend = async (isSendInvoice) => {
     apiReqResLoader("btnsend", "Sending...", API_ACTION_STATUS.START);
+    apiReqResLoader("btnsave", "Saving...", API_ACTION_STATUS.START);
     apiReqResLoader("btnsendproceed", "Sending...", API_ACTION_STATUS.START);
 
     let isapimethoderr = false;
@@ -206,7 +214,7 @@ const ViewInvoice = () => {
     objBodyParams.append("InvoiceId", invoiceId);
     objBodyParams.append("AccountId", accountid);
     objBodyParams.append("ProfileId", profileid);
-
+    objBodyParams.append("IsSendInvoice", isSendInvoice);
     const arrayBuffer = await pdfBlob.arrayBuffer();
     objBodyParams.append(
       "PdfBytes",
@@ -246,6 +254,7 @@ const ViewInvoice = () => {
           Toast.error(AppMessages.SomeProblem);
         }
         apiReqResLoader("btnsend", "Save & Send", API_ACTION_STATUS.COMPLETED);
+        apiReqResLoader("btnsave", "Save", API_ACTION_STATUS.COMPLETED);
         apiReqResLoader(
           "btnsendproceed",
           "Proceed",
@@ -254,45 +263,54 @@ const ViewInvoice = () => {
       });
   };
 
-  const onSendInvoice = async (e) => {
+  const onSendInvoice = async (e, isSendInvoice) => {
     e.preventDefault();
     e.stopPropagation();
-
-    let isapimethoderr = false;
-    apiReqResLoader("btnsend", "Saving...", API_ACTION_STATUS.START);
-    let objSubAccountsParams = {
-      AccountId: accountid,
-      ProfileId: profileid,
-      Status: `${config.paymentAccountCreateStatus.Active}`,
-    };
-    axiosPost(
-      `${config.apiBaseUrl}${ApiUrls.getPaymentSubAccountsCountByStatus}`,
-      objSubAccountsParams
-    )
-      .then((response) => {
-        let objResponse = response.data;
-        if (objResponse.StatusCode === 200) {
-          if (objResponse.Data.TotalCount > 0) {
-            onSend();
+    if (isSendInvoice == 0) {
+      onSend(0);
+    } else {
+      let isapimethoderr = false;
+      apiReqResLoader("btnsend", "Sending...", API_ACTION_STATUS.START);
+      apiReqResLoader("btnsave", "Saving...", API_ACTION_STATUS.START);
+      let objSubAccountsParams = {
+        AccountId: accountid,
+        ProfileId: profileid,
+        Status: `${config.paymentAccountCreateStatus.Active}`,
+      };
+      axiosPost(
+        `${config.apiBaseUrl}${ApiUrls.getPaymentSubAccountsCountByStatus}`,
+        objSubAccountsParams
+      )
+        .then((response) => {
+          let objResponse = response.data;
+          if (objResponse.StatusCode === 200) {
+            if (objResponse.Data.TotalCount > 0) {
+              onSend(1);
+            } else {
+              setModalInvoiceSendConfirmationShow(true);
+            }
           } else {
-            setModalInvoiceSendConfirmationShow(true);
+            isapimethoderr = true;
           }
-        } else {
+        })
+        .catch((err) => {
           isapimethoderr = true;
-        }
-      })
-      .catch((err) => {
-        isapimethoderr = true;
-        console.error(
-          `"API :: ${ApiUrls.getPaymentSubAccountsCountByStatus}, Error ::" ${err}`
-        );
-      })
-      .finally(() => {
-        if (isapimethoderr == true) {
-          Toast.error(AppMessages.SomeProblem);
-        }
-        apiReqResLoader("btnsend", "Save & Send", API_ACTION_STATUS.COMPLETED);
-      });
+          console.error(
+            `"API :: ${ApiUrls.getPaymentSubAccountsCountByStatus}, Error ::" ${err}`
+          );
+        })
+        .finally(() => {
+          if (isapimethoderr == true) {
+            Toast.error(AppMessages.SomeProblem);
+            apiReqResLoader(
+              "btnsend",
+              "Save & Send",
+              API_ACTION_STATUS.COMPLETED
+            );
+            apiReqResLoader("btnsave", "Save", API_ACTION_STATUS.COMPLETED);
+          }
+        });
+    }
   };
 
   //Account Creation Resitricted Modal actions
@@ -351,23 +369,42 @@ const ViewInvoice = () => {
                       <DataLoader />
                     )}
                   </div>
-                  <div className="row mt-20 px-0 mx-0">
+                  <div className="row mt-10 px-0 mx-0 flex fl ex-center">
                     <div className="col-md-6 px-0 col-lg-6 col-xl-6 mb-15">
-                      <span className="font-500 font-general">
-                        Bill To : {invoiceDetails?.BillToUser?.FirstName}{" "}
-                        {invoiceDetails?.BillToUser?.LastName},{" "}
-                        {invoiceDetails?.BillToUser?.ProfileType}
-                      </span>
+                      <div className="font-500 font-general d-flex lh-1 v-center">
+                        Bill To :
+                        <div className="d-flex px-1 lh-1">
+                          <img
+                            alt=""
+                            src={invoiceDetails?.BillToUser?.PicPath}
+                            className="rounded img-border-white w-40px mx-1"
+                          />
+                        </div>
+                        <div className="pt-1 px-0">
+                          <div className="te xt-secondary">
+                            {checkEmptyVal(
+                              invoiceDetails?.BillToUser?.CompanyName
+                            )
+                              ? invoiceDetails?.BillToUser?.FirstName +
+                                " " +
+                                invoiceDetails?.BillToUser?.LastName
+                              : invoiceDetails?.BillToUser?.CompanyName}
+                            <div className="mt-0 pt-1 small text-light font-small font-400">
+                              {invoiceDetails?.BillToUser?.ProfileType}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                     {!checkEmptyVal(invoiceDetails.Message) && (
-                      <div className="col-md-6 px-0 col-lg-6 col-xl-6 mb-15 text-md-end">
+                      <div className="col-md-6 px-0 col-lg-6 col-xl-6 mb-15 text-md-end pt-10">
                         <span className="font-500 font-general">
                           Message : {invoiceDetails?.Message}
                         </span>
                       </div>
                     )}
                   </div>
-                  <hr className="w-100 text-primary mb-20 px-0 mx-0 mt-20"></hr>
+                  <hr className="w-100 text-primary mb-20 px-0 mx-0 mt-10"></hr>
                   <div className="row form-action d-flex flex-center px-0 mx-0 my-15">
                     <div className="col-md-6 form-error" id="form-error"></div>
                     <div className="col-md-6  px-0">
@@ -382,9 +419,18 @@ const ViewInvoice = () => {
                       </button>
                       <button
                         className="btn btn-primary"
+                        id="btnsave"
+                        onClick={(e) => {
+                          onSendInvoice(e, 0);
+                        }}
+                      >
+                        Save
+                      </button>
+                      <button
+                        className="btn btn-primary"
                         id="btnsend"
                         onClick={(e) => {
-                          onSendInvoice(e);
+                          onSendInvoice(e, 1);
                         }}
                       >
                         Save & Send
@@ -423,7 +469,7 @@ const ViewInvoice = () => {
                 displayOrder: 1,
                 id: "btnsendproceed",
                 btnClass: "btn-primary",
-                onClick: (e) => onSend(e),
+                onClick: (e) => onSend(1),
               },
             ]}
           ></ModalView>

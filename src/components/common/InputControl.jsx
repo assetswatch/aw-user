@@ -449,7 +449,9 @@ const InputControl = ({
           onChange={onChange}
           maxLength={ctl.input.max}
           {...ctl.input.keyEvents}
-          placeholder={placeHolder}
+          placeholder={
+            !checkEmptyVal(placeHolder) ? placeHolder : ctl.input.placeHolder
+          }
         />
       </div>
       {errors?.[`${name}`] && (

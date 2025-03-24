@@ -11,6 +11,7 @@ import {
   SessionStorageKeys,
 } from "../utils/constants";
 import {
+  aesCtrEncrypt,
   apiReqResLoader,
   checkEmptyVal,
   checkObjNullorEmpty,
@@ -391,7 +392,9 @@ const Properties = () => {
 
   const onPropertyDetails = (e, assetId) => {
     e.preventDefault();
-    navigate(routeNames.property.path.replace(":id", assetId));
+    aesCtrEncrypt(assetId.toString()).then((encId) => {
+      navigate(routeNames.property.path.replace(":id", encId));
+    });
   };
 
   const onProperties = (e) => {
@@ -406,15 +409,21 @@ const Properties = () => {
 
   const onAgentDetails = (e, profileid) => {
     e.preventDefault();
-    navigate(routeNames.agent.path.replace(":id", profileid));
+    aesCtrEncrypt(profileid.toString()).then((encId) => {
+      navigate(routeNames.agent.path.replace(":id", encId));
+    });
   };
 
   const onAssetProfileDetails = (e, p) => {
     e.preventDefault();
     if (p.ListedByProfileTypeId == config.userProfileTypes.Agent) {
-      navigate(routeNames.agent.path.replace(":id", p.ListedByProfileId));
+      aesCtrEncrypt(p.ListedByProfileId.toString()).then((encId) => {
+        navigate(routeNames.agent.path.replace(":id", encId));
+      });
     } else if (p.ListedByProfileTypeId == config.userProfileTypes.Owner) {
-      navigate(routeNames.owner.path.replace(":id", p.ListedByProfileId));
+      aesCtrEncrypt(p.ListedByProfileId.toString()).then((encId) => {
+        navigate(routeNames.owner.path.replace(":id", encId));
+      });
     }
   };
 

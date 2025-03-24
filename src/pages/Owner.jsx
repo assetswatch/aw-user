@@ -1,7 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import PageTitle from "../components/layouts/PageTitle";
 import { routeNames } from "../routes/routes";
-import { checkEmptyVal, checkObjNullorEmpty, isInt } from "../utils/common";
+import {
+  aesCtrDecrypt,
+  aesCtrEncrypt,
+  checkEmptyVal,
+  checkObjNullorEmpty,
+  isInt,
+} from "../utils/common";
 import { ApiUrls } from "../utils/constants";
 import config from "../config.json";
 import { axiosPost } from "../helpers/axiosHelper";
@@ -19,7 +25,7 @@ const Owner = () => {
 
   const { id } = useParams();
 
-  let ownerId = parseInt(isInt(Number(id)) ? id : 0);
+  let ownerId = 0; // parseInt(isInt(Number(id)) ? id : 0);
 
   const { topAssetsList } = useGetTopAssetsGateWay("recent", 5);
   const topAssetsRef = useRef(null);
@@ -42,11 +48,15 @@ const Owner = () => {
   }, [topAssetsList, rerouteKey]);
 
   useEffect(() => {
-    if (ownerId == 0) {
-      navigate(routeNames.home.path);
-    } else {
-      getOwnerDetails();
-    }
+    aesCtrDecrypt(id).then((decId) => {
+      ownerId = decId.toString().substring(0, decId.toString().indexOf(":"));
+
+      if (ownerId == 0) {
+        navigate(routeNames.home.path);
+      } else {
+        getOwnerDetails();
+      }
+    });
   }, [rerouteKey]);
 
   //set carousel
@@ -117,14 +127,18 @@ const Owner = () => {
   const onownerDetails = (e, profileId) => {
     e.preventDefault();
     setRerouteKey(rerouteKey + 1);
-    navigate(routeNames.agent.path.replace(":id", profileId));
+    aesCtrEncrypt(profileId.toString()).then((encId) => {
+      navigate(routeNames.agent.path.replace(":id", encId));
+    });
     window.scrollTo(0, 0);
   };
 
   const onPropertyDetails = (e, assetId) => {
     e.preventDefault();
     setRerouteKey(rerouteKey + 1);
-    navigate(routeNames.property.path.replace(":id", assetId));
+    aesCtrEncrypt(assetId.toString()).then((encId) => {
+      navigate(routeNames.property.path.replace(":id", encId));
+    });
   };
 
   return (

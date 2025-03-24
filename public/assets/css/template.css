@@ -595,6 +595,11 @@ a.hover-bg-primary:hover,
   line-height: 40px;
 }
 
+.font-size-80 {
+  font-size: 80px;
+  line-height: 80px;
+}
+
 .font-400 {
   font-weight: 400 !important;
 }
@@ -1490,6 +1495,24 @@ a.text-dark:focus {
   padding-top: 25px !important;
 }
 
+.py-25,
+.p-25,
+.pb-25 {
+  padding-bottom: 25px !important;
+}
+
+.py-28,
+.p-28,
+.pt-28 {
+  padding-top: 28px !important;
+}
+
+.py-28,
+.p-28,
+.pb-28 {
+  padding-bottom: 28px !important;
+}
+
 .py-30,
 .p-30,
 .pt-30 {
@@ -1614,6 +1637,10 @@ a.text-dark:focus {
 .p-50,
 .pb-50 {
   padding-bottom: 50px !important;
+}
+
+.pb-60 {
+  padding-bottom: 60px !important;
 }
 
 .py-auto,

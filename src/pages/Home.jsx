@@ -2,7 +2,11 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { loadFile, unloadFile, getArrLoadFiles } from "../utils/loadFiles";
 import { routeNames } from "../routes/routes";
 import { Link, useNavigate } from "react-router-dom";
-import { Base62NumberToAlpha, SetPageLoaderNavLinks } from "../utils/common";
+import {
+  aesCtrEncrypt,
+  Base62NumberToAlpha,
+  SetPageLoaderNavLinks,
+} from "../utils/common";
 import { useGetTopAssetsGateWay } from "../hooks/useGetTopAssetsGateWay";
 import { useGetTopAgentsGateWay } from "../hooks/useGetTopAgentsGateWay";
 import Rating from "../components/common/Rating";
@@ -186,20 +190,28 @@ const Home = () => {
 
   const onPropertyDetails = (e, assetId) => {
     e.preventDefault();
-    navigate(routeNames.property.path.replace(":id", assetId));
+    aesCtrEncrypt(assetId.toString()).then((encId) => {
+      navigate(routeNames.property.path.replace(":id", encId));
+    });
   };
 
   const onAgentDetails = (e, profileid) => {
     e.preventDefault();
-    navigate(routeNames.agent.path.replace(":id", profileid));
+    aesCtrEncrypt(profileid.toString()).then((encId) => {
+      navigate(routeNames.agent.path.replace(":id", encId));
+    });
   };
 
   const onAssetProfileDetails = (e, p) => {
     e.preventDefault();
     if (p.ListedByProfileTypeId == config.userProfileTypes.Agent) {
-      navigate(routeNames.agent.path.replace(":id", p.ListedByProfileId));
+      aesCtrEncrypt(p.ListedByProfileId.toString()).then((encId) => {
+        navigate(routeNames.agent.path.replace(":id", encId));
+      });
     } else if (p.ListedByProfileTypeId == config.userProfileTypes.Owner) {
-      navigate(routeNames.owner.path.replace(":id", p.ListedByProfileId));
+      aesCtrEncrypt(p.ListedByProfileId.toString()).then((encId) => {
+        navigate(routeNames.owner.path.replace(":id", encId));
+      });
     }
   };
 

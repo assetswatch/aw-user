@@ -20,6 +20,7 @@ import {
   checkStartEndDateGreater,
   convertImageToBase64,
   GetUserCookieValues,
+  replacePlaceHolders,
   SetPageLoaderNavLinks,
 } from "../../../utils/common";
 import DateControl from "../../../components/common/DateControl";
@@ -90,6 +91,11 @@ const Invoices = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [pageCount, setPageCount] = useState(0);
   const [selectedGridRow, setSelectedGridRow] = useState(null);
+
+  const [modalDeleteConfirmShow, setModalDeleteConfirmShow] = useState(false);
+  const [modalDeleteConfirmContent, setModalDeleteConfirmContent] = useState(
+    AppMessages.DeleteInvoiceConfirmationMessage
+  );
 
   const [isDataLoading, setIsDataLoading] = useState(false);
 
@@ -299,7 +305,7 @@ const Invoices = () => {
         disableSortBy: true,
         className: "w-300px",
         Cell: ({ row }) => (
-          <div className="row px-5">
+          <div className="row">
             {row.original.BillToProfileId > 0 ? (
               <div
                 className="cur-pointer"
@@ -314,12 +320,12 @@ const Invoices = () => {
                     placeHolderClass="pos-absolute w-50px min-h-50 fl-l"
                   ></LazyImage>
                 </div>
-                <div className="col property-info flex v-center pb-0 min-h-50 px-5">
+                <div className="col property-info flex v-center pb-0 min-h-50 px-5 pt-0">
                   <h5 className="text-secondary">
                     {checkEmptyVal(row.original.BillToCompanyName)
                       ? row.original.BillToFirstName +
                         " " +
-                        row.original.BillToFirstName
+                        row.original.BillToLastName
                       : row.original.BillToCompanyName}
 
                     <div className="mt-0 py-0 small text-light">
@@ -335,13 +341,36 @@ const Invoices = () => {
         ),
       },
       {
-        Header: "Sent To",
+        Header: "Sent To / From",
         accessor: "",
         disableSortBy: true,
         className: "w-400px",
         Cell: ({ row }) => (
           <>
-            {row.original.SentProfiles.length == 1 ? (
+            {row.original.InvoiceDirection == config.directionTypes.Received ? (
+              <div>
+                <div className="col-auto px-0">
+                  <LazyImage
+                    className="rounded cur-pointer w-50px mx-1"
+                    src={row.original.FromPicPath}
+                    placeHolderClass="pos-absolute w-50px min-h-50 fl-l"
+                  ></LazyImage>
+                </div>
+                <div className="col property-info flex v-center pb-0 min-h-50 px-5 pt-0">
+                  <h5 className="text-secondary">
+                    {checkEmptyVal(row.original.FromCompanyName)
+                      ? row.original.FromFirstName +
+                        " " +
+                        row.original.FromLastName
+                      : row.original.FromCompanyName}
+
+                    <div className="mt-0 py-0 small text-light">
+                      {row.original.FromProfileType}
+                    </div>
+                  </h5>
+                </div>
+              </div>
+            ) : row.original.SentProfiles.length == 1 ? (
               <div
                 className="cur-pointer"
                 onClick={(e) => {
@@ -355,7 +384,7 @@ const Invoices = () => {
                     placeHolderClass="pos-absolute w-50px min-h-50 fl-l"
                   ></LazyImage>
                 </div>
-                <div className="col property-info flex v-center pb-0 min-h-50 px-5">
+                <div className="col property-info flex v-center pb-0 min-h-50 px-5 pt-0">
                   <h5 className="text-secondary">
                     {checkEmptyVal(row.original.SentProfiles[0].CompanyName)
                       ? row.original.SentProfiles[0].FirstName +
@@ -400,7 +429,7 @@ const Invoices = () => {
                           </span>
                         </>
                       ) : (
-                        <div class="more">
+                        <div className="more">
                           +{row.original.SentProfiles.length - 5}
                         </div>
                       )}
@@ -421,12 +450,123 @@ const Invoices = () => {
               <div>Amount: {row.original.TotalAmountDisplay}</div>
               {/* <div>Date: {row.original.BillDateDisplay}</div> */}
               <div>Due On: {row.original.DueDateDisplay}</div>
-              {row.original.InvoiceDirection !=
-                config.directionTypes.Created && (
+              {row.original.InvoiceDirection != config.directionTypes.Created &&
+                (row.original.InvoiceDirection ==
+                  config.directionTypes.Received &&
+                row.original.PaymentStatus ==
+                  config.paymentStatusTypes.UnPaid ? (
+                  <div>Due Amount: {row.original.TotalBalanceDisplay}</div>
+                ) : (
+                  <>
+                    {row.original.PaymentStatus ==
+                      config.paymentStatusTypes.PartiallyPaid && (
+                      <div>Due Amount: {row.original.TotalBalanceDisplay}</div>
+                    )}
+                    {row.original.PaymentStatus ==
+                      config.paymentStatusTypes.Paid && (
+                      <div>
+                        Paid Amount: {row.original.TotalPaidAmountDisplay}
+                      </div>
+                    )}
+                    <span>
+                      <span
+                        className={`badge badge-pill gr-badge-pill mt-2 ${
+                          row.original.PaymentStatus ==
+                            config.paymentStatusTypes.UnPaid &&
+                          row.original.InvoiceDirection !=
+                            config.directionTypes.Received
+                            ? "gr-badge-pill-warning w-100px"
+                            : row.original.PaymentStatus ==
+                              config.paymentStatusTypes.PartiallyPaid
+                            ? "gr-badge-pill-info w-100px"
+                            : row.original.PaymentStatus ==
+                              config.paymentStatusTypes.Paid
+                            ? "gr-badge-pill-suc"
+                            : ""
+                        }`}
+                      >
+                        {row.original.PaymentStatusDisplay}
+                      </span>
+                    </span>
+                  </>
+                ))}
+
+              {row.original.InvoiceDirection ==
+                config.directionTypes.Received &&
+                row.original.PaymentStatus !=
+                  config.paymentStatusTypes.Paid && (
+                  <div className="mt-1">
+                    <button
+                      className="btn btn-primary btn-xs btn-glow shadow rounded lh-30 px-15"
+                      name="btnpaynow"
+                      id="btnpaynow"
+                      type="button"
+                      onClick={(e) => onPayNow(e, row)}
+                    >
+                      <i className="fa fa-credit-card position-relative me-1 t-1 text-white"></i>{" "}
+                      Pay Now{" "}
+                    </button>
+                  </div>
+                )}
+
+              {/* {row.original.InvoiceDirection != config.directionTypes.Created &&
+              row.original.InvoiceDirection == config.directionTypes.Received &&
+              row.original.PaymentStatus != config.paymentStatusTypes.UnPaid ? (
+                <div>
+                  <button
+                    className="btn btn-primary btn-xs btn-glow shadow rounded lh-26 px-10"
+                    name="btnpaynow"
+                    id="btnpaynow"
+                    type="button"
+                    onClick={(e) => onPayNow(e, row)}
+                  >
+                    <i className="fa fa-credit-card position-relative me-1 t-1 text-white"></i>{" "}
+                    Pay Now{" "}
+                  </button>
+                </div>
+              ) : (
                 <span>
                   <span
                     className={`badge badge-pill gr-badge-pill mt-2 ${
-                      row.original.PaymentStatus == 2
+                      row.original.PaymentStatus ==
+                      config.paymentStatusTypes.PartiallyPaid
+                        ? "gr-badge-pill-info w-100px"
+                        : row.original.PaymentStatus ==
+                          config.paymentStatusTypes.UnPaid
+                        ? "gr-badge-pill-warning w-100px"
+                        : "gr-badge-pill-suc"
+                    }`}
+                  >
+                    {row.original.PaymentStatusDisplay}
+                  </span>
+                </span>
+              )} */}
+
+              {/* {row.original.InvoiceDirection ==
+                config.directionTypes.Received &&
+                row.original.PaymentStatus !=
+                  config.paymentStatusTypes.Paid && (
+                  <div>
+                    <button
+                      className="btn btn-primary btn-xs btn-glow shadow rounded lh-26 px-10"
+                      name="btnpaynow"
+                      id="btnpaynow"
+                      type="button"
+                      onClick={(e) => onPayNow(e, row)}
+                    >
+                      <i className="fa fa-credit-card position-relative me-1 t-1 text-white"></i>{" "}
+                      Pay Now{" "}
+                    </button>
+                  </div>
+                )} */}
+
+              {/* {row.original.PaymentStatus !=
+                config.paymentStatusTypes.UnPaid && (
+                <span>
+                  <span
+                    className={`badge badge-pill gr-badge-pill mt-2 ${
+                      row.original.PaymentStatus ==
+                      config.paymentStatusTypes.PartiallyPaid
                         ? "gr-badge-pill-info w-100px"
                         : row.original.PaymentStatus == 0
                         ? "gr-badge-pill-warning w-100px"
@@ -436,7 +576,26 @@ const Invoices = () => {
                     {row.original.PaymentStatusDisplay}
                   </span>
                 </span>
-              )}
+               )} */}
+
+              {/* {row.original.InvoiceDirection ==
+                config.directionTypes.Received &&
+                row.original.PaymentStatus !=
+                  config.paymentStatusTypes.Paid && (
+                  <div>
+                    <button
+                      className="btn btn-primary btn-xs btn-glow shadow rounded lh-26 px-10"
+                      name="btnpaynow"
+                      id="btnpaynow"
+                      type="button"
+                      onClick={(e) => onPayNow(e, row)}
+                    >
+                      <i className="fa fa-credit-card position-relative me-1 t-1 text-white"></i>{" "}
+                      Pay Now{" "}
+                    </button>
+                  </div>
+                )} */}
+
               {/* {checkEmptyVal(row.original.PaymentId == 0) ? (
                 ""
               ) : (
@@ -473,8 +632,8 @@ const Invoices = () => {
             icssclass: "pr-10 pl-2px",
             isconditionalshow: (row) => {
               return (
-                row?.original?.PaymentId > 0 &&
-                row?.original?.InvoiceDirection == 2
+                row?.original?.PaymentStatus != 0
+                // && row?.original?.InvoiceDirection == 2
               );
             },
           },
@@ -482,18 +641,37 @@ const Invoices = () => {
             text: "Send",
             onclick: (e, row) => onSendInvoiceModalShow(e, row),
             icssclass: "pr-10 pl-2px",
-          },
-          {
-            text: "Pay Now",
-            onclick: (e, row) => onPayNow(e, row),
-            icssclass: "pr-10 pl-2px",
             isconditionalshow: (row) => {
               return (
-                row?.original?.PaymentId == 0 &&
-                row?.original?.InvoiceDirection == 2
+                row.original.InvoiceDirection != config.directionTypes.Received
               );
             },
           },
+          {
+            text: "Delete Invoice",
+            onclick: (e, row) => {
+              onDeleteConfirmModalShow(e, row);
+            },
+            icssclass: "pr-10 pl-2px",
+            isconditionalshow: (row) => {
+              return (
+                row?.original?.SentProfiles.length == 0 &&
+                row?.original?.InvoiceDirection !=
+                  config.directionTypes.Received
+              );
+            },
+          },
+          // {
+          //   text: "Pay Now",
+          //   onclick: (e, row) => onPayNow(e, row),
+          //   icssclass: "pr-10 pl-2px",
+          //   isconditionalshow: (row) => {
+          //     return (
+          //       row?.original?.PaymentId == 0 &&
+          //       row?.original?.InvoiceDirection == 2
+          //     );
+          //   },
+          // },
         ],
       },
     ],
@@ -636,8 +814,11 @@ const Invoices = () => {
 
               for (let i = 1; i <= totalPages; i++) {
                 pdf.setPage(i);
-
-                pdf.setDrawColor(pdfHFWMSettings.fLineColor);
+                pdf.setDrawColor(
+                  pdfHFWMSettings.fLineColor.r,
+                  pdfHFWMSettings.fLineColor.g,
+                  pdfHFWMSettings.fLineColor.b
+                );
                 pdf.line(
                   pdfHFWMSettings.fLinex1OffSet,
                   pageHeight - pdfHFWMSettings.fLiney1OffSet,
@@ -647,7 +828,11 @@ const Invoices = () => {
 
                 pdf.setFontSize(pdfHFWMSettings.fFontSize);
                 pdf.setFont(...pdfHFWMSettings.fFontFamily);
-                pdf.setTextColor(pdfHFWMSettings.fFontColor);
+                pdf.setTextColor(
+                  pdfHFWMSettings.fFontColor.r,
+                  pdfHFWMSettings.fFontColor.g,
+                  pdfHFWMSettings.fFontColor.b
+                );
                 pdf.text(
                   pdfDetails?.BrandingDetails?.Footer,
                   pageWidth / pdfHFWMSettings.pageHalf,
@@ -764,8 +949,11 @@ const Invoices = () => {
 
         for (let i = 1; i <= totalPages; i++) {
           pdf.setPage(i);
-
-          pdf.setDrawColor(pdfHFWMSettings.fLineColor);
+          pdf.setDrawColor(
+            pdfHFWMSettings.fLineColor.r,
+            pdfHFWMSettings.fLineColor.g,
+            pdfHFWMSettings.fLineColor.b
+          );
           pdf.line(
             pdfHFWMSettings.fLinex1OffSet,
             pageHeight - pdfHFWMSettings.fLiney1OffSet,
@@ -775,7 +963,11 @@ const Invoices = () => {
 
           pdf.setFontSize(pdfHFWMSettings.fFontSize);
           pdf.setFont(...pdfHFWMSettings.fFontFamily);
-          pdf.setTextColor(pdfHFWMSettings.fFontColor);
+          pdf.setTextColor(
+            pdfHFWMSettings.fFontColor.r,
+            pdfHFWMSettings.fFontColor.g,
+            pdfHFWMSettings.fFontColor.b
+          );
           pdf.text(
             pdfDetails?.BrandingDetails?.Footer,
             pageWidth / pdfHFWMSettings.pageHalf,
@@ -952,8 +1144,8 @@ const Invoices = () => {
 
     let isapimethoderr = false;
     let objSubAccountsParams = {
-      AccountId: accountid,
-      ProfileId: profileid,
+      AccountId: parseInt(row?.original?.AccountId),
+      ProfileId: parseInt(row?.original?.ProfileId),
       Status: `${config.paymentAccountCreateStatus.Active}`,
     };
     axiosPost(
@@ -968,7 +1160,7 @@ const Invoices = () => {
               SessionStorageKeys.CheckoutInvoiceId,
               row.original.InvoiceId
             );
-            navigate(routeNames.checkout.path);
+            navigate(routeNames.usercheckout.path);
           } else {
             setModalPayWarningShow(true);
           }
@@ -992,6 +1184,72 @@ const Invoices = () => {
   const onPayWarningModalClose = () => {
     setModalPayWarningShow(false);
   };
+
+  //Delete confirmation Modal actions
+
+  const onDeleteConfirmModalShow = (e, row) => {
+    e.preventDefault();
+    setSelectedGridRow(row);
+    setModalDeleteConfirmContent(
+      replacePlaceHolders(modalDeleteConfirmContent, {
+        invoicenumber: `${row?.original?.InvoiceNumber}`,
+      })
+    );
+    setModalDeleteConfirmShow(true);
+  };
+
+  const onDeleteConfirmModalClose = () => {
+    setModalDeleteConfirmShow(false);
+    setSelectedGridRow(null);
+    apiReqResLoader(
+      "btndeleteinvoice",
+      "Yes",
+      API_ACTION_STATUS.COMPLETED,
+      false
+    );
+    setModalDeleteConfirmContent(AppMessages.DeleteInvoiceConfirmationMessage);
+  };
+
+  const onDelete = (e) => {
+    e.preventDefault();
+
+    apiReqResLoader("btndeleteinvoice", "Deleting", API_ACTION_STATUS.START);
+
+    let isapimethoderr = false;
+    let objBodyParams = {
+      InvoiceId: parseInt(selectedGridRow?.original?.InvoiceId),
+      AccountId: accountid,
+      ProfileId: profileid,
+    };
+
+    axiosPost(`${config.apiBaseUrl}${ApiUrls.deleteInvoice}`, objBodyParams)
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode === 200) {
+          if (objResponse.Data.Status == 1) {
+            Toast.success(AppMessages.DeleteInvoiceSuccess);
+            getInvoices({});
+            onDeleteConfirmModalClose();
+          } else {
+            Toast.error(objResponse.Data.Message);
+          }
+        } else {
+          isapimethoderr = true;
+        }
+      })
+      .catch((err) => {
+        isapimethoderr = true;
+        console.error(`"API :: ${ApiUrls.deleteInvoice}, Error ::" ${err}`);
+      })
+      .finally(() => {
+        if (isapimethoderr == true) {
+          Toast.error(AppMessages.SomeProblem);
+        }
+        apiReqResLoader("btndeleteinvoice", "Yes", API_ACTION_STATUS.COMPLETED);
+      });
+  };
+
+  //Delete confirmation Modal actions
 
   return (
     <>
@@ -1266,6 +1524,33 @@ const Invoices = () => {
         </>
       )}
       {/*============== Pay Warning Modal End ==============*/}
+
+      {/*============== Delete Confirmation Modal Start ==============*/}
+      {modalDeleteConfirmShow && (
+        <>
+          <ModalView
+            title={AppMessages.DeleteConfirmationTitle}
+            content={modalDeleteConfirmContent}
+            onClose={onDeleteConfirmModalClose}
+            actions={[
+              {
+                id: "btndeleteinvoice",
+                text: "Yes",
+                displayOrder: 1,
+                btnClass: "btn-primary",
+                onClick: (e) => onDelete(e),
+              },
+              {
+                text: "No",
+                displayOrder: 2,
+                btnClass: "btn-secondary",
+                onClick: (e) => onDeleteConfirmModalClose(e),
+              },
+            ]}
+          ></ModalView>
+        </>
+      )}
+      {/*============== Delete Confirmation Modal End ==============*/}
     </>
   );
 };

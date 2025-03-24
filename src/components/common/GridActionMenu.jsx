@@ -188,28 +188,39 @@ export const GridDocActionMenu = ({ row, actions }) => {
 };
 
 export const GridUserConnectionActionMenu = ({ row, actions }) => {
-  if (row.original.Status == config.userConnectionStatusTypes.Joined) {
+  if (row.original.ProfileId > 0) {
+    if (row.original.Status == config.userConnectionStatusTypes.Joined) {
+      actions = actions.filter(
+        (item) =>
+          item.text.toLowerCase() !== "accept" &&
+          item.text.toLowerCase() !== "reject"
+      );
+    } else if (
+      row.original.Status == config.userConnectionStatusTypes.Terminated ||
+      row.original.Status == config.userConnectionStatusTypes.Rejected ||
+      row.original.RequestTypeId == config.userConnectionRequestTypes.Sent
+    ) {
+      actions = actions.filter((item) => 1 != 1);
+    } else if (
+      row.original.Status == config.userConnectionStatusTypes.Pending &&
+      row.original.RequestTypeId == config.userConnectionRequestTypes.Received
+    ) {
+      actions = actions.filter(
+        (item) =>
+          item.text.toLowerCase() !== "send message" &&
+          item.text.toLowerCase() !== "terminate"
+      );
+    }
+  } else {
+    //new registration invitations.
     actions = actions.filter(
       (item) =>
         item.text.toLowerCase() !== "accept" &&
-        item.text.toLowerCase() !== "reject"
-    );
-  } else if (
-    row.original.Status == config.userConnectionStatusTypes.Terminated ||
-    row.original.Status == config.userConnectionStatusTypes.Rejected ||
-    row.original.RequestTypeId == config.userConnectionRequestTypes.Sent
-  ) {
-    actions = actions.filter((item) => 1 != 1);
-  } else if (
-    row.original.Status == config.userConnectionStatusTypes.Pending &&
-    row.original.RequestTypeId == config.userConnectionRequestTypes.Received
-  ) {
-    actions = actions.filter(
-      (item) =>
-        item.text.toLowerCase() !== "send message" &&
+        item.text.toLowerCase() !== "reject" &&
         item.text.toLowerCase() !== "terminate"
     );
   }
+
   return (
     <>
       {actions?.length > 0 && (
@@ -222,6 +233,7 @@ export const GridUserConnectionActionMenu = ({ row, actions }) => {
           </button>
           <ul className="dropdown-menu gr-action-menu dropdown-menu-left  box-shadow bg-white">
             {actions.map((a, i) => {
+              if (a["isconditionalshow"]?.(row) == false) return "";
               return (
                 <li key={`gr-action-menu-li${i}`}>
                   <a

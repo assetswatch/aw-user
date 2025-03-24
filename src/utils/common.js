@@ -1,4 +1,4 @@
-import { AppMessages, ValidationMessages } from "./constants";
+import { ApiUrls, AppMessages, ValidationMessages } from "./constants";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
@@ -90,7 +90,7 @@ export function SetPageLoaderNavLinks() {
         case routeNames.createinvoice.path.toLowerCase():
         case routeNames.previewinvoice.path.toLowerCase():
         case routeNames.viewinvoice.path.toLowerCase():
-        case routeNames.checkout.path.toLowerCase():
+        case routeNames.usercheckout.path.toLowerCase():
           activelink = "payments";
           break;
         case routeNames.tenantprofile.path.toLowerCase():
@@ -630,23 +630,33 @@ export function getPagesPathByLoggedinUserProfile(
   }
 }
 
-export const usioGetToken = (objCard) => {
+export const usioGetToken = (objCard, objUser) => {
   return new Promise((resolve, reject) => {
-    let objParams = {
-      MerchantKey:
-        objCard.ProfileId == 8
-          ? "2CE3513A-085E-4DC1-8D78-84E79F85DC6D"
-          : config.usioPaymentConfig.merchantAPIKey,
-    };
-    objParams = { ...objParams, ...objCard };
-
-    axiosPost(`${config.usioPaymentConfig.getTokenUrl}`, objParams)
-      .then((response) => {
-        resolve(response.data);
-      })
-      .catch((error) => {
-        reject(error);
-      });
+    axiosPost(`${config.apiBaseUrl}${ApiUrls.getPaymentSubAccountDetails}`, {
+      AccountId: objUser.AccountId,
+      ProfileId: objUser.ProfileId,
+      IsAccountLevel: 1,
+    }).then((objAccountresponse) => {
+      let accountresponse = objAccountresponse.data;
+      if (
+        accountresponse.StatusCode === 200 &&
+        checkEmptyVal(accountresponse?.Data?.SubAccountKey) == false
+      ) {
+        let objParams = {
+          MerchantKey: accountresponse.Data.SubAccountKey,
+        };
+        objParams = { ...objParams, ...objCard };
+        axiosPost(`${config.usioPaymentConfig.getTokenUrl}`, objParams)
+          .then((response) => {
+            resolve(response.data);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      } else {
+        resolve(null);
+      }
+    });
   });
 };
 
@@ -657,6 +667,92 @@ export const Encrypt = (text) => {
     padding: CryptoJS.pad.Pkcs7,
   }).toString();
 };
+
+export const Decrypt = (data) => {
+  try {
+    const decrypted = CryptoJS.AES.decrypt(
+      data,
+      CryptoJS.enc.Utf8.parse(config.secretKey),
+      {
+        iv: CryptoJS.enc.Utf8.parse(config.secretIV),
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+      }
+    );
+
+    return decrypted.toString(CryptoJS.enc.Utf8);
+  } catch {
+    return "";
+  }
+};
+
+function arrayBufferToCustomBase64(buffer) {
+  let binary = "";
+  let bytes = new Uint8Array(buffer);
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  let base64 = btoa(binary);
+  // Replace `+` with `-`, `/` with `_`, and remove padding `=`
+  return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function customBase64ToArrayBuffer(base64) {
+  base64 = base64.replace(/-/g, "+").replace(/_/g, "/");
+  let padding = base64.length % 4;
+  if (padding > 0) {
+    base64 += "=".repeat(4 - padding);
+  }
+
+  let binary = atob(base64);
+  let buffer = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    buffer[i] = binary.charCodeAt(i);
+  }
+  return buffer.buffer;
+}
+
+export async function aesCtrEncrypt(plaintext) {
+  plaintext =
+    plaintext.length == 1 || plaintext.length == 3
+      ? plaintext + ":a@w"
+      : plaintext.length == 2
+      ? plaintext + ":aw"
+      : plaintext;
+
+  const encoder = new TextEncoder();
+  const keyData = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(config.secretKey),
+    { name: "AES-CTR" },
+    false,
+    ["encrypt", "decrypt"]
+  );
+  const encrypted = await crypto.subtle.encrypt(
+    { name: "AES-CTR", counter: encoder.encode(config.secretIV), length: 64 },
+    keyData,
+    encoder.encode(plaintext)
+  );
+  return arrayBufferToCustomBase64(encrypted);
+}
+
+export async function aesCtrDecrypt(ciphertextBase64) {
+  const encoder = new TextEncoder();
+  const keyData = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(config.secretKey),
+    { name: "AES-CTR" },
+    false,
+    ["decrypt"]
+  );
+  const encrypted = customBase64ToArrayBuffer(ciphertextBase64);
+  const decrypted = await crypto.subtle.decrypt(
+    { name: "AES-CTR", counter: encoder.encode(config.secretIV), length: 64 },
+    keyData,
+    encrypted
+  );
+  return new TextDecoder().decode(decrypted);
+}
 
 export const formatBytes = (bytes) => {
   if (bytes === 0) return "0 Bytes";
@@ -683,4 +779,11 @@ export async function convertImageToBase64(url) {
 
 export function isInt(value) {
   return typeof value === "number" && Number.isInteger(value);
+}
+
+export function maskNumber(number, maskcount = 4) {
+  let str = number.toString();
+  return maskcount == -1
+    ? str.replace(/\d/g, "x")
+    : str.slice(0, -maskcount).replace(/\d/g, "x") + str.slice(-maskcount);
 }
