@@ -48,6 +48,12 @@ const AddCommercialProperty = () => {
     GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
   );
 
+  let loggedinUserDetails = {
+    Name: GetUserCookieValues(UserCookie.Name, loggedinUser),
+    ProfileType: GetUserCookieValues(UserCookie.ProfileType, loggedinUser),
+    PicPath: GetUserCookieValues(UserCookie.ProfilePic, loggedinUser),
+  };
+
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     txtdescription: "",
@@ -220,7 +226,19 @@ const AddCommercialProperty = () => {
       .then((response) => {
         let objResponse = response.data;
         if (objResponse.StatusCode == 200) {
-          return objResponse.Data.map((item) => ({
+          let data = Array.isArray(objResponse?.Data)
+            ? [...objResponse.Data]
+            : [];
+          data.push({
+            AccountId: accountid,
+            ProfileId: profileid,
+            FirstName: loggedinUserDetails?.Name || "",
+            LastName: "",
+            ProfileType: `${loggedinUserDetails?.ProfileType} - Self`,
+            PicPath: loggedinUserDetails?.PicPath || "",
+          });
+
+          return data.map((item) => ({
             label: (
               <div className="flex items-center">
                 <div className="w-40px h-40px mr-10 flex-shrink-0">

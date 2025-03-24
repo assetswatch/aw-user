@@ -188,6 +188,7 @@ export const GridDocActionMenu = ({ row, actions }) => {
 };
 
 export const GridUserConnectionActionMenu = ({ row, actions }) => {
+  console.log(row.original.Status, row.original.RequestTypeId);
   if (row.original.ProfileId > 0) {
     if (row.original.Status == config.userConnectionStatusTypes.Joined) {
       actions = actions.filter(
@@ -200,7 +201,15 @@ export const GridUserConnectionActionMenu = ({ row, actions }) => {
       row.original.Status == config.userConnectionStatusTypes.Rejected ||
       row.original.RequestTypeId == config.userConnectionRequestTypes.Sent
     ) {
-      actions = actions.filter((item) => 1 != 1);
+      row.original.Status == config.userConnectionStatusTypes.Pending &&
+      row.original.RequestTypeId == config.userConnectionRequestTypes.Sent
+        ? (actions = actions.filter(
+            (item) =>
+              item.text.toLowerCase() !== "accept" &&
+              item.text.toLowerCase() !== "reject" &&
+              item.text.toLowerCase() !== "send message"
+          ))
+        : (actions = actions.filter((item) => 1 != 1));
     } else if (
       row.original.Status == config.userConnectionStatusTypes.Pending &&
       row.original.RequestTypeId == config.userConnectionRequestTypes.Received

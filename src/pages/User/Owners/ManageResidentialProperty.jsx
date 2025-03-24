@@ -52,6 +52,12 @@ const ManageResidentialProperty = () => {
     GetUserCookieValues(UserCookie.ProfileId, loggedinUser)
   );
 
+  let loggedinUserDetails = {
+    Name: GetUserCookieValues(UserCookie.Name, loggedinUser),
+    ProfileType: GetUserCookieValues(UserCookie.ProfileType, loggedinUser),
+    PicPath: GetUserCookieValues(UserCookie.ProfilePic, loggedinUser),
+  };
+
   const [assetDetails, setAssetDetails] = useState([]);
 
   const [errors, setErrors] = useState({});
@@ -482,7 +488,19 @@ const ManageResidentialProperty = () => {
       .then((response) => {
         let objResponse = response.data;
         if (objResponse.StatusCode == 200) {
-          let data = objResponse.Data.map((item) => ({
+          let users = Array.isArray(objResponse?.Data)
+            ? [...objResponse.Data]
+            : [];
+          users.push({
+            AccountId: accountid,
+            ProfileId: profileid,
+            FirstName: loggedinUserDetails?.Name || "",
+            LastName: "",
+            ProfileType: `${loggedinUserDetails?.ProfileType} - Self`,
+            PicPath: loggedinUserDetails?.PicPath || "",
+          });
+
+          let data = users.map((item) => ({
             label: (
               <div className="flex items-center">
                 <div className="w-40px h-40px mr-10 flex-shrink-0">
@@ -1479,7 +1497,10 @@ const ManageResidentialProperty = () => {
                                       <div className="col-md-6 mb-15">
                                         <span>Owner : </span>
                                         <span>
-                                          {o.FirstName} {o.LastName}
+                                          {o.FirstName} {o.LastName}{" "}
+                                          {o.ProfileId == profileid
+                                            ? " - Self"
+                                            : ""}
                                         </span>
                                       </div>
                                       <div className="col-md-6 mb-15 text-md-end">
