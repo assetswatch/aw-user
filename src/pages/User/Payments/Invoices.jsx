@@ -447,15 +447,15 @@ const Invoices = () => {
         Cell: ({ row }) => (
           <>
             <div className="property-info d-table">
-              <div>Amount: {row.original.TotalAmountDisplay}</div>
+              {/* <div>Amount: {row.original.TotalAmountDisplay}</div> */}
               {/* <div>Date: {row.original.BillDateDisplay}</div> */}
-              <div>Due On: {row.original.DueDateDisplay}</div>
+              {/* <div>Due On: {row.original.DueDateDisplay}</div> */}
               {row.original.InvoiceDirection != config.directionTypes.Created &&
                 (row.original.InvoiceDirection ==
                   config.directionTypes.Received &&
                 row.original.PaymentStatus ==
                   config.paymentStatusTypes.UnPaid ? (
-                  <div>Due Amount: {row.original.TotalBalanceDisplay}</div>
+                  <div>Due Amount: {row.original.TotalAmountDisplay}</div>
                 ) : (
                   <>
                     {row.original.PaymentStatus ==
@@ -468,26 +468,46 @@ const Invoices = () => {
                         Paid Amount: {row.original.TotalPaidAmountDisplay}
                       </div>
                     )}
-                    <span>
-                      <span
-                        className={`badge badge-pill gr-badge-pill mt-2 ${
-                          row.original.PaymentStatus ==
-                            config.paymentStatusTypes.UnPaid &&
-                          row.original.InvoiceDirection !=
-                            config.directionTypes.Received
-                            ? "gr-badge-pill-warning w-100px"
-                            : row.original.PaymentStatus ==
-                              config.paymentStatusTypes.PartiallyPaid
-                            ? "gr-badge-pill-info w-100px"
-                            : row.original.PaymentStatus ==
-                              config.paymentStatusTypes.Paid
-                            ? "gr-badge-pill-suc"
-                            : ""
-                        }`}
-                      >
-                        {row.original.PaymentStatusDisplay}
+
+                    {row.original.InvoiceDirection !=
+                    config.directionTypes.Received ? (
+                      <span>
+                        <span
+                          className={`badge badge-pill gr-badge-pill mt-2 ${
+                            row.original.PaymentStatus ==
+                              config.paymentStatusTypes.UnPaid &&
+                            row.original.InvoiceDirection !=
+                              config.directionTypes.Received
+                              ? "gr-badge-pill-warning w-100px"
+                              : row.original.PaymentStatus ==
+                                config.paymentStatusTypes.PartiallyPaid
+                              ? "gr-badge-pill-info w-100px"
+                              : row.original.PaymentStatus ==
+                                config.paymentStatusTypes.Paid
+                              ? "gr-badge-pill-suc"
+                              : ""
+                          }`}
+                        >
+                          {row.original.PaymentStatusDisplay}
+                        </span>
                       </span>
-                    </span>
+                    ) : (
+                      row.original.PaymentStatus ==
+                        config.paymentStatusTypes.Paid && (
+                        <span>
+                          <span
+                            className={`badge badge-pill gr-badge-pill mt-2 ${
+                              row.original.PaymentStatus ==
+                              config.paymentStatusTypes.Paid
+                                ? "gr-badge-pill-suc"
+                                : ""
+                            }`}
+                          >
+                            {row.original.PaymentStatusDisplay}
+                          </span>
+                        </span>
+                      )
+                    )}
                   </>
                 ))}
 

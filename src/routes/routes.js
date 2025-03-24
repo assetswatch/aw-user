@@ -556,6 +556,7 @@ const routes = [
     name: routeNames.usercheckout.name,
     element: lazy(() => import("../pages/User/Payments/Checkout")),
     isexact: true,
+    isprotected: true,
   },
   {
     path: routeNames.connectionsowners.path,
