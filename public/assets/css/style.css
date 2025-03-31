@@ -3873,9 +3873,9 @@ Deshboard Style Start
   font-family: var(--theme-hiperlink-font) !important;
   visibility: hidden;
   position: absolute;
-  top: 30px; /* Position it just below the container */
-  left: 50%;
-  transform: translateX(-50%); /* Center the tooltip horizontally */
+  top: 25px; /* Position it just below the container */
+  left: 45%;
+  transform: translateX(-45%); /* Center the tooltip horizontally */
   background-color: var(--theme-secondary-color);
   color: #fff;
   text-align: center;
@@ -3885,9 +3885,9 @@ Deshboard Style Start
   transition: opacity 0.3s;
   white-space: nowrap;
   z-index: 1;
-  padding: 2px 15px 4px 15px;
-  font-size: 13px;
-  font-weight: 500;
+  padding: 4px 15px 6px 15px;
+  font-size: 12px;
+  font-weight: 400;
 }
 
 /* Show the tooltip when hovering over the container */

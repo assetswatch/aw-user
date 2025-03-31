@@ -5,11 +5,17 @@ import { routeNames } from "../routes/routes";
 import {
   aesCtrDecrypt,
   aesCtrEncrypt,
+  apiReqResLoader,
   checkEmptyVal,
   checkObjNullorEmpty,
-  isInt,
+  GetUserCookieValues,
 } from "../utils/common";
-import { ApiUrls, AppMessages } from "../utils/constants";
+import {
+  API_ACTION_STATUS,
+  ApiUrls,
+  AppMessages,
+  UserCookie,
+} from "../utils/constants";
 import config from "../config.json";
 import { axiosPost } from "../helpers/axiosHelper";
 import { useGetTopAssetsGateWay } from "../hooks/useGetTopAssetsGateWay";
@@ -20,16 +26,26 @@ import {
   NoData,
 } from "../components/common/LazyComponents";
 import PropertySearch from "../components/layouts/PropertySearch";
+import InputControl from "../components/common/InputControl";
+import { formCtrlTypes } from "../utils/formvalidation";
+import TextAreaControl from "../components/common/TextAreaControl";
+import { useAuth } from "../contexts/AuthContext";
+import { Toast } from "../components/common/ToastView";
 
 const Property = () => {
   let $ = window.$;
 
   const navigate = useNavigate();
+  const { isAuthenticated, loggedinUser } = useAuth();
   const [rerouteKey, setRerouteKey] = useState(0);
 
   const { id } = useParams();
 
   let assetDetailId = 0; //parseInt(isInt(Number(id)) ? id : 0);
+
+  let loggedInProfileId = isAuthenticated()
+    ? parseInt(GetUserCookieValues(UserCookie.ProfileId, loggedinUser))
+    : 0;
 
   //list of js/css dependencies.
   let arrJsCssFiles = [
@@ -56,6 +72,7 @@ const Property = () => {
         Promise.allSettled(promiseLoadFiles).then(function (responses) {});
 
         getAssetDetails();
+        getLoggedInUserDetails();
       }
     });
 
@@ -68,6 +85,19 @@ const Property = () => {
 
   const [assetDetails, setAssetDetails] = useState(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
+
+  let formErrors = {};
+  const [errors, setErrors] = useState({});
+
+  function setInitialFormData() {
+    return {
+      txtemail: "",
+      txtname: "",
+      txtphone: "",
+      txtmessage: "",
+    };
+  }
+  const [formData, setFormData] = useState(setInitialFormData());
 
   useEffect(() => {
     try {
@@ -99,6 +129,7 @@ const Property = () => {
         popupTransitionOut: "scaletobottom",
         height: 700,
         skinsPath: "/assets/skins/",
+        keybNav: false,
       });
     } catch {}
   }, [assetDetails]);
@@ -140,14 +171,114 @@ const Property = () => {
       });
   };
 
+  //get loggedinuser details
+  const getLoggedInUserDetails = () => {
+    if (loggedInProfileId > 0) {
+      let objParams = {
+        ProfileId: loggedInProfileId,
+      };
+      axiosPost(`${config.apiBaseUrl}${ApiUrls.getUserDetails}`, objParams)
+        .then((response) => {
+          let objResponse = response.data;
+          if (objResponse.StatusCode === 200) {
+            setFormData({
+              ...formData,
+              txtemail: objResponse.Data?.Email,
+              txtname: objResponse.Data?.FirstName,
+              txtphone: objResponse.Data?.MobileNo,
+            });
+          }
+        })
+        .catch((err) => {
+          console.error(`"API :: ${ApiUrls.getUserDetails}, Error ::" ${err}`);
+        })
+        .finally(() => {});
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e?.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const onSendMessage = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (Object.keys(formErrors).length === 0) {
+      apiReqResLoader(
+        "btnsendmessage",
+        "Sending Message",
+        API_ACTION_STATUS.START
+      );
+      let errctl = ".form-error";
+      $(errctl).html("");
+
+      setErrors({});
+      let isapimethoderr = false;
+
+      let fromProfileid = GetUserCookieValues(
+        UserCookie.ProfileId,
+        loggedinUser
+      );
+
+      let objBodyParams = {
+        Name: formData.txtname,
+        Email: formData.txtemail,
+        Phone: formData.txtphone,
+        Message: formData.txtmessage,
+        FromProfileId: parseInt(
+          checkEmptyVal(fromProfileid) ? 0 : fromProfileid
+        ),
+        ToProfileId: parseInt(assetDetails?.ListedByProfileId),
+        AssetId: parseInt(assetDetails?.AssetId),
+      };
+
+      axiosPost(`${config.apiBaseUrl}${ApiUrls.sendUserEnquiry}`, objBodyParams)
+        .then((response) => {
+          let objResponse = response.data;
+          if (objResponse.StatusCode === 200) {
+            if (objResponse.Data != null && objResponse.Data?.Id > 0) {
+              Toast.success(objResponse.Data.Message);
+              setFormData(setInitialFormData());
+            } else {
+              $(errctl).html(objResponse.Data.Message);
+            }
+          } else {
+            isapimethoderr = true;
+          }
+        })
+        .catch((err) => {
+          isapimethoderr = true;
+          console.error(`"API :: ${ApiUrls.sendUserEnquiry}, Error ::" ${err}`);
+        })
+        .finally(() => {
+          if (isapimethoderr == true) {
+            $(errctl).html(AppMessages.SomeProblem);
+          }
+          apiReqResLoader(
+            "btnsendmessage",
+            "Send Message",
+            API_ACTION_STATUS.COMPLETED
+          );
+        });
+    } else {
+      $(`[name=${Object.keys(formErrors)[0]}]`).focus();
+      setErrors(formErrors);
+    }
+  };
+
   const onPropertyDetails = (e, assetId) => {
     e.preventDefault();
-    setRerouteKey(rerouteKey + 1);
     aesCtrEncrypt(assetId.toString()).then((encId) => {
       navigate(routeNames.property.path.replace(":id", encId), {
         state: { timestamp: Date.now() },
         replace: true,
       });
+      setRerouteKey(rerouteKey + 1);
     });
     window.scrollTo(0, 0);
   };
@@ -206,57 +337,85 @@ const Property = () => {
                 )}
                 <form
                   className="quick-search form-icon-right"
-                  action="#"
-                  method="post"
+                  noValidate
+                  onSubmit={onSendMessage}
                 >
-                  <div className="form-row">
-                    <div className="col-12 mb-10">
-                      <div className="form-group mb-0">
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="name"
-                          placeholder="Your Name"
-                        />
-                      </div>
+                  <div className="row">
+                    <div className="col-md-12 mb-15">
+                      <InputControl
+                        lblClass="mb-0 lbl-req-field d-none"
+                        lblText="Your name:"
+                        placeHolder={"Name"}
+                        name="txtname"
+                        ctlType={formCtrlTypes.name}
+                        isFocus={true}
+                        required={true}
+                        onChange={handleChange}
+                        value={formData.txtname}
+                        errors={errors}
+                        formErrors={formErrors}
+                        tabIndex={10}
+                      ></InputControl>
                     </div>
-                    <div className="col-12 mb-10">
-                      <div className="form-group mb-0">
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="phone"
-                          placeholder="Phone Number"
-                        />
-                      </div>
+                    <div className="col-md-12 mb-15">
+                      <InputControl
+                        lblClass="mb-0 lbl-req-field d-none"
+                        lblText="Your email:"
+                        name="txtemail"
+                        placeHolder={"Email Id"}
+                        ctlType={formCtrlTypes.email}
+                        required={true}
+                        onChange={handleChange}
+                        value={formData.txtemail}
+                        errors={errors}
+                        formErrors={formErrors}
+                        tabIndex={11}
+                      ></InputControl>
                     </div>
-                    <div className="col-12 mb-10">
-                      <div className="form-group mb-0">
-                        <input
-                          type="email"
-                          className="form-control"
-                          name="email"
-                          placeholder="Your Email"
-                        />
-                      </div>
+                    <div className="col-md-12 mb-15">
+                      <InputControl
+                        lblClass="mb-0 lbl-req-field d-none"
+                        lblText="Your phone:"
+                        name="txtphone"
+                        placeHolder={"Phone number"}
+                        ctlType={formCtrlTypes.phone}
+                        required={true}
+                        onChange={handleChange}
+                        value={formData.txtphone}
+                        errors={errors}
+                        formErrors={formErrors}
+                        tabIndex={12}
+                      ></InputControl>
                     </div>
-                    <div className="col-12 mb-10">
-                      <div className="form-group mb-0">
-                        <textarea
-                          className="form-control"
-                          name="message"
-                          placeholder="Message"
-                          rows={4}
-                        />
-                      </div>
+                    <div className="col-md-12 mb-20">
+                      <TextAreaControl
+                        lblClass="mb-0 lbl-req-field d-none"
+                        name="txtmessage"
+                        placeHolder={"Message"}
+                        ctlType={formCtrlTypes.message}
+                        required={true}
+                        onChange={handleChange}
+                        value={formData.txtmessage}
+                        errors={errors}
+                        formErrors={formErrors}
+                        tabIndex={13}
+                        rows={6}
+                      ></TextAreaControl>
                     </div>
                     <div className="col-12">
-                      <div className="form-group mb-0">
-                        <button className="btn btn-primary w-100 btn-glow box-shadow rounded">
-                          Send Message
-                        </button>
-                      </div>
+                      <button
+                        className="btn btn-primary w-100 btn-glow box-shadow rounded"
+                        name="btnsendmessage"
+                        id="btnsendmessage"
+                        type="submit"
+                      >
+                        Send Message
+                      </button>
                     </div>
+                    <div
+                      className="form-error text-left col-12 mt-15"
+                      id="err-message"
+                    ></div>
                   </div>
                 </form>
               </div>

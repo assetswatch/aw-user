@@ -664,7 +664,7 @@ const Checkout = () => {
   };
 
   const navigateToInvoices = () => {
-    navigate(routeNames.paymentsinvoices.path);
+    navigate(routeNames.paymentsinvoices.path, { replace: true });
   };
 
   const [showPaymentSummary, setShowPaymentSummary] = useState(false);

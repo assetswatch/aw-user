@@ -459,6 +459,10 @@ const Invoices = () => {
                 ) : (
                   <>
                     {row.original.PaymentStatus ==
+                      config.paymentStatusTypes.UnPaid && (
+                      <div>Due Amount: {row.original.TotalAmountDisplay}</div>
+                    )}
+                    {row.original.PaymentStatus ==
                       config.paymentStatusTypes.PartiallyPaid && (
                       <div>Due Amount: {row.original.TotalBalanceDisplay}</div>
                     )}

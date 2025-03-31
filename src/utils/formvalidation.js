@@ -1114,10 +1114,10 @@ export const formCtrlTypes = {
     lbl: "Item:",
   },
   itemfortype: {
-    lbl: "Item:",
+    lbl: "Item for:",
   },
   accountfortype: {
-    lbl: "Account:",
+    lbl: "Account for:",
   },
   select: {
     lbl: "Select:",

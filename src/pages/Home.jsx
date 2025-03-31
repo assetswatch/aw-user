@@ -32,7 +32,7 @@ const Home = () => {
   const { topAssetsList } = useGetTopAssetsGateWay("recent", 8);
   const topAssetsRef = useRef(null);
 
-  const { topAgentsList } = useGetTopAgentsGateWay("recent", 10);
+  const { topAgentsList } = useGetTopAgentsGateWay("listed", 10);
   const topAgentsRef = useRef(null);
 
   useLayoutEffect(() => {

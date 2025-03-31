@@ -475,7 +475,9 @@ const CreateInvoice = () => {
     if (name === "ddladdnewitemforitem") {
       updateFormData = {
         ...updateFormData,
-        txtaddnewitemdescription: e?.label,
+        txtaddnewitemdescription: checkEmptyVal(e?.description)
+          ? e?.label
+          : e?.description,
       };
     }
     setAddNewItemFormData({ ...updateFormData });
@@ -1164,6 +1166,10 @@ const CreateInvoice = () => {
                         options={invoiceForItems}
                         dataKey="Id"
                         dataVal="Name"
+                        extraOptions={{
+                          key: "description",
+                          dataVal: "Description",
+                        }}
                         onChange={(e) =>
                           addNewItemDdlChange(e, "ddladdnewitemforitem")
                         }
