@@ -4,6 +4,7 @@ import { AppDetails, UserCookie } from "../../utils/constants";
 import { routeNames } from "../../routes/routes";
 import { useAuth } from "../../contexts/AuthContext";
 import UserProfileMenu from "../common/UserProfileMenu";
+import { UrlWithoutParam } from "../../utils/common";
 
 const Header = () => {
   let $ = window.$;
@@ -138,7 +139,7 @@ const Header = () => {
                             <Link
                               className="nav-link d-inline"
                               id="nav-login"
-                              to={routeNames.login.path}
+                              to={UrlWithoutParam(routeNames.login)}
                             >
                               <i className="fas fa-user"></i> Login
                             </Link>{" "}
@@ -146,7 +147,7 @@ const Header = () => {
                             <Link
                               className="nav-link d-inline"
                               id="nav-register"
-                              to={routeNames.register.path}
+                              to={UrlWithoutParam(routeNames.register)}
                             >
                               Register
                             </Link>

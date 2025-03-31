@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { routeNames } from "../routes/routes";
 import {
   ApiUrls,
@@ -18,6 +18,9 @@ import {
   checkEmptyVal,
   getPagesPathByLoggedinUserProfile,
   GetCookieValues,
+  aesCtrDecrypt,
+  GetUserCookieValues,
+  UrlWithoutParam,
 } from "../utils/common";
 import config from "../config.json";
 import { axiosPost, axiosGet } from "../helpers/axiosHelper";
@@ -26,13 +29,14 @@ import PageTitle from "../components/layouts/PageTitle";
 import InputControl from "../components/common/InputControl";
 import { useAuth } from "../contexts/AuthContext";
 import getuuid from "../helpers/uuidHelper";
-import TextAreaControl from "../components/common/TextAreaControl";
 
 const Register = () => {
   let $ = window.$;
 
-  const { isAuthenticated, loginUser } = useAuth();
+  const { isAuthenticated, loginUser, loggedinUser, logoutUser } = useAuth();
   const navigate = useNavigate();
+  const { id } = useParams();
+
   let formErrors = {};
 
   const [errors, setErrors] = useState({});
@@ -51,8 +55,18 @@ const Register = () => {
   const [profileCatData, setProfileCatData] = useState([]);
   const [selectedProfileCatId, setSelectedProfileCatId] = useState(null);
 
+  const [formData, setFormData] = useState(setInitialFormData());
+
   //Load
   useEffect(() => {
+    if (isAuthenticated() == true && checkEmptyVal(id)) {
+      let loggedinptid = parseInt(
+        GetUserCookieValues(UserCookie.ProfileTypeId, loggedinUser)
+      );
+      navigate(getPagesPathByLoggedinUserProfile(loggedinptid, "profile"), {
+        replace: true,
+      });
+    }
     Promise.allSettled([getProfileTypes(), getCountries()]).then(() => {
       setinitApisLoaded(true);
     });
@@ -64,7 +78,38 @@ const Register = () => {
       .then((response) => {
         let objProfileTypesResponse = response.data;
         if (objProfileTypesResponse.StatusCode === 200) {
-          setProfileTypes(objProfileTypesResponse.Data);
+          let pt = objProfileTypesResponse.Data;
+          let filteredpt = [];
+          let isSetAllProfileTypes = true;
+          if (!checkEmptyVal(id)) {
+            aesCtrDecrypt(id).then((decId) => {
+              logoutUser();
+              let [upinviterid, enckey, upptid] = decId.split(":");
+              upptid = parseInt(upptid);
+              upinviterid = parseInt(upinviterid);
+              let checkParams =
+                Number.isSafeInteger(upinviterid) &&
+                !checkEmptyVal(enckey) &&
+                Number.isSafeInteger(upptid);
+              if (checkParams) {
+                filteredpt = pt.filter((p) => p.ProfileTypeId == upptid);
+                if (filteredpt.length > 0) {
+                  isSetAllProfileTypes = false;
+                  setProfileTypes(filteredpt);
+                  setFormData({
+                    ...formData,
+                    rblprofiletype: upptid,
+                  });
+                  if (filteredpt[0]?.ProfileTypeId == upptid) {
+                    getProfileCategories(null, filteredpt[0]);
+                  }
+                }
+              }
+            });
+          }
+          if (isSetAllProfileTypes) {
+            setProfileTypes(pt);
+          }
         } else {
           setProfileTypes([]);
         }
@@ -171,11 +216,15 @@ const Register = () => {
     setCitySelected(selItem);
   };
 
-  const getProfileCategories = (e) => {
+  const getProfileCategories = (e, pt) => {
     setSelectedProfileCatId(null);
     setProfileCatData([]);
-    let profileTypeId = parseInt(e.target.value);
-    let iscatavailable = stringToBool(e.target.attributes["data-iscat"].value);
+    let profileTypeId = checkObjNullorEmpty(pt)
+      ? parseInt(e.target.value)
+      : pt.ProfileTypeId;
+    let iscatavailable = checkObjNullorEmpty(pt)
+      ? stringToBool(e.target.attributes["data-iscat"].value)
+      : pt.IsCategories;
     let divctrl = "divprofilecategory";
     showHideCtrl(divctrl, !iscatavailable);
     if (iscatavailable) {
@@ -224,8 +273,6 @@ const Register = () => {
       cbagreeterms: false,
     };
   }
-
-  const [formData, setFormData] = useState(setInitialFormData());
 
   const handleChange = (e) => {
     const { name, value } = e?.target;
@@ -355,430 +402,413 @@ const Register = () => {
 
   return (
     <>
-      {isAuthenticated() == true ? (
-        <Navigate
-          to={getPagesPathByLoggedinUserProfile(
-            GetCookieValues(UserCookie.ProfileTypeId),
-            "profile"
-          )}
-          replace
-        />
-      ) : (
-        <>
-          {/*============== Page title Start ==============*/}
-          <PageTitle
-            title="Register"
-            navLinks={[{ title: "Home", url: routeNames.home.path }]}
-          ></PageTitle>
-          {/*============== Page title End ==============*/}
+      {/*============== Page title Start ==============*/}
+      <PageTitle
+        title="Register"
+        navLinks={[{ title: "Home", url: routeNames.home.path }]}
+      ></PageTitle>
+      {/*============== Page title End ==============*/}
 
-          {/*============== Register Form Start ==============*/}
-          <div className="full-row  bg-light">
-            <div className="container">
-              <div className="row">
-                <div className="col-xl-8 col-lg-10 mx-auto">
-                  <div className="bg-white xs-p-20 p-30 border rounded shadow">
-                    <div className="form-icon-left rounded form-boder">
-                      <h4 className="mb-4 down-line pb-10">
-                        Create New Account
-                      </h4>
-                      <form noValidate onSubmit={register}>
-                        <div className="row">
-                          <div className="col-md-12 mb-20 mt-10">
-                            <h5 className="down-line pb-10">
-                              Login Information
-                            </h5>
-                          </div>
-                          <div className="row mb-15" tabIndex={0}>
-                            {initApisLoaded &&
-                              profileTypes.map((pt, idx) => {
-                                return (
-                                  <div
-                                    className="col-md-4"
-                                    key={"ptkey-" + idx}
+      {/*============== Register Form Start ==============*/}
+      <div className="full-row  bg-light">
+        <div className="container">
+          <div className="row">
+            <div className="col-xl-8 col-lg-10 mx-auto">
+              <div className="bg-white xs-p-20 p-30 border rounded shadow">
+                <div className="form-icon-left rounded form-boder">
+                  <h4 className="mb-4 down-line pb-10">Create New Account</h4>
+                  <form noValidate onSubmit={register}>
+                    <div className="row">
+                      <div className="col-md-12 mb-20 mt-10">
+                        <h5 className="down-line pb-10">Login Information</h5>
+                      </div>
+                      <div className="row mb-15" tabIndex={0}>
+                        {initApisLoaded &&
+                          profileTypes.map((pt, idx) => {
+                            return (
+                              <div className="col-md-4" key={"ptkey-" + idx}>
+                                <div
+                                  className={`custom-check-box-2  ${
+                                    idx == 0
+                                      ? "text-left"
+                                      : idx == profileTypes.length - 1
+                                      ? "text-right"
+                                      : "text-center"
+                                  }`}
+                                >
+                                  <input
+                                    className="d-none"
+                                    type="radio"
+                                    value={pt.ProfileTypeId}
+                                    id={"pt-" + pt.ProfileTypeId}
+                                    name="rblprofiletype"
+                                    checked={
+                                      formData.rblprofiletype ==
+                                      pt.ProfileTypeId
+                                    }
+                                    onChange={(e) => {
+                                      handleChange(e);
+                                      getProfileCategories(e);
+                                    }}
+                                    data-iscat={pt.IsCategories}
+                                  />
+                                  <label
+                                    htmlFor={"pt-" + pt.ProfileTypeId}
+                                    className="radio-lbl"
                                   >
-                                    <div
-                                      className={`custom-check-box-2  ${
-                                        idx == 0
-                                          ? "text-left"
-                                          : idx == profileTypes.length - 1
-                                          ? "text-right"
-                                          : "text-center"
-                                      }`}
-                                    >
-                                      <input
-                                        className="d-none"
-                                        type="radio"
-                                        value={pt.ProfileTypeId}
-                                        id={"pt-" + pt.ProfileTypeId}
-                                        name="rblprofiletype"
-                                        onChange={(e) => {
-                                          handleChange(e);
-                                          getProfileCategories(e);
-                                        }}
-                                        data-iscat={pt.IsCategories}
-                                      />
-                                      <label
-                                        htmlFor={"pt-" + pt.ProfileTypeId}
-                                        className="radio-lbl"
-                                      >
-                                        {pt.ProfileType}
-                                      </label>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            {errors?.[`rblprofiletype`] && (
-                              <div className="err-invalid">
-                                {errors?.[`rblprofiletype`]}
-                              </div>
-                            )}
-                          </div>
-                          <div className="col-md-6 mb-15">
-                            <InputControl
-                              lblClass="mb-0 lbl-req-field"
-                              name="txtemail"
-                              ctlType={formCtrlTypes.email}
-                              isFocus={true}
-                              required={true}
-                              onChange={handleChange}
-                              value={formData.txtemail}
-                              errors={errors}
-                              formErrors={formErrors}
-                              tabIndex={1}
-                            ></InputControl>
-                          </div>
-                          <div className="col-md-6 mb-15">
-                            <div id="divprofilecategory" className="hide">
-                              <AsyncSelect
-                                placeHolder={
-                                  profileCatData.length <= 0 &&
-                                  selectedProfileCatId == null
-                                    ? AppMessages.DdLLoading
-                                    : AppMessages.DdlNoData
-                                }
-                                noData={
-                                  profileCatData.length <= 0 &&
-                                  selectedProfileCatId == null
-                                    ? AppMessages.DdLLoading
-                                    : AppMessages.DdlNoData
-                                }
-                                options={profileCatData}
-                                onChange={handleProifleCatChange}
-                                value={selectedProfileCatId}
-                                defualtselected={selectedProfileCatId}
-                                name="ddlprofilecategory"
-                                lbl={formCtrlTypes.category}
-                                lblClass="mb-0 lbl-req-field"
-                                isClearable={false}
-                                required={true}
-                                errors={errors}
-                                formErrors={formErrors}
-                                tabIndex={2}
-                              ></AsyncSelect>
-                            </div>
-                          </div>
-                          <div className="col-md-6 mb-15">
-                            <InputControl
-                              lblClass="mb-0 lbl-req-field"
-                              name="txtpassword"
-                              ctlType={formCtrlTypes.pwd}
-                              required={true}
-                              onChange={handleChange}
-                              value={formData.txtpassword}
-                              errors={errors}
-                              formErrors={formErrors}
-                              tabIndex={3}
-                            ></InputControl>
-                          </div>
-                          <div className="col-md-6 mb-15">
-                            <InputControl
-                              lblClass="mb-0 lbl-req-field"
-                              name="txtconfirmpassword"
-                              ctlType={formCtrlTypes.confirmpwd}
-                              required={true}
-                              onChange={handleChange}
-                              value={formData.txtconfirmpassword}
-                              pwdVal={formData.txtpassword}
-                              errors={errors}
-                              formErrors={formErrors}
-                              objProps={{ pwdVal: formData.txtpassword }}
-                              tabIndex={4}
-                            ></InputControl>
-                          </div>
-                          <div className="col-md-12 mb-20 mt-20">
-                            <h5 className="down-line pb-10">
-                              Contact Information
-                            </h5>
-                          </div>
-                          <div className="col-md-6 mb-15">
-                            <InputControl
-                              lblClass="mb-0 lbl-req-field"
-                              name="txtfirstname"
-                              ctlType={formCtrlTypes.fname}
-                              required={true}
-                              onChange={handleChange}
-                              value={formData.txtfirstname}
-                              errors={errors}
-                              formErrors={formErrors}
-                              tabIndex={5}
-                            ></InputControl>
-                          </div>
-                          <div className="col-md-6 mb-15">
-                            <InputControl
-                              lblClass="mb-0 lbl-req-field"
-                              name="txtlastname"
-                              ctlType={formCtrlTypes.lname}
-                              required={true}
-                              onChange={handleChange}
-                              value={formData.txtlastname}
-                              errors={errors}
-                              formErrors={formErrors}
-                              tabIndex={6}
-                            ></InputControl>
-                          </div>
-                          <div className="col-md-6 mb-15">
-                            <InputControl
-                              lblClass="mb-0 lbl-req-field"
-                              name="txtmobile"
-                              ctlType={formCtrlTypes.mobile}
-                              required={true}
-                              onChange={handleChange}
-                              value={formData.txtmobile}
-                              errors={errors}
-                              formErrors={formErrors}
-                              tabIndex={7}
-                            ></InputControl>
-                          </div>
-                          <div className="col-md-6 mb-15">
-                            <InputControl
-                              lblClass="mb-0"
-                              name="txtlandline"
-                              ctlType={formCtrlTypes.landline}
-                              onChange={handleChange}
-                              value={formData.txtlandline}
-                              errors={errors}
-                              formErrors={formErrors}
-                              tabIndex={8}
-                            ></InputControl>
-                          </div>
-                          <div className="col-md-6 mb-15">
-                            <InputControl
-                              lblClass="mb-0"
-                              name="txtcompanyname"
-                              ctlType={formCtrlTypes.companyname}
-                              required={false}
-                              onChange={handleChange}
-                              value={formData.txtcompanyname}
-                              errors={errors}
-                              formErrors={formErrors}
-                              tabIndex={9}
-                            ></InputControl>
-                          </div>
-                          <div className="col-md-6 mb-15">
-                            <InputControl
-                              lblClass="mb-0"
-                              name="txtwebsite"
-                              ctlType={formCtrlTypes.website}
-                              required={false}
-                              onChange={handleChange}
-                              value={formData.txtwebsite}
-                              errors={errors}
-                              formErrors={formErrors}
-                              tabIndex={10}
-                            ></InputControl>
-                          </div>
-                          <div className="col-md-6 mb-15">
-                            <InputControl
-                              lblClass="mb-0 lbl-req-field"
-                              name="txtaddressone"
-                              ctlType={formCtrlTypes.addressone}
-                              required={true}
-                              onChange={handleChange}
-                              value={formData.txtaddressone}
-                              errors={errors}
-                              formErrors={formErrors}
-                              tabIndex={11}
-                            ></InputControl>
-                          </div>
-                          <div className="col-md-6 mb-15">
-                            <InputControl
-                              lblClass="mb-0"
-                              name="txtaddresstwo"
-                              ctlType={formCtrlTypes.addresstwo}
-                              required={false}
-                              onChange={handleChange}
-                              value={formData.txtaddresstwo}
-                              errors={errors}
-                              formErrors={formErrors}
-                              tabIndex={12}
-                            ></InputControl>
-                          </div>
-                          {initApisLoaded && (
-                            <>
-                              <div className="col-md-6 mb-15">
-                                <AsyncSelect
-                                  placeHolder={
-                                    countriesData.length <= 0 &&
-                                    countrySelected == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlDefaultSelect
-                                  }
-                                  noData={
-                                    countriesData.length <= 0 &&
-                                    countrySelected == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.NoCountries
-                                  }
-                                  options={countriesData}
-                                  onChange={handleCountryChange}
-                                  value={countrySelected}
-                                  name="ddlcountries"
-                                  lbl={formCtrlTypes.country}
-                                  lblClass="mb-0 lbl-req-field"
-                                  required={true}
-                                  errors={errors}
-                                  formErrors={formErrors}
-                                  tabIndex={13}
-                                ></AsyncSelect>
-                              </div>
-                              <div className="col-md-6 mb-15">
-                                <AsyncSelect
-                                  placeHolder={
-                                    countrySelected == null ||
-                                    Object.keys(countrySelected).length === 0
-                                      ? AppMessages.DdlDefaultSelect
-                                      : statesData.length <= 0 &&
-                                        stateSelected == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlDefaultSelect
-                                  }
-                                  noData={
-                                    countrySelected == null ||
-                                    Object.keys(countrySelected).length === 0
-                                      ? AppMessages.NoStates
-                                      : statesData.length <= 0 &&
-                                        stateSelected == null &&
-                                        countrySelected != null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.NoStates
-                                  }
-                                  options={statesData}
-                                  onChange={handleStateChange}
-                                  value={stateSelected}
-                                  name="ddlstates"
-                                  lbl={formCtrlTypes.state}
-                                  lblClass="mb-0 lbl-req-field"
-                                  required={true}
-                                  errors={errors}
-                                  formErrors={formErrors}
-                                  tabIndex={14}
-                                ></AsyncSelect>
-                              </div>
-                              <div className="col-md-6 mb-15">
-                                <AsyncSelect
-                                  placeHolder={
-                                    stateSelected == null ||
-                                    Object.keys(stateSelected).length === 0
-                                      ? AppMessages.DdlDefaultSelect
-                                      : citiesData.length <= 0 &&
-                                        citySelected == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlDefaultSelect
-                                  }
-                                  noData={
-                                    stateSelected == null ||
-                                    Object.keys(stateSelected).length === 0
-                                      ? AppMessages.NoCities
-                                      : citiesData.length <= 0 &&
-                                        citySelected == null &&
-                                        stateSelected != null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.NoCities
-                                  }
-                                  options={citiesData}
-                                  onChange={handleCityChange}
-                                  value={citySelected}
-                                  name="ddlcities"
-                                  lbl={formCtrlTypes.city}
-                                  lblClass="mb-0 lbl-req-field"
-                                  required={true}
-                                  errors={errors}
-                                  formErrors={formErrors}
-                                  tabIndex={15}
-                                ></AsyncSelect>
-                              </div>
-                            </>
-                          )}
-                          <div className="col-md-6 mb-15">
-                            <InputControl
-                              lblClass="mb-0 lbl-req-field"
-                              name="txtzip"
-                              ctlType={formCtrlTypes.zip}
-                              required={true}
-                              onChange={handleChange}
-                              value={formData.txtzip}
-                              errors={errors}
-                              formErrors={formErrors}
-                              tabIndex={16}
-                            ></InputControl>
-                          </div>
-                          <div className="col-md-12 mb-20">
-                            <div className="custom-check-box-2">
-                              <input
-                                className="d-none"
-                                type="checkbox"
-                                id="cbagreeterms"
-                                name="cbagreeterms"
-                                value={formData.cbagreeterms}
-                                onChange={handleTermsChange}
-                                tabIndex={17}
-                              />
-                              <label htmlFor="cbagreeterms">
-                                I Agree to AssetsWatch Terms of use i would like
-                                to receive property relates communication
-                                through Email, call or SMS.
-                              </label>
-                              {errors?.["cbagreeterms"] && (
-                                <div className="err-invalid">
-                                  {errors?.["cbagreeterms"]}
+                                    {pt.ProfileType}
+                                  </label>
                                 </div>
-                              )}
-                            </div>
+                              </div>
+                            );
+                          })}
+                        {errors?.[`rblprofiletype`] && (
+                          <div className="err-invalid">
+                            {errors?.[`rblprofiletype`]}
                           </div>
-                          <div className="col-md-12 mb-20">
-                            <button
-                              className="btn btn-primary box-shadow"
-                              name="btnregister"
-                              id="btnregister"
-                              type="submit"
-                            >
-                              Register
-                            </button>
-                          </div>
-                          <div
-                            className="form-error text-left"
-                            id="err-message"
-                          ></div>
-                          <div className="col">
-                            <Link
-                              to={routeNames.login.path}
-                              className="text-dark d-table py-1"
-                            >
-                              <u>I already have account.</u>
-                            </Link>
-                          </div>
+                        )}
+                      </div>
+                      <div className="col-md-6 mb-15">
+                        <InputControl
+                          lblClass="mb-0 lbl-req-field"
+                          name="txtemail"
+                          ctlType={formCtrlTypes.email}
+                          isFocus={true}
+                          required={true}
+                          onChange={handleChange}
+                          value={formData.txtemail}
+                          errors={errors}
+                          formErrors={formErrors}
+                          tabIndex={1}
+                        ></InputControl>
+                      </div>
+                      <div className="col-md-6 mb-15">
+                        <div id="divprofilecategory" className="hide">
+                          <AsyncSelect
+                            placeHolder={
+                              profileCatData.length <= 0 &&
+                              selectedProfileCatId == null
+                                ? AppMessages.DdLLoading
+                                : AppMessages.DdlNoData
+                            }
+                            noData={
+                              profileCatData.length <= 0 &&
+                              selectedProfileCatId == null
+                                ? AppMessages.DdLLoading
+                                : AppMessages.DdlNoData
+                            }
+                            options={profileCatData}
+                            onChange={handleProifleCatChange}
+                            value={selectedProfileCatId}
+                            defualtselected={selectedProfileCatId}
+                            name="ddlprofilecategory"
+                            lbl={formCtrlTypes.category}
+                            lblClass="mb-0 lbl-req-field"
+                            isClearable={false}
+                            required={true}
+                            errors={errors}
+                            formErrors={formErrors}
+                            tabIndex={2}
+                          ></AsyncSelect>
                         </div>
-                      </form>
+                      </div>
+                      <div className="col-md-6 mb-15">
+                        <InputControl
+                          lblClass="mb-0 lbl-req-field"
+                          name="txtpassword"
+                          ctlType={formCtrlTypes.pwd}
+                          required={true}
+                          onChange={handleChange}
+                          value={formData.txtpassword}
+                          errors={errors}
+                          formErrors={formErrors}
+                          tabIndex={3}
+                        ></InputControl>
+                      </div>
+                      <div className="col-md-6 mb-15">
+                        <InputControl
+                          lblClass="mb-0 lbl-req-field"
+                          name="txtconfirmpassword"
+                          ctlType={formCtrlTypes.confirmpwd}
+                          required={true}
+                          onChange={handleChange}
+                          value={formData.txtconfirmpassword}
+                          pwdVal={formData.txtpassword}
+                          errors={errors}
+                          formErrors={formErrors}
+                          objProps={{ pwdVal: formData.txtpassword }}
+                          tabIndex={4}
+                        ></InputControl>
+                      </div>
+                      <div className="col-md-12 mb-20 mt-20">
+                        <h5 className="down-line pb-10">Contact Information</h5>
+                      </div>
+                      <div className="col-md-6 mb-15">
+                        <InputControl
+                          lblClass="mb-0 lbl-req-field"
+                          name="txtfirstname"
+                          ctlType={formCtrlTypes.fname}
+                          required={true}
+                          onChange={handleChange}
+                          value={formData.txtfirstname}
+                          errors={errors}
+                          formErrors={formErrors}
+                          tabIndex={5}
+                        ></InputControl>
+                      </div>
+                      <div className="col-md-6 mb-15">
+                        <InputControl
+                          lblClass="mb-0 lbl-req-field"
+                          name="txtlastname"
+                          ctlType={formCtrlTypes.lname}
+                          required={true}
+                          onChange={handleChange}
+                          value={formData.txtlastname}
+                          errors={errors}
+                          formErrors={formErrors}
+                          tabIndex={6}
+                        ></InputControl>
+                      </div>
+                      <div className="col-md-6 mb-15">
+                        <InputControl
+                          lblClass="mb-0 lbl-req-field"
+                          name="txtmobile"
+                          ctlType={formCtrlTypes.mobile}
+                          required={true}
+                          onChange={handleChange}
+                          value={formData.txtmobile}
+                          errors={errors}
+                          formErrors={formErrors}
+                          tabIndex={7}
+                        ></InputControl>
+                      </div>
+                      <div className="col-md-6 mb-15">
+                        <InputControl
+                          lblClass="mb-0"
+                          name="txtlandline"
+                          ctlType={formCtrlTypes.landline}
+                          onChange={handleChange}
+                          value={formData.txtlandline}
+                          errors={errors}
+                          formErrors={formErrors}
+                          tabIndex={8}
+                        ></InputControl>
+                      </div>
+                      <div className="col-md-6 mb-15">
+                        <InputControl
+                          lblClass="mb-0"
+                          name="txtcompanyname"
+                          ctlType={formCtrlTypes.companyname}
+                          required={false}
+                          onChange={handleChange}
+                          value={formData.txtcompanyname}
+                          errors={errors}
+                          formErrors={formErrors}
+                          tabIndex={9}
+                        ></InputControl>
+                      </div>
+                      <div className="col-md-6 mb-15">
+                        <InputControl
+                          lblClass="mb-0"
+                          name="txtwebsite"
+                          ctlType={formCtrlTypes.website}
+                          required={false}
+                          onChange={handleChange}
+                          value={formData.txtwebsite}
+                          errors={errors}
+                          formErrors={formErrors}
+                          tabIndex={10}
+                        ></InputControl>
+                      </div>
+                      <div className="col-md-6 mb-15">
+                        <InputControl
+                          lblClass="mb-0 lbl-req-field"
+                          name="txtaddressone"
+                          ctlType={formCtrlTypes.addressone}
+                          required={true}
+                          onChange={handleChange}
+                          value={formData.txtaddressone}
+                          errors={errors}
+                          formErrors={formErrors}
+                          tabIndex={11}
+                        ></InputControl>
+                      </div>
+                      <div className="col-md-6 mb-15">
+                        <InputControl
+                          lblClass="mb-0"
+                          name="txtaddresstwo"
+                          ctlType={formCtrlTypes.addresstwo}
+                          required={false}
+                          onChange={handleChange}
+                          value={formData.txtaddresstwo}
+                          errors={errors}
+                          formErrors={formErrors}
+                          tabIndex={12}
+                        ></InputControl>
+                      </div>
+                      {initApisLoaded && (
+                        <>
+                          <div className="col-md-6 mb-15">
+                            <AsyncSelect
+                              placeHolder={
+                                countriesData.length <= 0 &&
+                                countrySelected == null
+                                  ? AppMessages.DdLLoading
+                                  : AppMessages.DdlDefaultSelect
+                              }
+                              noData={
+                                countriesData.length <= 0 &&
+                                countrySelected == null
+                                  ? AppMessages.DdLLoading
+                                  : AppMessages.NoCountries
+                              }
+                              options={countriesData}
+                              onChange={handleCountryChange}
+                              value={countrySelected}
+                              name="ddlcountries"
+                              lbl={formCtrlTypes.country}
+                              lblClass="mb-0 lbl-req-field"
+                              required={true}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={13}
+                            ></AsyncSelect>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <AsyncSelect
+                              placeHolder={
+                                countrySelected == null ||
+                                Object.keys(countrySelected).length === 0
+                                  ? AppMessages.DdlDefaultSelect
+                                  : statesData.length <= 0 &&
+                                    stateSelected == null
+                                  ? AppMessages.DdLLoading
+                                  : AppMessages.DdlDefaultSelect
+                              }
+                              noData={
+                                countrySelected == null ||
+                                Object.keys(countrySelected).length === 0
+                                  ? AppMessages.NoStates
+                                  : statesData.length <= 0 &&
+                                    stateSelected == null &&
+                                    countrySelected != null
+                                  ? AppMessages.DdLLoading
+                                  : AppMessages.NoStates
+                              }
+                              options={statesData}
+                              onChange={handleStateChange}
+                              value={stateSelected}
+                              name="ddlstates"
+                              lbl={formCtrlTypes.state}
+                              lblClass="mb-0 lbl-req-field"
+                              required={true}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={14}
+                            ></AsyncSelect>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <AsyncSelect
+                              placeHolder={
+                                stateSelected == null ||
+                                Object.keys(stateSelected).length === 0
+                                  ? AppMessages.DdlDefaultSelect
+                                  : citiesData.length <= 0 &&
+                                    citySelected == null
+                                  ? AppMessages.DdLLoading
+                                  : AppMessages.DdlDefaultSelect
+                              }
+                              noData={
+                                stateSelected == null ||
+                                Object.keys(stateSelected).length === 0
+                                  ? AppMessages.NoCities
+                                  : citiesData.length <= 0 &&
+                                    citySelected == null &&
+                                    stateSelected != null
+                                  ? AppMessages.DdLLoading
+                                  : AppMessages.NoCities
+                              }
+                              options={citiesData}
+                              onChange={handleCityChange}
+                              value={citySelected}
+                              name="ddlcities"
+                              lbl={formCtrlTypes.city}
+                              lblClass="mb-0 lbl-req-field"
+                              required={true}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={15}
+                            ></AsyncSelect>
+                          </div>
+                        </>
+                      )}
+                      <div className="col-md-6 mb-15">
+                        <InputControl
+                          lblClass="mb-0 lbl-req-field"
+                          name="txtzip"
+                          ctlType={formCtrlTypes.zip}
+                          required={true}
+                          onChange={handleChange}
+                          value={formData.txtzip}
+                          errors={errors}
+                          formErrors={formErrors}
+                          tabIndex={16}
+                        ></InputControl>
+                      </div>
+                      <div className="col-md-12 mb-20">
+                        <div className="custom-check-box-2">
+                          <input
+                            className="d-none"
+                            type="checkbox"
+                            id="cbagreeterms"
+                            name="cbagreeterms"
+                            value={formData.cbagreeterms}
+                            onChange={handleTermsChange}
+                            tabIndex={17}
+                          />
+                          <label htmlFor="cbagreeterms">
+                            I Agree to AssetsWatch Terms of use i would like to
+                            receive property relates communication through
+                            Email, call or SMS.
+                          </label>
+                          {errors?.["cbagreeterms"] && (
+                            <div className="err-invalid">
+                              {errors?.["cbagreeterms"]}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="col-md-12 mb-20">
+                        <button
+                          className="btn btn-primary box-shadow"
+                          name="btnregister"
+                          id="btnregister"
+                          type="submit"
+                        >
+                          Register
+                        </button>
+                      </div>
+                      <div
+                        className="form-error text-left"
+                        id="err-message"
+                      ></div>
+                      <div className="col">
+                        <Link
+                          to={UrlWithoutParam(routeNames.login)}
+                          className="text-dark d-table py-1"
+                        >
+                          <u>I already have account.</u>
+                        </Link>
+                      </div>
                     </div>
-                  </div>
+                  </form>
                 </div>
               </div>
             </div>
           </div>
-          {/*============== Register Form End ==============*/}
-        </>
-      )}
+        </div>
+      </div>
+      {/*============== Register Form End ==============*/}
     </>
   );
 };

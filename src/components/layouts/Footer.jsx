@@ -3,13 +3,19 @@ import { AppDetails } from "../../utils/constants";
 import { routeNames } from "../../routes/routes";
 import { useAuth } from "../../contexts/AuthContext";
 import FooterCopyRight from "./FooterCopyRight";
+import { UrlWithoutParam } from "../../utils/common";
 
 const Footer = () => {
   let location = useLocation();
   let current = location.pathname;
   let path = current.substring(current.lastIndexOf("/") + 1).toLowerCase();
   let showFooter = false;
-  let footerFalsePages = ["login", "register", "forgotpassword"];
+  let footerFalsePages = [
+    "login",
+    "register",
+    "forgotpassword",
+    "resetpassword",
+  ];
   if (footerFalsePages.includes(path)) {
     showFooter = false;
   } else {
@@ -103,7 +109,7 @@ const Footer = () => {
                           <li>
                             <Link
                               className="nav-link d-inline"
-                              to={routeNames.login.path}
+                              to={UrlWithoutParam(routeNames.login)}
                             >
                               Login
                             </Link>
@@ -111,7 +117,7 @@ const Footer = () => {
                           <li>
                             <Link
                               className="nav-link d-inline"
-                              to={routeNames.register.path}
+                              to={UrlWithoutParam(routeNames.register)}
                             >
                               Register
                             </Link>

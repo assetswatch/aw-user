@@ -269,7 +269,6 @@ const ContactUs = () => {
                       lblText="Your email:"
                       name="txtemail"
                       ctlType={formCtrlTypes.email}
-                      isFocus={true}
                       required={true}
                       onChange={handleChange}
                       value={formData.txtemail}

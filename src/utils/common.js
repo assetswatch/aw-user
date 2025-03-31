@@ -737,21 +737,25 @@ export async function aesCtrEncrypt(plaintext) {
 }
 
 export async function aesCtrDecrypt(ciphertextBase64) {
-  const encoder = new TextEncoder();
-  const keyData = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(config.secretKey),
-    { name: "AES-CTR" },
-    false,
-    ["decrypt"]
-  );
-  const encrypted = customBase64ToArrayBuffer(ciphertextBase64);
-  const decrypted = await crypto.subtle.decrypt(
-    { name: "AES-CTR", counter: encoder.encode(config.secretIV), length: 64 },
-    keyData,
-    encrypted
-  );
-  return new TextDecoder().decode(decrypted);
+  try {
+    const encoder = new TextEncoder();
+    const keyData = await crypto.subtle.importKey(
+      "raw",
+      encoder.encode(config.secretKey),
+      { name: "AES-CTR" },
+      false,
+      ["decrypt"]
+    );
+    const encrypted = customBase64ToArrayBuffer(ciphertextBase64);
+    const decrypted = await crypto.subtle.decrypt(
+      { name: "AES-CTR", counter: encoder.encode(config.secretIV), length: 64 },
+      keyData,
+      encrypted
+    );
+    return new TextDecoder().decode(decrypted);
+  } catch {
+    return "";
+  }
 }
 
 export const formatBytes = (bytes) => {
@@ -786,4 +790,24 @@ export function maskNumber(number, maskcount = 4) {
   return maskcount == -1
     ? str.replace(/\d/g, "x")
     : str.slice(0, -maskcount).replace(/\d/g, "x") + str.slice(-maskcount);
+}
+
+export function UrlWithoutParam(page) {
+  let url = page.path;
+  switch (page.path.toLowerCase()) {
+    case routeNames.register.path.toLowerCase():
+      url = routeNames.register.path.replace("/:id", "");
+      break;
+    case routeNames.login.path.toLowerCase():
+      url = routeNames.login.path.replace("/:id", "");
+      break;
+    default:
+      url = page.path;
+      break;
+  }
+  return url;
+}
+
+export function getKeyByValue(obj, value) {
+  return Object.entries(obj).find(([key, val]) => val === value)?.[0];
 }

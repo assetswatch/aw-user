@@ -188,7 +188,6 @@ export const GridDocActionMenu = ({ row, actions }) => {
 };
 
 export const GridUserConnectionActionMenu = ({ row, actions }) => {
-  console.log(row.original.Status, row.original.RequestTypeId);
   if (row.original.ProfileId > 0) {
     if (row.original.Status == config.userConnectionStatusTypes.Joined) {
       actions = actions.filter(

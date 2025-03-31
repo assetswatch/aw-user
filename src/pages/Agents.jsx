@@ -56,7 +56,7 @@ const Agents = () => {
   const { topAssetsList } = useGetTopAssetsGateWay("recent", 5);
   const topAssetsRef = useRef(null);
 
-  const { topAgentsList } = useGetTopAgentsGateWay("rating", 4);
+  const { topAgentsList } = useGetTopAgentsGateWay("listed", 4);
 
   useEffect(() => {
     if (topAssetsList.length > 0) {
@@ -124,6 +124,7 @@ const Agents = () => {
 
     objParams = {
       keyword: "",
+      islisted: 1,
       pi: parseInt(pi),
       ps: parseInt(ps),
     };

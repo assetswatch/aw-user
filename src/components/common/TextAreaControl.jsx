@@ -16,6 +16,7 @@ const TextAreaControl = ({
   objProps, //define any control specific props.
   errors,
   formErrors = {},
+  placeHolder,
 }) => {
   let ctl = ctlType;
 
@@ -107,6 +108,9 @@ const TextAreaControl = ({
         onChange={onChange}
         maxLength={ctl.input.max}
         rows={rows}
+        placeholder={
+          !checkEmptyVal(placeHolder) ? placeHolder : ctl.input.placeHolder
+        }
       />
       {errors?.[`${name}`] && (
         <div className="err-invalid">{errors?.[`${name}`]}</div>
