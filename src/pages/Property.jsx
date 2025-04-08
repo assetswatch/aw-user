@@ -469,7 +469,8 @@ const Property = () => {
                               </div> */}
                               <ul className="d-flex quantity font-general my-1 flex-sb">
                                 <li className="flex-start pr-20 listing-location mb-1">
-                                  {a.City}, {a.State}, {a.CountryShortName}
+                                  {a.City}, {a.StateShortName || a.State},{" "}
+                                  {a.CountryShortName || a.Country}
                                 </li>
                                 <li className="flex-end listing-price font-15 font-500 mb-1">
                                   {a.PriceDisplay}
@@ -592,8 +593,10 @@ const Property = () => {
                             : `, ${assetDetails.AddressTwo}`}
                         </h6>
                         <span className="listing-location d-block">
-                          {assetDetails.City}, {assetDetails.State},{" "}
-                          {assetDetails.CountryShortName}
+                          {assetDetails.City},{" "}
+                          {assetDetails.StateShortName || assetDetails.State},{" "}
+                          {assetDetails.CountryShortName ||
+                            assetDetails.Country}
                         </span>
                       </div>
                       <div className="col-auto ms-auto xs-m-0 text-end xs-text-start pb-4">

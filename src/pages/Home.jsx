@@ -379,7 +379,7 @@ const Home = () => {
                               </span> */}
                               <ul className="d-flex font-general mb-10 mt-10 flex-sb">
                                 <li className="flex-start pr-20 listing-location mb-1">
-                                  {a.City}, {a.State}, {a.CountryShortName}
+                                {a.City}, {a.StateShortName || a.State}, {a.CountryShortName || a.Country}
                                 </li>
                                 <li className="flex-end listing-price font-15 font-500 mb-1">
                                   {a.PriceDisplay}
@@ -752,6 +752,45 @@ const Home = () => {
         </div>
       </div>
       {/*============== Counter Banner End ==============*/}
+
+      {/*============== Our Integrations Start ==============*/}
+      <div className="full-row bg-light py-5">
+        <div className="container">
+          <div className="row mb-4 justify-content-center">
+            <div className="col-md-8 text-center">
+              <h2 className="down-line pb-10 w-50 mx-auto mb-4 text-center w-sm-100">Our Integrations</h2>
+              <span className="sub-title text-primary">
+                Seamless collaboration with trusted platforms
+              </span>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col">
+              <div className="integration-logos d-flex justify-content-center flex-wrap gap-4">
+                <div className="integration-carousel-item">
+                  <img src="./assets/images/Amazon_Web_Services_Logo.png" alt="AWS Logo" />
+                </div>
+                <div className="integration-carousel-item">
+                  <img
+                    src="./assets/images/Google-logo.png"
+                    alt="Google Logo"
+                  />
+                </div>
+                <div className="integration-carousel-item">
+                  <img src="./assets/images/usio-logo.webp" alt="Usio Logo" />
+                </div>
+                <div className="integration-carousel-item">
+                  <img
+                    src="./assets/images/USAFACT_Logo.png"
+                    alt="USAFACT Logo"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/*============== Our Integrations End ==============*/}
 
       {/*============== Testimonials Start ==============*/}
       <div className="full-row bg-light pt-5 pb-5">

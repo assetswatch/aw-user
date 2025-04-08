@@ -110,8 +110,9 @@ const PropertyReport = () => {
               </a>
               <div>
                 <i className="fas fa-map-marker-alt text-primary font-13 p-r-5" />
-                {row.original.City}, {row.original.State},{" "}
-                {row.original.Country}
+                {row.original.City},{" "}
+                {row.original.StateShortName || row.original.State},{" "}
+                {row.original.CountryShortName || row.original.Country}
               </div>
             </div>
           </>

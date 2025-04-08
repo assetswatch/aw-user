@@ -505,7 +505,7 @@ const Owner = () => {
                                             </div> */}
                               <ul className="d-flex quantity font-general my-1 flex-sb">
                                 <li className="flex-start pr-20 listing-location mb-1">
-                                  {a.City}, {a.State}, {a.CountryShortName}
+                                {a.City}, {a.StateShortName || a.State}, {a.CountryShortName || a.Country}
                                 </li>
                                 <li className="flex-end listing-price font-15 font-500 mb-1">
                                   {a.PriceDisplay}

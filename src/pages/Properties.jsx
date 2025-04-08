@@ -308,8 +308,9 @@ const Properties = () => {
                   </span> */}
                   <ul className="d-flex font-general mb-10 mt-10 flex-sb">
                     <li className="flex-start pr-20 listing-location mb-1">
-                      {row.original.City}, {row.original.State},{" "}
-                      {row.original.CountryShortName}
+                      {row.original.City},{" "}
+                      {row.original.StateShortName || row.original.State},{" "}
+                      {row.original.CountryShortName || row.original.Country}
                     </li>
                     <li className="flex-end listing-price font-15 font-500 mb-1">
                       {row.original.PriceDisplay}
@@ -510,7 +511,8 @@ const Properties = () => {
                                   </span> */}
                                   <ul className="d-flex font-general my-10 flex-sb">
                                     <li className="flex-start pr-20 listing-location mb-1">
-                                      {a.City}, {a.State}, {a.CountryShortName}
+                                      {a.City}, {a.StateShortName || a.State},{" "}
+                                      {a.CountryShortName || a.Country}
                                     </li>
                                     <li className="flex-end listing-price font-15 font-500 mb-1">
                                       {a.PriceDisplay}

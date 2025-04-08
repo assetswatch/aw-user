@@ -277,8 +277,9 @@ const AssignedProperties = () => {
               </a>
               {/* <div>{row.original.AddressTwo}</div> */}
               <div>
-                {row.original.City}, {row.original.State},{" "}
-                {row.original.Country}
+                {row.original.City},{" "}
+                {row.original.StateShortName || row.original.State},{" "}
+                {row.original.CountryShortName || row.original.Country}
               </div>
               <div className="price">
                 <span className="text-primary">
