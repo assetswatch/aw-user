@@ -3869,11 +3869,12 @@ Deshboard Style Start
 }
 
 /* The tooltip itself */
-.ctooltip {
+.ctooltip,
+i .ctooltip {
   font-family: var(--theme-hiperlink-font) !important;
   visibility: hidden;
   position: absolute;
-  top: 25px; /* Position it just below the container */
+  top: 30px; /* Position it just below the container */
   left: 45%;
   transform: translateX(-45%); /* Center the tooltip horizontally */
   background-color: var(--theme-secondary-color);
@@ -3885,9 +3886,15 @@ Deshboard Style Start
   transition: opacity 0.3s;
   white-space: nowrap;
   z-index: 1;
-  padding: 4px 15px 6px 15px;
+  padding: 2px 15px 2px 15px;
   font-size: 12px;
   font-weight: 400;
+}
+
+i .ctooltip {
+  top: 25px;
+  padding: 4px 15px 4px 15px;
+  min-height: 22px;
 }
 
 /* Show the tooltip when hovering over the container */
@@ -4231,6 +4238,9 @@ Social Media Style Start
 }
 .w-80px {
   width: 80px !important;
+}
+.w-90px {
+  width: 90px !important;
 }
 .w-100px {
   width: 100px !important;
@@ -4694,6 +4704,22 @@ Social Media Style Start
   border-bottom-left-radius: 0 !important;
 }
 /*Toast*/
+
+.form-check-input:checked {
+  background-color: var(--theme-primary-color) !important;
+  border-color: var(--theme-primary-color) !important;
+}
+.form-check-input:focus {
+  border-color: var(--theme-primary-color) !important;
+  box-shadow: 0 0 0 0.25rem rgba(113, 184, 98, 0.25);
+}
+.form-switch .form-check-input:focus {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%280, 0, 0, 0.25%29'/%3e%3c/svg%3e");
+}
+.form-switch .form-check-input:checked {
+  background-position: right center;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+}
 
 /*date picker*/
 .dt-ctrl {

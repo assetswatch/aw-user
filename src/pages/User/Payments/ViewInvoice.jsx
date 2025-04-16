@@ -15,8 +15,6 @@ import {
   AppMessages,
   API_ACTION_STATUS,
   ValidationMessages,
-  html2PdfSettings,
-  pdfHFWMSettings,
 } from "../../../utils/constants";
 import { useAuth } from "../../../contexts/AuthContext";
 import { axiosPost } from "../../../helpers/axiosHelper";
@@ -29,13 +27,13 @@ import PdfViewer from "../../../components/common/PdfViewer";
 import DataLoader from "../../../components/common/DataLoader";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 import { formCtrlTypes } from "../../../utils/formvalidation";
-import html2pdf from "html2pdf.js";
 import InputControl from "../../../components/common/InputControl";
 import {
   Grid,
   LazyImage,
   ModalView,
 } from "../../../components/common/LazyComponents";
+import { generateInvoicePDF } from "../../../utils/pdfhelper";
 
 const ViewInvoice = () => {
   let $ = window.$;
@@ -148,88 +146,6 @@ const ViewInvoice = () => {
       });
   };
 
-  const generatePDF = async (pdfDetails, invoiceDetails) => {
-    const watermarkImage = pdfDetails.BrandingDetails.WatermarkUrl;
-    const base64Watermark = await convertImageToBase64(watermarkImage);
-
-    const pdf = await html2pdf()
-      .from(pdfDetails.PdfHtml)
-      .set(
-        { ...html2PdfSettings },
-        {
-          filename: `${invoiceDetails?.InvoiceNumner}.pdf`,
-        }
-      )
-      .toPdf()
-      .get("pdf")
-      .then((pdf) => {
-        const totalPages = pdf.internal.getNumberOfPages();
-        const pageHeight = pdf.internal.pageSize.height;
-        const pageWidth = pdf.internal.pageSize.width;
-
-        for (let i = 1; i <= totalPages; i++) {
-          pdf.setPage(i);
-          pdf.setDrawColor(
-            pdfHFWMSettings.fLineColor.r,
-            pdfHFWMSettings.fLineColor.g,
-            pdfHFWMSettings.fLineColor.b
-          );
-          pdf.line(
-            pdfHFWMSettings.fLinex1OffSet,
-            pageHeight - pdfHFWMSettings.fLiney1OffSet,
-            pageWidth - pdfHFWMSettings.fLinex1OffSet,
-            pageHeight - pdfHFWMSettings.fLiney1OffSet
-          );
-
-          pdf.setFontSize(pdfHFWMSettings.fFontSize);
-          pdf.setFont(...pdfHFWMSettings.fFontFamily);
-          pdf.setTextColor(
-            pdfHFWMSettings.fFontColor.r,
-            pdfHFWMSettings.fFontColor.g,
-            pdfHFWMSettings.fFontColor.b
-          );
-          pdf.text(
-            pdfDetails?.BrandingDetails?.Footer,
-            pageWidth / pdfHFWMSettings.pageHalf,
-            pageHeight - pdfHFWMSettings.fTextyOffSet,
-            pdfHFWMSettings.fCenter
-          );
-
-          pdf.text(
-            `Page ${i} of ${totalPages}`,
-            pageWidth - pdfHFWMSettings.fPixOffSet,
-            pageHeight - pdfHFWMSettings.fPiyOffSet,
-            pdfHFWMSettings.fRight
-          );
-
-          pdf.setGState(new pdf.GState(pdfHFWMSettings.wmOpacity));
-          pdf.addImage(
-            base64Watermark,
-            "PNG",
-            (pageWidth - pdfHFWMSettings.wmWidth) / pdfHFWMSettings.pageHalf,
-            (pageHeight -
-              (pdfHFWMSettings.wmHeight - pdfHFWMSettings.wmyOffSet)) /
-              pdfHFWMSettings.pageHalf,
-            pdfHFWMSettings.wmWidth,
-            pdfHFWMSettings.wmHeight,
-            "",
-            "FAST"
-          );
-          pdf.setGState(new pdf.GState({ opacity: 1 }));
-        }
-
-        pdf.internal.scaleFactor = pdfHFWMSettings.scaleFactor;
-      })
-      .outputPdf("blob")
-      .then((pdf) => {
-        setPdfBlob(pdf);
-        const pdfBlobUrl = URL.createObjectURL(pdf);
-        setFileUrl(pdfBlobUrl);
-
-        // pdf.save("StyledPDF.pdf");
-      });
-  };
-
   const getInvoiceDetails = async () => {
     if (inoviceId > 0) {
       let isapimethoderr = false;
@@ -246,7 +162,13 @@ const ViewInvoice = () => {
             }).then(async (presponse) => {
               let objPResponse = presponse.data;
               if (objPResponse.StatusCode === 200) {
-                generatePDF(objPResponse.Data, objResponse.Data);
+                generateInvoicePDF(
+                  objPResponse.Data,
+                  objResponse.Data,
+                  "Invoice",
+                  setPdfBlob,
+                  setFileUrl
+                );
               } else {
                 isapimethoderr = true;
               }
@@ -375,13 +297,19 @@ const ViewInvoice = () => {
               <LazyImage
                 className="rounded cur-pointer w-50px mx-1"
                 src={row.original.PicPath}
-                alt={row.original.FirstName + " " + row.original.LastName}
+                alt={
+                  checkEmptyVal(row.original.CompanyName)
+                    ? row.original.FirstName + " " + row.original.LastName
+                    : row.original.CompanyName
+                }
                 placeHolderClass="pos-absolute w-50px min-h-50 fl-l"
               ></LazyImage>
             </div>
             <div className="col property-info flex v-center pb-0 min-h-50 px-5">
               <h5 className="text-secondary">
-                {row.original.FirstName + " " + row.original.LastName}
+                {checkEmptyVal(row.original.CompanyName)
+                  ? row.original.FirstName + " " + row.original.LastName
+                  : row.original.CompanyName}
                 <div className="mt-0 py-0 small text-light">
                   {row.original?.ProfileType}
                 </div>
@@ -411,7 +339,7 @@ const ViewInvoice = () => {
       {
         Header: "Actions",
         showActionMenu: false,
-        className: "w-100px gr-action",
+        className: `w-100px gr-action`,
         Cell: ({ row }) => (
           <a
             className="pr-10"
@@ -560,99 +488,138 @@ const ViewInvoice = () => {
                     ) : (
                       <DataLoader />
                     )}
-                    {!checkEmptyVal(invoiceDetails.Message) && (
-                      <span className="font-500 font-general">
-                        Message : {invoiceDetails?.Message}
-                      </span>
-                    )}
+                    <div className="row mt-10 px-0 mx-0 flex fl ex-center">
+                      <div className="col-md-6 px-0 col-lg-6 col-xl-6 mb-15">
+                        <div className="font-500 font-general d-flex lh-1 v-center">
+                          {invoiceDetails?.BillToUser && (
+                            <>
+                              Bill To :
+                              <div className="d-flex px-1 lh-1">
+                                <img
+                                  alt=""
+                                  src={invoiceDetails?.BillToUser?.PicPath}
+                                  className="rounded img-border-white w-40px mx-1"
+                                />
+                              </div>
+                              <div className="pt-1 px-0">
+                                <div className="te xt-secondary">
+                                  {checkEmptyVal(
+                                    invoiceDetails?.BillToUser?.CompanyName
+                                  )
+                                    ? invoiceDetails?.BillToUser?.FirstName +
+                                      " " +
+                                      invoiceDetails?.BillToUser?.LastName
+                                    : invoiceDetails?.BillToUser?.CompanyName}
+                                  <div className="mt-0 pt-1 small text-light font-small font-400">
+                                    {invoiceDetails?.BillToUser?.ProfileType}
+                                  </div>
+                                </div>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      {!checkEmptyVal(invoiceDetails.Message) && (
+                        <div className="col-md-6 px-0 col-lg-6 col-xl-6 mb-15 text-md-end pt-10">
+                          <span className="font-500 font-general">
+                            Message : {invoiceDetails?.Message}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-              <form noValidate>
-                <div className="container-fluid mt-20 pb-30">
-                  <div className="row">
-                    <hr className="w-100 text-primary mb-20 px-0 mx-0"></hr>
-                    <h6 className="mb-3 down-line pb-10 px-0">Send Invoice</h6>
-                    <div className="col px-0">
-                      <div className="row">
-                        <div className="col-md-6 mb-15">
-                          <AsyncSelect
-                            placeHolder={
-                              selectedJoinedUser == null ||
-                              Object.keys(selectedJoinedUser).length === 0
-                                ? AppMessages.DdlDefaultSelect
-                                : joinedUsersData.length <= 0 &&
-                                  selectedProfileType == null
-                                ? AppMessages.DdLLoading
-                                : AppMessages.DdlDefaultSelect
-                            }
-                            noData={
-                              selectedJoinedUser == null ||
-                              Object.keys(selectedJoinedUser).length === 0
-                                ? AppMessages.NoUsers
-                                : joinedUsersData.length <= 0 &&
-                                  selectedProfileType == null &&
-                                  selectedProfileType != null
-                                ? AppMessages.DdLLoading
-                                : AppMessages.NoUsers
-                            }
-                            options={joinedUsersData}
-                            onChange={(e) => {
-                              handleJoinedUserChange(e);
-                            }}
-                            value={selectedJoinedUser}
-                            name="ddljoinedusers"
-                            lblText="Users"
-                            lbl={formCtrlTypes.users}
-                            lblClass="mb-0 lbl-req-field"
-                            required={true}
-                            errors={sendInvoiceErrors}
-                            formErrors={formSendInvoiceErrors}
-                            isMulti={true}
-                            isRenderOptions={false}
-                            tabIndex={1}
-                          ></AsyncSelect>
+
+              {invoiceDetails?.ProfileId == profileid && (
+                <form noValidate>
+                  <div className="container-fluid mt-20 pb-30">
+                    <div className="row">
+                      <hr className="w-100 text-primary mb-20 px-0 mx-0"></hr>
+                      <h6 className="mb-3 down-line pb-10 px-0">
+                        Send Invoice
+                      </h6>
+                      <div className="col px-0">
+                        <div className="row">
+                          <div className="col-md-6 mb-15">
+                            <AsyncSelect
+                              placeHolder={
+                                selectedJoinedUser == null ||
+                                Object.keys(selectedJoinedUser).length === 0
+                                  ? AppMessages.DdlDefaultSelect
+                                  : joinedUsersData.length <= 0 &&
+                                    selectedProfileType == null
+                                  ? AppMessages.DdLLoading
+                                  : AppMessages.DdlDefaultSelect
+                              }
+                              noData={
+                                selectedJoinedUser == null ||
+                                Object.keys(selectedJoinedUser).length === 0
+                                  ? AppMessages.NoUsers
+                                  : joinedUsersData.length <= 0 &&
+                                    selectedProfileType == null &&
+                                    selectedProfileType != null
+                                  ? AppMessages.DdLLoading
+                                  : AppMessages.NoUsers
+                              }
+                              options={joinedUsersData}
+                              onChange={(e) => {
+                                handleJoinedUserChange(e);
+                              }}
+                              value={selectedJoinedUser}
+                              name="ddljoinedusers"
+                              lblText="Users"
+                              lbl={formCtrlTypes.users}
+                              lblClass="mb-0 lbl-req-field"
+                              required={true}
+                              errors={sendInvoiceErrors}
+                              formErrors={formSendInvoiceErrors}
+                              isMulti={true}
+                              isRenderOptions={false}
+                              tabIndex={1}
+                            ></AsyncSelect>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0"
+                              name={`txtcomments`}
+                              ctlType={formCtrlTypes.comments}
+                              onChange={handleSendInvoiceInputChange}
+                              value={sendInvoiceFormData.txtcomments}
+                              required={false}
+                              errors={sendInvoiceErrors}
+                              formErrors={formSendInvoiceErrors}
+                              tabIndex={2}
+                            ></InputControl>
+                          </div>
                         </div>
-                        <div className="col-md-6 mb-15">
-                          <InputControl
-                            lblClass="mb-0"
-                            name={`txtcomments`}
-                            ctlType={formCtrlTypes.comments}
-                            onChange={handleSendInvoiceInputChange}
-                            value={sendInvoiceFormData.txtcomments}
-                            required={false}
-                            errors={sendInvoiceErrors}
-                            formErrors={formSendInvoiceErrors}
-                            tabIndex={2}
-                          ></InputControl>
-                        </div>
-                      </div>
-                      <div className="row form-action d-flex flex-end mt-20">
-                        <div
-                          className="col-md-6 form-error"
-                          id="form-error"
-                        ></div>
-                        <div className="col-md-6">
-                          <button
-                            className="btn btn-secondary"
-                            id="btncancel"
-                            onClick={onCancel}
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            className="btn btn-primary"
-                            id="btnsend"
-                            onClick={onSendInvoice}
-                          >
-                            Send
-                          </button>
+                        <div className="row form-action d-flex flex-end mt-20">
+                          <div
+                            className="col-md-6 form-error"
+                            id="form-error"
+                          ></div>
+                          <div className="col-md-6">
+                            <button
+                              className="btn btn-secondary"
+                              id="btncancel"
+                              onClick={onCancel}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              className="btn btn-primary"
+                              id="btnsend"
+                              onClick={onSendInvoice}
+                            >
+                              Send
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </form>
+                </form>
+              )}
 
               {/*============== Pdf Content ==============*/}
               {/* <div
@@ -676,7 +643,11 @@ const ViewInvoice = () => {
                       <div className="col px-0 mx-0">
                         <div className="dashboard-panel border bg-white rounded overflow-hidden w-100 box-shadow">
                           <Grid
-                            columns={columns}
+                            columns={columns.filter((c) => {
+                              return invoiceDetails?.ProfileId == profileid
+                                ? 1 == 1
+                                : c.Header !== "Actions";
+                            })}
                             data={invoiceDetails.SentProfiles}
                             fetchData={() => {}}
                             loading={isDataLoading}

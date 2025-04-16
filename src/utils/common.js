@@ -73,6 +73,7 @@ export function SetPageLoaderNavLinks() {
           activesublink = "connectedproperties";
           break;
         case routeNames.settings.path.toLowerCase():
+        case routeNames.branding.path.toLowerCase():
           activelink = "settings";
           break;
         case routeNames.connectionsowners.path.toLowerCase():

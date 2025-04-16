@@ -42,6 +42,7 @@ const Checkout = () => {
     { PaymentTypeId: "ACH", PaymentType: "ACH Payment" },
     { PaymentTypeId: "CreditCard", PaymentType: "Credit Card" },
   ]);
+
   const [selectedPaymentType, setSelectedPaymentType] = useState(
     paymentTypes[0].PaymentTypeId
   );

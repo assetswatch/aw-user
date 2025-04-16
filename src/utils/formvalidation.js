@@ -97,6 +97,14 @@ export const Regex = {
     max: length50,
     required: ValidationMessages.LNameReq,
   },
+  brandingheader: {
+    max: length250,
+    required: ValidationMessages.BrandingHeaderReq,
+  },
+  brandingfooter: {
+    max: length250,
+    required: ValidationMessages.BrandingFooterReq,
+  },
   accountnum: {
     min: length4,
     max: length17,
@@ -456,14 +464,6 @@ export const formCtrlTypes = {
       max: length100,
     },
   },
-  currentpwd: {
-    lbl: "Description:",
-    input: {
-      type: "text",
-      min: length2,
-      max: length50,
-    },
-  },
   paymentsubaccountfname: {
     lbl: "First Name:",
     input: {
@@ -492,6 +492,20 @@ export const formCtrlTypes = {
     input: {
       type: "text",
       max: length50,
+    },
+  },
+  brandingheader: {
+    lbl: "Header text:",
+    input: {
+      type: "text",
+      max: length250,
+    },
+  },
+  brandingfooter: {
+    lbl: "Footer text:",
+    input: {
+      type: "text",
+      max: length250,
     },
   },
   accountnum: {
@@ -886,9 +900,6 @@ export const formCtrlTypes = {
   },
   assetcontracttype: {
     lbl: "Contract type:",
-  },
-  assetlistingtype: {
-    lbl: "Listing type:",
   },
   assetclassificationtype: {
     lbl: "Classification type:",

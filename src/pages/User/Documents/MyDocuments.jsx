@@ -735,7 +735,7 @@ const MyDocuments = () => {
             onclick: (e, row) => onView(e, row),
           },
           {
-            text: "Edit",
+            text: "Rename",
             onclick: (e, row) => onEdit(e, row),
           },
           {
@@ -788,15 +788,16 @@ const MyDocuments = () => {
 
   const onEdit = (e, row) => {
     e.preventDefault();
-    if (row.original.IsFolder == 1) {
-      onEditModalShow(e, row);
-    } else {
-      addSessionStorageItem(
-        SessionStorageKeys.ViewEditDocumentId,
-        row.original.Id
-      );
-      navigate(routeNames.editdocument.path);
-    }
+    onEditModalShow(e, row);
+    // if (row.original.IsFolder == 1) {
+    //   onEditModalShow(e, row);
+    // } else {
+    //   addSessionStorageItem(
+    //     SessionStorageKeys.ViewEditDocumentId,
+    //     row.original.Id
+    //   );
+    //   navigate(routeNames.editdocument.path);
+    // }
   };
 
   const onUpdateFolder = (e) => {
@@ -810,19 +811,31 @@ const MyDocuments = () => {
       let isapimethoderr = false;
 
       let objBodyParams = {
-        ParentFolderId: folderid,
-        FolderId: parseInt(selectedGridRow?.original?.Id),
         AccountId: accountid,
         ProfileId: profileid,
         Name: editFolderFormData.txtname,
-        StorageTypeId: 1,
-        StorageFolderId: selectedGridRow?.original?.StorageFileId,
       };
 
-      axiosPost(
-        `${config.apiBaseUrl}${ApiUrls.addDocumentFolder}`,
-        objBodyParams
-      )
+      let apiUrl = `${config.apiBaseUrl}`;
+
+      if (selectedGridRow?.original?.IsFolder == 1) {
+        objBodyParams = {
+          ...objBodyParams,
+          ParentFolderId: folderid,
+          FolderId: parseInt(selectedGridRow?.original?.Id),
+          StorageTypeId: 1,
+          StorageFolderId: selectedGridRow?.original?.StorageFileId,
+        };
+        apiUrl = `${apiUrl}${ApiUrls.addDocumentFolder}`;
+      } else {
+        objBodyParams = {
+          ...objBodyParams,
+          DocumentId: parseInt(selectedGridRow?.original?.Id),
+        };
+        apiUrl = `${apiUrl}${ApiUrls.updateDocument}`;
+      }
+
+      axiosPost(apiUrl, objBodyParams)
         .then((response) => {
           let objResponse = response.data;
           if (objResponse.StatusCode === 200) {
@@ -839,9 +852,7 @@ const MyDocuments = () => {
         })
         .catch((err) => {
           isapimethoderr = true;
-          console.error(
-            `"API :: ${ApiUrls.addDocumentFolder}, Error ::" ${err}`
-          );
+          console.error(`"API :: ${apiUrl}, Error ::" ${err}`);
         })
         .finally(() => {
           if (isapimethoderr == true) {
@@ -1378,7 +1389,11 @@ const MyDocuments = () => {
       {editFolderModalShow && (
         <>
           <ModalView
-            title={AppMessages.EditFolderModalTitle}
+            title={
+              selectedGridRow?.original?.IsFolder == 1
+                ? AppMessages.RenameFolderModalTitle
+                : AppMessages.RenameDocumentModalTitle
+            }
             content={
               <>
                 <div className="row">

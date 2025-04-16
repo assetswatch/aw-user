@@ -334,20 +334,20 @@ const MyDocuments = () => {
       {
         Header: "Name",
         accessor: "",
-        className: "w-350px",
+        className: "w-450px",
         disableSortBy: true,
         Cell: ({ row }) => {
           return (
             <>
-              {row.original.IsFolder === 1 ? (
-                <div
-                  style={{ paddingLeft: `${row.depth * 30}px` }}
-                  className="gr-link"
-                  onDoubleClick={(e) => {
-                    //row.toggleRowExpanded(!row.isExpanded);
-                    onGridDoubleClick(row);
-                  }}
-                >
+              <div
+                style={{ paddingLeft: `${row.depth * 30}px` }}
+                className="gr-link"
+                onDoubleClick={(e) => {
+                  //row.toggleRowExpanded(!row.isExpanded);
+                  onGridDoubleClick(row);
+                }}
+              >
+                {row.original.IsFolder === 1 ? (
                   <span className="gr-txt-14-b">
                     <i
                       className={`${
@@ -356,46 +356,57 @@ const MyDocuments = () => {
                     ></i>
                     {row.original.Name}
                   </span>
-                </div>
-              ) : (
-                <div
-                  style={{ paddingLeft: `${row.depth * 30}px` }}
-                  className="gr-link"
-                  onClick={(e) => onGridDoubleClick(row)}
-                >
+                ) : (
                   <span className="gr-txt-14-b">
                     <i className={`far fa-file-lines gr-icon`}></i>
                     {row.original.Name}
                   </span>
-                </div>
-              )}
+                )}
+                <i
+                  className={`mdi font-20 min-w-30px w-30px ctooltip-container gr-badge-pill px-1 ${
+                    row.original.SharedTypeId == config.sharedTypes.Sent
+                      ? "gr-badge-pill-suc mdi-arrow-right"
+                      : "gr-badge-pill-error mdi-arrow-left"
+                  } nocnt bo-0 bg-none`}
+                >
+                  <div
+                    className={`ctooltip opa9 shadow lh-1 ${
+                      row.original.SharedTypeId == config.sharedTypes.Sent
+                        ? "bg-primary"
+                        : "bg-danger"
+                    }`}
+                  >
+                    {row.original.SharedType}
+                  </div>
+                </i>
+              </div>
             </>
           );
         },
       },
-      {
-        Header: "Share Type",
-        accessor: "SharedType",
-        disableSortBy: true,
-        className: "w-180px",
-        Cell: ({ row }) => (
-          <>
-            {row.depth === 0 && (
-              <span
-                className={`badge badge-pill gr-badge-pill nocnt text-center w-80px ${
-                  row.original.SharedTypeId == config.sharedTypes.Sent
-                    ? "gr-badge-pill-suc"
-                    : row.original.SharedTypeId == config.sharedTypes.Received
-                    ? "gr-badge-pill-error"
-                    : ""
-                }`}
-              >
-                {row.original.SharedType}
-              </span>
-            )}
-          </>
-        ),
-      },
+      // {
+      //   Header: "Share Type",
+      //   accessor: "SharedType",
+      //   disableSortBy: true,
+      //   className: "w-180px",
+      //   Cell: ({ row }) => (
+      //     <>
+      //       {row.depth === 0 && (
+      //         <span
+      //           className={`badge badge-pill gr-badge-pill nocnt text-center w-80px ${
+      //             row.original.SharedTypeId == config.sharedTypes.Sent
+      //               ? "gr-badge-pill-suc"
+      //               : row.original.SharedTypeId == config.sharedTypes.Received
+      //               ? "gr-badge-pill-error"
+      //               : ""
+      //           }`}
+      //         >
+      //           {row.original.SharedType}
+      //         </span>
+      //       )}
+      //     </>
+      //   ),
+      // },
       {
         Header: "File Size",
         accessor: "Size",

@@ -768,7 +768,7 @@ const Register = () => {
                           />
                           <label htmlFor="cbagreeterms">
                             I Agree to AssetsWatch Terms of use i would like to
-                            receive property relates communication through
+                            receive property related communication through
                             Email, call or SMS.
                           </label>
                           {errors?.["cbagreeterms"] && (

@@ -57,13 +57,14 @@ export const pdfHFWMSettings = {
   fTextyOffSet: 15,
   fFontSize: 9,
   fFontFamily: ["helvetica", "italic"],
-  fFontColor: { r: 189, g: 189, b: 189 },
+  fFontColor: { r: 66, g: 66, b: 68 },
   fCenter: { align: "center" },
   fRight: { align: "right" },
   fPixOffSet: 15,
   fPiyOffSet: 8,
   scaleFactor: 2,
   pageHalf: 2,
+  hTextyOffSet: 10,
 };
 /*pdf Settings*/
 
@@ -240,11 +241,13 @@ export const AppMessages = {
   ProfileDetailsNotFound: "Profile details not found...",
   CreateProfileSuccess: "Profile created successfully...",
   UpdateProfileSuccess: "Profile details updated successfully...",
+  CreateUserBrandingSuccess: "Branding details updated successfully...",
   NoAgreementTemplates: "No templates found...",
   NoAgreements: "No agreements found...",
   NoDocuments: `No documents found...`,
   DeleteDocumentMessage: "You want to delete the {name}.",
-  EditFolderModalTitle: "Edit folder",
+  RenameFolderModalTitle: "Rename Folder",
+  RenameDocumentModalTitle: "Rename Document",
   ShareFolderModalTitle: "Share Folder",
   DdlNoFolders: "No folders found.",
   AddDocumentSuccess: "Document added successfully...",
@@ -279,7 +282,7 @@ export const AppMessages = {
     "You do not have a created payment account. We cannot process payments without a payment account. Are you sure you want to continue?",
   CheckoutNoSubAccountAlertTitle: "Warning: No Active Payment Account!",
   CheckoutNoSubAccountMessage:
-    "Payment cannot be initiated, Because the invoice creator does not have an active payment account.",
+    "The invoice creator does not have an active payment account. Payment cannot be initiated.",
   AddInvocieItemModalTitle: "Add New Item",
   DeleteInvitationConfirmationMessage:
     "You want to delete the invitation request for {email}.",
@@ -287,6 +290,9 @@ export const AppMessages = {
   DeleteInvoiceConfirmationMessage:
     "You want to delete the invoice#: {invoicenumber}.",
   DeleteInvoiceSuccess: "Invoice deleted successfully...",
+  MarkasPaidConfirmationTitle: "Mark inovice as paid?",
+  MarkasPaidConfirmationMessage:
+    "Invoice #{invoicenumber} will be marked as paid. This action cannot be undone. Proceed?",
 };
 /*Common App messages*/
 
@@ -304,6 +310,8 @@ export const ValidationMessages = {
   BusinessNameOnAccountReq: "Business Name on Account can not be empty.",
   FNameReq: "Firstname can not be empty.",
   LNameReq: "Lastname can not be empty.",
+  BrandingHeaderReq: "Header text can not be empty.",
+  BrandingFooterReq: "Footer text can not be empty.",
   EmailReq: "Emailid can not be empty.",
   EmailInvalid: "Emailid is not valid.",
   PwdReq: "Password can not be empty.",
@@ -460,6 +468,8 @@ export let ApiUrls = {
   getUserDetails: `users/v1/GetUserDetails`,
   getUserAccountDetails: `users/v1/GetUserAccountDetails`,
   getUserBrandingDetails: `users/v1/GetUserBrandingDetails`,
+  createUserBranding: `users/v1/CreateUserBranding`,
+  switchUserProfileBranding: `users/v1/SwitchUserProfileBranding`,
   getAgents: `users/v1/GetAgents`,
   getAssetTypes: `assets/v1/GetAssetTypes`,
   getAssetListingTypes: `assets/v1/GetAssetListingTypes`,
@@ -540,6 +550,7 @@ export let ApiUrls = {
   getDocumentFile: `documents/v1/GetDocumentFile`,
   editDocument: `documents/v1/EditDocument`,
   addDocument: `documents/v1/AddDocument`,
+  updateDocument: `documents/v1/UpdateDocument`,
   getFolderDocuments: `documents/v1/GetFolderDocuments`,
   getDocumentFoldersHierarchy: `documents/v1/GetDocumentFoldersHierarchy`,
   getDocumentSharedUsers: `documents/v1/GetDocumentSharedUsers`,

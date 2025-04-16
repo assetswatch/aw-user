@@ -285,8 +285,8 @@ const Tenants = () => {
                   className={`mdi font-20 min-w-30px w-30px ctooltip-container gr-badge-pill px-1 ${
                     row.original.RequestTypeId ==
                     config.userConnectionRequestTypes.Sent
-                      ? "gr-badge-pill-suc mdi-arrow-right-bold"
-                      : "gr-badge-pill-error mdi-arrow-left-bold"
+                      ? "gr-badge-pill-suc mdi-arrow-right"
+                      : "gr-badge-pill-error mdi-arrow-left"
                   } nocnt bo-0 bg-none py-0`}
                 >
                   <div

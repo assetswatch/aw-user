@@ -134,7 +134,6 @@ const Login = () => {
               clearForm();
               let [decaccountid, enckey, upptid] = [0, "", 0];
               let redirectToCreateProfile = false;
-              console.log(checkEmptyVal(id));
 
               const checkParamId = new Promise(async (resolve) => {
                 if (checkEmptyVal(id) == false) {
@@ -167,7 +166,9 @@ const Login = () => {
                   );
                 } else {
                   if (respData.Profiles.length > 1) {
-                    navigate(routeNames.profiles.path, { replace: true });
+                    navigate(routeNames.profiles.path + "?v", {
+                      replace: true,
+                    });
                   } else {
                     let defaultProfile = respData.Profiles?.filter(
                       (p) => p.ProfileId == respData.DefaultProfileId
