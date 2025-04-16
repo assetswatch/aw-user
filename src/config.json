@@ -11,6 +11,11 @@
     "Agent": 2,
     "Tenant": 3
   },
+  "UserBrandingTypes": {
+    "Default_Branding": 0,
+    "No_Branding": 1,
+    "Custom_Branding": 2
+  },
   "userConnectionStatusTypes": {
     "Pending": 0,
     "Joined": 1,

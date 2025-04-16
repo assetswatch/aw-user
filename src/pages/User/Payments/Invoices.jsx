@@ -48,6 +48,7 @@ import {
 import TextAreaControl from "../../../components/common/TextAreaControl";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 import html2pdf from "html2pdf.js";
+import { generateInvoiceDownloadPDF } from "../../../utils/pdfhelper";
 
 const Invoices = () => {
   let $ = window.$;
@@ -96,6 +97,11 @@ const Invoices = () => {
   const [modalDeleteConfirmContent, setModalDeleteConfirmContent] = useState(
     AppMessages.DeleteInvoiceConfirmationMessage
   );
+
+  const [modalMarkasPaidConfirmShow, setModalMarkasPaidConfirmShow] =
+    useState(false);
+  const [modalMarkasPaidConfirmContent, setModalMarkasPaidConfirmContent] =
+    useState(AppMessages.MarkasPaidConfirmationMessage);
 
   const [isDataLoading, setIsDataLoading] = useState(false);
 
@@ -278,8 +284,8 @@ const Invoices = () => {
                     className={`mdi font-20 min-w-30px w-30px ctooltip-container gr-badge-pill px-1 ${
                       row.original.InvoiceDirection ==
                       config.directionTypes.Sent
-                        ? "gr-badge-pill-suc mdi-arrow-right-bold"
-                        : "gr-badge-pill-error mdi-arrow-left-bold"
+                        ? "gr-badge-pill-suc mdi-arrow-right"
+                        : "gr-badge-pill-error mdi-arrow-left"
                     } nocnt bo-0 bg-none`}
                   >
                     <div
@@ -532,103 +538,6 @@ const Invoices = () => {
                     </button>
                   </div>
                 )}
-
-              {/* {row.original.InvoiceDirection != config.directionTypes.Created &&
-              row.original.InvoiceDirection == config.directionTypes.Received &&
-              row.original.PaymentStatus != config.paymentStatusTypes.UnPaid ? (
-                <div>
-                  <button
-                    className="btn btn-primary btn-xs btn-glow shadow rounded lh-26 px-10"
-                    name="btnpaynow"
-                    id="btnpaynow"
-                    type="button"
-                    onClick={(e) => onPayNow(e, row)}
-                  >
-                    <i className="fa fa-credit-card position-relative me-1 t-1 text-white"></i>{" "}
-                    Pay Now{" "}
-                  </button>
-                </div>
-              ) : (
-                <span>
-                  <span
-                    className={`badge badge-pill gr-badge-pill mt-2 ${
-                      row.original.PaymentStatus ==
-                      config.paymentStatusTypes.PartiallyPaid
-                        ? "gr-badge-pill-info w-100px"
-                        : row.original.PaymentStatus ==
-                          config.paymentStatusTypes.UnPaid
-                        ? "gr-badge-pill-warning w-100px"
-                        : "gr-badge-pill-suc"
-                    }`}
-                  >
-                    {row.original.PaymentStatusDisplay}
-                  </span>
-                </span>
-              )} */}
-
-              {/* {row.original.InvoiceDirection ==
-                config.directionTypes.Received &&
-                row.original.PaymentStatus !=
-                  config.paymentStatusTypes.Paid && (
-                  <div>
-                    <button
-                      className="btn btn-primary btn-xs btn-glow shadow rounded lh-26 px-10"
-                      name="btnpaynow"
-                      id="btnpaynow"
-                      type="button"
-                      onClick={(e) => onPayNow(e, row)}
-                    >
-                      <i className="fa fa-credit-card position-relative me-1 t-1 text-white"></i>{" "}
-                      Pay Now{" "}
-                    </button>
-                  </div>
-                )} */}
-
-              {/* {row.original.PaymentStatus !=
-                config.paymentStatusTypes.UnPaid && (
-                <span>
-                  <span
-                    className={`badge badge-pill gr-badge-pill mt-2 ${
-                      row.original.PaymentStatus ==
-                      config.paymentStatusTypes.PartiallyPaid
-                        ? "gr-badge-pill-info w-100px"
-                        : row.original.PaymentStatus == 0
-                        ? "gr-badge-pill-warning w-100px"
-                        : "gr-badge-pill-suc"
-                    }`}
-                  >
-                    {row.original.PaymentStatusDisplay}
-                  </span>
-                </span>
-               )} */}
-
-              {/* {row.original.InvoiceDirection ==
-                config.directionTypes.Received &&
-                row.original.PaymentStatus !=
-                  config.paymentStatusTypes.Paid && (
-                  <div>
-                    <button
-                      className="btn btn-primary btn-xs btn-glow shadow rounded lh-26 px-10"
-                      name="btnpaynow"
-                      id="btnpaynow"
-                      type="button"
-                      onClick={(e) => onPayNow(e, row)}
-                    >
-                      <i className="fa fa-credit-card position-relative me-1 t-1 text-white"></i>{" "}
-                      Pay Now{" "}
-                    </button>
-                  </div>
-                )} */}
-
-              {/* {checkEmptyVal(row.original.PaymentId == 0) ? (
-                ""
-              ) : (
-                <>
-                  <div>Payment Ref#: {row.original.PaymentRefNumber}</div>
-                  <div>Paid On#: {row.original.PaidDateDisplay}</div>
-                  <div>Paid Amount#: {row.original.PaidAmountDisplay}</div>
-                </>
-              )} */}
             </div>
           </>
         ),
@@ -648,6 +557,14 @@ const Invoices = () => {
             },
             icssclass: "pr-10 pl-2px",
           },
+          // {
+          //   text: "Mark as Paid",
+          //   onclick: (e, row) => onMarkasPaidModalShow(e, row),
+          //   icssclass: "pr-10 pl-2px",
+          //   isconditionalshow: (row) => {
+          //     return row?.original?.PaymentStatus != 1;
+          //   },
+          // },
           {
             text: "Download Receipt",
             onclick: (e, row) => {
@@ -740,7 +657,11 @@ const Invoices = () => {
           }).then(async (presponse) => {
             let objPResponse = presponse.data;
             if (objPResponse.StatusCode === 200) {
-              generatePDF(objPResponse.Data, objResponse.Data, "Invoice");
+              generateInvoiceDownloadPDF(
+                objPResponse.Data,
+                objResponse.Data,
+                "Invoice"
+              );
             } else {
               isapimethoderr = true;
             }
@@ -819,7 +740,9 @@ const Invoices = () => {
         if (objPResponse.StatusCode === 200) {
           let pdfDetails = objPResponse.Data;
           const watermarkImage = pdfDetails.BrandingDetails.WatermarkUrl;
-          const base64Watermark = await convertImageToBase64(watermarkImage);
+          const base64Watermark = checkEmptyVal(watermarkImage)
+            ? ""
+            : await convertImageToBase64(watermarkImage);
 
           const pdf = await html2pdf()
             .from(pdfDetails.PdfHtml)
@@ -857,12 +780,25 @@ const Invoices = () => {
                   pdfHFWMSettings.fFontColor.g,
                   pdfHFWMSettings.fFontColor.b
                 );
-                pdf.text(
-                  pdfDetails?.BrandingDetails?.Footer,
-                  pageWidth / pdfHFWMSettings.pageHalf,
-                  pageHeight - pdfHFWMSettings.fTextyOffSet,
-                  pdfHFWMSettings.fCenter
-                );
+
+                if (
+                  pdfDetails.BrandingDetails.IsBrandingEnabled == 1 &&
+                  pdfDetails.BrandingDetails.Id > 0
+                ) {
+                  pdf.text(
+                    pdfDetails?.BrandingDetails?.Header,
+                    pageWidth / pdfHFWMSettings.pageHalf,
+                    pdfHFWMSettings.hTextyOffSet,
+                    pdfHFWMSettings.fCenter
+                  );
+
+                  pdf.text(
+                    pdfDetails?.BrandingDetails?.Footer,
+                    pageWidth / pdfHFWMSettings.pageHalf,
+                    pageHeight - pdfHFWMSettings.fTextyOffSet,
+                    pdfHFWMSettings.fCenter
+                  );
+                }
 
                 pdf.text(
                   `Page ${i} of ${totalPages}`,
@@ -870,22 +806,27 @@ const Invoices = () => {
                   pageHeight - pdfHFWMSettings.fPiyOffSet,
                   pdfHFWMSettings.fRight
                 );
-
-                pdf.setGState(new pdf.GState(pdfHFWMSettings.wmOpacity));
-                pdf.addImage(
-                  base64Watermark,
-                  "PNG",
-                  (pageWidth - pdfHFWMSettings.wmWidth) /
-                    pdfHFWMSettings.pageHalf,
-                  (pageHeight -
-                    (pdfHFWMSettings.wmHeight - pdfHFWMSettings.wmyOffSet)) /
-                    pdfHFWMSettings.pageHalf,
-                  pdfHFWMSettings.wmWidth,
-                  pdfHFWMSettings.wmHeight,
-                  "",
-                  "FAST"
-                );
-                pdf.setGState(new pdf.GState({ opacity: 1 }));
+                if (
+                  !checkEmptyVal(base64Watermark) &&
+                  pdfDetails.BrandingDetails.IsBrandingEnabled == 1 &&
+                  pdfDetails.BrandingDetails.Id > 0
+                ) {
+                  pdf.setGState(new pdf.GState(pdfHFWMSettings.wmOpacity));
+                  pdf.addImage(
+                    base64Watermark,
+                    "PNG",
+                    (pageWidth - pdfHFWMSettings.wmWidth) /
+                      pdfHFWMSettings.pageHalf,
+                    (pageHeight -
+                      (pdfHFWMSettings.wmHeight - pdfHFWMSettings.wmyOffSet)) /
+                      pdfHFWMSettings.pageHalf,
+                    pdfHFWMSettings.wmWidth,
+                    pdfHFWMSettings.wmHeight,
+                    "",
+                    "FAST"
+                  );
+                  pdf.setGState(new pdf.GState({ opacity: 1 }));
+                }
               }
 
               pdf.internal.scaleFactor = pdfHFWMSettings.scaleFactor;
@@ -942,91 +883,6 @@ const Invoices = () => {
     }
   };
 
-  const generatePDF = async (pdfDetails, invoiceDetails, receiptType) => {
-    const watermarkImage = pdfDetails.BrandingDetails.WatermarkUrl;
-    const base64Watermark = await convertImageToBase64(watermarkImage);
-
-    const pdfFileName = `${
-      receiptType +
-      "-" +
-      invoiceDetails?.AccountId +
-      "-" +
-      invoiceDetails?.ProfileId +
-      "-" +
-      invoiceDetails?.InvoiceNumber
-    }.pdf`;
-
-    const pdf = await html2pdf()
-      .from(pdfDetails.PdfHtml)
-      .set(
-        { ...html2PdfSettings },
-        {
-          filename: pdfFileName,
-        }
-      )
-      .toPdf()
-      .get("pdf")
-      .then((pdf) => {
-        const totalPages = pdf.internal.getNumberOfPages();
-        const pageHeight = pdf.internal.pageSize.height;
-        const pageWidth = pdf.internal.pageSize.width;
-
-        for (let i = 1; i <= totalPages; i++) {
-          pdf.setPage(i);
-          pdf.setDrawColor(
-            pdfHFWMSettings.fLineColor.r,
-            pdfHFWMSettings.fLineColor.g,
-            pdfHFWMSettings.fLineColor.b
-          );
-          pdf.line(
-            pdfHFWMSettings.fLinex1OffSet,
-            pageHeight - pdfHFWMSettings.fLiney1OffSet,
-            pageWidth - pdfHFWMSettings.fLinex1OffSet,
-            pageHeight - pdfHFWMSettings.fLiney1OffSet
-          );
-
-          pdf.setFontSize(pdfHFWMSettings.fFontSize);
-          pdf.setFont(...pdfHFWMSettings.fFontFamily);
-          pdf.setTextColor(
-            pdfHFWMSettings.fFontColor.r,
-            pdfHFWMSettings.fFontColor.g,
-            pdfHFWMSettings.fFontColor.b
-          );
-          pdf.text(
-            pdfDetails?.BrandingDetails?.Footer,
-            pageWidth / pdfHFWMSettings.pageHalf,
-            pageHeight - pdfHFWMSettings.fTextyOffSet,
-            pdfHFWMSettings.fCenter
-          );
-
-          pdf.text(
-            `Page ${i} of ${totalPages}`,
-            pageWidth - pdfHFWMSettings.fPixOffSet,
-            pageHeight - pdfHFWMSettings.fPiyOffSet,
-            pdfHFWMSettings.fRight
-          );
-
-          pdf.setGState(new pdf.GState(pdfHFWMSettings.wmOpacity));
-          pdf.addImage(
-            base64Watermark,
-            "PNG",
-            (pageWidth - pdfHFWMSettings.wmWidth) / pdfHFWMSettings.pageHalf,
-            (pageHeight -
-              (pdfHFWMSettings.wmHeight - pdfHFWMSettings.wmyOffSet)) /
-              pdfHFWMSettings.pageHalf,
-            pdfHFWMSettings.wmWidth,
-            pdfHFWMSettings.wmHeight,
-            "",
-            "FAST"
-          );
-          pdf.setGState(new pdf.GState({ opacity: 1 }));
-        }
-
-        pdf.internal.scaleFactor = pdfHFWMSettings.scaleFactor;
-        pdf.save(`${pdfFileName}`);
-      });
-  };
-
   const downloadReceiptPdf = async (e, row) => {
     e.preventDefault();
     apiReqResLoader("x", "x", API_ACTION_STATUS.START);
@@ -1043,7 +899,11 @@ const Invoices = () => {
           }).then(async (presponse) => {
             let objPResponse = presponse.data;
             if (objPResponse.StatusCode === 200) {
-              generatePDF(objPResponse.Data, objResponse.Data, "Receipt");
+              generateInvoiceDownloadPDF(
+                objPResponse.Data,
+                objResponse.Data,
+                "Receipt"
+              );
             } else {
               isapimethoderr = true;
             }
@@ -1208,6 +1068,72 @@ const Invoices = () => {
   const onPayWarningModalClose = () => {
     setModalPayWarningShow(false);
   };
+
+  //Mark as paid Modal actions
+
+  const onMarkasPaidModalShow = (e, row) => {
+    e.preventDefault();
+    setSelectedGridRow(row);
+    setModalMarkasPaidConfirmContent(
+      replacePlaceHolders(modalMarkasPaidConfirmContent, {
+        invoicenumber: `${row?.original?.InvoiceNumber}`,
+      })
+    );
+    setModalMarkasPaidConfirmShow(true);
+  };
+
+  const onMarkasPaidModalClose = () => {
+    setModalMarkasPaidConfirmShow(false);
+    setSelectedGridRow(null);
+    apiReqResLoader("btnmarkaspaid", "Yes", API_ACTION_STATUS.COMPLETED, false);
+    setModalMarkasPaidConfirmContent(AppMessages.MarkasPaidConfirmationMessage);
+  };
+
+  const onMarkasPaid = (e) => {
+    e.preventDefault();
+
+    apiReqResLoader("btnmarkaspaid", "Yes", API_ACTION_STATUS.START);
+
+    let isapimethoderr = false;
+    let objBodyParams = {
+      InvoiceId: parseInt(selectedGridRow?.original?.InvoiceId),
+      AccountId: accountid,
+      ProfileId: profileid,
+    };
+
+    axiosPost(
+      `${config.apiBaseUrl}${ApiUrls.createPaymentTransaction}`,
+      objBodyParams
+    )
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode === 200) {
+          if (objResponse.Data.Status == 1) {
+            Toast.success(AppMessages.DeleteInvoiceSuccess);
+            getInvoices({});
+            onDeleteConfirmModalClose();
+          } else {
+            Toast.error(objResponse.Data.Message);
+          }
+        } else {
+          isapimethoderr = true;
+        }
+      })
+      .catch((err) => {
+        isapimethoderr = true;
+        console.error(
+          `"API :: ${ApiUrls.createPaymentTransaction}, Error ::" ${err}`
+        );
+      })
+      .finally(() => {
+        if (isapimethoderr == true) {
+          Toast.error(AppMessages.SomeProblem);
+        }
+        apiReqResLoader("btnmarkaspaid", "Yes", API_ACTION_STATUS.COMPLETED);
+      });
+  };
+
+  //Mark as paid Modal actions
 
   //Delete confirmation Modal actions
 
@@ -1430,6 +1356,39 @@ const Invoices = () => {
           </div>
         </div>
       </div>
+
+      {/*============== MarkasPaid Confirmation Modal Start ==============*/}
+      {modalMarkasPaidConfirmShow && (
+        <>
+          <ModalView
+            title={AppMessages.MarkasPaidConfirmationTitle}
+            content={
+              <>
+                <span className="font-general font-400">
+                  {modalMarkasPaidConfirmContent}
+                </span>
+              </>
+            }
+            onClose={onMarkasPaidModalClose}
+            actions={[
+              {
+                id: "btnmarkaspaid",
+                text: "Yes",
+                displayOrder: 1,
+                btnClass: "btn-primary",
+                onClick: (e) => onMarkasPaid(e),
+              },
+              {
+                text: "No",
+                displayOrder: 2,
+                btnClass: "btn-secondary",
+                onClick: (e) => onMarkasPaidModalClose(e),
+              },
+            ]}
+          ></ModalView>
+        </>
+      )}
+      {/*============== MarkasPaid Confirmation Modal End ==============*/}
 
       {/*============== Send Invoice Modal Start ==============*/}
       {sendInvoiceModalShow && (

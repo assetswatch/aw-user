@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   apiReqResLoader,
   checkEmptyVal,
-  convertImageToBase64,
   GetUserCookieValues,
   SetPageLoaderNavLinks,
 } from "../../../utils/common";
@@ -11,8 +10,6 @@ import {
   UserCookie,
   SessionStorageKeys,
   AppMessages,
-  html2PdfSettings,
-  pdfHFWMSettings,
   API_ACTION_STATUS,
 } from "../../../utils/constants";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -27,8 +24,8 @@ import { routeNames } from "../../../routes/routes";
 import { useNavigate } from "react-router-dom";
 import PdfViewer from "../../../components/common/PdfViewer";
 import DataLoader from "../../../components/common/DataLoader";
-import html2pdf from "html2pdf.js";
 import { ModalView } from "../../../components/common/LazyComponents";
+import { generateInvoicePDF } from "../../../utils/pdfhelper";
 
 const ViewInvoice = () => {
   let $ = window.$;
@@ -77,88 +74,6 @@ const ViewInvoice = () => {
       });
   };
 
-  const generatePDF = async (pdfDetails, invoiceDetails) => {
-    const watermarkImage = pdfDetails.BrandingDetails.WatermarkUrl;
-    const base64Watermark = await convertImageToBase64(watermarkImage);
-
-    const pdf = await html2pdf()
-      .from(pdfDetails.PdfHtml)
-      .set(
-        { ...html2PdfSettings },
-        {
-          filename: `${invoiceDetails?.InvoiceNumner}.pdf`,
-        }
-      )
-      .toPdf()
-      .get("pdf")
-      .then((pdf) => {
-        const totalPages = pdf.internal.getNumberOfPages();
-        const pageHeight = pdf.internal.pageSize.height;
-        const pageWidth = pdf.internal.pageSize.width;
-
-        for (let i = 1; i <= totalPages; i++) {
-          pdf.setPage(i);
-          pdf.setDrawColor(
-            pdfHFWMSettings.fLineColor.r,
-            pdfHFWMSettings.fLineColor.g,
-            pdfHFWMSettings.fLineColor.b
-          );
-          pdf.line(
-            pdfHFWMSettings.fLinex1OffSet,
-            pageHeight - pdfHFWMSettings.fLiney1OffSet,
-            pageWidth - pdfHFWMSettings.fLinex1OffSet,
-            pageHeight - pdfHFWMSettings.fLiney1OffSet
-          );
-
-          pdf.setFontSize(pdfHFWMSettings.fFontSize);
-          pdf.setFont(...pdfHFWMSettings.fFontFamily);
-          pdf.setTextColor(
-            pdfHFWMSettings.fFontColor.r,
-            pdfHFWMSettings.fFontColor.g,
-            pdfHFWMSettings.fFontColor.b
-          );
-          pdf.text(
-            pdfDetails?.BrandingDetails?.Footer,
-            pageWidth / pdfHFWMSettings.pageHalf,
-            pageHeight - pdfHFWMSettings.fTextyOffSet,
-            pdfHFWMSettings.fCenter
-          );
-
-          pdf.text(
-            `Page ${i} of ${totalPages}`,
-            pageWidth - pdfHFWMSettings.fPixOffSet,
-            pageHeight - pdfHFWMSettings.fPiyOffSet,
-            pdfHFWMSettings.fRight
-          );
-
-          pdf.setGState(new pdf.GState(pdfHFWMSettings.wmOpacity));
-          pdf.addImage(
-            base64Watermark,
-            "PNG",
-            (pageWidth - pdfHFWMSettings.wmWidth) / pdfHFWMSettings.pageHalf,
-            (pageHeight -
-              (pdfHFWMSettings.wmHeight - pdfHFWMSettings.wmyOffSet)) /
-              pdfHFWMSettings.pageHalf,
-            pdfHFWMSettings.wmWidth,
-            pdfHFWMSettings.wmHeight,
-            "",
-            "FAST"
-          );
-          pdf.setGState(new pdf.GState({ opacity: 1 }));
-        }
-
-        pdf.internal.scaleFactor = pdfHFWMSettings.scaleFactor;
-      })
-      .outputPdf("blob")
-      .then((pdf) => {
-        setPdfBlob(pdf);
-        const pdfBlobUrl = URL.createObjectURL(pdf);
-        setFileUrl(pdfBlobUrl);
-
-        // pdf.save("StyledPDF.pdf");
-      });
-  };
-
   const getInvoiceDetails = async () => {
     if (invoiceId > 0) {
       let isapimethoderr = false;
@@ -175,7 +90,13 @@ const ViewInvoice = () => {
             }).then(async (presponse) => {
               let objPResponse = presponse.data;
               if (objPResponse.StatusCode === 200) {
-                generatePDF(objPResponse.Data, objResponse.Data);
+                generateInvoicePDF(
+                  objPResponse.Data,
+                  objResponse.Data,
+                  "Invoice",
+                  setPdfBlob,
+                  setFileUrl
+                );
               } else {
                 isapimethoderr = true;
               }

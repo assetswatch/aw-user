@@ -34,7 +34,7 @@ const ResetPassword = () => {
       checkEmptyVal(decId) ||
       checkEmptyVal(encKey) ||
       !moment.unix(expiryDate).isValid() ||
-      moment().utc().unix() > expiryDate ||
+      moment().utc().unix() < expiryDate ||
       decaccid == 0
     );
   };

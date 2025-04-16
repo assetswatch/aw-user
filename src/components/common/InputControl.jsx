@@ -88,6 +88,18 @@ const InputControl = ({
         formErrors[name] = rex.required;
       }
       break;
+    case formCtrlTypes.brandingheader:
+      rex = Regex.brandingheader;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      break;
+    case formCtrlTypes.brandingfooter:
+      rex = Regex.brandingfooter;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      break;
     case formCtrlTypes.paymentsubaccountfname:
       rex = Regex.paymentsubaccountfname;
       if (required && checkEmptyVal(value)) {

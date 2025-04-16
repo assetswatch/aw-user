@@ -42,6 +42,7 @@ export const routeNames = {
   },
   profiles: { name: "Profiles", path: "/User/Profiles" },
   settings: { name: "Settings", path: "/User/Settings" },
+  branding: { name: "Branding", path: "/User/Branding" },
   upgradeplan: { name: "UpgradePlan", path: "/User/UpgradePlan" },
   ownerproperties: { name: "OwnerProperties", path: "/User/Owners/Properties" },
   ownerlistedproperties: {
@@ -376,6 +377,13 @@ const routes = [
     path: routeNames.settings.path,
     name: routeNames.settings.name,
     element: lazy(() => import("../pages/User/Settings")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.branding.path,
+    name: routeNames.branding.name,
+    element: lazy(() => import("../pages/User/Branding")),
     isexact: true,
     isprotected: true,
   },

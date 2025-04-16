@@ -8873,8 +8873,16 @@
   content: "\F055";
 }
 
+.mdi-arrow-right:before {
+  content: "\F054";
+}
+
 .mdi-arrow-left-bold:before {
   content: "\F04e";
+}
+
+.mdi-arrow-left:before {
+  content: "\F04d";
 }
 
 .mdi-arrow-right-bold-circle:before {

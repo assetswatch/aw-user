@@ -74,6 +74,11 @@ const GridActionMenu = ({ row, actions }) => {
                       <i
                         className={`fa fa-credit-card pe-2 text-general ${a["icssclass"]}`}
                       />
+                    ) : a["text"].toLowerCase().indexOf("mark as paid") !=
+                      -1 ? (
+                      <i
+                        className={`fa fa-check-circle pe-2 text-general ${a["icssclass"]}`}
+                      />
                     ) : (
                       ""
                     )}
@@ -94,7 +99,7 @@ export const GridDocActionMenu = ({ row, actions }) => {
   //   actions = actions.filter((item) => item.text.toLowerCase() !== "view");
   // }
   if (row.original.IsFolder == 0 || checkEmptyVal(row.original["IsFolder"])) {
-    actions = actions.filter((item) => item.text.toLowerCase() !== "edit");
+    // actions = actions.filter((item) => item.text.toLowerCase() !== "edit");
   }
   if (
     row.original.SharedType?.toString().toLowerCase() == config.sharedTypes.Sent
@@ -171,6 +176,10 @@ export const GridDocActionMenu = ({ row, actions }) => {
                     ) : a["text"].toLowerCase().indexOf("pay") != -1 ? (
                       <i
                         className={`fa fa-credit-card pe-2 text-general ${a["icssclass"]}`}
+                      />
+                    ) : a["text"].toLowerCase().indexOf("rename") != -1 ? (
+                      <i
+                        className={`fa fa-file-pen pe-2 text-general font-15 ${a["icssclass"]}`}
                       />
                     ) : (
                       ""
