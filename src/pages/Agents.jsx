@@ -10,7 +10,12 @@ import {
   GridDefaultValues,
   SessionStorageKeys,
 } from "../utils/constants";
-import { aesCtrEncrypt, apiReqResLoader, checkEmptyVal } from "../utils/common";
+import {
+  aesCtrEncrypt,
+  apiReqResLoader,
+  checkEmptyVal,
+  getCityStateCountryZipFormat,
+} from "../utils/common";
 import { axiosPost } from "../helpers/axiosHelper";
 import config from "../config.json";
 import { GridList, LazyImage } from "../components/common/LazyComponents";
@@ -191,7 +196,7 @@ const Agents = () => {
                   </div>
                 </div>
                 <div className="property_text p-10 pb-0 border-top shadow rounded">
-                  <h5 className="listing-title">
+                  <h5 className="listing-title text-primary">
                     <Link
                       onClick={(e) => onAgentDetails(e, row.original.ProfileId)}
                       className="text-primary font-16"
@@ -208,6 +213,7 @@ const Agents = () => {
                       {checkEmptyVal(row.original.AddressOne)
                         ? "--"
                         : row.original.AddressOne}
+                      {/* {getCityStateCountryZipFormat(row.original)} */}
                     </li>
                   </ul>
                   <ul className="d-flex font-general flex-sb">
@@ -290,7 +296,7 @@ const Agents = () => {
                 <PropertySearch></PropertySearch>
                 {/*============== Recent Property Widget Start ==============*/}
                 <div className="widget property_carousel_widget box-shadow rounded pb-20">
-                  <h5 className="mb-30 down-line pb-10">Recent Properties</h5>
+                  <h6 className="mb-30 down-line pb-10">Recent Properties</h6>
                   <div
                     className="topprop-carusel owl-carousel nav-disable owl-loaded owl-drag"
                     ref={topAssetsRef}
@@ -355,7 +361,8 @@ const Agents = () => {
                                   </span> */}
                                   <ul className="d-flex font-general my-10 flex-sb">
                                     <li className="flex-start pr-20 listing-location mb-1">
-                                      {a.City}, {a.State}, {a.CountryShortName}
+                                      {getCityStateCountryZipFormat(a)}
+                                      {/* {a.City}, {a.State}, {a.CountryShortName} */}
                                     </li>
                                     <li className="flex-end listing-price font-15 font-500 mb-1">
                                       {a.PriceDisplay}
@@ -401,9 +408,9 @@ const Agents = () => {
                 {/*============== Recent Property Widget End ==============*/}
                 {/*============== Agents Widget Start ==============*/}
                 <div className="widget widget_recent_property box-shadow rounded pb-20">
-                  <h5 className="text-secondary mb-4 down-line pb-10">
+                  <h6 className="text-secondary mb-4 down-line pb-10">
                     Listed Agents
-                  </h5>
+                  </h6>
                   <ul>
                     {topAgentsList?.length > 0 && (
                       <>
@@ -420,7 +427,7 @@ const Agents = () => {
                                 placeHolderClass="min-h-80 w-80px"
                                 onClick={(e) => onAgentDetails(e, a.ProfileId)}
                               />
-                              <div className="thumb-body">
+                              <div className="thumb-body w-100">
                                 <h5 className="listing-title">
                                   <a
                                     onClick={(e) =>

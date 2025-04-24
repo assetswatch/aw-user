@@ -131,6 +131,7 @@ export const GridDefaultValues = {
   ps: 10,
   ps5: 5,
   ps3: 3,
+  ps12: 12,
 };
 /*Grid default values*/
 
@@ -173,6 +174,7 @@ export const AppMessages = {
   NoProfiles: "No profiles found...",
   NoProfileTypes: "No profile types found...",
   NoProperties: "No properties found...",
+  NoListedProperties: "No listed properties found...",
   NoInvoices: "No invoices found...",
   NoAccounts: "No accounts found...",
   AccountDetailsNotFound: "Account details not found...",
@@ -293,6 +295,7 @@ export const AppMessages = {
   MarkasPaidConfirmationTitle: "Mark inovice as paid?",
   MarkasPaidConfirmationMessage:
     "Invoice #{invoicenumber} will be marked as paid. This action cannot be undone. Proceed?",
+  NoTestimonials: "No testimonials found...",
 };
 /*Common App messages*/
 
@@ -441,6 +444,7 @@ export let ApiUrls = {
   getDdlSupportTypes: `common/v1/GetDdlSupportTypes`,
   getAppConfig: `common/v1/GetAppConfig`,
   createSupportTicket: `common/v1/CreateSupportTicket`,
+  getSupportTickets: `common/v1/GetSupportTickets`,
   getProfileTypes: `users/v1/GetProfileTypes`,
   getProfileCategories: `users/v1/GetProfileCategories`,
   sendUserEnquiry: `users/v1/SendUserEnquiry`,

@@ -8,6 +8,7 @@ import {
   apiReqResLoader,
   checkEmptyVal,
   checkObjNullorEmpty,
+  getCityStateCountryZipFormat,
   GetUserCookieValues,
 } from "../utils/common";
 import {
@@ -423,17 +424,17 @@ const Property = () => {
               <PropertySearch />
               {/*============== Recent Property Widget Start ==============*/}
               <div className="widget widget_recent_property rounded box-shadow pb-20">
-                <h5 className="text-secondary mb-4 down-line pb-10">
+                <h6 className="text-secondary mb-4 down-line pb-10">
                   Recent Properties
-                </h5>
+                </h6>
                 <ul>
                   {topAssetsList?.length > 0 && (
                     <>
                       {topAssetsList?.map((a, i) => {
                         return (
                           <li
-                            className={`v-center ${
-                              i == 0 ? "" : "border-top pt-3"
+                            className={`v-c enter ${
+                              i == 0 ? "" : "border-top pt-4"
                             }`}
                             key={`tassets-key-${i}`}
                           >
@@ -446,8 +447,8 @@ const Property = () => {
                                 placeHolderClass="min-h-80 w-80px"
                               />
                             </Link>
-                            <div className="thumb-body">
-                              <h5 className="listing-title mb-0">
+                            <div className="thumb-body w-100">
+                              <h5 className="listing-title text-primary mb-0">
                                 <Link
                                   onClick={(e) =>
                                     onPropertyDetails(e, a.AssetId)
@@ -469,7 +470,8 @@ const Property = () => {
                               </div> */}
                               <ul className="d-flex quantity font-general my-1 flex-sb">
                                 <li className="flex-start pr-20 listing-location mb-1">
-                                  {a.City}, {a.State}, {a.CountryShortName}
+                                  {getCityStateCountryZipFormat(a)}
+                                  {/* {a.City}, {a.State}, {a.CountryShortName} */}
                                 </li>
                                 <li className="flex-end listing-price font-15 font-500 mb-1">
                                   {a.PriceDisplay}
@@ -584,16 +586,21 @@ const Property = () => {
                             <span>{assetDetails.AssetType}</span>
                           </a>
                         </div>
-                        <h6 className="listing-title my-10 text-primary">
+                        <h6 className="listing-title mt-10 mb-0 text-primary">
                           <i className="fas fa-map-marker-alt text-primary" />{" "}
                           {assetDetails.AddressOne}
-                          {checkEmptyVal(assetDetails.AddressTwo)
-                            ? ""
-                            : `, ${assetDetails.AddressTwo}`}
                         </h6>
-                        <span className="listing-location d-block">
-                          {assetDetails.City}, {assetDetails.State},{" "}
-                          {assetDetails.CountryShortName}
+                        {!checkEmptyVal(assetDetails.AddressTwo) && (
+                          <>
+                            <span className="listing-location d-block pl-20">
+                              {assetDetails.AddressTwo}
+                            </span>
+                          </>
+                        )}
+                        <span className="listing-location d-block pl-20">
+                          {getCityStateCountryZipFormat(assetDetails)}
+                          {/* {assetDetails.City}, {assetDetails.State},{" "}
+                          {assetDetails.CountryShortName} */}
                         </span>
                       </div>
                       <div className="col-auto ms-auto xs-m-0 text-end xs-text-start pb-4">
@@ -644,6 +651,38 @@ const Property = () => {
                       <div className="col">
                         <h5 className="mb-3">Description</h5>
                         <p>{assetDetails.Description}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="property-overview border rounded bg-white p-30 mb-30 box-shadow">
+                    <div className="row row-cols-1">
+                      <div className="entry-wrapper">
+                        {/* Location Map */}
+                        <h6 className="mb-4 down-line pb-10">Geo Location</h6>
+                        <p className="rounded">
+                          <iframe
+                            title="locationmap"
+                            src={`https://www.google.com/maps?q=${
+                              encodeURIComponent(assetDetails?.AddressOne) +
+                              encodeURIComponent(
+                                !checkEmptyVal(assetDetails?.AddressTwo)
+                                  ? `, ${assetDetails.AddressTwo}`
+                                  : ", "
+                              ) +
+                              encodeURIComponent(
+                                getCityStateCountryZipFormat(assetDetails, true)
+                              )
+                            }
+                            &output=embed`}
+                            width="100%"
+                            height="300"
+                            style={{ border: "0" }}
+                            allowFullScreen
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            className="rounded"
+                          ></iframe>
+                        </p>
                       </div>
                     </div>
                   </div>

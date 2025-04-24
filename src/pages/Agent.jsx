@@ -7,6 +7,7 @@ import {
   apiReqResLoader,
   checkEmptyVal,
   checkObjNullorEmpty,
+  getCityStateCountryZipFormat,
   GetUserCookieValues,
 } from "../utils/common";
 import {
@@ -27,6 +28,7 @@ import { formCtrlTypes } from "../utils/formvalidation";
 import TextAreaControl from "../components/common/TextAreaControl";
 import { useAuth } from "../contexts/AuthContext";
 import { Toast } from "../components/common/ToastView";
+import PropertiesList from "../components/common/PropertiesList";
 
 const Agent = () => {
   let $ = window.$;
@@ -180,6 +182,7 @@ const Agent = () => {
 
   const onAgentDetails = (e, profileId) => {
     e.preventDefault();
+    setAgentDetails(null);
     aesCtrEncrypt(profileId.toString()).then((encId) => {
       navigate(routeNames.agent.path.replace(":id", encId), {
         state: { timestamp: Date.now() },
@@ -352,8 +355,15 @@ const Agent = () => {
                         <li className="col-xl-7 col-md-12">
                           <span className="font-500">Address: </span>
                           {"  "}
-                          {agentDetails?.AddressOne}, {agentDetails?.City},{" "}
-                          {agentDetails?.State}, {agentDetails?.Country}.
+                          <div className="d-inlinegrid">
+                            {agentDetails?.AddressOne}
+                            {agentDetails?.AddressTwo
+                              ? `, ${agentDetails.AddressTwo}`
+                              : ""}
+                            <span className="d-block">
+                              {getCityStateCountryZipFormat(agentDetails)}
+                            </span>
+                          </div>
                         </li>
                         <li className="col-xl-5 col-md-12 text-xl-end">
                           <span className="font-500">Website: </span>
@@ -375,7 +385,7 @@ const Agent = () => {
               <div className="widget widget_send_message mb-30 box-shadow rounded">
                 <h6 className="mb-4 text-primary mb-15">
                   {!isDataLoading &&
-                    agentDetails?.FirstName + " " + agentDetails.LastName}
+                    agentDetails?.FirstName + " " + agentDetails?.LastName}
                 </h6>
                 <form
                   className="quick-search form-icon-right"
@@ -463,17 +473,17 @@ const Agent = () => {
               </div>
               {/*============== Recent Property Widget Start ==============*/}
               <div className="widget widget_recent_property rounded box-shadow pb-20">
-                <h5 className="text-secondary mb-4 down-line pb-10">
+                <h6 className="text-secondary mb-4 down-line pb-10">
                   Recent Properties
-                </h5>
+                </h6>
                 <ul>
                   {topAssetsList?.length > 0 && (
                     <>
                       {topAssetsList?.map((a, i) => {
                         return (
                           <li
-                            className={`v-center ${
-                              i == 0 ? "" : "border-top pt-3"
+                            className={`v-c enter ${
+                              i == 0 ? "" : "border-top pt-4"
                             }`}
                             key={`tassets-key-${i}`}
                           >
@@ -486,8 +496,8 @@ const Agent = () => {
                                 placeHolderClass="min-h-80 w-80px"
                               />
                             </Link>
-                            <div className="thumb-body">
-                              <h5 className="listing-title mb-0">
+                            <div className="thumb-body w-100">
+                              <h5 className="listing-title text-primary mb-0">
                                 <Link
                                   onClick={(e) =>
                                     onPropertyDetails(e, a.AssetId)
@@ -509,7 +519,8 @@ const Agent = () => {
                                             </div> */}
                               <ul className="d-flex quantity font-general my-1 flex-sb">
                                 <li className="flex-start pr-20 listing-location mb-1">
-                                  {a.City}, {a.State}, {a.CountryShortName}
+                                  {getCityStateCountryZipFormat(a)}
+                                  {/* {a.City}, {a.State}, {a.CountryShortName} */}
                                 </li>
                                 <li className="flex-end listing-price font-15 font-500 mb-1">
                                   {a.PriceDisplay}
@@ -554,9 +565,9 @@ const Agent = () => {
               {/*============== Recent Property Widget End ==============*/}
               {/*============== Agents Widget Start ==============*/}
               <div className="widget widget_recent_property box-shadow rounded pb-20">
-                <h5 className="text-secondary mb-4 down-line pb-10">
+                <h6 className="text-secondary mb-4 down-line pb-10">
                   Listed Agents
-                </h5>
+                </h6>
                 <ul>
                   {topAgentsList?.length > 0 && (
                     <>
@@ -573,7 +584,7 @@ const Agent = () => {
                               placeHolderClass="min-h-80 w-80px"
                               onClick={(e) => onAgentDetails(e, a.ProfileId)}
                             />
-                            <div className="thumb-body">
+                            <div className="thumb-body w-100">
                               <h5 className="listing-title">
                                 <a
                                   onClick={(e) =>
@@ -613,11 +624,21 @@ const Agent = () => {
             <div className="col-xl-8 order-xl-1">
               <div className="entry-wrapper">
                 {/* Agent Overview */}
-                <div className="agent-overview p-30 bg-white mb-50 border px-0 box-shadow rounded">
+                <div className="agent-overview p-30 bg-white mb-30 border px-0 box-shadow rounded">
                   <h6 className="mb-4 text-primary">Agent Overview</h6>
                   <p> {!isDataLoading && agentDetails?.AboutUs}</p>
                 </div>
               </div>
+              {/* Agent listed properties */}
+              {!checkObjNullorEmpty(agentDetails) && (
+                <div className="entry-wrapper">
+                  <PropertiesList
+                    listedByProfileId={agentDetails?.ProfileId}
+                    isShowNoData={false}
+                  />
+                </div>
+              )}
+              {/* Agent listed properties */}
             </div>
           </div>
         </div>

@@ -7,6 +7,7 @@ export const routeNames = {
   howItWorks: { name: "HowItWorks", path: "/HowItWorks" },
   plans: { name: "Plans", path: "/Plans" },
   blog: { name: "Blog", path: "/Blog" },
+  testimonials: { name: "Testimonials", path: "/Testimonials" },
   privacyPolicy: { name: "PrivacyPolicy", path: "/PrivacyPolicy" },
   terms: { name: "Terms", path: "/Terms" },
   contactUs: { name: "ContactUs", path: "/ContactUs" },
@@ -284,6 +285,12 @@ const routes = [
     path: routeNames.blog.path,
     name: routeNames.blog.name,
     element: lazy(() => import("../pages/Blog")),
+    isexact: true,
+  },
+  {
+    path: routeNames.testimonials.path,
+    name: routeNames.testimonials.name,
+    element: lazy(() => import("../pages/Testimonials")),
     isexact: true,
   },
   {

@@ -9,6 +9,7 @@ import {
   setSelectDefaultVal,
   SetAccordion,
   showHideCtrl,
+  checkEmptyVal,
 } from "../../utils/common";
 import {
   API_ACTION_STATUS,
@@ -58,7 +59,6 @@ const Settings = () => {
   const [showdivcustombranding, setShowdivcustombranding] = useState(false);
 
   function setInitFormData(bdetails) {
-    console.log(bdetails);
     return {
       txtheader: bdetails ? (bdetails.Id > 0 ? bdetails.Header : "") : "",
       txtfooter: bdetails ? (bdetails.Id > 0 ? bdetails.Footer : "") : "",
@@ -243,7 +243,14 @@ const Settings = () => {
       setErrors({});
       let isapimethoderr = false;
       let objBodyParams = new FormData();
-      objBodyParams.append("Id", brandingDetails ? brandingDetails.Id : 0);
+      objBodyParams.append(
+        "Id",
+        brandingDetails
+          ? checkEmptyVal(brandingDetails.Id)
+            ? 0
+            : brandingDetails.Id
+          : 0
+      );
       objBodyParams.append("AccountId", accountId);
       objBodyParams.append("ProfileId", profileId);
 
@@ -583,10 +590,10 @@ const Settings = () => {
 
                       <div className="row form-action flex-center mx-0">
                         <div
-                          className="col-md-4 px-0 form-error"
+                          className="col-md-6 px-0 form-error"
                           id="form-error"
                         ></div>
-                        <div className="col-md-8 px-0">
+                        <div className="col-md-6 px-0">
                           <button
                             className="btn btn-secondary"
                             id="btnCancelEdit"

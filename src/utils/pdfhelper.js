@@ -1,6 +1,28 @@
 import { checkEmptyVal, convertImageToBase64 } from "./common";
 import { pdfHFWMSettings, html2PdfSettings } from "./constants";
 import html2pdf from "html2pdf.js";
+import config from "../config.json";
+
+export function checkUserBranding(brandingDetails) {
+  if (brandingDetails?.Id == 0) {
+    return true;
+  } else if (
+    brandingDetails?.Id > 0 &&
+    brandingDetails?.IsBrandingEnabled == 1 &&
+    (brandingDetails?.BrandingTypeId ==
+      config.UserBrandingTypes.Custom_Branding ||
+      brandingDetails?.BrandingTypeId ==
+        config.UserBrandingTypes.Default_Branding)
+  ) {
+    if (brandingDetails != null) {
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return false;
+  }
+}
 
 export const generateInvoiceDownloadPDF = async (
   pdfDetails,
@@ -33,6 +55,7 @@ export const generateInvoiceDownloadPDF = async (
     .toPdf()
     .get("pdf")
     .then((pdf) => {
+      const userBranding = checkUserBranding(pdfDetails?.BrandingDetails);
       const totalPages = pdf.internal.getNumberOfPages();
       const pageHeight = pdf.internal.pageSize.height;
       const pageWidth = pdf.internal.pageSize.width;
@@ -59,10 +82,7 @@ export const generateInvoiceDownloadPDF = async (
           pdfHFWMSettings.fFontColor.b
         );
 
-        if (
-          pdfDetails.BrandingDetails.IsBrandingEnabled == 1 &&
-          pdfDetails.BrandingDetails.Id > 0
-        ) {
+        if (userBranding) {
           pdf.text(
             pdfDetails?.BrandingDetails?.Header,
             pageWidth / pdfHFWMSettings.pageHalf,
@@ -85,11 +105,7 @@ export const generateInvoiceDownloadPDF = async (
           pdfHFWMSettings.fRight
         );
 
-        if (
-          !checkEmptyVal(base64Watermark) &&
-          pdfDetails.BrandingDetails.IsBrandingEnabled == 1 &&
-          pdfDetails.BrandingDetails.Id > 0
-        ) {
+        if (!checkEmptyVal(base64Watermark) && userBranding) {
           pdf.setGState(new pdf.GState(pdfHFWMSettings.wmOpacity));
           pdf.addImage(
             base64Watermark,
@@ -145,6 +161,7 @@ export const generateInvoicePDF = async (
     .toPdf()
     .get("pdf")
     .then((pdf) => {
+      const userBranding = checkUserBranding(pdfDetails?.BrandingDetails);
       const totalPages = pdf.internal.getNumberOfPages();
       const pageHeight = pdf.internal.pageSize.height;
       const pageWidth = pdf.internal.pageSize.width;
@@ -171,10 +188,7 @@ export const generateInvoicePDF = async (
           pdfHFWMSettings.fFontColor.b
         );
 
-        if (
-          pdfDetails.BrandingDetails.IsBrandingEnabled == 1 &&
-          pdfDetails.BrandingDetails.Id > 0
-        ) {
+        if (userBranding) {
           pdf.text(
             pdfDetails?.BrandingDetails?.Header,
             pageWidth / pdfHFWMSettings.pageHalf,
@@ -197,11 +211,7 @@ export const generateInvoicePDF = async (
           pdfHFWMSettings.fRight
         );
 
-        if (
-          !checkEmptyVal(base64Watermark) &&
-          pdfDetails.BrandingDetails.IsBrandingEnabled == 1 &&
-          pdfDetails.BrandingDetails.Id > 0
-        ) {
+        if (!checkEmptyVal(base64Watermark) && userBranding) {
           pdf.setGState(new pdf.GState(pdfHFWMSettings.wmOpacity));
           pdf.addImage(
             base64Watermark,

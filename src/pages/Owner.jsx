@@ -7,6 +7,7 @@ import {
   apiReqResLoader,
   checkEmptyVal,
   checkObjNullorEmpty,
+  getCityStateCountryZipFormat,
   GetUserCookieValues,
 } from "../utils/common";
 import {
@@ -27,6 +28,7 @@ import { formCtrlTypes } from "../utils/formvalidation";
 import TextAreaControl from "../components/common/TextAreaControl";
 import { useAuth } from "../contexts/AuthContext";
 import { Toast } from "../components/common/ToastView";
+import PropertiesList from "../components/common/PropertiesList";
 
 const Owner = () => {
   let $ = window.$;
@@ -348,8 +350,15 @@ const Owner = () => {
                         <li className="col-xl-7 col-md-12">
                           <span className="font-500">Address: </span>
                           {"  "}
-                          {ownerDetails?.AddressOne}, {ownerDetails?.City},{" "}
-                          {ownerDetails?.State}, {ownerDetails?.Country}.
+                          <div className="d-inlinegrid">
+                            {ownerDetails?.AddressOne}
+                            {ownerDetails?.AddressTwo
+                              ? `, ${ownerDetails.AddressTwo}`
+                              : ""}
+                            <span className="d-block">
+                              {getCityStateCountryZipFormat(ownerDetails)}
+                            </span>
+                          </div>
                         </li>
                         <li className="col-xl-5 col-md-12 text-xl-end">
                           <span className="font-500">Website: </span>
@@ -459,17 +468,17 @@ const Owner = () => {
               </div>
               {/*============== Recent Property Widget Start ==============*/}
               <div className="widget widget_recent_property rounded box-shadow pb-20">
-                <h5 className="text-secondary mb-4 down-line pb-10">
+                <h6 className="text-secondary mb-4 down-line pb-10">
                   Recent Properties
-                </h5>
+                </h6>
                 <ul>
                   {topAssetsList?.length > 0 && (
                     <>
                       {topAssetsList?.map((a, i) => {
                         return (
                           <li
-                            className={`v-center ${
-                              i == 0 ? "" : "border-top pt-3"
+                            className={`v-c enter ${
+                              i == 0 ? "" : "border-top pt-4"
                             }`}
                             key={`tassets-key-${i}`}
                           >
@@ -482,8 +491,8 @@ const Owner = () => {
                                 placeHolderClass="min-h-80 w-80px"
                               />
                             </Link>
-                            <div className="thumb-body">
-                              <h5 className="listing-title mb-0">
+                            <div className="thumb-body w-100">
+                              <h5 className="listing-title text-primary mb-0">
                                 <Link
                                   onClick={(e) =>
                                     onPropertyDetails(e, a.AssetId)
@@ -505,7 +514,8 @@ const Owner = () => {
                                             </div> */}
                               <ul className="d-flex quantity font-general my-1 flex-sb">
                                 <li className="flex-start pr-20 listing-location mb-1">
-                                  {a.City}, {a.State}, {a.CountryShortName}
+                                  {getCityStateCountryZipFormat(a)}
+                                  {/* {a.City}, {a.State}, {a.CountryShortName} */}
                                 </li>
                                 <li className="flex-end listing-price font-15 font-500 mb-1">
                                   {a.PriceDisplay}
@@ -550,9 +560,9 @@ const Owner = () => {
               {/*============== Recent Property Widget End ==============*/}
               {/*============== Agents Widget Start ==============*/}
               <div className="widget widget_recent_property box-shadow rounded pb-20">
-                <h5 className="text-secondary mb-4 down-line pb-10">
+                <h6 className="text-secondary mb-4 down-line pb-10">
                   Listed Agents
-                </h5>
+                </h6>
                 <ul>
                   {topAgentsList?.length > 0 && (
                     <>
@@ -569,7 +579,7 @@ const Owner = () => {
                               placeHolderClass="min-h-80 w-80px"
                               onClick={(e) => onownerDetails(e, a.ProfileId)}
                             />
-                            <div className="thumb-body">
+                            <div className="thumb-body w-100">
                               <h5 className="listing-title">
                                 <a
                                   onClick={(e) =>
@@ -614,6 +624,16 @@ const Owner = () => {
                   <p> {!isDataLoading && ownerDetails?.AboutUs}</p>
                 </div>
               </div>
+              {/* Owner listed properties */}
+              {!checkObjNullorEmpty(ownerDetails) && (
+                <div className="entry-wrapper">
+                  <PropertiesList
+                    listedByProfileId={ownerDetails?.ProfileId}
+                    isShowNoData={false}
+                  />
+                </div>
+              )}
+              {/* Owner listed properties */}
             </div>
           </div>
         </div>

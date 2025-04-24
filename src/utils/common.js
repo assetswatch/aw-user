@@ -176,6 +176,9 @@ export function SetPageLoaderNavLinks() {
         case "blog":
           path = "blog";
           break;
+        case "testimonials":
+          path = "testimonials";
+          break;
         case "howitworks":
           path = "howitworks";
           break;
@@ -811,4 +814,15 @@ export function UrlWithoutParam(page) {
 
 export function getKeyByValue(obj, value) {
   return Object.entries(obj).find(([key, val]) => val === value)?.[0];
+}
+
+export function getCityStateCountryZipFormat(objData, isSeperator = true) {
+  const parts = [
+    objData?.City || "",
+    objData?.StateShortName || objData?.State || "",
+    objData?.CountryShortName || objData?.Country || "",
+    objData?.Zip || "",
+  ].filter(Boolean);
+  const result = isSeperator ? parts.join(", ") : parts.join(" ").trim();
+  return result ? `${result}.` : "";
 }

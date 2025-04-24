@@ -4,7 +4,9 @@ import { routeNames } from "../routes/routes";
 import { Link, useNavigate } from "react-router-dom";
 import {
   aesCtrEncrypt,
-  Base62NumberToAlpha,
+  apiReqResLoader,
+  checkEmptyVal,
+  getCityStateCountryZipFormat,
   SetPageLoaderNavLinks,
 } from "../utils/common";
 import { useGetTopAssetsGateWay } from "../hooks/useGetTopAssetsGateWay";
@@ -13,6 +15,9 @@ import Rating from "../components/common/Rating";
 import LazyImage from "../components/common/LazyImage";
 import config from "../config.json";
 import PropertySearch from "../components/layouts/PropertySearch";
+import { API_ACTION_STATUS, ApiUrls, AppMessages } from "../utils/constants";
+import { axiosPost } from "../helpers/axiosHelper";
+import { DataLoader, NoData } from "../components/common/LazyComponents";
 
 const Home = () => {
   let $ = window.$;
@@ -29,17 +34,39 @@ const Home = () => {
     },
   ];
 
-  const { topAssetsList } = useGetTopAssetsGateWay("recent", 8);
+  const propertyFilters = [
+    {
+      All: 0,
+      House: 2,
+      Office: 3,
+      Apartment: 1,
+      Townhome: 6,
+      Condo: 7,
+      Land: 8,
+    },
+  ];
+
+  //const { topAssetsList } = useGetTopAssetsGateWay("recent", 8);
+  const [topAssetsList, setTopAssetsList] = useState([]);
+  const [isTopAssetsLoading, setIsTopAssetsLoading] = useState(true);
+  const [selectedPropertyFilter, setSelectedPropertyFilter] = useState(
+    propertyFilters[0].All
+  );
   const topAssetsRef = useRef(null);
 
   const { topAgentsList } = useGetTopAgentsGateWay("listed", 10);
   const topAgentsRef = useRef(null);
+
+  const [testimonials, setTestimonials] = useState([]);
+  const testimonialsRef = useRef(null);
 
   useLayoutEffect(() => {
     //load js/css depedency files.
     let arrLoadFiles = getArrLoadFiles(arrJsCssFiles);
     let promiseLoadFiles = arrLoadFiles.map(loadFile);
     Promise.allSettled(promiseLoadFiles).then(function (responses) {
+      getTopAssets();
+      getTestimonials();
       loadSettings();
     });
 
@@ -100,6 +127,19 @@ const Home = () => {
     };
   }, [topAgentsList]);
 
+  useEffect(() => {
+    if (testimonials.length > 0) {
+      setCarousel($(testimonialsRef.current), true);
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if ($(testimonialsRef.current).hasClass("owl-loaded")) {
+        $(testimonialsRef.current).trigger("destroy.owl.carousel");
+      }
+    };
+  }, [testimonials]);
+
   //load all jquery dependencies.
   function loadSettings() {
     try {
@@ -124,41 +164,39 @@ const Home = () => {
         height: 600,
         skinsPath: "assets/skins/",
       });
-
-      // Testimonials carousel
-      if ($(".testimonial-carousel").length) {
-        $(".testimonial-carousel")?.owlCarousel({
-          loop: true,
-          margin: 30,
-          nav: false,
-          dots: true,
-          smartSpeed: 500,
-          autoplay: true,
-          responsive: {
-            0: {
-              items: 1,
-            },
-            480: {
-              items: 1,
-            },
-            600: {
-              items: 1,
-            },
-            800: {
-              items: 1,
-            },
-            1200: {
-              items: 1,
-            },
-          },
-        });
-      }
     } catch (e) {
       console.error(e.message);
     }
   }
 
-  function setCarousel(elem) {
+  function setCarousel(elem, istestimonials = false) {
+    try {
+      elem?.owlCarousel({
+        loop: false,
+        margin: 24,
+        nav: istestimonials ? false : true,
+        dots: true,
+        smartSpeed: 500,
+        autoplay: false,
+        responsive: {
+          0: {
+            items: 1,
+          },
+          576: {
+            items: istestimonials ? 1 : 2,
+          },
+          992: {
+            items: istestimonials ? 1 : 2,
+          },
+          1200: {
+            items: istestimonials ? 1 : 3,
+          },
+          1400: {
+            items: istestimonials ? 1 : 4,
+          },
+        },
+      });
+    } catch {}
     try {
       elem?.owlCarousel({
         loop: false,
@@ -188,6 +226,59 @@ const Home = () => {
     } catch {}
   }
 
+  const getTopAssets = (assetTypeId = 0, showLoader = false) => {
+    setIsTopAssetsLoading(true);
+    // if (showLoader) {
+    //   apiReqResLoader("x");
+    // }
+    return axiosPost(`${config.apiBaseUrl}${ApiUrls.getTopAssets}`, {
+      FeatureType: "recent",
+      AssetTypeId: assetTypeId,
+      Count: 12,
+    })
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode == 200) {
+          setTopAssetsList(objResponse?.Data);
+          $(topAssetsRef.current).css("display", "block");
+        } else {
+          setTopAssetsList([]);
+        }
+      })
+      .catch((err) => {
+        console.error(`"API :: ${ApiUrls.getTopAssets}, Error ::" ${err}`);
+        setTopAssetsList([]);
+      })
+      .finally(() => {
+        // if (showLoader) {
+        //   apiReqResLoader("x", "x", API_ACTION_STATUS.COMPLETED);
+        // }
+        setIsTopAssetsLoading(false);
+      });
+  };
+
+  const getTestimonials = () => {
+    return axiosPost(`${config.apiBaseUrl}${ApiUrls.getSupportTickets}`, {
+      SupportTypeId: 3, //testimonials
+      Status: 1,
+      Pi: 0,
+      Ps: 5,
+    })
+      .then((response) => {
+        let objResponse = response.data;
+        if (objResponse.StatusCode == 200) {
+          setTestimonials(objResponse?.Data?.SupportTickets);
+        } else {
+          setTestimonials([]);
+        }
+      })
+      .catch((err) => {
+        console.error(`"API :: ${ApiUrls.getSupportTickets}, Error ::" ${err}`);
+        setTestimonials([]);
+      })
+      .finally(() => {});
+  };
+
   const onPropertyDetails = (e, assetId) => {
     e.preventDefault();
     aesCtrEncrypt(assetId.toString()).then((encId) => {
@@ -213,6 +304,19 @@ const Home = () => {
         navigate(routeNames.owner.path.replace(":id", encId));
       });
     }
+  };
+
+  const onPropertyFilter = (e, assetTypeId) => {
+    e.preventDefault();
+    setSelectedPropertyFilter(assetTypeId);
+    if ($(topAssetsRef.current).hasClass("owl-loaded")) {
+      $(topAssetsRef.current).css("display", "none");
+      $(topAssetsRef.current).trigger("destroy.owl.carousel");
+      $(topAssetsRef.current).removeClass("owl-loaded owl-hidden");
+      $(topAssetsRef.current).find(".owl-stage-outer").children().unwrap();
+      $(topAssetsRef.current).removeData();
+    }
+    getTopAssets(assetTypeId, true);
   };
 
   return (
@@ -283,10 +387,10 @@ const Home = () => {
           <div className="row mb-4 align-items-center">
             <div className="col-md-8">
               <div className="me-auto">
-                <h3 className="d-table mb-4 down-line pb-10">
+                <h3 className="d-table mb-1 down-line pb-10">
                   Recent Properties
                 </h3>
-                <span className="d-table sub-title text-primary">
+                <span className="d-table sub-ti tle text-primary sup">
                   Be the First to See Our Latest Properties!
                 </span>
               </div>
@@ -300,146 +404,193 @@ const Home = () => {
                 <i className="fa-solid fa-chevron-right font-mini"></i>
               </Link>
             </div>
+            <div className="col-md-12 pr-0">
+              <div className="mix-tab">
+                <ul className="nav-tab-border-active ms-auto d-table">
+                  {propertyFilters?.map((f, i) => {
+                    return Object.keys(f).map((key, i) => {
+                      return (
+                        <li
+                          key={`rprop-key-${i}`}
+                          className={`mixitup-control
+                            ${
+                              f[key] == selectedPropertyFilter
+                                ? "mixitup-control-active shadow"
+                                : ""
+                            }
+                          `}
+                          onClick={(e) => onPropertyFilter(e, f[key])}
+                        >
+                          {key}
+                        </li>
+                      );
+                    });
+                  })}
+                </ul>
+              </div>
+            </div>
           </div>
           <div className="row">
             <div className="col position-relative">
-              <div
-                className="properties-carousel nav-disable owl-carousel position-static owl-loaded owl-drag"
-                ref={topAssetsRef}
-              >
-                {topAssetsList?.length > 0 && (
-                  <>
-                    {topAssetsList?.map((a, i) => {
-                      return (
-                        <div
-                          className="item"
-                          key={`rprop-key-${i}`}
-                          d-assetid={a.AssetId}
-                        >
-                          <div className="property-grid-1 property-block bg-light transation-this rounded">
-                            <div className="overflow-hidden position-relative transation thumbnail-img hover-img-zoom box-shadow rounded">
-                              <div className="catart position-absolute">
-                                <span className="sale bg-secondary text-white">
-                                  For {a.ListingType}
-                                </span>
-                              </div>
-                              <Link
-                                onClick={(e) => onPropertyDetails(e, a.AssetId)}
-                              >
-                                <LazyImage
-                                  src={a.Images?.[0]?.ImagePath}
-                                  className="img-fit-grid"
-                                  placeHolderClass="min-h-200"
-                                />
-                              </Link>
-                              <Link
-                                onClick={(e) => onPropertyDetails(e, a.AssetId)}
-                                className="listing-ctg text-primary"
-                              >
-                                <i className="fa-solid fa-building" />
-                                <span>{a.AssetType}</span>
-                              </Link>
-                              {/* <ul className="position-absolute quick-meta">
-                                <li>
-                                  <a href="#" title="Add Favourite">
-                                    <i className="flaticon-like-1 flat-mini" />
-                                  </a>
-                                </li>
-                                <li className="md-mx-none">
-                                  <a
-                                    className="quick-view"
-                                    href="#quick-view"
-                                    title="Quick View"
-                                  >
-                                    <i className="flaticon-zoom-increasing-symbol flat-mini" />
-                                  </a>
-                                </li>
-                              </ul> */}
-                            </div>
-                            <div className="property_text p-3 pb-0">
-                              <h5 className="listing-title">
+              {isTopAssetsLoading && (
+                <div className="item min-h-300 d-flex flex-center">
+                  <DataLoader />
+                </div>
+              )}
+              {!isTopAssetsLoading &&
+                (checkEmptyVal(topAssetsList) || topAssetsList.length == 0) && (
+                  <div className="item min-h-300 d-flex flex-center">
+                    <NoData
+                      className="d-table sub-title text-primary"
+                      pos="center"
+                      message={AppMessages.NoProperties}
+                    />
+                  </div>
+                )}
+              {!isTopAssetsLoading &&
+                !checkEmptyVal(topAssetsList) &&
+                topAssetsList.length > 0 && (
+                  <div
+                    className="properties-carousel nav-disable owl-carousel position-static owl-loaded owl-drag min-h-400"
+                    ref={topAssetsRef}
+                  >
+                    <>
+                      {topAssetsList?.map((a, i) => {
+                        return (
+                          <div
+                            className="item"
+                            key={`rprop-key-${a.AssetId}`}
+                            d-assetid={a.AssetId}
+                          >
+                            <div className="property-grid-1 property-block bg-light transation-this rounded">
+                              <div className="overflow-hidden position-relative transation thumbnail-img hover-img-zoom box-shadow rounded">
+                                <div className="catart position-absolute">
+                                  <span className="sale bg-secondary text-white">
+                                    For {a.ListingType}
+                                  </span>
+                                </div>
                                 <Link
                                   onClick={(e) =>
                                     onPropertyDetails(e, a.AssetId)
                                   }
-                                  className="text-primary font-16"
                                 >
-                                  <i className="fas fa-map-marker-alt" />{" "}
-                                  {a.AddressOne}{" "}
-                                  {/* {checkEmptyVal(a.AddressTwo)
-                                    ? ""
-                                    : `, ${a.AddressTwo}`} */}
-                                </Link>
-                              </h5>
-                              {/* <span className="listing-location mb-1">
-                                {a.City}, {a.State}, {a.CountryShortName}
-                              </span>
-                              <span className="listing-price font-15 font-500 mb-1">
-                                {a.PriceDisplay}
-                              </span> */}
-                              <ul className="d-flex font-general mb-10 mt-10 flex-sb">
-                                <li className="flex-start pr-20 listing-location mb-1">
-                                  {a.City}, {a.State}, {a.CountryShortName}
-                                </li>
-                                <li className="flex-end listing-price font-15 font-500 mb-1">
-                                  {a.PriceDisplay}
-                                </li>
-                              </ul>
-                              <ul className="d-flex quantity font-general mb-2 flex-sb">
-                                <li title="Beds">
-                                  <span>
-                                    <i className="fa-solid fa-bed"></i>
-                                  </span>
-                                  {a.Bedrooms}
-                                </li>
-                                <li title="Baths">
-                                  <span>
-                                    <i className="fa-solid fa-shower"></i>
-                                  </span>
-                                  {a.Bathrooms}
-                                </li>
-                                <li title="Area">
-                                  <span>
-                                    <i className="fa-solid fa-vector-square"></i>
-                                  </span>
-                                  {a.AreaDisplay} {a.AreaUnitType}
-                                </li>
-                              </ul>
-                            </div>
-                            <div className="d-flex align-items-center post-meta mt-2 py-3 px-3 border-top shadow">
-                              <div className="agent">
-                                <a
-                                  onClick={(e) => onAssetProfileDetails(e, a)}
-                                  className="d-flex text-general align-items-center lh-18 font-general hovertxt-decnone"
-                                >
-                                  <img
-                                    className="rounded-circle me-1 shadow img-border-white"
-                                    src={a.PicPath}
-                                    alt={a.FirstName}
+                                  <LazyImage
+                                    src={a.Images?.[0]?.ImagePath}
+                                    className="img-fit-grid"
+                                    placeHolderClass="min-h-200"
                                   />
-                                  <span className="font-general">
-                                    {a.FirstName} {a.LastName}
-                                    <br />
-                                    <span className="mt-1 small text-light">
-                                      {a.ListedByProfileType}
-                                    </span>
-                                  </span>
-                                </a>
+                                </Link>
+                                <Link
+                                  onClick={(e) =>
+                                    onPropertyDetails(e, a.AssetId)
+                                  }
+                                  className="listing-ctg text-primary"
+                                >
+                                  <i className="fa-solid fa-building" />
+                                  <span>{a.AssetType}</span>
+                                </Link>
+                                {/* <ul className="position-absolute quick-meta">
+                                            <li>
+                                              <a href="#" title="Add Favourite">
+                                                <i className="flaticon-like-1 flat-mini" />
+                                              </a>
+                                            </li>
+                                            <li className="md-mx-none">
+                                              <a
+                                                className="quick-view"
+                                                href="#quick-view"
+                                                title="Quick View"
+                                              >
+                                                <i className="flaticon-zoom-increasing-symbol flat-mini" />
+                                              </a>
+                                            </li>
+                                          </ul> */}
                               </div>
-                              <div className="post-date ms-auto font-small">
-                                <span>
-                                  <i className="fa fa-clock text-primary me-1"></i>
-                                  {a.PostedDaysDiff}
-                                </span>
+                              <div className="property_text p-3 pb-0">
+                                <h5 className="listing-title text-primary">
+                                  <Link
+                                    onClick={(e) =>
+                                      onPropertyDetails(e, a.AssetId)
+                                    }
+                                    className="text-primary font-16"
+                                  >
+                                    <i className="fas fa-map-marker-alt" />{" "}
+                                    {a.AddressOne}{" "}
+                                    {/* {checkEmptyVal(a.AddressTwo)
+                                                ? ""
+                                                : `, ${a.AddressTwo}`} */}
+                                  </Link>
+                                </h5>
+                                {/* <span className="listing-location mb-1">
+                                            {a.City}, {a.State}, {a.CountryShortName}
+                                          </span>
+                                          <span className="listing-price font-15 font-500 mb-1">
+                                            {a.PriceDisplay}
+                                          </span> */}
+                                <ul className="d-flex font-general mb-10 mt-10 flex-sb">
+                                  <li className="flex-start pr-20 listing-location mb-1">
+                                    {getCityStateCountryZipFormat(a)}
+                                    {/* {a.City}, {a.State}, {a.CountryShortName} */}
+                                  </li>
+                                  <li className="flex-end listing-price font-15 font-500 mb-1">
+                                    {a.PriceDisplay}
+                                  </li>
+                                </ul>
+                                <ul className="d-flex quantity font-general mb-2 flex-sb">
+                                  <li title="Beds">
+                                    <span>
+                                      <i className="fa-solid fa-bed"></i>
+                                    </span>
+                                    {a.Bedrooms}
+                                  </li>
+                                  <li title="Baths">
+                                    <span>
+                                      <i className="fa-solid fa-shower"></i>
+                                    </span>
+                                    {a.Bathrooms}
+                                  </li>
+                                  <li title="Area">
+                                    <span>
+                                      <i className="fa-solid fa-vector-square"></i>
+                                    </span>
+                                    {a.AreaDisplay} {a.AreaUnitType}
+                                  </li>
+                                </ul>
+                              </div>
+                              <div className="d-flex align-items-center post-meta mt-2 py-3 px-3 border-top shadow">
+                                <div className="agent">
+                                  <a
+                                    onClick={(e) => onAssetProfileDetails(e, a)}
+                                    className="d-flex text-general align-items-center lh-18 font-general hovertxt-decnone"
+                                  >
+                                    <img
+                                      className="rounded-circle me-1 shadow img-border-white"
+                                      src={a.PicPath}
+                                      alt={a.FirstName}
+                                    />
+                                    <span className="font-general">
+                                      {a.FirstName} {a.LastName}
+                                      <br />
+                                      <span className="mt-1 small text-light">
+                                        {a.ListedByProfileType}
+                                      </span>
+                                    </span>
+                                  </a>
+                                </div>
+                                <div className="post-date ms-auto font-small">
+                                  <span>
+                                    <i className="fa fa-clock text-primary me-1"></i>
+                                    {a.PostedDaysDiff}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </>
+                        );
+                      })}
+                    </>
+                  </div>
                 )}
-              </div>
             </div>
           </div>
         </div>
@@ -607,7 +758,7 @@ const Home = () => {
                               </a>
                             </div>
                             <div className="property_text p-3 pb-2">
-                              <h5 className="listing-title">
+                              <h5 className="listing-title text-primary">
                                 <a
                                   onClick={(e) =>
                                     onAgentDetails(e, a.ProfileId)
@@ -753,67 +904,155 @@ const Home = () => {
       </div>
       {/*============== Counter Banner End ==============*/}
 
-      {/*============== Testimonials Start ==============*/}
-      <div className="full-row bg-light pt-5 pb-5">
-        <div className="container-fluid">
+      {/*============== Partners Start ==============*/}
+      <div className="full-row bg-white pt-5 pb-5">
+        <div className="container">
           <div className="row">
-            <div className="col mb-3">
-              <span className="text-primary tagline pb-2 d-table m-auto">
-                Testimonials
-              </span>
-              <h2 className="down-line pb-10 w-50 mx-auto mb-4 text-center w-sm-100">
-                What Client Says About Us
+            <div className="col-lg-12 mb-5">
+              <h2 className="mb-4 text-center text-primary w-50 w-sm-100 mx-auto down-line pb-10">
+                Partners
               </h2>
+              <span className="text-secondary w-75 d-table text-center w-sm-100 mx-auto pb-4">
+                Our platform integrates seamlessly with best-in-class
+                third-party providers to streamline your operations. From secure
+                payments and storage to background checks and cloud file
+                management — we’ve got you covered.
+              </span>
             </div>
           </div>
-          <div className="row justify-content-center">
-            <div className="col-lg-7">
-              <div className="testimonial-simple text-center px-5">
-                <div className="testimonial-carousel owl-carousel">
-                  <div className="item">
-                    <i className="flaticon-right-quote flat-large text-primary d-table mx-auto" />
-                    <blockquote className="text-secondary fs-5 fst-italic">
-                      “ Assetswatch saves time in processing rental payments and
-                      I'm always sure that the rent is paid every month.I love
-                      the "split the rent option" so I'm going to sign up my
-                      roommates too. ”
-                    </blockquote>
-                    <h4 className="mt-4 font-400">Mark Wiggins</h4>
-                    <span className="text-primary font-fifteen">
-                      CEO ( AssetsWatch )
-                    </span>
-                  </div>
-                  <div className="item">
-                    <i className="flaticon-right-quote flat-large text-primary d-table mx-auto" />
-                    <blockquote className="text-secondary fs-5 fst-italic">
-                      “ I must say that I've been looking for such program for
-                      long. Only one rental application! That's just perfect, no
-                      need to refill it each time you move. ”
-                    </blockquote>
-                    <h4 className="mt-4 font-400">Kiran</h4>
-                    <span className="text-primary font-fifteen">
-                      MANAGER ( Kansolve Technologies )
-                    </span>
-                  </div>
-                  <div className="item">
-                    <i className="flaticon-right-quote flat-large text-primary d-table mx-auto" />
-                    <blockquote className="text-secondary fs-5 fst-italic">
-                      “ Assetswatch saves time in processing rental payments and
-                      I'm always sure that the rent is paid every month.I love
-                      the "split the rent option" so I'm going to sign up my
-                      roommates too! ”
-                    </blockquote>
-                    <h4 className="mt-4 font-400">Manoj</h4>
-                    <span className="text-primary font-fifteen">
-                      CTO ( Eyegate Parking Solutions )
-                    </span>
+          <div className="row row-cols-lg-2 row-cols-md-2 row-cols-1">
+            <div className="col mb-5">
+              <div className="thumb-modern-border p-4 h-100 rounded box-shadow">
+                <i className="flaticon-database-storage flat-medium text-white bg-primary d-table rounded shadow"></i>
+                <h5 className="my-3">
+                  <span className="text-primary">Secure Data Storage</span>
+                </h5>
+                <p>
+                  Your data is securely stored in the Amazon Web Services (AWS)
+                  cloud, with regular automated backups, real-time redundancy,
+                  and end-to-end encryption. AWS’s robust infrastructure ensures
+                  reliability, compliance, and protection against data loss or
+                  breaches.
+                </p>
+                <a className="d-flex flex-center py-10 hover-img-upshow overflow-hidden pe-2">
+                  <LazyImage
+                    src="./assets/images/aws_logo.png"
+                    className="w-80px"
+                  ></LazyImage>
+                </a>
+              </div>
+            </div>
+            <div className="col mb-5">
+              <div className="thumb-modern-border p-4 h-100 rounded box-shadow">
+                <i className="flaticon-folder flat-medium text-white bg-primary d-table rounded shadow"></i>
+                <h5 className="my-3">
+                  <span className="text-primary">Cloud File Management</span>
+                </h5>
+                <p>
+                  Our built-in integration with Google Cloud enables you to
+                  securely store, access, and share files directly from your
+                  dashboard — without switching between platforms. Whether it's
+                  important documents, forms, meeting minutes, or reports,
+                  everything stays organized and accessible in one centralized
+                  location.
+                </p>
+                <a className="d-flex flex-center py-10 hover-img-upshow overflow-hidden pe-2">
+                  <LazyImage
+                    src="./assets/images/gcp_logo.png"
+                    className="w-200px"
+                  ></LazyImage>
+                </a>
+              </div>
+            </div>
+            <div className="col mb-2">
+              <div className="thumb-modern-border p-4 h-100 rounded box-shadow">
+                <i className="flaticon-bank flat-medium text-white bg-primary d-table rounded shadow"></i>
+                <h5 className="my-3">
+                  <span className="text-primary">Online Payments</span>
+                </h5>
+                <p>
+                  Our integration with Usio allows you to accept and process
+                  online payments directly within the platform — without needing
+                  to set up a separate merchant account or deal with complex
+                  onboarding processes. Usio’s secure and PCI-compliant
+                  infrastructure ensures that all transactions are encrypted and
+                  handled safely.
+                </p>
+                <a className="d-flex flex-center py-10 hover-img-upshow overflow-hidden pe-2">
+                  <LazyImage
+                    src="./assets/images/usio_logo.png"
+                    className="w-150px"
+                  ></LazyImage>
+                </a>
+              </div>
+            </div>
+            <div className="col mb-2">
+              <div className="thumb-modern-border p-4 h-100 rounded box-shadow">
+                <i className="fa-solid fa-user-check flat-medium text-white bg-primary d-table rounded shadow"></i>
+                <h5 className="my-3">
+                  <span className="text-primary">Background Screening</span>
+                </h5>
+                <p>
+                  USAFact’s powerful background screening services are
+                  seamlessly integrated into our platform, enabling you to
+                  initiate and manage background checks in just a few clicks.
+                  USAFact offers comprehensive reports covering criminal
+                  records, employment history, identity verification, and more.
+                </p>
+                <a className="d-flex flex-center py-10 hover-img-upshow overflow-hidden pe-2">
+                  <LazyImage
+                    src="./assets/images/usafact_logo.png"
+                    className="w-150px"
+                  ></LazyImage>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/*============== Partners End ==============*/}
+
+      {/*============== Testimonials Start ==============*/}
+      {testimonials?.length > 0 && (
+        <div className="full-row bg-light pt-5 pb-5">
+          <div className="container-fluid">
+            <div className="row">
+              <div className="col mb-3">
+                <h2 className="mb-4 text-center text-primary w-50 w-sm-100 mx-auto down-line pb-10">
+                  Testimonials
+                </h2>
+                {/* <h2 className="down-line pb-10 w-50 mx-auto mb-4 text-center w-sm-100">
+                  What Client Says About Us
+                </h2> */}
+              </div>
+            </div>
+            <div className="row justify-content-center">
+              <div className="col-lg-7">
+                <div className="testimonial-simple text-center px-5">
+                  <div
+                    className="testimonial-carousel owl-carousel dots-mt-15"
+                    //ref={testimonialsRef}
+                  >
+                    {testimonials?.map((t, i) => {
+                      return (
+                        <div className="item" key={`testi-key-${i}`}>
+                          <i className="flaticon-right-quote flat-large text-primary d-table mx-auto" />
+                          <blockquote className="text-secondary fs-4 fst-italic pb-3">
+                            “{t.Message}“
+                          </blockquote>
+                          <h6 className="mt-2 text-primary font-400">
+                            {t.Name}
+                          </h6>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
       {/*============== Testimonials End ==============*/}
     </>
   );

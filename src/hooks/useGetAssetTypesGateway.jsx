@@ -3,6 +3,7 @@ import config from "../config.json";
 import { ApiUrls } from "../utils/constants";
 import useApiGateway from "./useApiGateway";
 import { axiosPost } from "../helpers/axiosHelper";
+import { checkEmptyVal } from "../utils/common";
 
 export function useGetAssetTypesGateway(
   keyword,
@@ -11,25 +12,27 @@ export function useGetAssetTypesGateway(
 ) {
   const [assetTypesList, setassetTypesList] = useState([]);
   useEffect(() => {
-    let objBody = {
-      ClassificationTypeId: classificationTypeId,
-      Keyword: keyword,
-      Status: status,
-    };
+    if (!checkEmptyVal(classificationTypeId)) {
+      let objBody = {
+        ClassificationTypeId: classificationTypeId,
+        Keyword: keyword,
+        Status: status,
+      };
 
-    axiosPost(`${config.apiBaseUrl}${ApiUrls.getAssetTypes}`, objBody)
-      .then((response) => {
-        let objResponse = response.data;
-        if (objResponse.StatusCode === 200) {
-          setassetTypesList(objResponse.Data);
-        }
-      })
-      .catch((err) => {
-        console.error(
-          `API :: ${config.apiBaseUrl}${ApiUrls.getAssetTypes}, Error :: ${err}`
-        );
-      })
-      .finally(() => {});
+      axiosPost(`${config.apiBaseUrl}${ApiUrls.getAssetTypes}`, objBody)
+        .then((response) => {
+          let objResponse = response.data;
+          if (objResponse.StatusCode === 200) {
+            setassetTypesList(objResponse.Data);
+          }
+        })
+        .catch((err) => {
+          console.error(
+            `API :: ${config.apiBaseUrl}${ApiUrls.getAssetTypes}, Error :: ${err}`
+          );
+        })
+        .finally(() => {});
+    }
   }, [classificationTypeId]);
 
   return { assetTypesList, isDataLoading: false };

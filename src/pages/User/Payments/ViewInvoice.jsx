@@ -427,22 +427,28 @@ const ViewInvoice = () => {
           <div className="row mx-auto col-md-12 col-lg-10 shadow">
             <div className="bg-white xs-p-20 p-30 pb-30 border rounded">
               <div className="row">
-                <div
-                  className={`${
-                    invoiceDetails?.PaymentStatus == 0
-                      ? "col-md-4 col-lg-4 col-xl-4 mb-15"
-                      : "col-md-3 col-lg-3 col-xl-3 mb-15"
-                  }`}
-                >
+                <div className="col-8 d-flex flex-ai-t flex-jc-l text-start mb-2">
                   <h6 className="mb-2 down-line pb-10">
                     Invoice#: {invoiceDetails?.InvoiceNumber}
                   </h6>
                 </div>
+                <div className="col-4 d-flex flex-ai-t flex-jc-r text-end pt-15">
+                  <button
+                    type="button"
+                    className="btn btn-glow px-0 rounded-circle text-primary lh-1 d-flex flex-center"
+                    onClick={onCancel}
+                  >
+                    <i className="icons font-18 icon-arrow-left-circle text-primary me-1"></i>
+                    <span className="font-general">Back</span>
+                  </button>
+                </div>
+              </div>
+              <div className="row">
                 <div
                   className={`${
                     invoiceDetails?.PaymentStatus == 0
-                      ? "col-md-4 col-lg-4 col-xl-4 mb-15 text-md-center"
-                      : "col-md-3 col-lg-3 col-xl-3 mb-15 text-md-center"
+                      ? "col-md-6 col-lg-6 col-xl-6 mb-15"
+                      : "col-md-4 col-lg-4 col-xl-4 mb-15"
                   }`}
                 >
                   <span className="font-500 font-general">
@@ -452,8 +458,8 @@ const ViewInvoice = () => {
                 <div
                   className={`${
                     invoiceDetails?.PaymentStatus == 0
-                      ? "col-md-4 col-lg-4 col-xl-4 mb-15 text-md-end"
-                      : "col-md-3 col-lg-3 col-xl-3 mb-15 text-md-center"
+                      ? "col-md-6 col-lg-6 col-xl-6 mb-15 text-md-end"
+                      : "col-md-4 col-lg-4 col-xl-4 mb-15 text-md-center"
                   }`}
                 >
                   <span className="font-500 font-general">
@@ -461,7 +467,7 @@ const ViewInvoice = () => {
                   </span>
                 </div>
                 {invoiceDetails?.PaymentStatus > 0 && (
-                  <div className="col-md-3 col-lg-3 col-xl-3 mb-15 text-md-end">
+                  <div className="col-md-4 col-lg-4 col-xl-4 mb-15 text-md-end">
                     <span
                       className={`${
                         invoiceDetails?.PaymentStatus == 1
