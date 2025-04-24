@@ -48,7 +48,10 @@ import {
 import TextAreaControl from "../../../components/common/TextAreaControl";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 import html2pdf from "html2pdf.js";
-import { generateInvoiceDownloadPDF } from "../../../utils/pdfhelper";
+import {
+  generateInvoiceDownloadPDF,
+  checkUserBranding,
+} from "../../../utils/pdfhelper";
 
 const Invoices = () => {
   let $ = window.$;
@@ -495,6 +498,8 @@ const Invoices = () => {
                               : row.original.PaymentStatus ==
                                 config.paymentStatusTypes.Paid
                               ? "gr-badge-pill-suc"
+                              : config.paymentStatusTypes.Refunded
+                              ? "gr-badge-pill-error w-100px"
                               : ""
                           }`}
                         >
@@ -573,8 +578,8 @@ const Invoices = () => {
             icssclass: "pr-10 pl-2px",
             isconditionalshow: (row) => {
               return (
-                row?.original?.PaymentStatus != 0
-                // && row?.original?.InvoiceDirection == 2
+                row?.original?.PaymentStatus == 1 ||
+                row?.original?.PaymentStatus == 2
               );
             },
           },
@@ -755,6 +760,9 @@ const Invoices = () => {
             .toPdf()
             .get("pdf")
             .then((pdf) => {
+              const userBranding = checkUserBranding(
+                pdfDetails?.BrandingDetails
+              );
               const totalPages = pdf.internal.getNumberOfPages();
               const pageHeight = pdf.internal.pageSize.height;
               const pageWidth = pdf.internal.pageSize.width;
@@ -781,10 +789,7 @@ const Invoices = () => {
                   pdfHFWMSettings.fFontColor.b
                 );
 
-                if (
-                  pdfDetails.BrandingDetails.IsBrandingEnabled == 1 &&
-                  pdfDetails.BrandingDetails.Id > 0
-                ) {
+                if (userBranding) {
                   pdf.text(
                     pdfDetails?.BrandingDetails?.Header,
                     pageWidth / pdfHFWMSettings.pageHalf,
@@ -806,11 +811,7 @@ const Invoices = () => {
                   pageHeight - pdfHFWMSettings.fPiyOffSet,
                   pdfHFWMSettings.fRight
                 );
-                if (
-                  !checkEmptyVal(base64Watermark) &&
-                  pdfDetails.BrandingDetails.IsBrandingEnabled == 1 &&
-                  pdfDetails.BrandingDetails.Id > 0
-                ) {
+                if (!checkEmptyVal(base64Watermark) && userBranding) {
                   pdf.setGState(new pdf.GState(pdfHFWMSettings.wmOpacity));
                   pdf.addImage(
                     base64Watermark,

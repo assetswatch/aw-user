@@ -2,7 +2,7 @@ import React from "react";
 import { formCtrlTypes, Regex } from "../../utils/formvalidation";
 import { checkEmptyVal, checkObjNullorEmpty } from "../../utils/common";
 
-const Rating = ({ length, ratingVal }) => {
+const Rating = ({ length, ratingVal = 0 }) => {
   {
     let arrRatingNum = [];
     length = checkEmptyVal(length) ? 5 : length;

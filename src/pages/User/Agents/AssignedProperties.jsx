@@ -12,6 +12,7 @@ import {
   apiReqResLoader,
   checkEmptyVal,
   checkStartEndDateGreater,
+  getCityStateCountryZipFormat,
   GetUserCookieValues,
   replacePlaceHolders,
   SetPageLoaderNavLinks,
@@ -273,12 +274,17 @@ const AssignedProperties = () => {
                 }}
               >
                 {/* <i className="fas fa-map-marker-alt text-primary font-13 p-r-5" /> */}
-                <h5 className="text-secondary">{row.original.AddressOne}</h5>
+                <h5 className="text-secondary mb-1">
+                  {row.original.AddressOne}
+                </h5>
               </a>
-              {/* <div>{row.original.AddressTwo}</div> */}
-              <div>
-                {row.original.City}, {row.original.State},{" "}
-                {row.original.Country}
+              {!checkEmptyVal(row.original.AddressTwo) && (
+                <div className="py-0">{row.original.AddressTwo}</div>
+              )}
+              <div className="py-0">
+                {getCityStateCountryZipFormat(row.original)}
+                {/* {row.original.City}, {row.original.State},{" "}
+                                          {row.original.Country} */}
               </div>
               <div className="price">
                 <span className="text-primary">

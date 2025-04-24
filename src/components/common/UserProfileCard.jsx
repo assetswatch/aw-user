@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  checkEmptyVal,
+  getCityStateCountryZipFormat,
   GetCookieValues,
   getPagesPathByLoggedinUserProfile,
   GetUserCookieValues,
@@ -23,6 +25,13 @@ const UserProfileCard = React.memo(({ showEdit = true, cssClass = "" }) => {
     ProfilePic: GetCookieValues(UserCookie.ProfilePic),
     Mobile: "",
     AddressOne: "",
+    AddressTwo: "",
+    Country: "",
+    CountryShortName: "",
+    State: "",
+    StateShortName: "",
+    City: "",
+    Zip: "",
   });
 
   useEffect(() => {
@@ -44,6 +53,13 @@ const UserProfileCard = React.memo(({ showEdit = true, cssClass = "" }) => {
             ...pDetails,
             Mobile: objResponse?.Data?.MobileNo,
             AddressOne: objResponse?.Data?.AddressOne,
+            AddressTwo: objResponse?.Data?.AddressTwo,
+            Country: objResponse?.Data?.Country,
+            CountryShortName: objResponse?.Data?.CountryShortName,
+            State: objResponse?.Data?.State,
+            StateShortName: objResponse?.Data?.StateShortName,
+            City: objResponse?.Data?.City,
+            Zip: objResponse?.Data?.Zip,
           });
         }
       })
@@ -119,6 +135,12 @@ const UserProfileCard = React.memo(({ showEdit = true, cssClass = "" }) => {
               </div>
               <div className="col-8 text-right">
                 <p className="text-muted mb-0">{pDetails?.AddressOne}</p>
+                {!checkEmptyVal(pDetails?.AddressTwo) && (
+                  <p className="text-muted mb-0">{pDetails?.AddressTwo}</p>
+                )}
+                <p className="text-muted mb-0">
+                  {getCityStateCountryZipFormat(pDetails)}
+                </p>
               </div>
             </div>
           </div>

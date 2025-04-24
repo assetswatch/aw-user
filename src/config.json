@@ -42,7 +42,10 @@
   "paymentStatusTypes": {
     "UnPaid": 0,
     "Paid": 1,
-    "PartiallyPaid": 2
+    "PartiallyPaid": 2,
+    "Processing": 3,
+    "Failed": 4,
+    "Refunded": 5
   },
   "paymentAccountCreateStatus": {
     "Pending": 0,

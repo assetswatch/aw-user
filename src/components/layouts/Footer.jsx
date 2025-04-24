@@ -46,25 +46,32 @@ const Footer = () => {
                       agents United States wide.
                     </p>
                   </div>
-                  <div className="footer-widget media-widget mb-4">
+                  <div className="footer-widget med ia-widget mb-4 media-widget-round-white-primary-shadow">
                     <a
                       href="https://www.facebook.com/assetswatch/"
                       target="_blank"
+                      className="mr-10"
                     >
                       <i className="fab fa-facebook-f" />
                     </a>
-                    <a href="https://twitter.com/assetswatch" target="_blank">
+                    <a
+                      href="https://twitter.com/assetswatch"
+                      target="_blank"
+                      className="mr-10"
+                    >
                       <i className="fab fa-twitter" />
                     </a>
                     <a
                       href="https://www.linkedin.com/in/assets-watch-355127175/"
                       target="_blank"
+                      className="mr-10"
                     >
                       <i className="fab fa-linkedin-in" />
                     </a>
                     <a
                       href="https://www.instagram.com/assetswatch/"
                       target="_blank"
+                      className="mr-10"
                     >
                       <i className="fab fa-instagram" />
                     </a>
@@ -142,9 +149,11 @@ const Footer = () => {
                       <li>
                         <Link to={routeNames.contactUs.path}>Contact Us</Link>
                       </li>
-                      {/* <li>
-                        <Link to={routeNames.blog.path}>Blog</Link>
-                      </li> */}
+                      <li>
+                        <Link to={routeNames.testimonials.path}>
+                          Testimonials
+                        </Link>
+                      </li>
                       <li>
                         <Link to={routeNames.privacyPolicy.path}>
                           Privacy Policy

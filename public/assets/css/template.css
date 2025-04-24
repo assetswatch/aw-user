@@ -595,6 +595,11 @@ a.hover-bg-primary:hover,
   line-height: 40px;
 }
 
+.font-size-45 {
+  font-size: 45px;
+  line-height: 45px;
+}
+
 .font-size-80 {
   font-size: 80px;
   line-height: 80px;
@@ -1011,6 +1016,7 @@ a.text-dark:focus {
   height: 50px;
   line-height: 50px;
   text-align: center;
+  z-index: 100000;
 }
 
 #scroll:before {
@@ -1046,6 +1052,11 @@ a.text-dark:focus {
   background: var(--theme-primary-color);
   left: -60px;
   top: 13px;
+}
+
+.tagline-2.w-20::before {
+  width: 20px;
+  left: -22px;
 }
 
 .w-0 {
@@ -2554,7 +2565,7 @@ ul.product_list_widget li {
   display: inline-block;
   position: relative;
   cursor: pointer;
-  padding: 8px 15px;
+  padding: 4px 10px;
 }
 .tabw100 .nav-tab-line li:hover {
   background-color: var(--theme-light-color);
@@ -2959,8 +2970,8 @@ ul.nav-tab-border-active .mixitup-control-active {
 }
 
 .thumb-modern-border {
-  border: 5px solid;
-  border-color: var(--theme-primary-color);
+  border: 2px solid;
+  border-color: var(--theme-gray-color);
 }
 
 .thumb-modern-border i {
@@ -4598,14 +4609,15 @@ Newsletter Style
 }
 
 [class*="media-widget-round"] a {
-  width: 44px;
-  height: 44px;
-  line-height: 44px;
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
   text-align: center;
   display: block;
   float: left;
   margin-right: 5px;
   border-radius: 50%;
+  box-shadow: 0 0px 3px rgba(255, 255, 255, 0.8);
 }
 
 .media-widget-round-primary a,

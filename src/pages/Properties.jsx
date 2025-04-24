@@ -16,6 +16,7 @@ import {
   checkEmptyVal,
   checkObjNullorEmpty,
   checkStartEndDateGreater,
+  getCityStateCountryZipFormat,
   setSelectDefaultVal,
 } from "../utils/common";
 import { axiosPost } from "../helpers/axiosHelper";
@@ -129,6 +130,7 @@ const Properties = () => {
           dots: true,
           smartSpeed: 500,
           autoplay: false,
+          autowidth: false,
           responsive: {
             0: {
               items: 1,
@@ -147,6 +149,9 @@ const Properties = () => {
             },
           },
         });
+        setTimeout(() => {
+          $(".prop-carousel")?.trigger("refresh.owl.carousel");
+        }, 500);
       } catch {}
     }
 
@@ -285,7 +290,7 @@ const Properties = () => {
                   </Link>
                 </div>
                 <div className="property_text p-3 pb-0">
-                  <h5 className="listing-title">
+                  <h5 className="listing-title text-primary">
                     <Link
                       onClick={(e) =>
                         onPropertyDetails(e, row.original.AssetId)
@@ -308,8 +313,9 @@ const Properties = () => {
                   </span> */}
                   <ul className="d-flex font-general mb-10 mt-10 flex-sb">
                     <li className="flex-start pr-20 listing-location mb-1">
-                      {row.original.City}, {row.original.State},{" "}
-                      {row.original.CountryShortName}
+                      {getCityStateCountryZipFormat(row.original)}
+                      {/* {row.original.City}, {row.original.State},{" "}
+                      {row.original.CountryShortName} */}
                     </li>
                     <li className="flex-end listing-price font-15 font-500 mb-1">
                       {row.original.PriceDisplay}
@@ -445,7 +451,7 @@ const Properties = () => {
                 <PropertySearch></PropertySearch>
                 {/*============== Recent Property Widget Start ==============*/}
                 <div className="widget property_carousel_widget box-shadow rounded pb-20">
-                  <h5 className="mb-30 down-line pb-10">Recent Properties</h5>
+                  <h6 className="mb-30 down-line pb-10">Recent Properties</h6>
                   <div
                     className="topprop-carusel owl-carousel nav-disable owl-loaded owl-drag"
                     ref={topAssetsRef}
@@ -488,7 +494,7 @@ const Properties = () => {
                                       </span>
                                     </Link>
                                   </div>
-                                  <h5 className="listing-title">
+                                  <h5 className="listing-title text-primary">
                                     <Link
                                       onClick={(e) =>
                                         onPropertyDetails(e, a.AssetId)
@@ -510,7 +516,8 @@ const Properties = () => {
                                   </span> */}
                                   <ul className="d-flex font-general my-10 flex-sb">
                                     <li className="flex-start pr-20 listing-location mb-1">
-                                      {a.City}, {a.State}, {a.CountryShortName}
+                                      {getCityStateCountryZipFormat(a)}
+                                      {/* {a.City}, {a.State}, {a.CountryShortName} */}
                                     </li>
                                     <li className="flex-end listing-price font-15 font-500 mb-1">
                                       {a.PriceDisplay}
@@ -556,9 +563,9 @@ const Properties = () => {
                 {/*============== Recent Property Widget End ==============*/}
                 {/*============== Agents Widget Start ==============*/}
                 <div className="widget widget_recent_property box-shadow rounded pb-20">
-                  <h5 className="text-secondary mb-4 down-line pb-10">
+                  <h6 className="text-secondary mb-4 down-line pb-10">
                     Listed Agents
-                  </h5>
+                  </h6>
                   <ul>
                     {topAgentsList?.length > 0 && (
                       <>
@@ -575,7 +582,7 @@ const Properties = () => {
                                 placeHolderClass="min-h-80 w-80px"
                                 onClick={(e) => onAgentDetails(e, a.ProfileId)}
                               />
-                              <div className="thumb-body">
+                              <div className="thumb-body w-100">
                                 <h5 className="listing-title">
                                   <a
                                     onClick={(e) =>
