@@ -43,9 +43,10 @@
     "UnPaid": 0,
     "Paid": 1,
     "PartiallyPaid": 2,
-    "Processing": 3,
+    "Processed": 3,
     "Failed": 4,
-    "Refunded": 5
+    "Insufficientfunds": 5,
+    "PayerBankNotAuthorized": 6
   },
   "paymentAccountCreateStatus": {
     "Pending": 0,

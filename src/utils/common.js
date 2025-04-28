@@ -179,6 +179,9 @@ export function SetPageLoaderNavLinks() {
         case "testimonials":
           path = "testimonials";
           break;
+        case "createtestimonial":
+          path = "createtestimonial";
+          break;
         case "howitworks":
           path = "howitworks";
           break;

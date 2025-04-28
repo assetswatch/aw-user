@@ -22,6 +22,7 @@ import {
   GetUserCookieValues,
   replacePlaceHolders,
   SetPageLoaderNavLinks,
+  setSelectDefaultVal,
 } from "../../../utils/common";
 import DateControl from "../../../components/common/DateControl";
 import moment from "moment";
@@ -130,6 +131,8 @@ const Invoices = () => {
   );
   const [joinedUsersData, setJoinedUsersData] = useState([]);
   const [selectedJoinedUser, setSelectedJoinedUser] = useState(null);
+  const [invoiceSentUsers, setInvoiceSentUsers] = useState([]);
+  const [selectedInvoiceSentUser, setSelectedInvoiceSentUser] = useState(null);
 
   //Set search form intial data
   const setSearchInitialFormData = () => {
@@ -467,70 +470,163 @@ const Invoices = () => {
                   <div>Due Amount: {row.original.TotalAmountDisplay}</div>
                 ) : (
                   <>
-                    {row.original.PaymentStatus ==
-                      config.paymentStatusTypes.UnPaid && (
-                      <div>Due Amount: {row.original.TotalAmountDisplay}</div>
-                    )}
-                    {row.original.PaymentStatus ==
-                      config.paymentStatusTypes.PartiallyPaid && (
-                      <div>Due Amount: {row.original.TotalBalanceDisplay}</div>
-                    )}
-                    {row.original.PaymentStatus ==
-                      config.paymentStatusTypes.Paid && (
-                      <div>
-                        Paid Amount: {row.original.TotalPaidAmountDisplay}
-                      </div>
-                    )}
-
                     {row.original.InvoiceDirection !=
                     config.directionTypes.Received ? (
-                      <span>
-                        <span
-                          className={`badge badge-pill gr-badge-pill mt-2 ${
-                            row.original.PaymentStatus ==
-                              config.paymentStatusTypes.UnPaid &&
-                            row.original.InvoiceDirection !=
-                              config.directionTypes.Received
-                              ? "gr-badge-pill-warning w-100px"
-                              : row.original.PaymentStatus ==
-                                config.paymentStatusTypes.PartiallyPaid
-                              ? "gr-badge-pill-info w-100px"
-                              : row.original.PaymentStatus ==
-                                config.paymentStatusTypes.Paid
-                              ? "gr-badge-pill-suc"
-                              : config.paymentStatusTypes.Refunded
-                              ? "gr-badge-pill-error w-100px"
-                              : ""
-                          }`}
-                        >
-                          {row.original.PaymentStatusDisplay}
-                        </span>
-                      </span>
-                    ) : (
-                      row.original.PaymentStatus ==
-                        config.paymentStatusTypes.Paid && (
+                      <>
+                        {row.original.PaymentStatus ==
+                          config.paymentStatusTypes.UnPaid && (
+                          <div>
+                            Due Amount: {row.original.TotalAmountDisplay}
+                          </div>
+                        )}
+                        {(row.original.PaymentStatus ==
+                          config.paymentStatusTypes.PartiallyPaid ||
+                          row.original.PaymentStatus ==
+                            config.paymentStatusTypes.Insufficientfunds ||
+                          row.original.PaymentStatus ==
+                            config.paymentStatusTypes
+                              .PayerBankNotAuthorized) && (
+                          <div>
+                            Due Amount: {row.original.TotalBalanceDisplay}
+                          </div>
+                        )}
+                        {(row.original.PaymentStatus ==
+                          config.paymentStatusTypes.Paid ||
+                          row.original.PaymentStatus ==
+                            config.paymentStatusTypes.Processed) && (
+                          <div>
+                            Paid Amount: {row.original.TotalPaidAmountDisplay}
+                          </div>
+                        )}
                         <span>
                           <span
                             className={`badge badge-pill gr-badge-pill mt-2 ${
                               row.original.PaymentStatus ==
-                              config.paymentStatusTypes.Paid
+                                config.paymentStatusTypes.UnPaid &&
+                              row.original.InvoiceDirection !=
+                                config.directionTypes.Received
+                                ? "gr-badge-pill-warning w-100px"
+                                : row.original.PaymentStatus ==
+                                  config.paymentStatusTypes.PartiallyPaid
+                                ? "gr-badge-pill-info w-100px"
+                                : row.original.PaymentStatus ==
+                                  config.paymentStatusTypes.Paid
                                 ? "gr-badge-pill-suc"
+                                : row.original.PaymentStatus ==
+                                  config.paymentStatusTypes.Insufficientfunds
+                                ? "gr-badge-pill-error w-125px"
+                                : row.original.PaymentStatus ==
+                                  config.paymentStatusTypes
+                                    .PayerBankNotAuthorized
+                                ? "gr-badge-pill-error w-170px"
+                                : row.original.PaymentStatus ==
+                                  config.paymentStatusTypes.Processed
+                                ? "gr-badge-pill-info w-100px"
                                 : ""
                             }`}
                           >
                             {row.original.PaymentStatusDisplay}
                           </span>
                         </span>
-                      )
+                      </>
+                    ) : row.original.PaymentStatus ==
+                        config.paymentStatusTypes.Paid ||
+                      row.original.PaymentStatus ==
+                        config.paymentStatusTypes.Processed ? (
+                      <>
+                        {row.original.PaymentStatus ==
+                          config.paymentStatusTypes.UnPaid && (
+                          <div>
+                            Due Amount: {row.original.TotalAmountDisplay}
+                          </div>
+                        )}
+                        {(row.original.PaymentStatus ==
+                          config.paymentStatusTypes.PartiallyPaid ||
+                          row.original.PaymentStatus ==
+                            config.paymentStatusTypes.Insufficientfunds ||
+                          row.original.PaymentStatus ==
+                            config.paymentStatusTypes
+                              .PayerBankNotAuthorized) && (
+                          <div>
+                            Due Amount: {row.original.TotalBalanceDisplay}
+                          </div>
+                        )}
+                        {(row.original.PaymentStatus ==
+                          config.paymentStatusTypes.Paid ||
+                          row.original.PaymentStatus ==
+                            config.paymentStatusTypes.Processed) && (
+                          <div>
+                            Paid Amount: {row.original.TotalPaidAmountDisplay}
+                          </div>
+                        )}
+                        <span>
+                          <span
+                            className={`badge badge-pill gr-badge-pill mt-2 ${
+                              row.original.PaymentStatus ==
+                              config.paymentStatusTypes.Paid
+                                ? "gr-badge-pill-suc"
+                                : row.original.PaymentStatus ==
+                                  config.paymentStatusTypes.Processed
+                                ? "gr-badge-pill-info w-100px"
+                                : ""
+                            }`}
+                          >
+                            {row.original.PaymentStatusDisplay}
+                          </span>
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span>
+                          <span
+                            className={`badge badge-pill gr-badge-pill mt-2 ${
+                              row.original.PaymentStatus ==
+                              config.paymentStatusTypes.Insufficientfunds
+                                ? "gr-badge-pill-error w-125px"
+                                : row.original.PaymentStatus ==
+                                  config.paymentStatusTypes
+                                    .PayerBankNotAuthorized
+                                ? "gr-badge-pill-error w-170px"
+                                : ""
+                            }`}
+                          >
+                            {row.original.PaymentStatusDisplay}
+                          </span>
+                        </span>
+                        {row.original.PaymentStatus ==
+                          config.paymentStatusTypes.UnPaid && (
+                          <div className="mt-1">
+                            Due Amount: {row.original.TotalAmountDisplay}
+                          </div>
+                        )}
+                        {(row.original.PaymentStatus ==
+                          config.paymentStatusTypes.PartiallyPaid ||
+                          row.original.PaymentStatus ==
+                            config.paymentStatusTypes.Insufficientfunds ||
+                          row.original.PaymentStatus ==
+                            config.paymentStatusTypes
+                              .PayerBankNotAuthorized) && (
+                          <div className="mt-1">
+                            Due Amount: {row.original.TotalBalanceDisplay}
+                          </div>
+                        )}
+                        {row.original.PaymentStatus ==
+                          config.paymentStatusTypes.Paid && (
+                          <div className="mt-1">
+                            Paid Amount: {row.original.TotalPaidAmountDisplay}
+                          </div>
+                        )}
+                      </>
                     )}
                   </>
                 ))}
 
               {row.original.InvoiceDirection ==
                 config.directionTypes.Received &&
+                row.original.PaymentStatus != config.paymentStatusTypes.Paid &&
                 row.original.PaymentStatus !=
-                  config.paymentStatusTypes.Paid && (
-                  <div className="mt-1">
+                  config.paymentStatusTypes.Processed && (
+                  <div className="mt-0">
                     <button
                       className="btn btn-primary btn-xs btn-glow shadow rounded lh-30 px-15"
                       name="btnpaynow"
@@ -562,14 +658,17 @@ const Invoices = () => {
             },
             icssclass: "pr-10 pl-2px",
           },
-          // {
-          //   text: "Mark as Paid",
-          //   onclick: (e, row) => onMarkasPaidModalShow(e, row),
-          //   icssclass: "pr-10 pl-2px",
-          //   isconditionalshow: (row) => {
-          //     return row?.original?.PaymentStatus != 1;
-          //   },
-          // },
+          {
+            text: "Mark as Paid",
+            onclick: (e, row) => onMarkasPaidModalShow(e, row),
+            icssclass: "pr-10 pl-2px",
+            isconditionalshow: (row) => {
+              return (
+                row?.original?.PaymentStatus != 1 &&
+                row?.original?.SentProfiles?.length > 0
+              );
+            },
+          },
           {
             text: "Download Receipt",
             onclick: (e, row) => {
@@ -1072,6 +1171,17 @@ const Invoices = () => {
 
   //Mark as paid Modal actions
 
+  let formMarkasPaidErrors = {};
+  const [markasPaidErrors, setMarkasPaidErrors] = useState({});
+  function setInitialMarkasPaidFormData() {
+    return {
+      txtpaidamount: 0,
+    };
+  }
+  const [markasPaidFormData, setMarkasPaidFormData] = useState(
+    setInitialMarkasPaidFormData()
+  );
+
   const onMarkasPaidModalShow = (e, row) => {
     e.preventDefault();
     setSelectedGridRow(row);
@@ -1080,58 +1190,119 @@ const Invoices = () => {
         invoicenumber: `${row?.original?.InvoiceNumber}`,
       })
     );
+
+    let data = row?.original?.SentProfiles?.map((item) => ({
+      label: (
+        <div className="flex items-center">
+          <div className="w-40px h-40px mr-10 flex-shrink-0">
+            <img
+              alt=""
+              src={item.PicPath}
+              className="rounded cur-pointer w-40px"
+            />
+          </div>
+          <div>
+            <span className="text-primary lh-1 d-block">
+              {item.FirstName + " " + item.LastName}
+            </span>
+            <span className="small text-light">{item.ProfileType}</span>
+          </div>
+        </div>
+      ),
+      value: item.ProfileId,
+      customlabel: item.FirstName + " " + item.LastName,
+    }));
+
+    setInvoiceSentUsers(data);
+
+    setMarkasPaidFormData({
+      ...markasPaidFormData,
+      txtpaidamount:
+        row.original.PaymentStatus == config.paymentStatusTypes.UnPaid
+          ? row.original.TotalAmount
+          : row.original.TotalBalance,
+    });
+
     setModalMarkasPaidConfirmShow(true);
   };
 
   const onMarkasPaidModalClose = () => {
     setModalMarkasPaidConfirmShow(false);
     setSelectedGridRow(null);
+    setInvoiceSentUsers([]);
+    setSelectedInvoiceSentUser(null);
+    setMarkasPaidFormData(setInitialMarkasPaidFormData());
+    setMarkasPaidErrors({});
     apiReqResLoader("btnmarkaspaid", "Yes", API_ACTION_STATUS.COMPLETED, false);
     setModalMarkasPaidConfirmContent(AppMessages.MarkasPaidConfirmationMessage);
+  };
+
+  const handleMarkasPaidInputChange = (e) => {
+    const { name, value } = e?.target;
+    setMarkasPaidFormData({
+      ...markasPaidFormData,
+      [name]: value,
+    });
+  };
+
+  const handleSelectedInvoiceSentUserChange = (e) => {
+    setSelectedInvoiceSentUser(e?.value);
   };
 
   const onMarkasPaid = (e) => {
     e.preventDefault();
 
-    apiReqResLoader("btnmarkaspaid", "Yes", API_ACTION_STATUS.START);
+    if (checkEmptyVal(selectedInvoiceSentUser)) {
+      formMarkasPaidErrors["ddlinvoicesentusers"] = ValidationMessages.UserReq;
+    } else {
+      delete formErrors["ddlinvoicesentusers"];
+    }
 
-    let isapimethoderr = false;
-    let objBodyParams = {
-      InvoiceId: parseInt(selectedGridRow?.original?.InvoiceId),
-      AccountId: accountid,
-      ProfileId: profileid,
-    };
+    if (Object.keys(formMarkasPaidErrors).length === 0) {
+      apiReqResLoader("btnmarkaspaid", "Yes", API_ACTION_STATUS.START);
 
-    axiosPost(
-      `${config.apiBaseUrl}${ApiUrls.createPaymentTransaction}`,
-      objBodyParams
-    )
-      .then((response) => {
-        let objResponse = response.data;
-        if (objResponse.StatusCode === 200) {
-          if (objResponse.Data.Status == 1) {
-            Toast.success(AppMessages.DeleteInvoiceSuccess);
-            getInvoices({});
-            onDeleteConfirmModalClose();
+      let isapimethoderr = false;
+      let objBodyParams = {
+        InvoiceId: parseInt(selectedGridRow?.original?.InvoiceId),
+        InvoiceNumber: selectedGridRow?.original?.InvoiceNumber,
+        FromId: parseInt(setSelectDefaultVal(selectedInvoiceSentUser)),
+        PaidAmount: markasPaidFormData.txtpaidamount,
+      };
+
+      axiosPost(
+        `${config.apiBaseUrl}${ApiUrls.markInvoiceAsPaid}`,
+        objBodyParams
+      )
+        .then((response) => {
+          let objResponse = response.data;
+          if (objResponse.StatusCode === 200) {
+            if (objResponse.Data.Id > 0) {
+              Toast.success(objResponse.Data.Message);
+              getInvoices({});
+              onMarkasPaidModalClose();
+            } else {
+              Toast.error(objResponse.Data.Message);
+            }
           } else {
-            Toast.error(objResponse.Data.Message);
+            isapimethoderr = true;
           }
-        } else {
+        })
+        .catch((err) => {
           isapimethoderr = true;
-        }
-      })
-      .catch((err) => {
-        isapimethoderr = true;
-        console.error(
-          `"API :: ${ApiUrls.createPaymentTransaction}, Error ::" ${err}`
-        );
-      })
-      .finally(() => {
-        if (isapimethoderr == true) {
-          Toast.error(AppMessages.SomeProblem);
-        }
-        apiReqResLoader("btnmarkaspaid", "Yes", API_ACTION_STATUS.COMPLETED);
-      });
+          console.error(
+            `"API :: ${ApiUrls.markInvoiceAsPaid}, Error ::" ${err}`
+          );
+        })
+        .finally(() => {
+          if (isapimethoderr == true) {
+            Toast.error(AppMessages.SomeProblem);
+          }
+          apiReqResLoader("btnmarkaspaid", "Yes", API_ACTION_STATUS.COMPLETED);
+        });
+    } else {
+      $(`[name=${Object.keys(formMarkasPaidErrors)[0]}]`).focus();
+      setMarkasPaidErrors(formMarkasPaidErrors);
+    }
   };
 
   //Mark as paid Modal actions
@@ -1368,6 +1539,49 @@ const Invoices = () => {
                 <span className="font-general font-400">
                   {modalMarkasPaidConfirmContent}
                 </span>
+                <div className="row">
+                  <div className="col-12 mb-15">
+                    <AsyncSelect
+                      placeHolder={AppMessages.DdlDefaultSelect}
+                      noData={
+                        selectedInvoiceSentUser == null ||
+                        Object.keys(selectedInvoiceSentUser).length === 0
+                          ? AppMessages.NoUsers
+                          : invoiceSentUsers.length <= 0
+                          ? AppMessages.DdLLoading
+                          : AppMessages.NoUsers
+                      }
+                      options={invoiceSentUsers}
+                      onChange={(e) => {
+                        handleSelectedInvoiceSentUserChange(e);
+                      }}
+                      value={selectedInvoiceSentUser}
+                      name="ddlinvoicesentusers"
+                      lblText="Paid by: "
+                      lbl={formCtrlTypes.users}
+                      lblClass="mb-0 lbl-req-field"
+                      required={true}
+                      errors={markasPaidErrors}
+                      formErrors={formMarkasPaidErrors}
+                      isRenderOptions={false}
+                      tabIndex={1}
+                    ></AsyncSelect>
+                  </div>
+                  <div className="col-12 mb-0">
+                    <InputControl
+                      lblClass="mb-0 lbl-req-field"
+                      lblText="Paid amount ($): "
+                      name="txtpaidamount"
+                      ctlType={formCtrlTypes.amount}
+                      required={true}
+                      onChange={handleMarkasPaidInputChange}
+                      value={markasPaidFormData.txtpaidamount}
+                      errors={markasPaidErrors}
+                      formErrors={formMarkasPaidErrors}
+                      tabIndex={2}
+                    ></InputControl>
+                  </div>
+                </div>
               </>
             }
             onClose={onMarkasPaidModalClose}

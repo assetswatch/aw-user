@@ -58,6 +58,14 @@ const checkPriceValue = (value) => {
 /*Regex */
 export const Regex = {
   name: { max: length50, required: ValidationMessages.NameReq },
+  name100: { max: length1000, required: ValidationMessages.NameReq },
+  occupation: { max: length50, required: ValidationMessages.OccupationReq },
+  testimonial: {
+    min: length50,
+    max: length500,
+    required: ValidationMessages.TestimonialReq,
+    invalid: ValidationMessages.TestimonialInvalid,
+  },
   dbaname: {
     min: length2,
     max: length50,
@@ -413,6 +421,28 @@ export const Regex = {
 export const formCtrlTypes = {
   name: {
     lbl: "Name:",
+    input: {
+      type: "text",
+      max: length50,
+    },
+  },
+  name100: {
+    lbl: "Name:",
+    input: {
+      type: "text",
+      max: length100,
+    },
+  },
+  testimonial: {
+    lbl: "Testimonial:",
+    input: {
+      type: "text",
+      min: length50,
+      max: length500,
+    },
+  },
+  occupation: {
+    lbl: "Occupation:",
     input: {
       type: "text",
       max: length50,
