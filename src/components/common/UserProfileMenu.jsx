@@ -41,7 +41,7 @@ const UserProfileMenu = (styleprops) => {
           (rl) => rl.path.toLowerCase() == path.pathname.toLowerCase()
         )?.[0];
 
-        if (isprotectedRoute == false) {
+        if (isprotectedRoute == false || isprotectedRoute == undefined) {
           window.location.reload();
         } else {
           navigate(routeNames.home.path, { replace: true });

@@ -22,7 +22,7 @@ const GridList = ({
   isColumnParentDiv = true,
   pagingNavigationArrows = false,
   dataloaderParentDiv = true,
-  noDataParentDiv = true,
+  noDataClassName = "min-h-200",
 }) => {
   const {
     getTableProps,
@@ -109,11 +109,13 @@ const GridList = ({
           )
         ) : data.length === 0 && isShowNoData ? (
           dataloaderParentDiv ? (
-            <div className="col bg-white d-flex flex-center min-h-200 rounded box-shadow">
+            <div
+              className={`col bg-white d-flex flex-center rounded box-shadow ${noDataClassName}`}
+            >
               <NoData message={noData}></NoData>
             </div>
           ) : (
-            <div className="col d-flex flex-center min-h-200">
+            <div className={`col d-flex flex-center ${noDataClassName}`}>
               <NoData message={noData}></NoData>
             </div>
           )

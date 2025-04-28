@@ -754,22 +754,22 @@ table th {
   letter-spacing: 0 !important;
 }
 .testimonial-block-1 {
-  padding: 20px 35px 10px 35px;
+  padding: 20px 25px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   position: relative;
 }
 .testimonial-block-1 .name-block {
-  position: absolute;
-  align-self: self-end;
-  bottom: 0;
+  /* position: absolute; */
+  /* align-self: self-end; */
+  bottom: 20px;
 }
 .testimonial-block-1 .image-avata {
   width: 50px;
 }
 .testimonial-block-1 p {
-  font-size: 17px;
+  font-size: 15px;
   line-height: 30px;
 }
 .testimonial-block-1 .quote-icon {
@@ -4304,11 +4304,17 @@ Social Media Style Start
 .w-120px {
   width: 120px !important;
 }
+.w-125px {
+  width: 125px !important;
+}
 .w-130px {
   width: 130px !important;
 }
 .w-140px {
   width: 140px !important;
+}
+.w-170px {
+  width: 170px !important;
 }
 .w-180px {
   width: 180px !important;

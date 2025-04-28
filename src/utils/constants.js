@@ -294,13 +294,16 @@ export const AppMessages = {
   DeleteInvoiceSuccess: "Invoice deleted successfully...",
   MarkasPaidConfirmationTitle: "Mark inovice as paid?",
   MarkasPaidConfirmationMessage:
-    "Invoice #{invoicenumber} will be marked as paid. This action cannot be undone. Proceed?",
+    "Invoice #{invoicenumber} will be marked as paid. This action cannot be undone.",
   NoTestimonials: "No testimonials found...",
 };
 /*Common App messages*/
 
 export const ValidationMessages = {
   NameReq: "Name can not be empty.",
+  OccupationReq: "Occupation can not be empty.",
+  TestimonialReq: "Testimonial can not be empty.",
+  TestimonialInvalid: "Testimonial should be minimum 50 to 500 characters.",
   DBANameReq: "DBA Name can not be empty.",
   DBANameInvalid: "DBA Name should be minimum 2 to 50 characters.",
   LegalNameReq: "Legal Name can not be empty.",
@@ -443,8 +446,10 @@ export let ApiUrls = {
   getDdlCities: `common/v1/GetDdlCities`,
   getDdlSupportTypes: `common/v1/GetDdlSupportTypes`,
   getAppConfig: `common/v1/GetAppConfig`,
-  createSupportTicket: `common/v1/CreateSupportTicket`,
+  createTestimonial: `common/v1/CreateTestimonial`,
   getSupportTickets: `common/v1/GetSupportTickets`,
+  registerUser: `users/v1/RegisterUser`,
+  getTestimonials: `common/v1/GetTestimonials`,
   getProfileTypes: `users/v1/GetProfileTypes`,
   getProfileCategories: `users/v1/GetProfileCategories`,
   sendUserEnquiry: `users/v1/SendUserEnquiry`,
@@ -539,6 +544,7 @@ export let ApiUrls = {
   unsendInvoice: `payments/v1/UnsendInvoice`,
   getSentInvoices: `payments/v1/GetSentInvoices`,
   createPaymentTransaction: `payments/v1/CreatePaymentTransaction`,
+  markInvoiceAsPaid: `payments/v1/MarkInvoiceAsPaid`,
   calculatePaymentAmount: `payments/v1/CalculatePaymentAmount`,
   getAgreements: `agreements/v1/GetAgreements`,
   getAgreementDetails: `agreements/v1/GetAgreementDetails`,

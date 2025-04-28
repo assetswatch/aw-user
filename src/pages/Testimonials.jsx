@@ -15,9 +15,12 @@ import {
   API_ACTION_STATUS,
   GridDefaultValues,
 } from "../utils/constants";
+import { useNavigate } from "react-router-dom";
 
 const Testimonials = () => {
   let $ = window.$;
+
+  const navigate = useNavigate();
 
   const [testimonialsList, setTestimonialsList] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -39,14 +42,13 @@ const Testimonials = () => {
 
     objParams = {
       keyword: "",
-      SupportTypeId: 3, //testimonials
       Status: 1,
       pi: parseInt(pi),
       ps: parseInt(ps),
     };
 
     return axiosPost(
-      `${config.apiBaseUrl}${ApiUrls.getSupportTickets}`,
+      `${config.apiBaseUrl}${ApiUrls.getTestimonials}`,
       objParams
     )
       .then((response) => {
@@ -54,7 +56,7 @@ const Testimonials = () => {
         if (objResponse.StatusCode === 200) {
           setTotalCount(objResponse.Data.TotalCount);
           setPageCount(Math.ceil(objResponse.Data.TotalCount / ps));
-          setTestimonialsList(objResponse.Data.SupportTickets);
+          setTestimonialsList(objResponse.Data.Testimonials);
         } else {
           isapimethoderr = true;
           setTestimonialsList([]);
@@ -65,7 +67,7 @@ const Testimonials = () => {
         isapimethoderr = true;
         setTestimonialsList([]);
         setPageCount(0);
-        console.error(`"API :: ${ApiUrls.getSupportTickets}, Error ::" ${err}`);
+        console.error(`"API :: ${ApiUrls.getTestimonials}, Error ::" ${err}`);
       })
       .finally(() => {
         if (isapimethoderr === true) {
@@ -90,29 +92,29 @@ const Testimonials = () => {
             d-id={row.original.Id}
           >
             <i className="flaticon-right-quote flat-small text-primary d-table"></i>
-            <p className="mb-50">
-              “{row.original.Message}“{" "}
-              {row.original.Id == 22 &&
-                "flaticon-right-quote flat-small text-primary d-table laticon-right-quote flat-small text-primary d-table laticon-right-quote flat-small text-primary d-table"}
-            </p>
-            <div className="d-flex align-items-center gap-3 mb-10 flex-jc-r name-block">
-              {/* <div className="image-avata">
+            <p className="p b-50">“{row.original.Testimonial}“ </p>
+            <div className="d-flex align-items-center gap-2 mb-10 flex-jc-r name-block w-100 ">
+              {row.original?.ProfileId > 0 && (
+                <div className="image-avata me-2">
                   <img
-                    className="rounded-circle me-2"
-                    src="assets/images/team/1.jpg"
-                    alt="avata"
+                    className="rounded-circle img-border-white shadow"
+                    src={row.original.PicPath}
                   />
-                </div> */}
-              <div className="about-avata">
-                {/* <div className="d-table">
-                    by <span className="name">{row.original.Name}</span>
-                  </div>
-                  <span className="d-table designation">
+                </div>
+              )}
+              <div className="about-avata lh-1">
+                <div className="d-table text-primary">
+                  by{" "}
+                  <span className="name text-primary font-500">
                     {row.original.Name}
-                  </span> */}
-                <span className="text-primary pb-2 d-table tagline-2 w-20 font-fifteen">
-                  <span className="name ls-0">{row.original.Name}</span>
+                  </span>
+                </div>
+                <span className="d-table designation mt-1 small text-light lh-1">
+                  {row.original.Occupation}
                 </span>
+                {/* <span className="text-primary pb-2 d-table tagline-2 w-20 font-fifteen">
+                  <span className="name ls-0">{row.original.Occupation}</span>
+                </span> */}
               </div>
             </div>
           </div>
@@ -135,6 +137,10 @@ const Testimonials = () => {
     }
   }, []);
 
+  const onCreateTestimonial = () => {
+    navigate(routeNames.createTestimonial.path);
+  };
+
   return (
     <>
       {/*============== Page title Start ==============*/}
@@ -147,6 +153,22 @@ const Testimonials = () => {
       {/*============== Testimonials Start ==============*/}
       <div className="full-row pt-5 pb-5 bg-light mb-20">
         <div className="container">
+          {testimonialsList.length > 0 && (
+            <div className="row">
+              <div className="col-12 d-flex justify-content-end align-items-end pb-10">
+                <button
+                  className="btn btn-primary btn-mini btn-glow shadow rounded"
+                  name="btncreatetestimonial"
+                  id="btncreatetestimonial"
+                  type="button"
+                  onClick={onCreateTestimonial}
+                >
+                  <i className="fa fa-message position-relative me-1 t-2"></i>{" "}
+                  Create Testimonial
+                </button>
+              </div>
+            </div>
+          )}
           <GridList
             columns={columns}
             data={testimonialsList}
@@ -158,14 +180,30 @@ const Testimonials = () => {
               count: totalCount,
             }}
             noData={AppMessages.NoTestimonials}
-            containerClassName="row row-cols-lg-3 row-cols-md-3 row-cols-1"
+            containerClassName="row row-cols-lg-3 row-cols-md-3 row-cols-1 g-3"
             defaultPs={12}
             isshowHeader={false}
             isColumnParentDiv={false}
             pagingNavigationArrows={true}
             dataloaderParentDiv={false}
-            noDataParentDiv={false}
+            noDataClassName="min-h-130"
           />
+          {testimonialsList.length == 0 && !isDataLoading && (
+            <div className="row">
+              <div className="col-12 d-flex justify-content-center align-items-end pb-10">
+                <button
+                  className="btn btn-primary btn-mini btn-glow shadow rounded"
+                  name="btncreatetestimonial"
+                  id="btncreatetestimonial"
+                  type="button"
+                  onClick={onCreateTestimonial}
+                >
+                  <i className="fa fa-message position-relative me-1 t-2"></i>{" "}
+                  Create Testimonial
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       {/*============== Testimonials End ==============*/}

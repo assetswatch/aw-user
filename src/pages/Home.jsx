@@ -258,8 +258,7 @@ const Home = () => {
   };
 
   const getTestimonials = () => {
-    return axiosPost(`${config.apiBaseUrl}${ApiUrls.getSupportTickets}`, {
-      SupportTypeId: 3, //testimonials
+    return axiosPost(`${config.apiBaseUrl}${ApiUrls.getTestimonials}`, {
       Status: 1,
       Pi: 0,
       Ps: 5,
@@ -267,13 +266,13 @@ const Home = () => {
       .then((response) => {
         let objResponse = response.data;
         if (objResponse.StatusCode == 200) {
-          setTestimonials(objResponse?.Data?.SupportTickets);
+          setTestimonials(objResponse?.Data?.Testimonials);
         } else {
           setTestimonials([]);
         }
       })
       .catch((err) => {
-        console.error(`"API :: ${ApiUrls.getSupportTickets}, Error ::" ${err}`);
+        console.error(`"API :: ${ApiUrls.getTestimonials}, Error ::" ${err}`);
         setTestimonials([]);
       })
       .finally(() => {});
@@ -602,9 +601,9 @@ const Home = () => {
         <div className="container">
           <div className="row">
             <div className="col">
-              <h1 className="main-title w-50 mx-auto mb-4 text-center w-sm-100 base-line">
+              <h3 className="main-title w-50 mx-auto mb-4 text-center w-sm-100 base-line">
                 What are you looking for?
-              </h1>
+              </h3>
             </div>
           </div>
           <div className="row row-cols-xl-4 row-cols-sm-2 row-cols-1 gy-5">
@@ -715,9 +714,9 @@ const Home = () => {
           <div className="row mb-4 align-items-center">
             <div className="col-md-8">
               <div className="me-auto">
-                <h2 className="d-table mb-4 down-line pb-10">
+                <h3 className="d-table mb-4 down-line pb-10">
                   Our Listed Property Agents
-                </h2>
+                </h3>
                 <span className="d-table sub-title text-primary">
                   Our listed property agetns.
                 </span>
@@ -909,9 +908,9 @@ const Home = () => {
         <div className="container">
           <div className="row">
             <div className="col-lg-12 mb-5">
-              <h2 className="mb-4 text-center text-primary w-50 w-sm-100 mx-auto down-line pb-10">
+              <h3 className="mb-4 text-center text-primary w-50 w-sm-100 mx-auto down-line pb-10">
                 Partners
-              </h2>
+              </h3>
               <span className="text-secondary w-75 d-table text-center w-sm-100 mx-auto pb-4">
                 Our platform integrates seamlessly with best-in-class
                 third-party providers to streamline your operations. From secure
@@ -1018,31 +1017,36 @@ const Home = () => {
           <div className="container-fluid">
             <div className="row">
               <div className="col mb-3">
-                <h2 className="mb-4 text-center text-primary w-50 w-sm-100 mx-auto down-line pb-10">
+                <h3 className="mb-3 text-center text-primary w-50 w-sm-100 mx-auto">
                   Testimonials
-                </h2>
-                {/* <h2 className="down-line pb-10 w-50 mx-auto mb-4 text-center w-sm-100">
+                </h3>
+                <h4 className="down-line pb-15 w-50 mx-auto mb-3 text-center w-sm-100">
                   What Client Says About Us
-                </h2> */}
+                </h4>
               </div>
             </div>
             <div className="row justify-content-center">
               <div className="col-lg-7">
                 <div className="testimonial-simple text-center px-5">
                   <div
-                    className="testimonial-carousel owl-carousel dots-mt-15"
-                    //ref={testimonialsRef}
+                    className="testimonial-carousel owl-carousel dots-mt-10"
+                    ref={testimonialsRef}
                   >
                     {testimonials?.map((t, i) => {
                       return (
                         <div className="item" key={`testi-key-${i}`}>
                           <i className="flaticon-right-quote flat-large text-primary d-table mx-auto" />
                           <blockquote className="text-secondary fs-4 fst-italic pb-3">
-                            “{t.Message}“
+                            “{t.Testimonial}“
                           </blockquote>
-                          <h6 className="mt-2 text-primary font-400">
+                          <h6 className="mt-2 text-primary font-large font-500 mb-0">
                             {t.Name}
                           </h6>
+                          {!checkEmptyVal(t.Occupation) && (
+                            <span className="text-light font-300">
+                              {t.Occupation}
+                            </span>
+                          )}
                         </div>
                       );
                     })}

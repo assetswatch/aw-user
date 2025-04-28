@@ -128,6 +128,24 @@ const InputControl = ({
         formErrors[name] = rex.required;
       }
       break;
+    case formCtrlTypes.name100:
+      rex = Regex.name100;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      break;
+    case formCtrlTypes.occupation:
+      rex = Regex.testimonial;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      break;
+    case formCtrlTypes.testimonial:
+      rex = Regex.testimonial;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      break;
     case formCtrlTypes.subject:
       rex = Regex.subject;
       if (required && checkEmptyVal(value)) {
