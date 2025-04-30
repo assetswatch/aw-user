@@ -44,7 +44,7 @@ export const routeNames = {
   },
   profiles: { name: "Profiles", path: "/User/Profiles" },
   settings: { name: "Settings", path: "/User/Settings" },
-  branding: { name: "Branding", path: "/User/Branding" },
+  branding: { name: "Branding", path: "/User/Settings/Branding" },
   upgradeplan: { name: "UpgradePlan", path: "/User/UpgradePlan" },
   ownerproperties: { name: "OwnerProperties", path: "/User/Owners/Properties" },
   ownerlistedproperties: {
@@ -236,6 +236,10 @@ export const routeNames = {
     name: "ServiceDetails",
     path: "/User/Services/ServiceDetails",
   },
+  applications: {
+    name: "Applications",
+    path: "/User/Applications/Application",
+  },
   notFound: { name: "NotFound", path: "/*" },
 };
 
@@ -390,14 +394,14 @@ const routes = [
   {
     path: routeNames.settings.path,
     name: routeNames.settings.name,
-    element: lazy(() => import("../pages/User/Settings")),
+    element: lazy(() => import("../pages/User/Settings/Settings")),
     isexact: true,
     isprotected: true,
   },
   {
     path: routeNames.branding.path,
     name: routeNames.branding.name,
-    element: lazy(() => import("../pages/User/Branding")),
+    element: lazy(() => import("../pages/User/Settings/Branding")),
     isexact: true,
     isprotected: true,
   },
@@ -773,6 +777,13 @@ const routes = [
     path: routeNames.servicedetails.path,
     name: routeNames.servicedetails.name,
     element: lazy(() => import("../pages/User/Services/ServiceDetails")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.applications.path,
+    name: routeNames.applications.name,
+    element: lazy(() => import("../pages/User/Applications/Application")),
     isexact: true,
     isprotected: true,
   },

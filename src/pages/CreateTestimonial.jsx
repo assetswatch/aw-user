@@ -211,7 +211,7 @@ const CreateTestimonial = () => {
                     </div>
                     <div className="col-md-6 mb-15">
                       <InputControl
-                        lblClass="mb-0"
+                        lblClass="mb-0 lbl-req-field"
                         lblText="Your phone:"
                         name="txtphone"
                         ctlType={formCtrlTypes.phone}

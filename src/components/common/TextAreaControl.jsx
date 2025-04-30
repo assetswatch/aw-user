@@ -22,6 +22,12 @@ const TextAreaControl = ({
 
   let rex = "";
   switch (ctl) {
+    case formCtrlTypes.max1000:
+      rex = Regex.max1000;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      break;
     case formCtrlTypes.message:
       rex = Regex.message;
       if (required && checkEmptyVal(value)) {

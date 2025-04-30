@@ -71,8 +71,8 @@ const Notifications = () => {
   const setSearchInitialFormData = () => {
     return {
       txtkeyword: "",
-      txtfromdate: moment().subtract(1, "month"),
-      txttodate: moment(),
+      txtfromdate: "", //moment().subtract(1, "month"),
+      txttodate: "", //moment(),
       ddlnotificationtype: null,
     };
   };
@@ -138,13 +138,18 @@ const Notifications = () => {
     //Add date error to form errors.
     delete formErrors["date"];
     if (!isShowall) {
-      let dateCheck = checkStartEndDateGreater(
-        searchFormData.txtfromdate,
-        searchFormData.txttodate
-      );
+      if (
+        !checkEmptyVal(searchFormData.txtfromdate) &&
+        !checkEmptyVal(searchFormData.txttodate)
+      ) {
+        let dateCheck = checkStartEndDateGreater(
+          searchFormData.txtfromdate,
+          searchFormData.txttodate
+        );
 
-      if (!checkEmptyVal(dateCheck)) {
-        formErrors["date"] = dateCheck;
+        if (!checkEmptyVal(dateCheck)) {
+          formErrors["date"] = dateCheck;
+        }
       }
     }
 

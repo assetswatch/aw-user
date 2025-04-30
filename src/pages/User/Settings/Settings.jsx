@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import config from "../../config.json";
-import { useAuth } from "../../contexts/AuthContext";
+import config from "../../../config.json";
+import { useAuth } from "../../../contexts/AuthContext";
 import {
   apiReqResLoader,
   checkEmptyVal,
@@ -11,23 +11,23 @@ import {
   SetPageLoaderNavLinks,
   setSelectDefaultVal,
   SetAccordion,
-} from "../../utils/common";
+} from "../../../utils/common";
 import {
   API_ACTION_STATUS,
   ApiUrls,
   AppMessages,
   UserCookie,
   ValidationMessages,
-} from "../../utils/constants";
-import InputControl from "../../components/common/InputControl";
-import { formCtrlTypes } from "../../utils/formvalidation";
-import AsyncSelect from "../../components/common/AsyncSelect";
-import FileControl from "../../components/common/FileControl";
-import TextAreaControl from "../../components/common/TextAreaControl";
-import { Toast } from "../../components/common/ToastView";
-import { axiosPost } from "../../helpers/axiosHelper";
-import { routeNames } from "../../routes/routes";
-import getuuid from "../../helpers/uuidHelper";
+} from "../../../utils/constants";
+import InputControl from "../../../components/common/InputControl";
+import { formCtrlTypes } from "../../../utils/formvalidation";
+import AsyncSelect from "../../../components/common/AsyncSelect";
+import FileControl from "../../../components/common/FileControl";
+import TextAreaControl from "../../../components/common/TextAreaControl";
+import { Toast } from "../../../components/common/ToastView";
+import { axiosPost } from "../../../helpers/axiosHelper";
+import { routeNames } from "../../../routes/routes";
+import getuuid from "../../../helpers/uuidHelper";
 
 const Settings = () => {
   let $ = window.$;

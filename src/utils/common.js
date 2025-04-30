@@ -130,6 +130,9 @@ export function SetPageLoaderNavLinks() {
         case routeNames.servicedetails.path.toLowerCase():
           activelink = "services";
           break;
+        case routeNames.applications.path.toLowerCase():
+          activelink = "applications";
+          break;
       }
 
       $('[id^="nav-"],[id^="nav-lnk-"],[id^="page-lnk-"]')
