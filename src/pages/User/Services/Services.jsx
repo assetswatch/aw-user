@@ -29,8 +29,8 @@ const Services = () => {
   const setSearchInitialFormData = () => {
     return {
       txtkeyword: "",
-      txtfromdate: moment().subtract(1, "month"),
-      txttodate: moment(),
+      txtfromdate: "", //moment().subtract(1, "month"),
+      txttodate: "", //moment(),
       ddlnotificationtype: null,
     };
   };

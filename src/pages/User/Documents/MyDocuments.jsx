@@ -505,8 +505,8 @@ const MyDocuments = () => {
   const setSearchInitialFormData = () => {
     return {
       txtkeyword: "",
-      txtfromdate: moment().subtract(3, "month"),
-      txttodate: moment(),
+      txtfromdate: "", //moment().subtract(3, "month"),
+      txttodate: "", //moment(),
       ddldocumenttype: 0,
     };
   };
@@ -572,13 +572,18 @@ const MyDocuments = () => {
     //Add date error to form errors.
     delete formErrors["date"];
     if (!isShowall) {
-      let dateCheck = checkStartEndDateGreater(
-        searchFormData.txtfromdate,
-        searchFormData.txttodate
-      );
+      if (
+        !checkEmptyVal(searchFormData.txtfromdate) &&
+        !checkEmptyVal(searchFormData.txttodate)
+      ) {
+        let dateCheck = checkStartEndDateGreater(
+          searchFormData.txtfromdate,
+          searchFormData.txttodate
+        );
 
-      if (!checkEmptyVal(dateCheck)) {
-        formErrors["date"] = dateCheck;
+        if (!checkEmptyVal(dateCheck)) {
+          formErrors["date"] = dateCheck;
+        }
       }
     }
 

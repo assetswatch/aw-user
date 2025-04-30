@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import config from "../../config.json";
-import { useAuth } from "../../contexts/AuthContext";
+import config from "../../../config.json";
+import { useAuth } from "../../../contexts/AuthContext";
 import {
   apiReqResLoader,
   GetUserCookieValues,
@@ -10,21 +10,21 @@ import {
   SetAccordion,
   showHideCtrl,
   checkEmptyVal,
-} from "../../utils/common";
+} from "../../../utils/common";
 import {
   API_ACTION_STATUS,
   ApiUrls,
   AppMessages,
   UserCookie,
-} from "../../utils/constants";
-import { Toast } from "../../components/common/ToastView";
-import { axiosPost } from "../../helpers/axiosHelper";
-import { routeNames } from "../../routes/routes";
-import { useUserBrandingTypesGateway } from "../../hooks/useUserBrandingTypesGateway";
-import LazyImage from "../../components/common/LazyImage";
-import InputControl from "../../components/common/InputControl";
-import { formCtrlTypes } from "../../utils/formvalidation";
-import FileControl from "../../components/common/FileControl";
+} from "../../../utils/constants";
+import { Toast } from "../../../components/common/ToastView";
+import { axiosPost } from "../../../helpers/axiosHelper";
+import { routeNames } from "../../../routes/routes";
+import { useUserBrandingTypesGateway } from "../../../hooks/useUserBrandingTypesGateway";
+import LazyImage from "../../../components/common/LazyImage";
+import InputControl from "../../../components/common/InputControl";
+import { formCtrlTypes } from "../../../utils/formvalidation";
+import FileControl from "../../../components/common/FileControl";
 
 const Settings = () => {
   let $ = window.$;

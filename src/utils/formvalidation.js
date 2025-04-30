@@ -11,6 +11,7 @@ const length6 = 6;
 const length7 = 7;
 const length8 = 8;
 const length9 = 9;
+const length11 = 11;
 const length10 = 10;
 const length13 = 13;
 const length15 = 15;
@@ -49,6 +50,7 @@ const RegexPattern = {
   pricenegitive: /^-?[0-9]+(?:[.,][0-9]*)?$/,
   cardexpiry: /^(0[1-9]|1[0-2])\/\d{4}$/,
   alphanumhyphendotspace: /^[a-zA-Z0-9 _.-]+$/,
+  numhyphen: /^[0-9-]+$/,
 };
 
 const checkPriceValue = (value) => {
@@ -101,6 +103,7 @@ export const Regex = {
     required: ValidationMessages.LNameReq,
   },
   fname: { max: length50, required: ValidationMessages.FNameReq },
+  mname: { max: length50, required: ValidationMessages.MNameReq },
   lname: {
     max: length50,
     required: ValidationMessages.LNameReq,
@@ -196,6 +199,13 @@ export const Regex = {
     required: ValidationMessages.WebsiteReq,
     invalid: ValidationMessages.WebsiteInvalid,
   },
+  ssn: {
+    min: length11,
+    max: length11,
+    pattern: RegexPattern.numhyphen,
+    required: ValidationMessages.SSNReq,
+    invalid: ValidationMessages.SSNInvalid,
+  },
   last4ssn: {
     min: length4,
     max: length4,
@@ -242,6 +252,9 @@ export const Regex = {
   message: {
     max: length500,
     required: ValidationMessages.MessageReq,
+  },
+  max1000: {
+    max: length1000,
   },
   aboutme: {
     max: length1000,
@@ -517,6 +530,13 @@ export const formCtrlTypes = {
       max: length50,
     },
   },
+  mname: {
+    lbl: "Middle name (optional):",
+    input: {
+      type: "text",
+      max: length50,
+    },
+  },
   lname: {
     lbl: "Last name:",
     input: {
@@ -674,6 +694,30 @@ export const formCtrlTypes = {
       max: length250,
     },
   },
+  ssn: {
+    lbl: "Social secuirty number (SSN):",
+    input: {
+      type: "text",
+      min: length11,
+      max: length11,
+      keyEvents: {
+        onKeyPress: (e) => {
+          if (!RegexPattern.numhyphen.test(e.key)) {
+            e.preventDefault();
+          }
+        },
+        onInput: (e) => {
+          let value = e.target.value.replace(/\D/g, "");
+          if (value.length > 9) value = value.slice(0, 9);
+          const formatted =
+            value.slice(0, 3) +
+            (value.length >= 4 ? "-" + value.slice(3, 5) : "") +
+            (value.length >= 6 ? "-" + value.slice(5, 9) : "");
+          e.target.value = formatted;
+        },
+      },
+    },
+  },
   last4ssn: {
     lbl: "Last 4 SSN:",
     input: {
@@ -819,6 +863,13 @@ export const formCtrlTypes = {
     input: {
       type: "text",
       max: length500,
+    },
+  },
+  max1000: {
+    lbl: "",
+    input: {
+      type: "text",
+      max: length1000,
     },
   },
   aboutme: {

@@ -836,6 +836,122 @@ table th {
 .hover-text-underline:hover {
   text-decoration: underline;
 }
+/*Wizard Style*/
+
+/* Wizard.css */
+.wizard-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.step-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.step-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  font-weight: bold;
+  color: #6c757d;
+  transition: border-color 0.4s linear, background-color 0.4s linear,
+    color 0.4s linear;
+  position: relative;
+}
+
+.step-label {
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+
+.step-wrapper:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  right: 0;
+  height: 2px;
+  background-color: #e4e4e4;
+  z-index: 1;
+  width: 100%;
+}
+
+/* This draws the line between steps */
+.step-wrapper:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  right: 0;
+  height: 2px;
+  background-color: #ccc;
+  z-index: 1;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s linear, background-color 0.4s linear;
+}
+
+/* When completed, animate the line growing */
+.step-wrapper.completed:not(:last-child)::after {
+  background-color: var(--theme-primary-color);
+  transform: scaleX(1);
+  width: 100%;
+}
+
+.step-wrapper.active .step-circle {
+  border-color: var(--theme-primary-color);
+  color: var(--theme-primary-color);
+}
+
+.step-wrapper.active .step-label,
+.step-wrapper.completed .step-label {
+  color: var(--theme-primary-color);
+}
+
+.step-wrapper.completed .step-circle {
+  background-color: var(--theme-primary-color);
+  border-color: var(--theme-primary-color);
+  color: #fff;
+}
+@media screen and (max-width: 1024px) {
+  .step-label.application {
+    font-size: 0.75rem !important;
+  }
+}
+@media screen and (min-width: 767px) and (max-width: 1023px) {
+  .step-label.application {
+    font-size: 0.75rem !important;
+    display: none;
+  }
+
+  .step-wrapper.active .step-label.application {
+    display: block;
+    position: absolute;
+    top: 25px;
+  }
+}
+@media screen and (max-width: 767px) {
+  .step-label.application {
+    font-size: 0.85rem !important;
+    display: none;
+  }
+}
+
+/* Wizard.css end */
 /*===============================================================================
 Button Style
 ===============================================================================*/

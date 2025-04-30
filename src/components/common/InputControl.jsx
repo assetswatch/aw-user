@@ -82,6 +82,12 @@ const InputControl = ({
         formErrors[name] = rex.required;
       }
       break;
+    case formCtrlTypes.mname:
+      rex = Regex.mname;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      break;
     case formCtrlTypes.lname:
       rex = Regex.lname;
       if (required && checkEmptyVal(value)) {
@@ -181,6 +187,19 @@ const InputControl = ({
       if (required && checkEmptyVal(value)) {
         formErrors[name] = rex.required;
       } else if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      }
+      break;
+    case formCtrlTypes.ssn:
+      rex = Regex.ssn;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      } else if (!checkEmptyVal(value) && !rex.pattern.test(value)) {
+        formErrors[name] = rex.invalid;
+      } else if (
+        !checkEmptyVal(value) &&
+        !(value?.length >= rex.min && value?.length <= rex.max)
+      ) {
         formErrors[name] = rex.invalid;
       }
       break;

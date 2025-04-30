@@ -664,6 +664,16 @@ const UserHeader = () => {
                       Services
                     </Link>
                   </li>
+                  <li className="nav-item d-none">
+                    <Link
+                      className="nav-link"
+                      id="nav-applications"
+                      to={routeNames.applications.path}
+                    >
+                      <i className="fa fa-file-alt pe-2"></i>
+                      Applications
+                    </Link>
+                  </li>
                   <li className="nav-item">
                     <Link
                       className="nav-link"
@@ -795,6 +805,16 @@ const UserHeader = () => {
                       Services
                     </Link>
                   </li>
+                  <li className="nav-item d-none">
+                    <Link
+                      className="nav-link"
+                      id="nav-applications"
+                      to={routeNames.applications.path}
+                    >
+                      <i className="fa fa-file-alt pe-2"></i>
+                      Applications
+                    </Link>
+                  </li>
                   <li className="nav-item">
                     <Link
                       className="nav-link"
@@ -907,6 +927,16 @@ const UserHeader = () => {
                     >
                       <i className="fa fa-screwdriver-wrench pe-2"></i>
                       Services
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link"
+                      id="nav-applications"
+                      to={routeNames.applications.path}
+                    >
+                      <i className="fa fa-file-alt pe-2"></i>
+                      Applications
                     </Link>
                   </li>
                   <li className="nav-item">
