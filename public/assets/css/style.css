@@ -568,6 +568,9 @@ textarea.form-control {
 .box-shadow {
   box-shadow: 0 0.3rem 1rem rgba(0, 0, 0, 0.1) !important;
 }
+.box-shadow-top {
+  box-shadow: 0 -1rem 0.1rem -1rem rgba(0, 0, 0, 0.1) !important;
+}
 
 .shadow-text {
   font-weight: 400;
@@ -681,6 +684,11 @@ table th {
 .artical-list li a {
   padding: 8px 0;
   display: inline-block;
+}
+.disc-list li {
+  list-style-type: disc;
+  list-style-position: outside;
+  padding-left: 0.1rem;
 }
 .line-list li {
   position: relative;
@@ -1562,6 +1570,54 @@ Header Style Start
 .bo-b1-primary {
   border-bottom: 1px solid var(--theme-primary-color) !important;
 }
+.bo-b1-lihover {
+  border-bottom: 1px solid var(--theme-li-hover-bg-color) !important;
+}
+.bo-t2-primary {
+  border-top: 2px solid var(--theme-primary-color) !important;
+}
+.bo-b2-primary {
+  border-bottom: 2px solid var(--theme-primary-color) !important;
+}
+.filter-section {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: scaleY(0.95);
+  transition: max-height 0.4s ease, opacity 0.4s ease, transform 0.4s ease;
+}
+
+.filter-section.show {
+  max-height: 500px; /* Adjust based on content */
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+.filter-section.hide {
+  max-height: 0;
+  opacity: 0;
+  transform: scaleY(0.95);
+}
+.bo2-transparent {
+  border: 2px solid transparent;
+}
+.transition2sl {
+  transition: all 0.2s linear;
+}
+
+.hoverbo1bg-primary:hover {
+  border: 2px solid var(--theme-primary-color) !important;
+  background-color: color-mix(
+    in srgb,
+    var(--theme-primary-color) 8%,
+    white
+  ) !important;
+}
+
+.hover-shadow:hover {
+  box-shadow: 0 0.3rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
 .fixed-column {
   position: fixed;
 
@@ -1622,6 +1678,10 @@ Header Style Start
   line-height: 30px;
   font-size: 12px;
   font-weight: normal;
+}
+.btn-glow ul {
+  background: transparent;
+  filter: brightness(90%) !important;
 }
 .btn-glow {
   background: transparent;
@@ -4197,6 +4257,9 @@ i .ctooltip {
   background-color: transparent;
   border-bottom: 1px solid #ececec;
 }
+.items-list.bg-transparent tr .bo-b-0 {
+  border-bottom: none !important;
+}
 .items-list tr td,
 .items-list tr th {
   padding: 20px;
@@ -4640,6 +4703,11 @@ Social Media Style Start
 .hovertxt-decnone:hover,
 .hovertxt-decnone:hover span {
   text-decoration: none !important;
+}
+
+.hovertxt-dec:hover,
+.hovertxt-dec:hover span {
+  text-decoration: underline !important;
 }
 
 .imgs-ol-container {
@@ -5216,7 +5284,7 @@ Responsive Style Start
     font-size: 13px !important;
   }
   .cwn {
-    left: calc(100% - 42.5px) !important;
+    left: calc(100% - 50px) !important;
   }
 }
 

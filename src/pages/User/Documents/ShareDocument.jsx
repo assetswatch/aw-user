@@ -28,6 +28,7 @@ import AsyncSelect from "../../../components/common/AsyncSelect";
 import PdfViewer from "../../../components/common/PdfViewer";
 import { useProfileTypesGateway } from "../../../hooks/useProfileTypesGateway";
 import InputControl from "../../../components/common/InputControl";
+import GoBackPanel from "../../../components/common/GoBackPanel";
 
 const ShareDocument = () => {
   let $ = window.$;
@@ -256,166 +257,192 @@ const ShareDocument = () => {
   return (
     <>
       {SetPageLoaderNavLinks()}
-      <div className="full-row  bg-light">
+      <div className="full-row  bg-light content-ph">
         <div className="container">
-          <div className="mx-auto col-12 shadow">
-            <div className="row bg-white xs-p-20 p-30 pb-30 border rounded">
-              <ol className="breadcrumb mb-0 bg-transparent p-0 col-md-8 col-lg-8 col-xl-8 mb-15">
-                <li className="breadcrumb-item" aria-current="page">
-                  {!checkObjNullorEmpty(documentDetails) && (
-                    <h6 className="mb-0 down-line pb-10 higlight-font">
-                      {documentDetails?.Name}.{documentDetails?.Extension}
-                    </h6>
-                  )}
-                </li>
-              </ol>
-              <div className="col-md-4 col-lg-4 col-xl-4 mb-15 text-lg-end px-0">
-                <span className="font-500 font-general">
-                  Modified On : {documentDetails?.ModifiedDateDisplay}
-                </span>
+          <div className="row">
+            <div className="col-12">
+              <div className="d-flex w-100">
+                <div className="flex-grow-1">
+                  <div className="breadcrumb my-1">
+                    <div className="breadcrumb-item bc-fh">
+                      <h6
+                        className="mb-3 down-line pb-10 cur-pointer"
+                        onClick={navigateToDocuments}
+                      >
+                        My Documents
+                      </h6>
+                    </div>
+                    <div className="breadcrumb-item bc-fh ctooltip-container">
+                      <span className="font-general font-500 cur-default">
+                        Share Document
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <GoBackPanel clickAction={navigateToDocuments} />
               </div>
+              <div className="full-row px-3 py-4 bg-white box-shadow rounded">
+                <div className="row container-fluid pb-30">
+                  <ol className="breadcrumb mb-0 bg-transparent p-0 col-md-8 col-lg-8 col-xl-8 mb-15">
+                    <li className="breadcrumb-item" aria-current="page">
+                      {!checkObjNullorEmpty(documentDetails) && (
+                        <h6 className="mb-0 down-line pb-10 higlight-font">
+                          {documentDetails?.Name}.{documentDetails?.Extension}
+                        </h6>
+                      )}
+                    </li>
+                  </ol>
+                  <div className="col-md-4 col-lg-4 col-xl-4 mb-15 text-lg-end px-0">
+                    <span className="font-500 font-general">
+                      Modified On : {documentDetails?.ModifiedDateDisplay}
+                    </span>
+                  </div>
 
-              <div className="container-fluid">
-                <div className="row">
-                  <div className="col px-0">
-                    {fileUrl ? (
-                      <div className="min-h-300">
-                        {documentDetails.Extension === "pdf" ? (
-                          <PdfViewer
-                            file={fileUrl}
-                            cssclass="mt-10"
-                          ></PdfViewer>
+                  <div className="container-fluid">
+                    <div className="row">
+                      <div className="col px-0">
+                        {fileUrl ? (
+                          <div className="min-h-300">
+                            {documentDetails.Extension === "pdf" ? (
+                              <PdfViewer
+                                file={fileUrl}
+                                cssclass="mt-10"
+                              ></PdfViewer>
+                            ) : (
+                              <div className="flex flex-center min-h-300 max-h-600">
+                                <img
+                                  src={fileUrl}
+                                  className="bg-light border rounded max-h-600"
+                                ></img>
+                              </div>
+                            )}
+                          </div>
                         ) : (
-                          <div className="flex flex-center min-h-300 max-h-600">
-                            <img
-                              src={fileUrl}
-                              className="bg-light border rounded max-h-600"
-                            ></img>
-                          </div>
+                          <DataLoader />
                         )}
-                      </div>
-                    ) : (
-                      <DataLoader />
-                    )}
 
-                    <form noValidate>
-                      <div className="container-fluid mt-20">
-                        <div className="row">
-                          <h6 className="mb-4 down-line pb-10 px-0">
-                            Share Document
-                          </h6>
-                          <div className="col px-0">
+                        <form noValidate>
+                          <div className="container-fluid mt-20">
                             <div className="row">
-                              <div className="col-md-3 mb-15">
-                                <AsyncSelect
-                                  placeHolder={
-                                    profileTypesList.length <= 0 &&
-                                    selectedProfileType == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlDefaultSelect
-                                  }
-                                  noData={
-                                    profileTypesList.length <= 0 &&
-                                    selectedProfileType == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.NoProfileTypes
-                                  }
-                                  options={profileTypesList}
-                                  onChange={(e) => {
-                                    handleProfileTypeChange(e);
-                                  }}
-                                  dataKey="ProfileTypeId"
-                                  dataVal="ProfileType"
-                                  value={selectedProfileType}
-                                  name="ddlprofiletype"
-                                  lbl={formCtrlTypes.profiletype}
-                                  lblClass="mb-0 lbl-req-field"
-                                  required={true}
-                                  errors={errors}
-                                  formErrors={formErrors}
-                                  tabIndex={1}
-                                  isSearchable={false}
-                                ></AsyncSelect>
-                              </div>
-                              <div className="col-md-5 mb-15">
-                                <AsyncSelect
-                                  placeHolder={
-                                    selectedJoinedUser == null ||
-                                    Object.keys(selectedJoinedUser).length === 0
-                                      ? AppMessages.DdlDefaultSelect
-                                      : joinedUsersData.length <= 0 &&
+                              <h6 className="mb-4 down-line pb-10 px-0">
+                                Share Document
+                              </h6>
+                              <div className="col px-0">
+                                <div className="row">
+                                  <div className="col-md-3 mb-15">
+                                    <AsyncSelect
+                                      placeHolder={
+                                        profileTypesList.length <= 0 &&
                                         selectedProfileType == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlDefaultSelect
-                                  }
-                                  noData={
-                                    selectedJoinedUser == null ||
-                                    Object.keys(selectedJoinedUser).length === 0
-                                      ? AppMessages.NoUsers
-                                      : joinedUsersData.length <= 0 &&
-                                        selectedProfileType == null &&
-                                        selectedProfileType != null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.NoUsers
-                                  }
-                                  options={joinedUsersData}
-                                  onChange={(e) => {
-                                    handleJoindUserChange(e);
-                                  }}
-                                  value={selectedJoinedUser}
-                                  name="ddljoinedusers"
-                                  lbl={formCtrlTypes.users}
-                                  lblClass="mb-0 lbl-req-field"
-                                  required={true}
-                                  errors={errors}
-                                  formErrors={formErrors}
-                                  isMulti={true}
-                                  isRenderOptions={false}
-                                  tabIndex={2}
-                                ></AsyncSelect>
-                              </div>
-                              <div className="col-md-4 mb-15">
-                                <InputControl
-                                  lblClass="mb-0"
-                                  name={`txtcomments`}
-                                  ctlType={formCtrlTypes.comments}
-                                  onChange={handleChange}
-                                  value={formData.txtcomments}
-                                  required={false}
-                                  errors={errors}
-                                  formErrors={formErrors}
-                                  rows={2}
-                                  tabIndex={3}
-                                ></InputControl>
-                              </div>
-                            </div>
-                            <hr className="w-100 text-primary my-20"></hr>
-                            <div className="row form-action d-flex flex-end">
-                              <div
-                                className="col-md-6 form-error"
-                                id="form-error"
-                              ></div>
-                              <div className="col-md-6">
-                                <button
-                                  className="btn btn-secondary"
-                                  id="btncancel"
-                                  onClick={onCancel}
-                                >
-                                  Cancel
-                                </button>
-                                <button
-                                  className="btn btn-primary"
-                                  id="btnshare"
-                                  onClick={onShare}
-                                >
-                                  Share
-                                </button>
+                                          ? AppMessages.DdLLoading
+                                          : AppMessages.DdlDefaultSelect
+                                      }
+                                      noData={
+                                        profileTypesList.length <= 0 &&
+                                        selectedProfileType == null
+                                          ? AppMessages.DdLLoading
+                                          : AppMessages.NoProfileTypes
+                                      }
+                                      options={profileTypesList}
+                                      onChange={(e) => {
+                                        handleProfileTypeChange(e);
+                                      }}
+                                      dataKey="ProfileTypeId"
+                                      dataVal="ProfileType"
+                                      value={selectedProfileType}
+                                      name="ddlprofiletype"
+                                      lbl={formCtrlTypes.profiletype}
+                                      lblClass="mb-0 lbl-req-field"
+                                      required={true}
+                                      errors={errors}
+                                      formErrors={formErrors}
+                                      tabIndex={1}
+                                      isSearchable={false}
+                                    ></AsyncSelect>
+                                  </div>
+                                  <div className="col-md-5 mb-15">
+                                    <AsyncSelect
+                                      placeHolder={
+                                        selectedJoinedUser == null ||
+                                        Object.keys(selectedJoinedUser)
+                                          .length === 0
+                                          ? AppMessages.DdlDefaultSelect
+                                          : joinedUsersData.length <= 0 &&
+                                            selectedProfileType == null
+                                          ? AppMessages.DdLLoading
+                                          : AppMessages.DdlDefaultSelect
+                                      }
+                                      noData={
+                                        selectedJoinedUser == null ||
+                                        Object.keys(selectedJoinedUser)
+                                          .length === 0
+                                          ? AppMessages.NoUsers
+                                          : joinedUsersData.length <= 0 &&
+                                            selectedProfileType == null &&
+                                            selectedProfileType != null
+                                          ? AppMessages.DdLLoading
+                                          : AppMessages.NoUsers
+                                      }
+                                      options={joinedUsersData}
+                                      onChange={(e) => {
+                                        handleJoindUserChange(e);
+                                      }}
+                                      value={selectedJoinedUser}
+                                      name="ddljoinedusers"
+                                      lbl={formCtrlTypes.users}
+                                      lblClass="mb-0 lbl-req-field"
+                                      required={true}
+                                      errors={errors}
+                                      formErrors={formErrors}
+                                      isMulti={true}
+                                      isRenderOptions={false}
+                                      tabIndex={2}
+                                    ></AsyncSelect>
+                                  </div>
+                                  <div className="col-md-4 mb-15">
+                                    <InputControl
+                                      lblClass="mb-0"
+                                      name={`txtcomments`}
+                                      ctlType={formCtrlTypes.comments}
+                                      onChange={handleChange}
+                                      value={formData.txtcomments}
+                                      required={false}
+                                      errors={errors}
+                                      formErrors={formErrors}
+                                      rows={2}
+                                      tabIndex={3}
+                                    ></InputControl>
+                                  </div>
+                                </div>
+                                <hr className="w-100 text-primary my-20"></hr>
+                                <div className="row form-action d-flex flex-end">
+                                  <div
+                                    className="col-md-6 form-error"
+                                    id="form-error"
+                                  ></div>
+                                  <div className="col-md-6">
+                                    <button
+                                      className="btn btn-secondary"
+                                      id="btncancel"
+                                      onClick={onCancel}
+                                    >
+                                      Cancel
+                                    </button>
+                                    <button
+                                      className="btn btn-primary"
+                                      id="btnshare"
+                                      onClick={onShare}
+                                    >
+                                      Share
+                                    </button>
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
+                        </form>
                       </div>
-                    </form>
+                    </div>
                   </div>
                 </div>
               </div>

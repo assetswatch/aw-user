@@ -28,6 +28,7 @@ import FileControl from "../../../components/common/FileControl";
 import TextAreaControl from "../../../components/common/TextAreaControl";
 import { Toast } from "../../../components/common/ToastView";
 import getuuid from "../../../helpers/uuidHelper";
+import GoBackPanel from "../../../components/common/GoBackPanel";
 
 const EditProfile = () => {
   let $ = window.$;
@@ -362,11 +363,30 @@ const EditProfile = () => {
     <>
       {SetPageLoaderNavLinks()}
 
-      <div className="full-row bg-light">
+      <div className="full-row bg-light content-ph">
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <h5 className="mb-4 down-line">Edit Profile</h5>
+              <div className="d-flex w-100">
+                <div className="flex-grow-1">
+                  <div className="breadcrumb my-1">
+                    <div className="breadcrumb-item bc-fh">
+                      <h6
+                        className="mb-3 down-line pb-10 cur-pointer"
+                        onClick={onCancel}
+                      >
+                        My Profile
+                      </h6>
+                    </div>
+                    <div className="breadcrumb-item bc-fh ctooltip-container">
+                      <span className="font-general font-500 cur-default">
+                        Edit Profile
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <GoBackPanel clickAction={onCancel} />
+              </div>
               <div className="row">
                 <div className="col-xl-3 col-lg-4">
                   {/*============== Profile Start ==============*/}

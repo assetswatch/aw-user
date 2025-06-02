@@ -1,9 +1,8 @@
-import React, { lazy, useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
   apiReqResLoader,
   checkEmptyVal,
   checkStartEndDateGreater,
-  debounce,
   GetUserCookieValues,
   replacePlaceHolders,
   SetPageLoaderNavLinks,
@@ -15,17 +14,14 @@ import { useAuth } from "../../../contexts/AuthContext";
 import {
   API_ACTION_STATUS,
   ApiUrls,
-  AppConstants,
   AppMessages,
   GridDefaultValues,
   NotificationTypes,
   UserCookie,
-  ValidationMessages,
 } from "../../../utils/constants";
-import moment from "moment";
 import DateControl from "../../../components/common/DateControl";
 import InputControl from "../../../components/common/InputControl";
-import { formCtrlTypes, Regex } from "../../../utils/formvalidation";
+import { formCtrlTypes } from "../../../utils/formvalidation";
 import { useUserConnectionStatusTypesGateway } from "../../../hooks/useUserConnectionStatusTypesGateway";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 import { axiosPost } from "../../../helpers/axiosHelper";
@@ -35,14 +31,14 @@ import {
   ModalView,
 } from "../../../components/common/LazyComponents";
 import { useUserConnectionRequestTypes } from "../../../hooks/useUserConnectionRequestTypes";
-import AsyncRemoteSelect from "../../../components/common/AsyncRemoteSelect";
 import TextAreaControl from "../../../components/common/TextAreaControl";
 import { Toast } from "../../../components/common/ToastView";
 import { routeNames } from "../../../routes/routes";
+import GridFiltersPanel from "../../../components/common/GridFiltersPanel";
 
 const Tenants = () => {
   let $ = window.$;
-  const location = useLocation();
+
   const navigate = useNavigate();
   const { loggedinUser } = useAuth();
 
@@ -61,21 +57,6 @@ const Tenants = () => {
 
   const { userConnectionStatusTypes } = useUserConnectionStatusTypesGateway();
   const { userConnectionRequestTypes } = useUserConnectionRequestTypes();
-
-  let formSendInvitaionErrors = {};
-  const [sendInvitationErrors, setSendInvitationErrors] = useState({});
-  const [sendInviteModalState, setSendInviteModalState] = useState(false);
-  const [selectedUsersProfile, setSelectedUsersProfile] = useState(null);
-  const [inputProfileValue, setInputProfileValue] = useState("");
-  function setInitialSendInvitationFormData() {
-    return {
-      txtmessage: "",
-    };
-  }
-
-  const [sendInvitationFormData, setSendInvitationFormData] = useState(
-    setInitialSendInvitationFormData()
-  );
 
   //Modal
   const [modalDeleteConfirmShow, setModalDeleteConfirmShow] = useState(false);
@@ -552,180 +533,15 @@ const Tenants = () => {
 
   //Delete confirmation Modal actions
 
-  // Send invite modal
-
-  //Get user profiles
-  const getUsersProfiles = async (searchValue) => {
-    if (checkEmptyVal(searchValue)) return [];
-    let objParams = {
-      AccountId: accountid,
-      ProfileId: profileid,
-      ProfileTypeId: config.userProfileTypes.Tenant,
-      Keyword: searchValue,
-    };
-
-    return axiosPost(
-      `${config.apiBaseUrl}${ApiUrls.getDdlUsersProfiles}`,
-      objParams
-    )
-      .then((response) => {
-        let objResponse = response.data;
-        if (objResponse.StatusCode == 200) {
-          return objResponse.Data.map((item) => ({
-            label: (
-              <div className="flex items-center">
-                <div className="w-40px h-40px mr-10 flex-shrink-0">
-                  <img
-                    alt=""
-                    src={item.PicPath}
-                    className="rounded cur-pointer w-40px"
-                  />
-                </div>
-                <div>
-                  <span className="text-primary lh-1 d-block">
-                    {item.FirstName + " " + item.LastName}
-                  </span>
-                  <span className="small text-light">{item.ProfileType}</span>
-                </div>
-              </div>
-            ),
-            value: item.ProfileId,
-            customlabel: item.FirstName + " " + item.LastName,
-          }));
-        } else {
-          return [];
-        }
-      })
-      .catch((err) => {
-        console.error(
-          `"API :: ${ApiUrls.getDdlUsersProfiles}, Error ::" ${err}`
-        );
-        return [];
-      });
-  };
-
-  const usersProfilesOptions = useCallback(
-    debounce((inputval, callback) => {
-      if (inputval?.length >= AppConstants.DdlSearchMinLength) {
-        getUsersProfiles(inputval).then((options) => {
-          callback && callback(options);
-        });
-      } else {
-        callback && callback([]);
-      }
-    }, AppConstants.DebounceDelay),
-    []
-  );
-
-  const handleDdlUsersProfilesChange = () => {
-    usersProfilesOptions();
-  };
-
-  const handleInputProfileChange = (newValue, actionMeta) => {
-    if (
-      actionMeta.action !== "menu-close" &&
-      actionMeta.action !== "input-blur"
-    ) {
-      setInputProfileValue(newValue);
-    }
-  };
-
-  const handleSendInvitationInputChange = (e) => {
-    const { name, value } = e?.target;
-    setSendInvitationFormData({
-      ...sendInvitationFormData,
-      [name]: value,
-    });
-  };
-
-  const onSendInviteModalShow = (e) => {
+  const onSendInvite = (e) => {
     e.preventDefault();
-    setSendInviteModalState(true);
+    navigate(
+      routeNames.connectionssendinvite.path +
+        `?p=${Object.keys(config.userProfileTypes).find(
+          (k) => config.userProfileTypes[k] === config.userProfileTypes.Tenant
+        )}`
+    );
   };
-
-  const onSendInviteModalHide = (e) => {
-    e?.preventDefault();
-    setSendInviteModalState(false);
-    setSelectedUsersProfile(null);
-    setInputProfileValue("");
-    setSendInvitationErrors({});
-    setSendInvitationFormData(setInitialSendInvitationFormData());
-  };
-
-  const onSendInvitation = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (
-      checkEmptyVal(selectedUsersProfile) &&
-      checkEmptyVal(inputProfileValue)
-    ) {
-      formSendInvitaionErrors["ddlusersprofiles"] =
-        ValidationMessages.TenantReq;
-    } else if (
-      !checkEmptyVal(inputProfileValue) &&
-      !Regex.email.pattern.test(inputProfileValue)
-    ) {
-      formSendInvitaionErrors["ddlusersprofiles"] =
-        ValidationMessages.EmailInvalid;
-    }
-
-    if (Object.keys(formSendInvitaionErrors).length === 0) {
-      setSendInvitationErrors({});
-      apiReqResLoader("btnsendinvitation", "Sending", API_ACTION_STATUS.START);
-
-      let isapimethoderr = false;
-      let objBodyParams = {
-        InviterId: profileid,
-        InviteeId: parseInt(setSelectDefaultVal(selectedUsersProfile)),
-        ConnectionForProfileTypeId: config.userProfileTypes.Tenant,
-        Email: inputProfileValue.trim(),
-        Message: sendInvitationFormData.txtmessage,
-      };
-
-      axiosPost(
-        `${config.apiBaseUrl}${ApiUrls.createUserConnection}`,
-        objBodyParams
-      )
-        .then((response) => {
-          let objResponse = response.data;
-          if (objResponse.StatusCode === 200) {
-            if (objResponse.Data.Id > 0) {
-              if (objResponse.Data.Status === 200) {
-                Toast.success(objResponse.Data.Message);
-                getUsers({});
-                onSendInviteModalHide();
-              } else {
-                Toast.info(objResponse.Data.Message);
-              }
-            }
-          } else {
-            isapimethoderr = true;
-          }
-        })
-        .catch((err) => {
-          isapimethoderr = true;
-          console.error(
-            `"API :: ${ApiUrls.createUserConnection}, Error ::" ${err}`
-          );
-        })
-        .finally(() => {
-          if (isapimethoderr == true) {
-            Toast.error(AppMessages.SomeProblem);
-          }
-          apiReqResLoader(
-            "btnsendinvitation",
-            "Send",
-            API_ACTION_STATUS.COMPLETED
-          );
-        });
-    } else {
-      $(`[name=${Object.keys(formSendInvitaionErrors)[0]}]`).focus();
-      setSendInvitationErrors(formSendInvitaionErrors);
-    }
-  };
-
-  // Send invite modal
 
   // Send message modal
 
@@ -784,12 +600,7 @@ const Tenants = () => {
 
     if (Object.keys(formSendMessageErrors).length === 0) {
       setSendMessageErrors({});
-      apiReqResLoader(
-        "btnsendmessage",
-        "Sending",
-        API_ACTION_STATUS.START,
-        false
-      );
+      apiReqResLoader("btnsendmessage", "Sending", API_ACTION_STATUS.START);
 
       let isapimethoderr = false;
       if (sendMessageFormData.toid != 0) {
@@ -879,8 +690,7 @@ const Tenants = () => {
             apiReqResLoader(
               "btnsendmessage",
               "Send",
-              API_ACTION_STATUS.COMPLETED,
-              false
+              API_ACTION_STATUS.COMPLETED
             );
           });
       }
@@ -907,34 +717,18 @@ const Tenants = () => {
   return (
     <>
       {SetPageLoaderNavLinks()}
-      <div className="full-row bg-light">
+      <div className="full-row bg-light content-ph">
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <div className="row">
-                <div className="col-6">
-                  <div className="breadcrumb">
-                    <div className="breadcrumb-item bc-fh">
-                      <h6 className="mb-3 down-line pb-10">Connections</h6>
-                    </div>
-                    <div className="breadcrumb-item bc-fh ctooltip-container">
-                      <label className="font-general font-500 cur-default">
-                        Tenants
-                      </label>
-                    </div>
-                  </div>
+              <div className="breadcrumb my-1">
+                <div className="breadcrumb-item bc-fh">
+                  <h6 className="mb-3 down-line pb-10">Connections</h6>
                 </div>
-                <div className="col-6 d-flex justify-content-end align-items-end pb-10">
-                  <button
-                    className="btn btn-primary btn-mini btn-glow shadow rounded"
-                    name="btnsendinvite"
-                    id="btnsendinvite"
-                    type="button"
-                    onClick={onSendInviteModalShow}
-                  >
-                    <i className="flaticon-envelope flat-mini position-relative me-1 t-1"></i>{" "}
-                    Send Invite
-                  </button>
+                <div className="breadcrumb-item bc-fh ctooltip-container">
+                  <label className="font-general font-500 cur-default">
+                    Tenants
+                  </label>
                 </div>
               </div>
               <div className="tabw100 tab-action shadow rounded bg-white">
@@ -961,146 +755,158 @@ const Tenants = () => {
                 </ul>
                 <div className="tab-element">
                   {/*============== Search Start ==============*/}
-                  <div className="woo-filter-bar full-row p-3 grid-search bo-0">
-                    <div className="container-fluid v-center">
-                      <div className="row">
-                        <div className="col px-0">
-                          <form noValidate>
-                            <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
-                              <div className="col-lg-4 col-xl-2 col-md-6">
-                                <InputControl
-                                  lblClass="mb-0"
-                                  lblText="Search by Name/ Email / Phone"
-                                  name="txtkeyword"
-                                  ctlType={formCtrlTypes.searchkeyword}
-                                  value={searchFormData.txtkeyword}
-                                  onChange={handleChange}
-                                  formErrors={formErrors}
-                                ></InputControl>
+                  <GridFiltersPanel
+                    divFilterControls={
+                      <div
+                        className="container-fluid v-center"
+                        id="div-filters-controls-panel"
+                      >
+                        <div className="row">
+                          <div className="col px-0">
+                            <form noValidate>
+                              <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
+                                <div className="col-lg-4 col-xl-2 col-md-6">
+                                  <InputControl
+                                    lblClass="mb-0"
+                                    lblText="Search by Name/ Email / Phone"
+                                    name="txtkeyword"
+                                    ctlType={formCtrlTypes.searchkeyword}
+                                    value={searchFormData.txtkeyword}
+                                    onChange={handleChange}
+                                    formErrors={formErrors}
+                                  ></InputControl>
+                                </div>
+                                <div className="col-lg-4 col-xl-2 col-md-3">
+                                  <AsyncSelect
+                                    placeHolder={
+                                      userConnectionStatusTypes.length <= 0 &&
+                                      searchFormData.ddlstatus == null
+                                        ? AppMessages.DdLLoading
+                                        : AppMessages.DdlDefaultSelect
+                                    }
+                                    noData={
+                                      userConnectionStatusTypes.length <= 0 &&
+                                      searchFormData.ddlstatus == null
+                                        ? AppMessages.DdLLoading
+                                        : AppMessages.DdlNoData
+                                    }
+                                    options={userConnectionStatusTypes}
+                                    dataKey="Id"
+                                    dataVal="Type"
+                                    onChange={(e) => ddlChange(e, "ddlstatus")}
+                                    value={searchFormData.ddlstatus}
+                                    defualtselected={searchFormData.ddlstatus}
+                                    name="ddlstatus"
+                                    lbl={formCtrlTypes.status}
+                                    lblClass="mb-0"
+                                    lblText="Status"
+                                    className="ddlborder"
+                                    isClearable={false}
+                                    isSearchCtl={true}
+                                    formErrors={formErrors}
+                                  ></AsyncSelect>
+                                </div>
+                                <div className="col-lg-4 col-xl-2 col-md-3">
+                                  <AsyncSelect
+                                    placeHolder={
+                                      userConnectionRequestTypes.length <= 0 &&
+                                      searchFormData.ddlrequesttype == null
+                                        ? AppMessages.DdLLoading
+                                        : AppMessages.DdlDefaultSelect
+                                    }
+                                    noData={
+                                      userConnectionRequestTypes.length <= 0 &&
+                                      searchFormData.ddlrequesttype == null
+                                        ? AppMessages.DdLLoading
+                                        : AppMessages.DdlNoData
+                                    }
+                                    options={userConnectionRequestTypes}
+                                    dataKey="Id"
+                                    dataVal="Type"
+                                    onChange={(e) =>
+                                      ddlChange(e, "ddlrequesttype")
+                                    }
+                                    value={searchFormData.ddlrequesttype}
+                                    defualtselected={
+                                      searchFormData.ddlrequesttype
+                                    }
+                                    name="ddlrequesttype"
+                                    lbl={formCtrlTypes.requesttype}
+                                    lblClass="mb-0"
+                                    lblText="Request type"
+                                    className="ddlborder"
+                                    isClearable={false}
+                                    isSearchCtl={true}
+                                    formErrors={formErrors}
+                                  ></AsyncSelect>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-4">
+                                  <DateControl
+                                    lblClass="mb-0"
+                                    lblText="Start date"
+                                    name="txtfromdate"
+                                    required={false}
+                                    onChange={(dt) =>
+                                      onDateChange(dt, "txtfromdate")
+                                    }
+                                    value={searchFormData.txtfromdate}
+                                    isTime={false}
+                                  ></DateControl>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-4">
+                                  <DateControl
+                                    lblClass="mb-0"
+                                    lblText="End date"
+                                    name="txttodate"
+                                    required={false}
+                                    onChange={(dt) =>
+                                      onDateChange(dt, "txttodate")
+                                    }
+                                    value={searchFormData.txttodate}
+                                    isTime={false}
+                                    objProps={{
+                                      checkVal: searchFormData.txtfromdate,
+                                    }}
+                                  ></DateControl>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-4 grid-search-action">
+                                  <label
+                                    className="mb-0 form-error w-100"
+                                    id="search-val-err-message"
+                                  ></label>
+                                  <button
+                                    className="btn btn-primary w- 100"
+                                    value="Search"
+                                    name="btnsearch"
+                                    type="button"
+                                    onClick={onSearch}
+                                  >
+                                    Search
+                                  </button>
+                                  <button
+                                    className="btn btn-primary w- 100"
+                                    value="Show all"
+                                    name="btnshowall"
+                                    type="button"
+                                    onClick={onShowAll}
+                                  >
+                                    Show All
+                                  </button>
+                                </div>
                               </div>
-                              <div className="col-lg-4 col-xl-2 col-md-3">
-                                <AsyncSelect
-                                  placeHolder={
-                                    userConnectionStatusTypes.length <= 0 &&
-                                    searchFormData.ddlstatus == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlDefaultSelect
-                                  }
-                                  noData={
-                                    userConnectionStatusTypes.length <= 0 &&
-                                    searchFormData.ddlstatus == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlNoData
-                                  }
-                                  options={userConnectionStatusTypes}
-                                  dataKey="Id"
-                                  dataVal="Type"
-                                  onChange={(e) => ddlChange(e, "ddlstatus")}
-                                  value={searchFormData.ddlstatus}
-                                  defualtselected={searchFormData.ddlstatus}
-                                  name="ddlstatus"
-                                  lbl={formCtrlTypes.status}
-                                  lblClass="mb-0"
-                                  lblText="Status"
-                                  className="ddlborder"
-                                  isClearable={false}
-                                  isSearchCtl={true}
-                                  formErrors={formErrors}
-                                ></AsyncSelect>
-                              </div>
-                              <div className="col-lg-4 col-xl-2 col-md-3">
-                                <AsyncSelect
-                                  placeHolder={
-                                    userConnectionRequestTypes.length <= 0 &&
-                                    searchFormData.ddlrequesttype == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlDefaultSelect
-                                  }
-                                  noData={
-                                    userConnectionRequestTypes.length <= 0 &&
-                                    searchFormData.ddlrequesttype == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlNoData
-                                  }
-                                  options={userConnectionRequestTypes}
-                                  dataKey="Id"
-                                  dataVal="Type"
-                                  onChange={(e) =>
-                                    ddlChange(e, "ddlrequesttype")
-                                  }
-                                  value={searchFormData.ddlrequesttype}
-                                  defualtselected={
-                                    searchFormData.ddlrequesttype
-                                  }
-                                  name="ddlrequesttype"
-                                  lbl={formCtrlTypes.requesttype}
-                                  lblClass="mb-0"
-                                  lblText="Request type"
-                                  className="ddlborder"
-                                  isClearable={false}
-                                  isSearchCtl={true}
-                                  formErrors={formErrors}
-                                ></AsyncSelect>
-                              </div>
-                              <div className="col-lg-3 col-xl-2 col-md-4">
-                                <DateControl
-                                  lblClass="mb-0"
-                                  lblText="Start date"
-                                  name="txtfromdate"
-                                  required={false}
-                                  onChange={(dt) =>
-                                    onDateChange(dt, "txtfromdate")
-                                  }
-                                  value={searchFormData.txtfromdate}
-                                  isTime={false}
-                                ></DateControl>
-                              </div>
-                              <div className="col-lg-3 col-xl-2 col-md-4">
-                                <DateControl
-                                  lblClass="mb-0"
-                                  lblText="End date"
-                                  name="txttodate"
-                                  required={false}
-                                  onChange={(dt) =>
-                                    onDateChange(dt, "txttodate")
-                                  }
-                                  value={searchFormData.txttodate}
-                                  isTime={false}
-                                  objProps={{
-                                    checkVal: searchFormData.txtfromdate,
-                                  }}
-                                ></DateControl>
-                              </div>
-                              <div className="col-lg-3 col-xl-2 col-md-4 grid-search-action">
-                                <label
-                                  className="mb-0 form-error w-100"
-                                  id="search-val-err-message"
-                                ></label>
-                                <button
-                                  className="btn btn-primary w- 100"
-                                  value="Search"
-                                  name="btnsearch"
-                                  type="button"
-                                  onClick={onSearch}
-                                >
-                                  Search
-                                </button>
-                                <button
-                                  className="btn btn-primary w- 100"
-                                  value="Show all"
-                                  name="btnshowall"
-                                  type="button"
-                                  onClick={onShowAll}
-                                >
-                                  Show All
-                                </button>
-                              </div>
-                            </div>
-                          </form>
+                            </form>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
+                    }
+                    elements={[
+                      {
+                        label: "Send Invite",
+                        icon: "flaticon-envelope flat-mini",
+                        onClick: onSendInvite,
+                      },
+                    ]}
+                  ></GridFiltersPanel>
                   {/*============== Search End ==============*/}
 
                   {/*============== Grid Start ==============*/}
@@ -1129,80 +935,6 @@ const Tenants = () => {
           </div>
         </div>
       </div>
-
-      {/*============== Send Invite Modal Start ==============*/}
-      {sendInviteModalState && (
-        <>
-          <ModalView
-            title={AppMessages.SendInvitaionModalTitle}
-            content={
-              <>
-                <div className="row">
-                  <div className="col-12 mb-15">
-                    <AsyncRemoteSelect
-                      placeHolder={AppMessages.DdlTypetoSearch}
-                      noData={AppMessages.NoTenants}
-                      loadOptions={usersProfilesOptions}
-                      handleInputChange={(e, val) => {
-                        handleInputProfileChange(e, val);
-                        handleDdlUsersProfilesChange(e, val.prevInputValue);
-                      }}
-                      onChange={(option) => {
-                        setSelectedUsersProfile(option);
-                        //setInputProfileValue(option ? option.customlabel : "");
-                      }}
-                      onBlur={() => {
-                        setInputProfileValue(inputProfileValue);
-                      }}
-                      inputValue={inputProfileValue}
-                      value={selectedUsersProfile}
-                      name="ddlusersprofiles"
-                      lblText="Tenants"
-                      lblClass="mb-0 lbl-req-field"
-                      required={true}
-                      errors={sendInvitationErrors}
-                      formErrors={formSendInvitaionErrors}
-                      isClearable={true}
-                      tabIndex={1}
-                    ></AsyncRemoteSelect>
-                  </div>
-                  <div className="col-12 mb-0">
-                    <TextAreaControl
-                      lblClass="mb-0 lbl-req-field"
-                      name={`txtmessage`}
-                      ctlType={formCtrlTypes.message}
-                      onChange={handleSendInvitationInputChange}
-                      value={sendInvitationFormData.txtmessage}
-                      required={true}
-                      errors={sendInvitationErrors}
-                      formErrors={formSendInvitaionErrors}
-                      rows={3}
-                      tabIndex={2}
-                    ></TextAreaControl>
-                  </div>
-                </div>
-              </>
-            }
-            onClose={onSendInviteModalHide}
-            actions={[
-              {
-                id: "btnsendinvitation",
-                text: "Send",
-                displayOrder: 1,
-                btnClass: "btn-primary",
-                onClick: (e) => onSendInvitation(e),
-              },
-              {
-                text: "Cancel",
-                displayOrder: 2,
-                btnClass: "btn-secondary",
-                onClick: (e) => onSendInviteModalHide(e),
-              },
-            ]}
-          ></ModalView>
-        </>
-      )}
-      {/*============== Send Invite Modal End ==============*/}
 
       {/*============== Send Message Modal Start ==============*/}
       {sendMessageModalState && (

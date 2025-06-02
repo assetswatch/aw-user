@@ -303,7 +303,7 @@ const Property = () => {
             <div className="col-xl-4 order-xl-2">
               {/* Message Form */}
               <div className="widget widget_contact bg-white border p-30 rounded mb-30 box-shadow">
-                <h5 className="mb-4 down-line pb-10">Listed By</h5>
+                <h6 className="mb-4 down-line pb-10">Listed By</h6>
                 {assetDetails && (
                   <div className="media mb-3">
                     <LazyImage

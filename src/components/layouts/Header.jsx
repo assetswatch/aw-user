@@ -14,11 +14,11 @@ const Header = () => {
   return (
     <>
       {/*============== Header Section Start ==============*/}
-      <header className="header-style header-fixed nav-on-top">
+      <header className="header-style header-fixed nav-on-top box-shadow bo-b2-primary">
         <div className="top-header hide">
-          <div className="container">
+          <div className="container-fluid">
             <div className="row">
-              <div className="col">
+              <div className="col px-0">
                 <ul className="nav-bar-top text-primary">
                   <li>
                     <i className="fa fa-phone" aria-hidden="true" />
@@ -27,7 +27,7 @@ const Header = () => {
                   </li>
                 </ul>
               </div>
-              <div className="col">
+              <div className="col px-0">
                 <ul className="nav-bar-top right d-flex">
                   <li>
                     <a href="#"></a>
@@ -44,10 +44,10 @@ const Header = () => {
           </div>
         </div>
         <div className="main-nav">
-          <div className="container">
+          <div className="container-fluid">
             <div className="row">
-              <div className="col">
-                <nav className="navbar navbar-expand-lg nav-secondary nav-primary-hover nav-line-active">
+              <div className="col px-0">
+                <nav className="navbar navbar-expand-lg nav-secondary nav-primary-hover nav-line-active header-menu">
                   <Link className="navbar-brand" to={routeNames.home.path}>
                     <img
                       className="nav-logo"
@@ -115,26 +115,26 @@ const Header = () => {
                           Blog
                         </Link>
                       </li> */}
+                      <li className="nav-item">
+                        <Link
+                          className="nav-link"
+                          id="nav-aboutus"
+                          to={routeNames.aboutUs.path}
+                        >
+                          About Us
+                        </Link>
+                      </li>
+                      <li className="nav-item">
+                        <Link
+                          className="nav-link"
+                          id="nav-contactus"
+                          to={routeNames.contactUs.path}
+                        >
+                          Contact Us
+                        </Link>
+                      </li>
                       {isAuthenticated() == false ? (
                         <>
-                          <li className="nav-item">
-                            <Link
-                              className="nav-link"
-                              id="nav-aboutus"
-                              to={routeNames.aboutUs.path}
-                            >
-                              About Us
-                            </Link>
-                          </li>
-                          <li className="nav-item">
-                            <Link
-                              className="nav-link"
-                              id="nav-contactus"
-                              to={routeNames.contactUs.path}
-                            >
-                              Contact Us
-                            </Link>
-                          </li>
                           <li className="nav-item nav-login-register">
                             <Link
                               className="nav-link d-inline"
@@ -160,7 +160,7 @@ const Header = () => {
                   </div>
                 </nav>
               </div>
-              <div className="col-auto px-12">
+              <div className="col-auto px-10">
                 {isAuthenticated() == true && (
                   <UserProfileMenu
                     style={{

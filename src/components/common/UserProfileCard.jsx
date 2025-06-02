@@ -13,7 +13,7 @@ import { LazyImage } from "./LazyComponents";
 import { axiosPost } from "../../helpers/axiosHelper";
 import config from "../../config.json";
 
-const UserProfileCard = React.memo(({ showEdit = true, cssClass = "" }) => {
+const UserProfileCard = React.memo(({ showEdit = false, cssClass = "" }) => {
   let $ = window.$;
   const { loggedinUser } = useAuth();
 

@@ -1,4 +1,4 @@
-import { React, startTransition, useState } from "react";
+import { React, startTransition, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   ApiUrls,
@@ -162,11 +162,11 @@ const UserHeader = () => {
   return (
     <>
       {/*============== Header Section Start ==============*/}
-      <header className="header-style header-fixed nav-on-top">
+      <header className="header-style header-fixed nav-on-top box-shadow bo-b1-lihover">
         <div className="top-header hide">
-          <div className="container">
+          <div className="container-fluid">
             <div className="row">
-              <div className="col">
+              <div className="col px-0">
                 <ul className="nav-bar-top text-primary">
                   <li>
                     <i className="fa fa-phone" aria-hidden="true" />
@@ -175,7 +175,7 @@ const UserHeader = () => {
                   </li>
                 </ul>
               </div>
-              <div className="col">
+              <div className="col px-0">
                 <ul className="nav-bar-top right d-flex">
                   <li>
                     <a href="#"></a>
@@ -192,10 +192,10 @@ const UserHeader = () => {
           </div>
         </div>
         <div className="main-nav">
-          <div className="container">
+          <div className="container-fluid">
             <div className="row">
-              <div className="col">
-                <nav className="navbar navbar-expand-lg nav-secondary nav-primary-hover nav-line-active">
+              <div className="col px-0">
+                <nav className="navbar navbar-expand-lg nav-secondary nav-primary-hover nav-line-active user-header-menu">
                   <Link className="navbar-brand" to={routeNames.home.path}>
                     <img
                       className="nav-logo"
@@ -212,218 +212,210 @@ const UserHeader = () => {
                   >
                     <span className="navbar-toggler-icon flaticon-menu flat-small text-primary" />
                   </button>
-                  <div className="collpase navbar-collapse user-navbar">
+                  <div
+                    className="navbar-collapse collapse"
+                    id="collpase-widget-usernavlinks"
+                  >
                     <ul className="navbar-nav ms-auto">
-                      {/* <li className="nav-item position-relative">
-                        <span
-                          className="nav-link icon-wrapper icon-wrapper-alt rounded-circle shadow"
-                          data-bs-toggle="collapse"
-                          data-bs-target="#collpase-widget-messages"
-                          aria-controls="collpase-widget-messages"
-                          aria-expanded="false"
-                          data-bs-placement="right"
-                          data-bs-boundary="window"
-                        >
-                          <span className="icon-wrapper-bg" />
-                          <i className="fa fa-envelope text-primary" />
-                          <span className="badge badge-dot badge-dot-sm badge-danger icon-anim-pulse">
-                            Messages
-                          </span>
-                        </span>
-                        <ul
-                          id="collpase-widget-messages"
-                          className="collapse in collpase-widget bg-white shadow"
-                        >
-                          <div>
-                            <div className="widget-header">
-                              <div className="row">
-                                <div className="col">
-                                  <span className="text-primary title">
-                                    Messages
-                                  </span>
-                                </div>
-                                <div className="col-auto">
-                                  <a
-                                    href="#"
-                                    className="font-small text-light-dark"
+                      <>
+                        <li className="nav-item dropdown">
+                          <a
+                            className="nav-link dropdown-toggle"
+                            id="nav-myproperties"
+                          >
+                            <i className="fa fa-home pe-2"></i>
+                            Properties
+                          </a>
+                          <ul className="dropdown-menu">
+                            <>
+                              {loggedinProfileTypeId ==
+                                config.userProfileTypes.Owner && (
+                                <>
+                                  <li className="dropdown-item">
+                                    <Link
+                                      id="nav-lnk-myproperties"
+                                      to={routeNames.ownerproperties.path}
+                                    >
+                                      <i className="fa fa-house pe-1"></i> My
+                                      Properties
+                                    </Link>
+                                  </li>
+                                  <li className="dropdown-item">
+                                    <Link
+                                      id="nav-lnk-addresidentialproperty"
+                                      to={
+                                        routeNames.addresidentialproperty.path
+                                      }
+                                    >
+                                      <i className="fa fa-house-medical pe-1"></i>{" "}
+                                      Add Residential Property
+                                    </Link>
+                                  </li>
+
+                                  <li className="dropdown-item">
+                                    <Link
+                                      id="nav-lnk-addcommercialproperty"
+                                      to={routeNames.addcommercialproperty.path}
+                                    >
+                                      <i className="fa fa-house-medical pe-1"></i>{" "}
+                                      Add Commercial Property
+                                    </Link>
+                                  </li>
+                                </>
+                              )}
+                              {loggedinProfileTypeId ==
+                                config.userProfileTypes.Agent && (
+                                <>
+                                  <li className="dropdown-item">
+                                    <Link
+                                      id="nav-lnk-myproperties"
+                                      to={routeNames.agentproperties.path}
+                                    >
+                                      <i className="fa fa-house pe-1"></i> My
+                                      Properties
+                                    </Link>
+                                  </li>
+                                  <li className="dropdown-item">
+                                    <Link
+                                      id="nav-lnk-assignedproperties"
+                                      to={
+                                        routeNames.agentassignedproperties.path
+                                      }
+                                    >
+                                      <i className="fa fa-house-circle-check pe-1"></i>{" "}
+                                      Assigned Properties
+                                    </Link>
+                                  </li>
+                                </>
+                              )}
+                              {loggedinProfileTypeId ==
+                                config.userProfileTypes.Tenant && (
+                                <li className="dropdown-item">
+                                  <Link
+                                    id="nav-lnk-connectedproperties"
+                                    to={
+                                      routeNames.tenantconnectedproperties.path
+                                    }
                                   >
-                                    <u>Clear All</u>
-                                  </a>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="widget-cnt-body lh-1 cscrollbar">
-                              <span className="date">Today</span>
-                              <div className="row box-shadow">
-                                <div className="col-auto">
-                                  <img
-                                    src={GetCookieValues(UserCookie.ProfilePic)}
-                                    alt=""
-                                    className="shadow profile"
-                                  ></img>
-                                </div>
-                                <div className="col minfo">
-                                  <div className="name">Admin</div>
-                                  <div className="message">
-                                    Got new message ...
-                                  </div>
-                                </div>
-                                <div className="col-auto">
-                                  <button
-                                    type="button"
-                                    className="btn-close"
-                                    aria-label="Close"
-                                  ></button>
-                                </div>
-                                <div className="time">
-                                  <i className="fa fa-clock"></i>
-                                  <span className="pl-5">1 min ago</span>
-                                </div>
-                              </div>
-                              <div className="row box-shadow">
-                                <div className="col-auto">
-                                  <img
-                                    src={GetCookieValues(UserCookie.ProfilePic)}
-                                    alt=""
-                                    className="shadow profile"
-                                  ></img>
-                                </div>
-                                <div className="col minfo">
-                                  <div className="name">Admin</div>
-                                  <div className="message">
-                                    Got new message ...
-                                  </div>
-                                </div>
-                                <div className="col-auto">
-                                  <button
-                                    type="button"
-                                    className="btn-close"
-                                    aria-label="Close"
-                                  ></button>
-                                </div>
-                                <div className="time">
-                                  <i className="fa fa-clock"></i>
-                                  <span className="pl-5">1 min ago</span>
-                                </div>
-                              </div>
-                              <span className="date">Yesterday</span>
-                              <div className="row box-shadow">
-                                <div className="col-auto">
-                                  <img
-                                    src={GetCookieValues(UserCookie.ProfilePic)}
-                                    alt=""
-                                    className="shadow profile"
-                                  ></img>
-                                </div>
-                                <div className="col minfo">
-                                  <div className="name">Admin</div>
-                                  <div className="message">
-                                    Got new message ...
-                                  </div>
-                                </div>
-                                <div className="col-auto">
-                                  <button
-                                    type="button"
-                                    className="btn-close"
-                                    aria-label="Close"
-                                  ></button>
-                                </div>
-                                <div className="time">
-                                  <i className="fa fa-clock"></i>
-                                  <span className="pl-5">1 min ago</span>
-                                </div>
-                              </div>
-                              <div className="row box-shadow">
-                                <div className="col-auto">
-                                  <img
-                                    src={GetCookieValues(UserCookie.ProfilePic)}
-                                    alt=""
-                                    className="shadow profile"
-                                  ></img>
-                                </div>
-                                <div className="col minfo">
-                                  <div className="name">Admin</div>
-                                  <div className="message">
-                                    Got new message ...
-                                  </div>
-                                </div>
-                                <div className="col-auto">
-                                  <button
-                                    type="button"
-                                    className="btn-close"
-                                    aria-label="Close"
-                                  ></button>
-                                </div>
-                                <div className="time">
-                                  <i className="fa fa-clock"></i>
-                                  <span className="pl-5">1 min ago</span>
-                                </div>
-                              </div>
-                              <span className="date">Dec 30, 2024</span>
-                              <div className="row box-shadow">
-                                <div className="col-auto">
-                                  <img
-                                    src={GetCookieValues(UserCookie.ProfilePic)}
-                                    alt=""
-                                    className="shadow profile"
-                                  ></img>
-                                </div>
-                                <div className="col minfo">
-                                  <div className="name">Admin</div>
-                                  <div className="message">
-                                    Got new message ...
-                                  </div>
-                                </div>
-                                <div className="col-auto">
-                                  <button
-                                    type="button"
-                                    className="btn-close"
-                                    aria-label="Close"
-                                  ></button>
-                                </div>
-                                <div className="time">
-                                  <i className="fa fa-clock"></i>
-                                  <span className="pl-5">1 min ago</span>
-                                </div>
-                              </div>
-                              <div className="row box-shadow">
-                                <div className="col-auto">
-                                  <img
-                                    src={GetCookieValues(UserCookie.ProfilePic)}
-                                    alt=""
-                                    className="shadow profile"
-                                  ></img>
-                                </div>
-                                <div className="col minfo">
-                                  <div className="name">Admin</div>
-                                  <div className="message">
-                                    Got new message ...
-                                  </div>
-                                </div>
-                                <div className="col-auto">
-                                  <button
-                                    type="button"
-                                    className="btn-close"
-                                    aria-label="Close"
-                                  ></button>
-                                </div>
-                                <div className="time">
-                                  <i className="fa fa-clock"></i>
-                                  <span className="pl-5">1 min ago</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="widget-footer row">
-                              <div className="col">
-                                <a href="#!">
-                                  <u>View All ...</u>
-                                </a>
-                              </div>
-                            </div>
-                          </div>
-                        </ul>
-                      </li> */}
-                      <li className="nav-item mr-20 position-relative">
+                                    <i className="fa fa-house-circle-check pe-1"></i>{" "}
+                                    Connected Properties
+                                  </Link>
+                                </li>
+                              )}
+                            </>
+                          </ul>
+                        </li>
+                        <li className="nav-item dropdown">
+                          <a
+                            className="nav-link dropdown-toggle"
+                            id="nav-agreements"
+                          >
+                            <i className="fa fa-handshake pe-2"></i>
+                            Agreements
+                          </a>
+                          <ul className="dropdown-menu">
+                            <>
+                              <li className="dropdown-item">
+                                <Link
+                                  id="nav-lnk-myagreements"
+                                  to={routeNames.myagreements.path}
+                                >
+                                  <i className="fa-regular fa-file-lines pe-1"></i>{" "}
+                                  My Agreements
+                                </Link>
+                              </li>
+                              {loggedinProfileTypeId !=
+                                config.userProfileTypes.Tenant && (
+                                <li className="dropdown-item">
+                                  <Link
+                                    id="nav-lnk-agreementtemplates"
+                                    to={routeNames.agreementtemplates.path}
+                                  >
+                                    <i className="fa-regular fa-file-lines pe-1"></i>{" "}
+                                    Agreement Templates
+                                  </Link>
+                                </li>
+                              )}
+                              <li className="dropdown-item">
+                                <Link
+                                  id="nav-lnk-documents"
+                                  to={routeNames.mydocuments.path}
+                                >
+                                  <i className="fa-regular fa-file-lines pe-1"></i>{" "}
+                                  My Documents
+                                </Link>
+                              </li>
+                            </>
+                          </ul>
+                        </li>
+                        <li className="nav-item">
+                          <Link
+                            className="nav-link"
+                            id="nav-myconnections"
+                            to={
+                              loggedinProfileTypeId ==
+                              config.userProfileTypes.Owner
+                                ? routeNames.connectionsowners.path
+                                : loggedinProfileTypeId ==
+                                  config.userProfileTypes.Agent
+                                ? routeNames.connectionsagents.path
+                                : routeNames.connectionstenants.path
+                            }
+                          >
+                            <i className="fa fa-users flat-mini pe-2"></i>
+                            Connections
+                          </Link>
+                        </li>
+                        <li className="nav-item d-none">
+                          <Link
+                            className="nav-link"
+                            id="nav-applications"
+                            to={routeNames.applications.path}
+                          >
+                            <i className="fa fa-file-alt pe-2 d-none"></i>
+                            Applications
+                          </Link>
+                        </li>
+                        <li className="nav-item">
+                          <Link
+                            className="nav-link"
+                            id="nav-services"
+                            to={routeNames.services.path}
+                          >
+                            <i className="fa fa-screwdriver-wrench pe-2"></i>
+                            Services
+                          </Link>
+                        </li>
+                        <li className="nav-item">
+                          <Link
+                            className="nav-link"
+                            id="nav-payments"
+                            to={routeNames.paymentsaccounts.path}
+                          >
+                            <i className="fa fa-credit-card flat-mini pe-2"></i>
+                            Payments
+                          </Link>
+                        </li>
+                        <li className="nav-item">
+                          <Link
+                            className="nav-link"
+                            id="nav-reports"
+                            to={routeNames.propertyreport.path}
+                          >
+                            <i className="fa fa-chart-pie flat-mini pe-2"></i>
+                            Reports
+                          </Link>
+                        </li>
+                      </>
+                      {SetUserMenu()}
+                    </ul>
+                  </div>
+                  <div
+                    className="collpase navbar-collapse user-navbar px-10 flex-grow-0"
+                    // style={{ width: "10px" }}
+                  >
+                    <ul className="navbar-nav ms-auto">
+                      <li className="nav-item mr-0 position-relative">
                         <span
                           className="nav-link icon-wrapper icon-wrapper-alt rounded-circle shadow bscollapsemenu"
                           data-bs-toggle="collapse"
@@ -442,7 +434,7 @@ const UserHeader = () => {
                         </span>
                         <ul
                           id="collpase-widget-notifications"
-                          className="collapse in collpase-widget cwn bg-white shadow"
+                          className="collapse in collpase-widget cwn bg-white shadow position-absolute"
                         >
                           <div>
                             <div className="widget-header">
@@ -560,432 +552,6 @@ const UserHeader = () => {
       {/*============== Header Section End ==============*/}
 
       {/*============== Menu Section End ==============*/}
-      {SetUserMenu()}
-      <nav className="navbar navbar-expand-lg user-menu div-page-title">
-        <div className="container">
-          <div
-            className="collapse navbar-collapse bscollapsemenu"
-            id="collpase-widget-usernavlinks"
-          >
-            <ul className="navbar-nav">
-              {/* Owner Menu */}
-              {GetCookieValues(UserCookie.ProfileTypeId) ==
-                config.userProfileTypes.Owner && (
-                <>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      id="nav-user-profile"
-                      to={onProfile()}
-                    >
-                      <i className="fa fa-user pe-2"></i>
-                      Dashboard
-                    </Link>
-                  </li>
-                  <li className="nav-item dropdown">
-                    <a
-                      className="nav-link dropdown-toggle"
-                      id="nav-myproperties"
-                    >
-                      <i className="fa fa-home pe-2"></i>
-                      Properties
-                    </a>
-                    <ul className="dropdown-menu">
-                      <li className="dropdown-item">
-                        <Link
-                          id="nav-lnk-myproperties"
-                          to={routeNames.ownerproperties.path}
-                        >
-                          <i className="fa fa-house pe-1"></i> My Properties
-                        </Link>
-                      </li>
-                      <li className="dropdown-item">
-                        <Link
-                          id="nav-lnk-addresidentialproperty"
-                          to={routeNames.addresidentialproperty.path}
-                        >
-                          <i className="fa fa-house-medical pe-1"></i> Add
-                          Residential Property
-                        </Link>
-                      </li>
-                      <li className="dropdown-item">
-                        <Link
-                          id="nav-lnk-addcommercialproperty"
-                          to={routeNames.addcommercialproperty.path}
-                        >
-                          <i className="fa fa-house-medical pe-1"></i> Add
-                          Commercial Property
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
-                  <li className="nav-item dropdown">
-                    <a className="nav-link dropdown-toggle" id="nav-agreements">
-                      <i className="fa fa-handshake pe-2"></i>
-                      Agreements
-                    </a>
-                    <ul className="dropdown-menu">
-                      <li className="dropdown-item">
-                        <Link
-                          id="nav-lnk-myagreements"
-                          to={routeNames.myagreements.path}
-                        >
-                          <i className="fa-regular fa-file-lines pe-1"></i> My
-                          Agreements
-                        </Link>
-                      </li>
-                      <li className="dropdown-item">
-                        <Link
-                          id="nav-lnk-agreementtemplates"
-                          to={routeNames.agreementtemplates.path}
-                        >
-                          <i className="fa-regular fa-file-lines pe-1"></i>{" "}
-                          Agreement Templates
-                        </Link>
-                      </li>
-                      <li className="dropdown-item">
-                        <Link
-                          id="nav-lnk-documents"
-                          to={routeNames.mydocuments.path}
-                        >
-                          <i className="fa-regular fa-file-lines pe-1"></i> My
-                          Documents
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      id="nav-services"
-                      to={routeNames.services.path}
-                    >
-                      <i className="fa fa-screwdriver-wrench pe-2"></i>
-                      Services
-                    </Link>
-                  </li>
-                  <li className="nav-item d-none">
-                    <Link
-                      className="nav-link"
-                      id="nav-applications"
-                      to={routeNames.applications.path}
-                    >
-                      <i className="fa fa-file-alt pe-2"></i>
-                      Applications
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      id="nav-payments"
-                      to={routeNames.paymentsaccounts.path}
-                    >
-                      <i className="fa fa-credit-card flat-mini pe-2"></i>
-                      Payments
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      id="nav-reports"
-                      to={routeNames.propertyreport.path}
-                    >
-                      <i className="fa fa-chart-pie flat-mini pe-2"></i>
-                      Reports
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      id="nav-myconnections"
-                      to={routeNames.connectionsowners.path}
-                    >
-                      <i className="fa fa-users flat-mini pe-2"></i>
-                      Connections
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      id="nav-settings"
-                      to={routeNames.settings.path}
-                    >
-                      <i className="fa fa-gear flat-mini pe-2"></i>
-                      Settings
-                    </Link>
-                  </li>
-                </>
-              )}
-              {/* Owner Menu */}
-
-              {/* Agent Menu */}
-              {GetCookieValues(UserCookie.ProfileTypeId) ==
-                config.userProfileTypes.Agent && (
-                <>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      id="nav-user-profile"
-                      to={onProfile()}
-                    >
-                      <i className="fa fa-user pe-2"></i>
-                      Dashboard
-                    </Link>
-                  </li>
-                  <li className="nav-item dropdown">
-                    <a
-                      className="nav-link dropdown-toggle"
-                      id="nav-myproperties"
-                    >
-                      <i className="fa fa-home pe-2"></i>
-                      Properties
-                    </a>
-                    <ul className="dropdown-menu">
-                      <li className="dropdown-item">
-                        <Link
-                          id="nav-lnk-myproperties"
-                          to={routeNames.agentproperties.path}
-                        >
-                          <i className="fa fa-house pe-1"></i> My Properties
-                        </Link>
-                      </li>
-                      <li className="dropdown-item">
-                        <Link
-                          id="nav-lnk-assignedproperties"
-                          to={routeNames.agentassignedproperties.path}
-                        >
-                          <i className="fa fa-house-circle-check pe-1"></i>{" "}
-                          Assigned Properties
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
-                  <li className="nav-item dropdown">
-                    <a className="nav-link dropdown-toggle" id="nav-agreements">
-                      <i className="fa fa-handshake pe-2"></i>
-                      Agreements
-                    </a>
-                    <ul className="dropdown-menu">
-                      <li className="dropdown-item">
-                        <Link
-                          id="nav-lnk-myagreements"
-                          to={routeNames.myagreements.path}
-                        >
-                          <i className="fa-regular fa-file-lines pe-1"></i> My
-                          Agreements
-                        </Link>
-                      </li>
-                      <li className="dropdown-item">
-                        <Link
-                          id="nav-lnk-agreementtemplates"
-                          to={routeNames.agreementtemplates.path}
-                        >
-                          <i className="fa-regular fa-file-lines pe-1"></i>{" "}
-                          Agreement Templates
-                        </Link>
-                      </li>
-                      <li className="dropdown-item">
-                        <Link
-                          id="nav-lnk-documents"
-                          to={routeNames.mydocuments.path}
-                        >
-                          <i className="fa-regular fa-file-lines pe-1"></i> My
-                          Documents
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      id="nav-home"
-                      to={routeNames.services.path}
-                    >
-                      <i className="fa fa-screwdriver-wrench pe-2"></i>
-                      Services
-                    </Link>
-                  </li>
-                  <li className="nav-item d-none">
-                    <Link
-                      className="nav-link"
-                      id="nav-applications"
-                      to={routeNames.applications.path}
-                    >
-                      <i className="fa fa-file-alt pe-2"></i>
-                      Applications
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      id="nav-payments"
-                      to={routeNames.paymentsaccounts.path}
-                    >
-                      <i className="fa fa-credit-card flat-mini pe-2"></i>
-                      Payments
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      id="nav-reports"
-                      to={routeNames.propertyreport.path}
-                    >
-                      <i className="fa fa-chart-pie flat-mini pe-2"></i>
-                      Reports
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      id="nav-myconnections"
-                      to={routeNames.connectionsagents.path}
-                    >
-                      <i className="fa fa-users flat-mini pe-2"></i>
-                      Connections
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      id="nav-settings"
-                      to={routeNames.settings.path}
-                    >
-                      <i className="fa fa-gear flat-mini pe-2"></i>
-                      Settings
-                    </Link>
-                  </li>
-                </>
-              )}
-              {/* Agent Menu */}
-
-              {/* Tenant Menu */}
-              {GetCookieValues(UserCookie.ProfileTypeId) ==
-                config.userProfileTypes.Tenant && (
-                <>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      id="nav-user-profile"
-                      to={onProfile()}
-                    >
-                      <i className="fa fa-user pe-2"></i>
-                      Dashboard
-                    </Link>
-                  </li>
-                  <li className="nav-item dropdown">
-                    <a
-                      className="nav-link dropdown-toggle"
-                      id="nav-myproperties"
-                    >
-                      <i className="fa fa-home pe-2"></i>
-                      Properties
-                    </a>
-                    <ul className="dropdown-menu">
-                      <li className="dropdown-item">
-                        <Link
-                          id="nav-lnk-connectedproperties"
-                          to={routeNames.tenantconnectedproperties.path}
-                        >
-                          <i className="fa fa-house-circle-check pe-1"></i>{" "}
-                          Connected Properties
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
-                  <li className="nav-item dropdown">
-                    <a className="nav-link dropdown-toggle" id="nav-agreements">
-                      <i className="fa fa-handshake pe-2"></i>
-                      Agreements
-                    </a>
-                    <ul className="dropdown-menu">
-                      <li className="dropdown-item">
-                        <Link
-                          id="nav-lnk-myagreements"
-                          to={routeNames.myagreements.path}
-                        >
-                          <i className="fa-regular fa-file-lines pe-1"></i> My
-                          Agreements
-                        </Link>
-                      </li>
-                      <li className="dropdown-item">
-                        <Link
-                          id="nav-lnk-documents"
-                          to={routeNames.mydocuments.path}
-                        >
-                          <i className="fa-regular fa-file-lines pe-1"></i> My
-                          Documents
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      id="nav-home"
-                      to={routeNames.services.path}
-                    >
-                      <i className="fa fa-screwdriver-wrench pe-2"></i>
-                      Services
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      id="nav-applications"
-                      to={routeNames.applications.path}
-                    >
-                      <i className="fa fa-file-alt pe-2"></i>
-                      Applications
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      id="nav-payments"
-                      to={routeNames.paymentsaccounts.path}
-                    >
-                      <i className="fa fa-credit-card flat-mini pe-2"></i>
-                      Payments
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      id="nav-reports"
-                      to={routeNames.propertyreport.path}
-                    >
-                      <i className="fa fa-chart-pie flat-mini pe-2"></i>
-                      Reports
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      id="nav-myconnections"
-                      to={routeNames.connectionstenants.path}
-                    >
-                      <i className="fa fa-users flat-mini pe-2"></i>
-                      Connections
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      id="nav-settings"
-                      to={routeNames.settings.path}
-                    >
-                      <i className="fa fa-gear flat-mini pe-2"></i>
-                      Settings
-                    </Link>
-                  </li>
-                </>
-              )}
-              {/* Tenant Menu */}
-            </ul>
-          </div>
-        </div>
-      </nav>
 
       {/*============== Menu Section End ==============*/}
     </>

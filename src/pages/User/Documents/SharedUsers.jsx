@@ -37,6 +37,8 @@ import { axiosPost } from "../../../helpers/axiosHelper";
 import { Toast } from "../../../components/common/ToastView";
 import config from "../../../config.json";
 import { useAuth } from "../../../contexts/AuthContext";
+import GridFiltersPanel from "../../../components/common/GridFiltersPanel";
+import GoBackPanel from "../../../components/common/GoBackPanel";
 
 const SharedUsers = () => {
   let $ = window.$;
@@ -498,44 +500,38 @@ const SharedUsers = () => {
   return (
     <div key={reloadKey}>
       {SetPageLoaderNavLinks()}
-      <div className="full-row bg-light">
+      <div className="full-row bg-light content-ph">
         <div className="container">
           <div className="row">
             <div className="col-12">
               <div className="row">
-                <div className="col-8">
-                  <div className="breadcrumb">
-                    <div className="breadcrumb-item bc-fh">
-                      <a
-                        className="dropdown-item pl-0"
-                        onClick={navigateToSharedDocuments}
-                      >
-                        <h6 className="mb-3 down-line pb-10">
-                          Shared Documents
-                        </h6>
-                      </a>
-                    </div>
-                    <div className="breadcrumb-item bc-fh ctooltip-container">
-                      <label className="font-general font-500 cur-default">
-                        {rootfoldername}
-                      </label>
-                      <div className="ctooltip">{rootfoldername}</div>
-                    </div>
-                    <div className="breadcrumb-item bc-fh">
-                      <label className="font-general font-500 cur-default">
-                        Users
-                      </label>
+                <div className="d-flex w-100">
+                  <div className="flex-grow-1">
+                    <div className="breadcrumb my-1">
+                      <div className="breadcrumb-item bc-fh">
+                        <a
+                          className="dropdown-item pl-0"
+                          onClick={navigateToSharedDocuments}
+                        >
+                          <h6 className="mb-3 down-line pb-10">
+                            Shared Documents
+                          </h6>
+                        </a>
+                      </div>
+                      <div className="breadcrumb-item bc-fh ctooltip-container">
+                        <label className="font-general font-500 cur-default">
+                          {rootfoldername}
+                        </label>
+                        <div className="ctooltip">{rootfoldername}</div>
+                      </div>
+                      <div className="breadcrumb-item bc-fh">
+                        <label className="font-general font-500 cur-default">
+                          Users
+                        </label>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="col-4 d-flex justify-content-end align-items-end pb-10">
-                  <button
-                    className="btn btn-primary btn-mini btn-glow shadow rounded"
-                    onClick={navigateToSharedDocuments}
-                  >
-                    <i className="icons icon-arrow-left-circle position-relative me-2 t-2"></i>{" "}
-                    Back
-                  </button>
+                  <GoBackPanel clickAction={navigateToSharedDocuments} />
                 </div>
               </div>
               <div className="tabw100 tab-action shadow rounded bg-white">
@@ -543,120 +539,129 @@ const SharedUsers = () => {
                   <li onClick={navigateToMyDocuments}>My Documents</li>
                   <li className="active">Shared Documents</li>
                 </ul>
-              </div>
-              <div className="tab-element">
-                {/*============== Search Start ==============*/}
-                <div className="woo-filter-bar full-row px-3 py-4 box-shadow grid-search rounded">
-                  <div className="container-fluid v-center">
-                    <div className="row">
-                      <div className="col px-0">
-                        <form noValidate>
-                          <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
-                            <div className="col-lg-5 col-xl-3 col-md-4">
-                              <InputControl
-                                lblClass="mb-0"
-                                lblText="Search by Name/ Email / Phone"
-                                name="txtkeyword"
-                                ctlType={formCtrlTypes.searchkeyword}
-                                value={searchFormData.txtkeyword}
-                                onChange={handleChange}
-                                formErrors={formErrors}
-                              ></InputControl>
-                            </div>
-                            <div className="col-lg-3 col-xl-2 col-md-4">
-                              <DateControl
-                                lblClass="mb-0"
-                                lblText="Shared On : Start date"
-                                name="txtfromdate"
-                                required={false}
-                                onChange={(dt) =>
-                                  onDateChange(dt, "txtfromdate")
-                                }
-                                value={searchFormData.txtfromdate}
-                                isTime={false}
-                              ></DateControl>
-                            </div>
-                            <div className="col-lg-3 col-xl-2 col-md-4">
-                              <DateControl
-                                lblClass="mb-0"
-                                lblText="Shared On : End date"
-                                name="txttodate"
-                                required={false}
-                                onChange={(dt) => onDateChange(dt, "txttodate")}
-                                value={searchFormData.txttodate}
-                                isTime={false}
-                                objProps={{
-                                  checkVal: searchFormData.txtfromdate,
-                                }}
-                              ></DateControl>
-                            </div>
-                            <div className="col-lg-5 col-xl-5 col-md-8 grid-search-action">
-                              <label
-                                className="mb-0 form-error w-100"
-                                id="search-val-err-message"
-                              ></label>
-                              <button
-                                className="btn btn-primary w- 100"
-                                value="Search"
-                                name="btnsearch"
-                                type="button"
-                                onClick={onSearch}
-                              >
-                                Search
-                              </button>
-                              <button
-                                className="btn btn-primary w- 100"
-                                value="Show all"
-                                name="btnshowall"
-                                type="button"
-                                onClick={onShowAll}
-                              >
-                                Show All
-                              </button>
-                              <button
-                                className="btn btn-primary w- 100"
-                                value="Remove Access"
-                                name={btnremoveaccesstoallid}
-                                id={btnremoveaccesstoallid}
-                                type="button"
-                                onClick={onRemoveAccessToAllConfirmModalShow}
-                                style={{ display: "none" }}
-                              >
-                                Remove Access
-                              </button>
-                            </div>
+                <div className="tab-element">
+                  {/*============== Search Start ==============*/}
+                  <GridFiltersPanel
+                    divFilterControls={
+                      <div
+                        className="container-fluid v-center"
+                        id="div-filters-controls-panel"
+                      >
+                        <div className="row">
+                          <div className="col px-0">
+                            <form noValidate>
+                              <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
+                                <div className="col-lg-5 col-xl-3 col-md-4">
+                                  <InputControl
+                                    lblClass="mb-0"
+                                    lblText="Search by Name/ Email / Phone"
+                                    name="txtkeyword"
+                                    ctlType={formCtrlTypes.searchkeyword}
+                                    value={searchFormData.txtkeyword}
+                                    onChange={handleChange}
+                                    formErrors={formErrors}
+                                  ></InputControl>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-4">
+                                  <DateControl
+                                    lblClass="mb-0"
+                                    lblText="Shared On : Start date"
+                                    name="txtfromdate"
+                                    required={false}
+                                    onChange={(dt) =>
+                                      onDateChange(dt, "txtfromdate")
+                                    }
+                                    value={searchFormData.txtfromdate}
+                                    isTime={false}
+                                  ></DateControl>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-4">
+                                  <DateControl
+                                    lblClass="mb-0"
+                                    lblText="Shared On : End date"
+                                    name="txttodate"
+                                    required={false}
+                                    onChange={(dt) =>
+                                      onDateChange(dt, "txttodate")
+                                    }
+                                    value={searchFormData.txttodate}
+                                    isTime={false}
+                                    objProps={{
+                                      checkVal: searchFormData.txtfromdate,
+                                    }}
+                                  ></DateControl>
+                                </div>
+                                <div className="col-lg-5 col-xl-5 col-md-8 grid-search-action">
+                                  <label
+                                    className="mb-0 form-error w-100"
+                                    id="search-val-err-message"
+                                  ></label>
+                                  <button
+                                    className="btn btn-primary w- 100"
+                                    value="Search"
+                                    name="btnsearch"
+                                    type="button"
+                                    onClick={onSearch}
+                                  >
+                                    Search
+                                  </button>
+                                  <button
+                                    className="btn btn-primary w- 100"
+                                    value="Show all"
+                                    name="btnshowall"
+                                    type="button"
+                                    onClick={onShowAll}
+                                  >
+                                    Show All
+                                  </button>
+                                  <button
+                                    className="btn btn-primary w- 100"
+                                    value="Remove Access"
+                                    name={btnremoveaccesstoallid}
+                                    id={btnremoveaccesstoallid}
+                                    type="button"
+                                    onClick={
+                                      onRemoveAccessToAllConfirmModalShow
+                                    }
+                                    style={{ display: "none" }}
+                                  >
+                                    Remove Access
+                                  </button>
+                                </div>
+                              </div>
+                            </form>
                           </div>
-                        </form>
+                        </div>
+                      </div>
+                    }
+                  ></GridFiltersPanel>
+                  {/*============== Search End ==============*/}
+
+                  {/*============== Grid Start ==============*/}
+                  <div className="row rounded">
+                    <div className="col">
+                      <div className="dashboard-panel border bg-white rounded overflow-hidden w-100 box-shadow">
+                        <Grid
+                          columns={columns}
+                          data={usersData}
+                          loading={isDataLoading}
+                          fetchData={fetchData}
+                          pageCount={pageCount}
+                          totalInfo={{
+                            text: "Total Users",
+                            count: totalCount,
+                          }}
+                          noData={AppMessages.NoUsers}
+                          rowHover={true}
+                          objCheckAll={{
+                            checkAllId: checkallusersid,
+                          }}
+                        />
                       </div>
                     </div>
                   </div>
+                  {/*============== Grid End ==============*/}
                 </div>
-                {/*============== Search End ==============*/}
-
-                {/*============== Grid Start ==============*/}
-                <div className="row rounded">
-                  <div className="col">
-                    <div className="dashboard-panel border bg-white rounded overflow-hidden w-100 box-shadow">
-                      <Grid
-                        columns={columns}
-                        data={usersData}
-                        loading={isDataLoading}
-                        fetchData={fetchData}
-                        pageCount={pageCount}
-                        totalInfo={{
-                          text: "Total Users",
-                          count: totalCount,
-                        }}
-                        noData={AppMessages.NoUsers}
-                        rowHover={true}
-                        objCheckAll={{
-                          checkAllId: checkallusersid,
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-                {/*============== Grid End ==============*/}
               </div>
             </div>
           </div>

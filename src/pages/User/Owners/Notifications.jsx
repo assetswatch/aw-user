@@ -41,6 +41,7 @@ import AsyncRemoteSelect from "../../../components/common/AsyncRemoteSelect";
 import TextAreaControl from "../../../components/common/TextAreaControl";
 import { useProfileTypesGateway } from "../../../hooks/useProfileTypesGateway";
 import { useGetDdlUserAssetsGateway } from "../../../hooks/useGetDdlUserAssetsGateway";
+import GridFiltersPanel from "../../../components/common/GridFiltersPanel";
 
 const Notifications = () => {
   let $ = window.$;
@@ -724,192 +725,162 @@ const Notifications = () => {
   return (
     <>
       {SetPageLoaderNavLinks()}
-      <div className="full-row bg-light">
+      <div className="full-row bg-light content-ph">
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <div className="row">
-                <div className="col-6">
-                  <h5 className="mb-4 down-line">Notifications</h5>
-                </div>
-                <div className="col-6 d-flex justify-content-end align-items-end pb-10">
-                  <button
-                    className="btn btn-primary btn-mini btn-glow shadow rounded"
-                    name="btnsendnotificationmodal"
-                    id="btnsendnotificationmodal"
-                    type="button"
-                    onClick={onSendNotificationModalShow}
-                  >
-                    <i className="flaticon-envelope flat-mini position-relative me-1 t-1"></i>{" "}
-                    Send Notification
-                  </button>
-
-                  {/* <div className="dropdown">
-                    <div
-                      className="btn btn-primary btn-mini btn-glow shadow rounded dropdown-toggle ddmenu-toggle"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#dropdownMenuButton"
-                      aria-controls="dropdownMenuButton"
-                      aria-expanded="false"
-                    >
-                      <i className="flaticon-envelope flat-mini position-relative me-1 t-1"></i>{" "}
-                      Send Notification
-                    </div>
-                    <ul
-                      className={`ddmenu arrow collapse in bg-white py-0 px-0 lh-1 shadow rounded text-primary`}
-                      id="dropdownMenuButton"
-                    >
-                      <li>
-                        <a
-                          className="dropdown-item"
-                          href="#"
-                          onClick={onSendNotificationModalShow}
-                        >
-                          <i className="fa fa-paper-plane position-relative me-1 t-1"></i>{" "}
-                          General Notification
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          className="dropdown-item"
-                          href="#"
-                          onClick={onSendPaymentNotificationModalShow}
-                        >
-                          <i className="fa fa-credit-card position-relative me-1 t-1"></i>{" "}
-                          Payment Notification
-                        </a>
-                      </li>
-                    </ul>
-                  </div> */}
+              <div className="d-flex w-100 my-1">
+                <div className="flex-grow-1">
+                  <h6 className="mb-3 down-line pb-10">Notifications</h6>
                 </div>
               </div>
-              {/*============== Search Start ==============*/}
-              <div className="woo-filter-bar full-row px-3 py-4 box-shadow grid-search rounded">
-                <div className="container-fluid v-center">
-                  <div className="row">
-                    <div className="col px-0">
-                      <form noValidate>
-                        <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
-                          <div className="col-lg-3 col-xl-2 col-md-3">
-                            <InputControl
-                              lblClass="mb-0"
-                              lblText="Search by Name"
-                              name="txtkeyword"
-                              ctlType={formCtrlTypes.searchkeyword}
-                              value={searchFormData.txtkeyword}
-                              onChange={handleChange}
-                              formErrors={formErrors}
-                            ></InputControl>
-                          </div>
-                          <div className="col-lg-3 col-xl-2 col-md-3">
-                            <AsyncSelect
-                              placeHolder={
-                                notificationTypesList.length <= 0 &&
-                                searchFormData.ddlnotificationtype == null
-                                  ? AppMessages.DdLLoading
-                                  : AppMessages.DdlDefaultSelect
-                              }
-                              noData={
-                                notificationTypesList.length <= 0 &&
-                                searchFormData.ddlnotificationtype == null
-                                  ? AppMessages.DdLLoading
-                                  : AppMessages.DdlNoData
-                              }
-                              options={notificationTypesList}
-                              dataKey="Id"
-                              dataVal="Text"
-                              onChange={(e) =>
-                                ddlChange(e, "ddlnotificationtype")
-                              }
-                              value={searchFormData.ddlnotificationtype}
-                              name="ddlnotificationtype"
-                              lbl={formCtrlTypes.Notificationtype}
-                              lblClass="mb-0"
-                              lblText="Notification type"
-                              className="ddlborder"
-                              isClearable={false}
-                              isSearchCtl={true}
-                              formErrors={formErrors}
-                            ></AsyncSelect>
-                          </div>
-                          <div className="col-lg-3 col-xl-2 col-md-3">
-                            <DateControl
-                              lblClass="mb-0"
-                              lblText="Start date"
-                              name="txtfromdate"
-                              required={false}
-                              onChange={(dt) => onDateChange(dt, "txtfromdate")}
-                              value={searchFormData.txtfromdate}
-                              isTime={false}
-                            ></DateControl>
-                          </div>
-                          <div className="col-lg-3 col-xl-2 col-md-3">
-                            <DateControl
-                              lblClass="mb-0"
-                              lblText="End date"
-                              name="txttodate"
-                              required={false}
-                              onChange={(dt) => onDateChange(dt, "txttodate")}
-                              value={searchFormData.txttodate}
-                              isTime={false}
-                              objProps={{
-                                checkVal: searchFormData.txtfromdate,
-                                days: 7,
-                              }}
-                            ></DateControl>
-                          </div>
-                          <div className="col-lg-4 col-xl-3 col-md-7 grid-search-action">
-                            <label
-                              className="mb-0 form-error w-100"
-                              id="search-val-err-message"
-                            ></label>
-                            <button
-                              className="btn btn-primary w- 100"
-                              value="Search"
-                              name="btnsearch"
-                              type="button"
-                              onClick={onSearch}
-                            >
-                              Search
-                            </button>
-                            <button
-                              className="btn btn-primary w- 100"
-                              value="Show all"
-                              name="btnshowall"
-                              type="button"
-                              onClick={onShowAll}
-                            >
-                              Show All
-                            </button>
+              <div className="tabw100 tab-action shadow rounded bg-white">
+                <div className="tab-element mt-0 pt-20">
+                  {/*============== Search Start ==============*/}
+                  <GridFiltersPanel
+                    divFilterControls={
+                      <div
+                        className="container-fluid v-center"
+                        id="div-filters-controls-panel"
+                      >
+                        <div className="row">
+                          <div className="col px-0">
+                            <form noValidate>
+                              <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
+                                <div className="col-lg-3 col-xl-2 col-md-3">
+                                  <InputControl
+                                    lblClass="mb-0"
+                                    lblText="Search by Name"
+                                    name="txtkeyword"
+                                    ctlType={formCtrlTypes.searchkeyword}
+                                    value={searchFormData.txtkeyword}
+                                    onChange={handleChange}
+                                    formErrors={formErrors}
+                                  ></InputControl>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-3">
+                                  <AsyncSelect
+                                    placeHolder={
+                                      notificationTypesList.length <= 0 &&
+                                      searchFormData.ddlnotificationtype == null
+                                        ? AppMessages.DdLLoading
+                                        : AppMessages.DdlDefaultSelect
+                                    }
+                                    noData={
+                                      notificationTypesList.length <= 0 &&
+                                      searchFormData.ddlnotificationtype == null
+                                        ? AppMessages.DdLLoading
+                                        : AppMessages.DdlNoData
+                                    }
+                                    options={notificationTypesList}
+                                    dataKey="Id"
+                                    dataVal="Text"
+                                    onChange={(e) =>
+                                      ddlChange(e, "ddlnotificationtype")
+                                    }
+                                    value={searchFormData.ddlnotificationtype}
+                                    name="ddlnotificationtype"
+                                    lbl={formCtrlTypes.Notificationtype}
+                                    lblClass="mb-0"
+                                    lblText="Notification type"
+                                    className="ddlborder"
+                                    isClearable={false}
+                                    isSearchCtl={true}
+                                    formErrors={formErrors}
+                                  ></AsyncSelect>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-3">
+                                  <DateControl
+                                    lblClass="mb-0"
+                                    lblText="Start date"
+                                    name="txtfromdate"
+                                    required={false}
+                                    onChange={(dt) =>
+                                      onDateChange(dt, "txtfromdate")
+                                    }
+                                    value={searchFormData.txtfromdate}
+                                    isTime={false}
+                                  ></DateControl>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-3">
+                                  <DateControl
+                                    lblClass="mb-0"
+                                    lblText="End date"
+                                    name="txttodate"
+                                    required={false}
+                                    onChange={(dt) =>
+                                      onDateChange(dt, "txttodate")
+                                    }
+                                    value={searchFormData.txttodate}
+                                    isTime={false}
+                                    objProps={{
+                                      checkVal: searchFormData.txtfromdate,
+                                      days: 7,
+                                    }}
+                                  ></DateControl>
+                                </div>
+                                <div className="col-lg-4 col-xl-3 col-md-7 grid-search-action">
+                                  <label
+                                    className="mb-0 form-error w-100"
+                                    id="search-val-err-message"
+                                  ></label>
+                                  <button
+                                    className="btn btn-primary w- 100"
+                                    value="Search"
+                                    name="btnsearch"
+                                    type="button"
+                                    onClick={onSearch}
+                                  >
+                                    Search
+                                  </button>
+                                  <button
+                                    className="btn btn-primary w- 100"
+                                    value="Show all"
+                                    name="btnshowall"
+                                    type="button"
+                                    onClick={onShowAll}
+                                  >
+                                    Show All
+                                  </button>
+                                </div>
+                              </div>
+                            </form>
                           </div>
                         </div>
-                      </form>
+                      </div>
+                    }
+                    elements={[
+                      {
+                        label: "Send Notification",
+                        icon: "flaticon-envelope flat-mini",
+                        onClick: onSendNotificationModalShow,
+                      },
+                    ]}
+                  ></GridFiltersPanel>
+                  {/*============== Search End ==============*/}
+
+                  {/*============== Grid Start ==============*/}
+                  <div className="row rounded">
+                    <div className="col">
+                      <div className="dashboard-panel border bg-white rounded overflow-hidden w-100 box-shadow">
+                        <Grid
+                          columns={columns}
+                          data={notificationsList}
+                          loading={isDataLoading}
+                          fetchData={fetchData}
+                          pageCount={pageCount}
+                          totalInfo={{
+                            text: "Total Notifications",
+                            count: totalCount,
+                          }}
+                          noData={AppMessages.NoNotifications}
+                        />
+                      </div>
                     </div>
                   </div>
+                  {/*============== Grid End ==============*/}
                 </div>
               </div>
-              {/*============== Search End ==============*/}
-
-              {/*============== Grid Start ==============*/}
-              <div className="row rounded">
-                <div className="col">
-                  <div className="dashboard-panel border bg-white rounded overflow-hidden w-100 box-shadow">
-                    <Grid
-                      columns={columns}
-                      data={notificationsList}
-                      loading={isDataLoading}
-                      fetchData={fetchData}
-                      pageCount={pageCount}
-                      totalInfo={{
-                        text: "Total Notifications",
-                        count: totalCount,
-                      }}
-                      noData={AppMessages.NoNotifications}
-                    />
-                  </div>
-                </div>
-              </div>
-              {/*============== Grid End ==============*/}
             </div>
           </div>
         </div>

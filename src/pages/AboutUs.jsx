@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { loadFile, unloadFile, getArrLoadFiles } from "../utils/loadFiles";
 import { SetPageLoaderNavLinks } from "../utils/common";
+import PageTitle from "../components/layouts/PageTitle";
+import { routeNames } from "../routes/routes";
 
 const AboutUs = () => {
   let $ = window.$;
@@ -68,11 +70,11 @@ const AboutUs = () => {
     <>
       {SetPageLoaderNavLinks()}
       {/*============== Page Banner Start ==============*/}
-      <div className="page-banner-simple footer-default-dark bg-footer py-20 div-page-title">
+      {/* <div className="page-banner-simple footer-default-dark bg-footer py-3 div-page-title">
         <div className="container">
           <div className="row">
             <div className="col-lg-10">
-              <h3 className="banner-title text-white">Who We Are</h3>
+              <h5 className="banner-title text-white">Who We Are</h5>
               <span className="banner-tagline font-medium text-white">
                 <h6 className="text-white">
                   “Don’t wait to buy a property, buy a property and then wait.”
@@ -83,11 +85,15 @@ const AboutUs = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
+      <PageTitle
+        title="About US"
+        navLinks={[{ title: "Home", url: routeNames.home.path }]}
+      ></PageTitle>
       {/*============== Page Banner End ==============*/}
 
       {/*============== Features Start ==============*/}
-      <div className="full-row pb-0 pt-50">
+      <div className="full-row pt-4 pb-0">
         <div className="container">
           <div className="row">
             <div className="col-lg-12">
@@ -126,9 +132,9 @@ const AboutUs = () => {
         <div className="container">
           <div className="row">
             <div className="col">
-              <h1 className="main-title w-50 mx-auto mb-4 text-center w-sm-100 base-line down-line pb-10">
+              <h3 className="main-title w-50 mx-auto mb-4 text-center w-sm-100 base-line down-line pb-10">
                 Why US?
-              </h1>
+              </h3>
             </div>
           </div>
           <div className="row row-cols-lg-3 row-cols-1 g-4">
@@ -176,9 +182,9 @@ const AboutUs = () => {
         <div className="container">
           <div className="row">
             <div className="col text-center">
-              <h1 className="main-title w-50 mx-auto mb-4 text-center w-sm-100 base-line down-line pb-10">
+              <h3 className="main-title w-50 mx-auto mb-4 text-center w-sm-100 base-line down-line pb-10">
                 Our Services
-              </h1>
+              </h3>
               Assetswatch offers a great marketplace so you can grow your
               business.
             </div>
@@ -220,11 +226,11 @@ const AboutUs = () => {
           <div className="row">
             <div className="col-lg-9 mx-auto position-relative">
               <span className="tagline text-primary">Testimonials</span>
-              <h2 className="mb-5">
+              <h4 className="mb-5">
                 <span className="font-weight-bold">
                   What People Says About Us
                 </span>
-              </h2>
+              </h4>
               <div className="testimonial-carousel owl-carousel single-carusel testimonial-slider dot-disable position-static">
                 <div className="testimonial-item font-medium">
                   <span className="flaticon-right-quote quote-icon flat-medium text-primary" />

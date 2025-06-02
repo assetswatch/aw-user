@@ -177,7 +177,11 @@ h6 a,
 .user-info-nav-item .nav-link {
   color: var(--theme-secondary-color);
 }
-
+.nav-secondary.user-header-menu .navbar-nav :not(.active) > .nav-link,
+.nav-secondary.header-menu .navbar-nav :not(.active) > .nav-link,
+.user-info-nav-item .nav-link {
+  color: var(--text-light-dark-color) !important;
+}
 .text-white .breadcrumb-item > a,
 .text-white .breadcrumb-item.active,
 .media-icon-white a,
@@ -314,8 +318,9 @@ a.hover-text-extra1:hover {
 }
 
 .content-wrapper {
-  height: calc(80vh - 100%);
-  min-height: calc(80vh);
+  /* height: calc(80vh - 100%);
+  min-height: calc(80vh); */
+  min-height: calc(100vh - 120px);
 }
 
 /*============ Background Colors ===============*/
@@ -979,7 +984,21 @@ a.text-dark:focus {
   width: 100%;
   padding: 30px 0 60px 0;
 }
-
+.full-row.content-ph {
+  padding: 20px 0 60px 0;
+  /* flex: 1; */
+  animation-duration: 0.5s;
+  animation-fill-mode: both;
+  animation-name: fadeIn;
+}
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
 .p-35 {
   padding: 35px;
 }
@@ -1178,6 +1197,8 @@ a.text-dark:focus {
   z-index: 999;
   top: 0;
   position: absolute;
+  padding-left: 30px;
+  padding-right: 30px;
 }
 
 .navbar-nav .tooltip {
@@ -1586,6 +1607,12 @@ a.text-dark:focus {
   padding-right: 20px !important;
 }
 
+.px-25,
+.p-25,
+.pr-25 {
+  padding-right: 25px !important;
+}
+
 .px-30,
 .p-30,
 .pr-30 {
@@ -1614,6 +1641,12 @@ a.text-dark:focus {
 .p-0,
 .pb-0 {
   padding-bottom: 0px !important;
+}
+
+.py-8,
+.p-8,
+.pb-8 {
+  padding-bottom: 8px !important;
 }
 
 .py-10,
@@ -1714,6 +1747,12 @@ a.text-dark:focus {
 .p-20,
 .pl-20 {
   padding-left: 20px !important;
+}
+
+.px-25,
+.p-25,
+.pl-25 {
+  padding-left: 25px !important;
 }
 
 .px-30,
@@ -2559,7 +2598,7 @@ ul.product_list_widget li {
   background: none;
 }
 
-.mix-tab ul li,
+.mix-tab > ul > li,
 .tab-simple ul li {
   font-weight: 500;
   display: inline-block;
@@ -2569,13 +2608,15 @@ ul.product_list_widget li {
 }
 .tabw100 .nav-tab-line li:hover {
   background-color: var(--theme-light-color);
+  color: var(--theme-primary-color) !important;
+  transition: all 0.3s ease-in-out;
 }
 .tabw100 .nav-tab-line li {
   font-weight: 500;
   font-size: 14px;
   display: inline-block;
   cursor: pointer;
-  padding: 10px 25px;
+  padding: 6px 25px;
   border: none !important;
   position: relative;
   color: var(--theme-footer-color) !important;
@@ -2586,7 +2627,7 @@ ul.product_list_widget li {
   width: 100%;
   overflow: hidden;
   overflow-x: auto;
-  transition: color 0.3s ease;
+  transition: color 0.3s ease-in-out;
 }
 
 .tabw100 .nav-tab-line li.active {
@@ -2619,9 +2660,9 @@ ul.product_list_widget li {
 }
 
 .tabw100 .tab-element {
-  margin-top: 20px !important;
-  margin-bottom: 20px !important;
-  min-height: 400px !important;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  min-height: 380px !important;
 }
 
 .nav-tab-line li.mixitup-control-active:after,
@@ -2631,12 +2672,19 @@ ul.product_list_widget li {
   bottom: -7px;
 }
 
-ul.nav-tab-border-active li {
+ul.nav-tab-border-active > li {
   min-width: 80px;
   border: 2px solid;
   border-color: transparent;
   border-radius: 25px;
   text-align: center;
+}
+
+.rounded-50 {
+  border-radius: 0.5rem !important;
+}
+.rounded-2rem {
+  border-radius: 2rem !important;
 }
 
 .rounded-top {
@@ -4712,7 +4760,9 @@ Newsletter Style
 .flex-vb {
   align-self: end;
 }
-
+.flex-grow-0 {
+  flex-grow: 0 !important;
+}
 .flex {
   display: flex;
 }
@@ -4997,13 +5047,29 @@ Newsletter Style
     max-width: 33.33%;
   }
 }
-
+@media screen and (min-width: 1024px) {
+  .user-header-menu .navbar-nav .nav-item > a i {
+    display: inline-block;
+  }
+}
 @media screen and (max-width: 1024px) {
   .navbar-expand-lg .navbar-nav .nav-link {
     font-size: 13px;
   }
   .full-row {
     padding: 20px 0 50px 0;
+  }
+  .full-row.content-ph {
+    padding: 10px 0 50px 0;
+  }
+  .nav-on-top {
+    padding-left: 10px !important;
+    padding-right: 0 !important;
+  }
+}
+@media screen and (min-width: 920px) and (max-width: 1200px) {
+  .user-header-menu .navbar-nav .nav-item > a i {
+    display: none;
   }
 }
 @media screen and (max-width: 1200px) {
@@ -5014,6 +5080,9 @@ Newsletter Style
 @media screen and (min-width: 1200px) {
   .user-menu .nav-item {
     padding: 0px 10px !important;
+  }
+  .user-header-menu .navbar-nav .nav-item > a i {
+    display: inline-block;
   }
 }
 @media screen and (min-width: 1400px) {
@@ -5090,7 +5159,10 @@ Newsletter Style
     padding-left: 0;
   }
   .navbar-expand-lg .navbar-nav .nav-item {
-    padding: 0 20px;
+    padding: 0 15px;
+  }
+  .navbar-expand-lg .navbar-nav .nav-item.dropdown {
+    padding: 0 25px;
   }
   .navbar-expand-lg.nav-border-active .navbar-nav .nav-item {
     padding: 0 5px;
@@ -5174,8 +5246,11 @@ Newsletter Style
     border: none;
     margin: 0;
   }
-  .nav-login-register.active > .nav-link:before {
-    bottom: -10px !important;
+  .nav-line-active .navbar-nav .active > .nav-link:before {
+    bottom: 22px !important;
+  }
+  .nav-line-active .nav-login-register.active > .nav-link:before {
+    bottom: -5px !important;
   }
   .nav-down-line-active .navbar-nav .active > .nav-link:before {
     width: 100%;
@@ -5221,13 +5296,29 @@ Newsletter Style
     background-color: #fff;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
     opacity: 0;
-    border: 0;
-    border-top: 1px solid;
+    /* border: 0; */
+    border: 2px solid;
     border-color: var(--theme-light-color);
-    border-radius: 3px;
+    border-radius: 10px;
     left: -10px;
     top: 100%;
-    margin-top: 0;
+    margin-top: -15px;
+  }
+  .navbar .navbar-nav li > ul.dropdown-menu::before {
+    content: "";
+    position: absolute;
+    top: -0.25rem;
+    left: 50%;
+    display: block;
+    background: inherit;
+    width: 14px;
+    height: 14px;
+    transform: translateX(-50%) rotate(45deg);
+    transform-origin: center;
+    border: solid 1px var(--text-light-color) !important;
+    border-color: inherit;
+    z-index: -1;
+    clip: rect(0, 9px, 9px, 0);
   }
   .navbar .navbar-nav li:hover > ul.dropdown-menu {
     visibility: visible;

@@ -24,6 +24,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { Toast } from "../../../components/common/ToastView";
 import { getsessionStorageItem } from "../../../helpers/sessionStorageHelper";
 import { LazyImage, NoData } from "../../../components/common/LazyComponents";
+import GoBackPanel from "../../../components/common/GoBackPanel";
 
 const AssignProperty = () => {
   let $ = window.$;
@@ -458,32 +459,36 @@ const AssignProperty = () => {
   };
 
   const onCancel = (e) => {
-    navigate(routeNames.ownerproperties.path);
+    // navigate(routeNames.ownerproperties.path);
+    window.history.go(-1);
   };
 
   return (
     <>
       {SetPageLoaderNavLinks()}
-      <div className="full-row bg-light">
+      <div className="full-row bg-light content-ph">
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <div className="row">
-                <div className="col-6">
-                  <h6 className="mb-3 down-line pb-10">Assign Property</h6>
+              <div className="d-flex w-100">
+                <div className="flex-grow-1">
+                  <div className="breadcrumb my-1">
+                    <div className="breadcrumb-item bc-fh">
+                      <h6
+                        className="mb-3 down-line pb-10 cur-pointer"
+                        onClick={onCancel}
+                      >
+                        Properties
+                      </h6>
+                    </div>
+                    <div className="breadcrumb-item bc-fh ctooltip-container">
+                      <span className="font-general font-500 cur-default">
+                        Assign Property
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="col-6 d-flex justify-content-end align-items-end pb-10">
-                  <button
-                    className="btn btn-primary btn-mini btn-glow shadow rounded"
-                    name="btnsendnotificationmodal"
-                    id="btnsendnotificationmodal"
-                    type="button"
-                    onClick={onCancel}
-                  >
-                    <i className="icons font-18 icon-arrow-left-circle position-relative me-1 t-3"></i>{" "}
-                    Back
-                  </button>
-                </div>
+                <GoBackPanel clickAction={onCancel} />
               </div>
               <div className="row">
                 <div className="col-xl-7 col-lg-7 md-mt-20 order-2 order-lg-1 ">

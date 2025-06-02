@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useGetUserProfilesGateway } from "../../hooks/useGetUserProfilesGateway";
 import { DataLoader, NoData } from "../../components/common/LazyComponents";
 import {
@@ -10,14 +10,10 @@ import {
 } from "../../utils/common";
 import { AppMessages, UserCookie } from "../../utils/constants";
 import { useAuth } from "../../contexts/AuthContext";
-import {
-  Link,
-  useLocation,
-  useNavigate,
-  useSearchParams,
-} from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { routeNames } from "../../routes/routes";
 import { useProfileTypesGateway } from "../../hooks/useProfileTypesGateway";
+import config from "../../config.json";
 
 const Profiles = () => {
   let $ = window.$;
@@ -74,150 +70,194 @@ const Profiles = () => {
     );
   };
 
+  const setProfileText = (profileTypeId) => {
+    if (profileTypeId == config.userProfileTypes.Owner) {
+      return " Manages property and invites agents or tenants.";
+    } else if (profileTypeId == config.userProfileTypes.Agent) {
+      return " Handles daily operations and tenant relations.";
+    } else if (profileTypeId == config.userProfileTypes.Tenant) {
+      return " Occupies and manages leased properties.";
+    } else {
+      return "";
+    }
+  };
+
   return (
     <>
       {SetPageLoaderNavLinks()}
-      <div className="full-row  bg-light">
+      <div className="full-row  bg-light content-ph">
         <div className="container">
-          <div className="row mx-auto col-md-8 col-xl-7 shadow">
-            <div className="bg-white xs-p-20 p-30 pb-30 border rounded">
-              <h4 className="mb-4 down-line pb-10">Profiles</h4>
-              <div className="row row-cols-lg-3 pt-10 pb-0 row-cols-1 g-4 flex-center">
-                {isDataLoading && (
-                  <div className="pb-100">
-                    <DataLoader />
+          <div className="row">
+            <div className="col-12">
+              <div className="d-flex w-100">
+                <div className="flex-grow-1">
+                  <div className="breadcrumb my-1">
+                    <div className="breadcrumb-item bc-fh">
+                      <h6 className="mb-3 down-line pb-10 cur-pointer">
+                        Profiles
+                      </h6>
+                    </div>
+                    <div className="breadcrumb-item bc-fh ctooltip-container">
+                      <span className="font-general font-500 cur-default">
+                        Choose Your Profile
+                      </span>
+                    </div>
                   </div>
-                )}
-                {!isDataLoading && (
-                  <>
-                    {checkObjNullorEmpty(userProfilesList) ||
-                      (userProfilesList.length == 0 && (
-                        <div className="pb-100">
-                          <NoData message={AppMessages.NoProfiles} />
-                        </div>
-                      ))}
-                    {!checkObjNullorEmpty(userProfilesList) &&
-                      userProfilesList.length > 0 && (
-                        <>
-                          {viewProfiles == true ? (
+                </div>
+              </div>
+              <div className="row mx-auto col-md-8 col-xl-8 shadow">
+                <div className="bg-white xs-p-20 px-30 py-20 pb-30 border rounded">
+                  <div className="breadcrumb mb-0">
+                    <div className="breadcrumb-item bc-fh">
+                      <h6 className="mb-2 down-line pb-10">Select Profile</h6>
+                    </div>
+                  </div>
+                  <div className="row row-cols-lg-3 pt-20 pb-10 row-cols-1 g-4 flex-center">
+                    {isDataLoading && (
+                      <div className="pb-100">
+                        <DataLoader />
+                      </div>
+                    )}
+                    {!isDataLoading && (
+                      <>
+                        {checkObjNullorEmpty(userProfilesList) ||
+                          (userProfilesList.length == 0 && (
+                            <div className="pb-100">
+                              <NoData message={AppMessages.NoProfiles} />
+                            </div>
+                          ))}
+                        {!checkObjNullorEmpty(userProfilesList) &&
+                          userProfilesList.length > 0 && (
                             <>
-                              {userProfilesList.map((p, pidx) => {
-                                return (
-                                  <div
-                                    className="col"
-                                    key={`profile-${pidx}`}
-                                    profile-id={p.ProfileId}
-                                    profile-type={p.ProfileType}
-                                    profile-name={p.Name}
-                                    profile-pic={p.PicPath}
-                                    profile-typeid={p.ProfileTypeId}
-                                    profile-catid={p.ProfileCategoryId}
-                                  >
-                                    <div className="text-center px-4 py-10">
-                                      <div>
-                                        <a href="#" onClick={onChangeProfile}>
-                                          <img
-                                            src={p.PicPath}
-                                            className="box-100px max-100 rounded-circle shadow"
-                                          ></img>
-                                        </a>
+                              {viewProfiles == true ? (
+                                <>
+                                  {userProfilesList.map((p, pidx) => {
+                                    return (
+                                      <div
+                                        className="col cur-pointer"
+                                        key={`profile-${pidx}`}
+                                        profile-id={p.ProfileId}
+                                        profile-type={p.ProfileType}
+                                        profile-name={p.Name}
+                                        profile-pic={p.PicPath}
+                                        profile-typeid={p.ProfileTypeId}
+                                        profile-catid={p.ProfileCategoryId}
+                                        onClick={onChangeProfile}
+                                      >
+                                        <div className="text-center px-4 py-20 bg-li-hover-color hoverbo1bg-primary rounded-2rem hover-shadow bo2-transparent transition2sl">
+                                          <div>
+                                            <a>
+                                              <img
+                                                src={p.PicPath}
+                                                className="box-100px max-100 rounded-circle shadow"
+                                              ></img>
+                                            </a>
+                                          </div>
+                                          <div className="mt-3">
+                                            <span className="transation font-500 text-primary">
+                                              <a>{p.ProfileType}</a>
+                                            </span>
+                                            <p className="transation font-general font-500">
+                                              {setProfileText(p.ProfileTypeId)}
+                                            </p>
+                                          </div>
+                                        </div>
                                       </div>
-                                      <div className="mt-3">
-                                        <span className="transation font-500">
-                                          <a href="#" onClick={onChangeProfile}>
-                                            {p.ProfileType}
-                                          </a>
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </>
-                          ) : (
-                            <>
-                              {profileTypesList.map((pt, pidx) => {
-                                let p = userProfilesList?.filter(
-                                  (item) =>
-                                    item.ProfileTypeId === pt.ProfileTypeId
-                                );
+                                    );
+                                  })}
+                                </>
+                              ) : (
+                                <>
+                                  {profileTypesList.map((pt, pidx) => {
+                                    let p = userProfilesList?.filter(
+                                      (item) =>
+                                        item.ProfileTypeId === pt.ProfileTypeId
+                                    );
 
-                                return p.length > 0 ? (
-                                  <div
-                                    className="col"
-                                    key={`profile-${pidx}`}
-                                    profile-id={p[0].ProfileId}
-                                    profile-type={p[0].ProfileType}
-                                    profile-name={p[0].Name}
-                                    profile-pic={p[0].PicPath}
-                                    profile-typeid={p[0].ProfileTypeId}
-                                    profile-catid={p[0].ProfileCategoryId}
-                                  >
-                                    <div className="text-center px-4 py-10">
-                                      <div>
-                                        <a href="#" onClick={onChangeProfile}>
-                                          <img
-                                            src={p[0].PicPath}
-                                            className="box-100px max-100 rounded-circle shadow"
-                                          ></img>
-                                        </a>
+                                    return p.length > 0 ? (
+                                      <div
+                                        className="col cur-pointer"
+                                        key={`profile-${pidx}`}
+                                        profile-id={p[0].ProfileId}
+                                        profile-type={p[0].ProfileType}
+                                        profile-name={p[0].Name}
+                                        profile-pic={p[0].PicPath}
+                                        profile-typeid={p[0].ProfileTypeId}
+                                        profile-catid={p[0].ProfileCategoryId}
+                                        onClick={onChangeProfile}
+                                      >
+                                        <div className="text-center px-4 py-20 bg-li-hover-color hoverbo1bg-primary rounded-2rem hover-shadow bo2-transparent transition2sl">
+                                          <div>
+                                            <a>
+                                              <img
+                                                src={p[0].PicPath}
+                                                className="box-100px max-100 rounded-circle shadow"
+                                              ></img>
+                                            </a>
+                                          </div>
+                                          <div className="mt-3">
+                                            <span className="transation font-500 text-primary">
+                                              <a>{p[0].ProfileType}</a>
+                                            </span>
+                                            <p className="transation font-general font-500">
+                                              {setProfileText(
+                                                p[0].ProfileTypeId
+                                              )}
+                                            </p>
+                                          </div>
+                                        </div>
                                       </div>
-                                      <div className="mt-3">
-                                        <span className="transation font-500">
-                                          <a href="#" onClick={onChangeProfile}>
-                                            {p[0].ProfileType}
-                                          </a>
-                                        </span>
+                                    ) : (
+                                      <div
+                                        className="col cur-pointer"
+                                        key={`profile-${pidx}`}
+                                        profile-id={0}
+                                        profile-type={pt.ProfileType}
+                                        profile-typeid={pt.ProfileTypeId}
+                                        onClick={onAddProfile}
+                                      >
+                                        <div className="text-center px-4 py-20 bg-li-hover-color hoverbo1bg-primary rounded-2rem hover-shadow bo2-transparent transition2sl">
+                                          <div>
+                                            <a>
+                                              <i className="fa fa-plus box-100px max-100 rounded-circle shadow bg-primary text-white flat-small pt-35" />
+                                            </a>
+                                          </div>
+                                          <div className="mt-3">
+                                            <span className="transation font-500 text-primary">
+                                              <a>{pt.ProfileType}</a>
+                                            </span>
+                                            <p className="transation font-general font-500">
+                                              {setProfileText(pt.ProfileTypeId)}
+                                            </p>
+                                          </div>
+                                        </div>
                                       </div>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <div
-                                    className="col"
-                                    key={`profile-${pidx}`}
-                                    profile-id={0}
-                                    profile-type={pt.ProfileType}
-                                    profile-typeid={pt.ProfileTypeId}
-                                  >
-                                    <div className="text-center px-4 py-10">
-                                      <div className="">
-                                        <a href="#" onClick={onAddProfile}>
-                                          <i className="fa fa-plus box-100px max-100 rounded-circle shadow bg-primary text-white flat-small pt-35" />
-                                        </a>
-                                      </div>
-                                      <div className="mt-3">
-                                        <span className="transation font-500">
-                                          <a href="#" onClick={onAddProfile}>
-                                            {pt.ProfileType}
-                                          </a>
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                );
-                              })}
+                                    );
+                                  })}
+                                </>
+                              )}
+                              {/* <hr className="w-100 text-primary mt-30 d -none"></hr> */}
+                              <div className="w-100 pt-30 pr-10 d-flex flex-end mt-0">
+                                <Link
+                                  className="font-500 font-general text-primary hovertxt-dec"
+                                  to={getPagesPathByLoggedinUserProfile(
+                                    GetCookieValues(UserCookie.ProfileTypeId),
+                                    "profile"
+                                  )}
+                                >
+                                  <span className="pe-2">
+                                    Skip →
+                                    {/* <i className="pl-5 fa fa-circle-chevron-right"></i> */}
+                                  </span>
+                                  {/* <u>Cancel</u> */}
+                                </Link>
+                              </div>
                             </>
                           )}
-                          <hr className="w-100 text-primary mt-30 d -none"></hr>
-                          <div className="w-100 pt-10 pr-10 d-flex flex-end mt-0">
-                            <Link
-                              className="font-500 font-general text-primary"
-                              to={getPagesPathByLoggedinUserProfile(
-                                GetCookieValues(UserCookie.ProfileTypeId),
-                                "profile"
-                              )}
-                            >
-                              <u>
-                                Skip
-                                <i className="pl-5 fa fa-circle-chevron-right"></i>
-                              </u>
-                              {/* <u>Cancel</u> */}
-                            </Link>
-                          </div>
-                        </>
-                      )}
-                  </>
-                )}
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

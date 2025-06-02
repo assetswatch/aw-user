@@ -33,6 +33,7 @@ import { useGetInvoiceItemAccountForTypesGateway } from "../../../hooks/usegetIn
 import { useGetDdlInvoiceForItemsGateway } from "../../../hooks/useGetDdlInvoiceForItemsGateway";
 import TextAreaControl from "../../../components/common/TextAreaControl";
 import DateControl from "../../../components/common/DateControl";
+import GoBackPanel from "../../../components/common/GoBackPanel";
 
 const CreateAccount = () => {
   let $ = window.$;
@@ -351,15 +352,20 @@ const CreateAccount = () => {
   return (
     <>
       {SetPageLoaderNavLinks()}
-      <div className="full-row  bg-light">
+      <div className="full-row  bg-light content-ph">
         <div className="container">
-          <div className="row mx-auto col-lg-8 shadow">
-            <div className="bg-white xs-p-20 p-30 pb-30 border rounded">
-              <div className="row">
-                <div className="col-6">
-                  <div className="breadcrumb mb-0">
+          <div className="row">
+            <div className="col-12">
+              <div className="d-flex w-100">
+                <div className="flex-grow-1">
+                  <div className="breadcrumb my-1">
                     <div className="breadcrumb-item bc-fh">
-                      <h6 className="mb-2 down-line pb-10">Payments</h6>
+                      <h6
+                        className="mb-3 down-line pb-10 cur-pointer"
+                        onClick={navigateToPaymentsAccounts}
+                      >
+                        Payments
+                      </h6>
                     </div>
                     <div className="breadcrumb-item bc-fh ctooltip-container">
                       <span className="font-general font-500 cur-default">
@@ -368,439 +374,445 @@ const CreateAccount = () => {
                     </div>
                   </div>
                 </div>
-                <div className="col-6 d-flex flex-ai-t flex-jc-r text-end pt-2">
-                  <button
-                    type="button"
-                    className="btn btn-glow px-0 rounded-circle text-primary lh-1 d-flex flex-center"
-                    onClick={navigateToPaymentsAccounts}
-                  >
-                    <i className="icons font-18 icon-arrow-left-circle text-primary me-1"></i>
-                    <span className="font-general">Back</span>
-                  </button>
-                </div>
               </div>
-              <div className="row pt-20 pb-0 row-cols-1 g-4 flex-center">
-                <div className="col">
-                  <form noValidate>
-                    <div className="row">
-                      <h6 className="mb-3 down-line pb-10 mx-10 px-0 font-16">
-                        About Your Business
-                      </h6>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtdbaname"
-                          ctlType={formCtrlTypes.dbaname}
-                          isFocus={true}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtdbaname}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={1}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtlegalname"
-                          ctlType={formCtrlTypes.legalname}
-                          isFocus={true}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtlegalname}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={2}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtbusinessdescription"
-                          ctlType={formCtrlTypes.businessdescription}
-                          isFocus={true}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtbusinessdescription}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={3}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <DateControl
-                          lblClass="mb-0 lbl-req-field"
-                          lblText="Business Start Date: "
-                          name="txtbusinessstartdate"
-                          required={true}
-                          onChange={(dt) =>
-                            onDateChange(dt, "txtbusinessstartdate")
-                          }
-                          value={formData.txtbusinessstartdate}
-                          isTime={false}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={4}
-                        ></DateControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtphone"
-                          ctlType={formCtrlTypes.phone}
-                          isFocus={true}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtphone}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={5}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtemail"
-                          ctlType={formCtrlTypes.email}
-                          isFocus={true}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtemail}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={6}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtwebsite"
-                          ctlType={formCtrlTypes.website}
-                          isFocus={true}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtwebsite}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={7}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtfederaltaxid"
-                          ctlType={formCtrlTypes.federaltaxid}
-                          isFocus={true}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtfederaltaxid}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={8}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtaddress"
-                          ctlType={formCtrlTypes.address50}
-                          isFocus={true}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtaddress}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={9}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <AsyncSelect
-                          placeHolder={
-                            statesData.length <= 0 && stateSelected == null
-                              ? AppMessages.DdlDefaultSelect
-                              : AppMessages.DdlDefaultSelect
-                          }
-                          noData={
-                            statesData.length <= 0 && stateSelected == null
-                              ? AppMessages.DdLLoading
-                              : AppMessages.NoStates
-                          }
-                          options={statesData}
-                          extraOptions={{
-                            key: "shortname",
-                            dataVal: "ShortName",
-                          }}
-                          onChange={handleStateChange}
-                          value={stateSelected}
-                          name="ddlstates"
-                          lbl={formCtrlTypes.state}
-                          lblClass="mb-0 lbl-req-field"
-                          required={true}
-                          isClearable={false}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={10}
-                        ></AsyncSelect>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtcity"
-                          ctlType={formCtrlTypes.txtcity}
-                          isFocus={true}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtcity}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={11}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtzip"
-                          ctlType={formCtrlTypes.zip}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtzip}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={12}
-                        ></InputControl>
-                      </div>
-                      <h6 className="mb-3 pt-20 down-line pb-10 mx-10 px-0 font-16">
-                        Settlement Account Information
-                      </h6>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtaccountnumber"
-                          ctlType={formCtrlTypes.accountnum}
-                          isFocus={true}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtaccountnumber}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={13}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtroutingnumber"
-                          ctlType={formCtrlTypes.routingnum}
-                          isFocus={true}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtroutingnumber}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={14}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtbusinessnameonaccount"
-                          ctlType={formCtrlTypes.businessnameonaccount}
-                          isFocus={true}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtbusinessnameonaccount}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={15}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <AsyncSelect
-                          placeHolder={AppMessages.DdlDefaultSelect}
-                          noData={AppMessages.NoData}
-                          options={accountTypes}
-                          onChange={handleAccountTypeChange}
-                          value={accountTypeSelected}
-                          defualtselected={accountTypeSelected}
-                          name="ddlaccounttypes"
-                          lbl={formCtrlTypes.accounttype}
-                          lblClass="mb-0 lbl-req-field"
-                          required={true}
-                          isClearable={false}
-                          isSearchable={false}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={16}
-                        ></AsyncSelect>
-                      </div>
-                      <h6 className="mb-3 pt-20 down-line pb-10 mx-10 px-0 font-16">
-                        Business Owner Information
-                      </h6>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtfname"
-                          ctlType={formCtrlTypes.paymentsubaccountfname}
-                          isFocus={true}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtfname}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={17}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtlname"
-                          ctlType={formCtrlTypes.paymentsubaccountlname}
-                          isFocus={true}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtlname}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={18}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtlast4ssn"
-                          ctlType={formCtrlTypes.last4ssn}
-                          isFocus={true}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtlast4ssn}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={19}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <DateControl
-                          lblClass="mb-0 lbl-req-field"
-                          lblText="Date of Birth: "
-                          name="txtdateofbirth"
-                          required={true}
-                          onChange={(dt) => onDateChange(dt, "txtdateofbirth")}
-                          value={formData.txtdateofbirth}
-                          isTime={false}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={20}
-                        ></DateControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtownerphone"
-                          ctlType={formCtrlTypes.phone}
-                          isFocus={true}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtownerphone}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={21}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtowneraddress"
-                          ctlType={formCtrlTypes.address50}
-                          isFocus={true}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtowneraddress}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={22}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <AsyncSelect
-                          placeHolder={
-                            statesData.length <= 0 && ownerStateSelected == null
-                              ? AppMessages.DdlDefaultSelect
-                              : AppMessages.DdlDefaultSelect
-                          }
-                          noData={
-                            statesData.length <= 0 && ownerStateSelected == null
-                              ? AppMessages.DdLLoading
-                              : AppMessages.NoStates
-                          }
-                          options={statesData}
-                          extraOptions={{
-                            key: "shortname",
-                            dataVal: "ShortName",
-                          }}
-                          onChange={handleOwnerStateChange}
-                          value={ownerStateSelected}
-                          name="ddlownerstates"
-                          lbl={formCtrlTypes.state}
-                          lblClass="mb-0 lbl-req-field"
-                          required={true}
-                          isClearable={false}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={23}
-                        ></AsyncSelect>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtownercity"
-                          ctlType={formCtrlTypes.txtcity}
-                          isFocus={true}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtownercity}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={24}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtownerzip"
-                          ctlType={formCtrlTypes.zip}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtownerzip}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={25}
-                        ></InputControl>
-                      </div>
-                    </div>
-                  </form>
-                  <hr className="w-100 text-primary my-20"></hr>
+              <div className="row mx-auto col-lg-8 shadow">
+                <div className="bg-white xs-p-20 px-30 py-20 pb-30 border rounded">
+                  <div className="row row-cols-1 g-4 flex-center">
+                    <div className="col">
+                      <form noValidate>
+                        <div className="row">
+                          <div className="d-flex w-100">
+                            <div className="flex-grow-1">
+                              <h6 className="mb-3 down-line pb-10 px-0 font-16">
+                                About Your Business
+                              </h6>
+                            </div>
+                            <GoBackPanel
+                              clickAction={navigateToPaymentsAccounts}
+                              isformBack={true}
+                            />
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtdbaname"
+                              ctlType={formCtrlTypes.dbaname}
+                              isFocus={true}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtdbaname}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={1}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtlegalname"
+                              ctlType={formCtrlTypes.legalname}
+                              isFocus={true}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtlegalname}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={2}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtbusinessdescription"
+                              ctlType={formCtrlTypes.businessdescription}
+                              isFocus={true}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtbusinessdescription}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={3}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <DateControl
+                              lblClass="mb-0 lbl-req-field"
+                              lblText="Business Start Date: "
+                              name="txtbusinessstartdate"
+                              required={true}
+                              onChange={(dt) =>
+                                onDateChange(dt, "txtbusinessstartdate")
+                              }
+                              value={formData.txtbusinessstartdate}
+                              isTime={false}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={4}
+                            ></DateControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtphone"
+                              ctlType={formCtrlTypes.phone}
+                              isFocus={true}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtphone}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={5}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtemail"
+                              ctlType={formCtrlTypes.email}
+                              isFocus={true}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtemail}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={6}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtwebsite"
+                              ctlType={formCtrlTypes.website}
+                              isFocus={true}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtwebsite}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={7}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtfederaltaxid"
+                              ctlType={formCtrlTypes.federaltaxid}
+                              isFocus={true}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtfederaltaxid}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={8}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtaddress"
+                              ctlType={formCtrlTypes.address50}
+                              isFocus={true}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtaddress}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={9}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <AsyncSelect
+                              placeHolder={
+                                statesData.length <= 0 && stateSelected == null
+                                  ? AppMessages.DdlDefaultSelect
+                                  : AppMessages.DdlDefaultSelect
+                              }
+                              noData={
+                                statesData.length <= 0 && stateSelected == null
+                                  ? AppMessages.DdLLoading
+                                  : AppMessages.NoStates
+                              }
+                              options={statesData}
+                              extraOptions={{
+                                key: "shortname",
+                                dataVal: "ShortName",
+                              }}
+                              onChange={handleStateChange}
+                              value={stateSelected}
+                              name="ddlstates"
+                              lbl={formCtrlTypes.state}
+                              lblClass="mb-0 lbl-req-field"
+                              required={true}
+                              isClearable={false}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={10}
+                            ></AsyncSelect>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtcity"
+                              ctlType={formCtrlTypes.txtcity}
+                              isFocus={true}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtcity}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={11}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtzip"
+                              ctlType={formCtrlTypes.zip}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtzip}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={12}
+                            ></InputControl>
+                          </div>
+                          <h6 className="mb-3 pt-20 down-line pb-10 mx-10 px-0 font-16">
+                            Settlement Account Information
+                          </h6>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtaccountnumber"
+                              ctlType={formCtrlTypes.accountnum}
+                              isFocus={true}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtaccountnumber}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={13}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtroutingnumber"
+                              ctlType={formCtrlTypes.routingnum}
+                              isFocus={true}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtroutingnumber}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={14}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtbusinessnameonaccount"
+                              ctlType={formCtrlTypes.businessnameonaccount}
+                              isFocus={true}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtbusinessnameonaccount}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={15}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <AsyncSelect
+                              placeHolder={AppMessages.DdlDefaultSelect}
+                              noData={AppMessages.NoData}
+                              options={accountTypes}
+                              onChange={handleAccountTypeChange}
+                              value={accountTypeSelected}
+                              defualtselected={accountTypeSelected}
+                              name="ddlaccounttypes"
+                              lbl={formCtrlTypes.accounttype}
+                              lblClass="mb-0 lbl-req-field"
+                              required={true}
+                              isClearable={false}
+                              isSearchable={false}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={16}
+                            ></AsyncSelect>
+                          </div>
+                          <h6 className="mb-3 pt-20 down-line pb-10 mx-10 px-0 font-16">
+                            Business Owner Information
+                          </h6>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtfname"
+                              ctlType={formCtrlTypes.paymentsubaccountfname}
+                              isFocus={true}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtfname}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={17}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtlname"
+                              ctlType={formCtrlTypes.paymentsubaccountlname}
+                              isFocus={true}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtlname}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={18}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtlast4ssn"
+                              ctlType={formCtrlTypes.last4ssn}
+                              isFocus={true}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtlast4ssn}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={19}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <DateControl
+                              lblClass="mb-0 lbl-req-field"
+                              lblText="Date of Birth: "
+                              name="txtdateofbirth"
+                              required={true}
+                              onChange={(dt) =>
+                                onDateChange(dt, "txtdateofbirth")
+                              }
+                              value={formData.txtdateofbirth}
+                              isTime={false}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={20}
+                            ></DateControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtownerphone"
+                              ctlType={formCtrlTypes.phone}
+                              isFocus={true}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtownerphone}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={21}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtowneraddress"
+                              ctlType={formCtrlTypes.address50}
+                              isFocus={true}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtowneraddress}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={22}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <AsyncSelect
+                              placeHolder={
+                                statesData.length <= 0 &&
+                                ownerStateSelected == null
+                                  ? AppMessages.DdlDefaultSelect
+                                  : AppMessages.DdlDefaultSelect
+                              }
+                              noData={
+                                statesData.length <= 0 &&
+                                ownerStateSelected == null
+                                  ? AppMessages.DdLLoading
+                                  : AppMessages.NoStates
+                              }
+                              options={statesData}
+                              extraOptions={{
+                                key: "shortname",
+                                dataVal: "ShortName",
+                              }}
+                              onChange={handleOwnerStateChange}
+                              value={ownerStateSelected}
+                              name="ddlownerstates"
+                              lbl={formCtrlTypes.state}
+                              lblClass="mb-0 lbl-req-field"
+                              required={true}
+                              isClearable={false}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={23}
+                            ></AsyncSelect>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtownercity"
+                              ctlType={formCtrlTypes.txtcity}
+                              isFocus={true}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtownercity}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={24}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtownerzip"
+                              ctlType={formCtrlTypes.zip}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtownerzip}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={25}
+                            ></InputControl>
+                          </div>
+                        </div>
+                      </form>
+                      <hr className="w-100 text-primary my-20"></hr>
 
-                  <div className="row form-action flex-center mx-0">
-                    <div
-                      className="col-md-7 px-0 form-error"
-                      id="form-error"
-                    ></div>
-                    <div className="col-md-5 px-0">
-                      <button
-                        className="btn btn-secondary"
-                        id="btnCancel"
-                        onClick={navigateToPaymentsAccounts}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        className="btn btn-primary"
-                        id="btnReview"
-                        onClick={onCreate}
-                      >
-                        Review
-                      </button>
+                      <div className="row form-action flex- center mx-0">
+                        <div
+                          className="col-md-7 px-0 form-error"
+                          id="form-error"
+                        ></div>
+                        <div className="col-md-5 px-0">
+                          <button
+                            className="btn btn-secondary"
+                            id="btnCancel"
+                            onClick={navigateToPaymentsAccounts}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            className="btn btn-primary"
+                            id="btnReview"
+                            onClick={onCreate}
+                          >
+                            Review
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

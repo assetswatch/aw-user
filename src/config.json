@@ -39,6 +39,12 @@
     "Active": "A",
     "Passive": "P"
   },
+  "applicationStatus": {
+    "Created": 0,
+    "Pending": 1,
+    "PatiallyCompleted": 2,
+    "Completed": 3
+  },
   "paymentStatusTypes": {
     "UnPaid": 0,
     "Paid": 1,

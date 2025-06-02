@@ -32,6 +32,7 @@ import { useGetAreaUnitTypesGateway } from "../../../hooks/useGetAreaUnitTypesGa
 import { useGetAssetOwnershipStatusTypesGateway } from "../../../hooks/useGetAssetOwnershipStatusTypesGateway";
 import AsyncRemoteSelect from "../../../components/common/AsyncRemoteSelect";
 import { useDropzone } from "react-dropzone";
+import GoBackPanel from "../../../components/common/GoBackPanel";
 
 const AddCommercialProperty = () => {
   let $ = window.$;
@@ -629,11 +630,30 @@ const AddCommercialProperty = () => {
   return (
     <>
       {SetPageLoaderNavLinks()}
-      <div className="full-row bg-light">
+      <div className="full-row bg-light content-ph">
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <h6 className="mb-3 down-line pb-10">Commercial Property</h6>
+              <div className="d-flex w-100">
+                <div className="flex-grow-1">
+                  <div className="breadcrumb my-1">
+                    <div className="breadcrumb-item bc-fh">
+                      <h6
+                        className="mb-3 down-line pb-10 cur-pointer"
+                        onClick={onCancel}
+                      >
+                        Properties
+                      </h6>
+                    </div>
+                    <div className="breadcrumb-item bc-fh ctooltip-container">
+                      <span className="font-general font-500 cur-default">
+                        Commercial Property
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <GoBackPanel clickAction={onCancel} />
+              </div>
               <div className="row">
                 <div className="col-xl-7 col-lg-7">
                   <form noValidate>

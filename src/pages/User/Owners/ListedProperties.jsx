@@ -41,6 +41,7 @@ import { useGetAssetTypesGateway } from "../../../hooks/useGetAssetTypesGateway"
 import { useGetAssetListingTypesGateway } from "../../../hooks/useGetAssetListingTypesGateway";
 import { Toast } from "../../../components/common/ToastView";
 import { useAssetClassificationTypesGateway } from "../../../hooks/useAssetClassificationTypesGateway";
+import GridFiltersPanel from "../../../components/common/GridFiltersPanel";
 
 const ListedProperties = () => {
   let $ = window.$;
@@ -896,20 +897,18 @@ const ListedProperties = () => {
   return (
     <>
       {SetPageLoaderNavLinks()}
-      <div className="full-row bg-light">
+      <div className="full-row bg-light content-ph">
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <div className="col-6">
-                <div className="breadcrumb">
-                  <div className="breadcrumb-item bc-fh">
-                    <h6 className="mb-3 down-line pb-10">Properties</h6>
-                  </div>
-                  <div className="breadcrumb-item bc-fh ctooltip-container">
-                    <span className="font-general font-500 cur-default">
-                      Listed Properties
-                    </span>
-                  </div>
+              <div className="breadcrumb my-1">
+                <div className="breadcrumb-item bc-fh">
+                  <h6 className="mb-3 down-line pb-10">Properties</h6>
+                </div>
+                <div className="breadcrumb-item bc-fh ctooltip-container">
+                  <span className="font-general font-500 cur-default">
+                    Listed Properties
+                  </span>
                 </div>
               </div>
               <div className="tabw100 tab-action shadow rounded bg-white">
@@ -922,155 +921,162 @@ const ListedProperties = () => {
                 </ul>
                 <div className="tab-element">
                   {/*============== Search Start ==============*/}
-                  <div className="woo-filter-bar full-row p-3 grid-search bo-0">
-                    <div className="container-fluid v-center">
-                      <div className="row">
-                        <div className="col px-0">
-                          <form noValidate>
-                            <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
-                              <div className="col-lg-3 col-xl-3 col-md-6">
-                                <InputControl
-                                  lblClass="mb-0"
-                                  lblText="Search keyword"
-                                  name="txtkeyword"
-                                  ctlType={formCtrlTypes.searchkeyword}
-                                  value={searchFormData.txtkeyword}
-                                  onChange={handleChange}
-                                  formErrors={formErrors}
-                                ></InputControl>
+                  <GridFiltersPanel
+                    divFilterControls={
+                      <div
+                        className="container-fluid v-center"
+                        id="div-filters-controls-panel"
+                      >
+                        <div className="row">
+                          <div className="col px-0">
+                            <form noValidate>
+                              <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
+                                <div className="col-lg-3 col-xl-3 col-md-6">
+                                  <InputControl
+                                    lblClass="mb-0"
+                                    lblText="Search keyword"
+                                    name="txtkeyword"
+                                    ctlType={formCtrlTypes.searchkeyword}
+                                    value={searchFormData.txtkeyword}
+                                    onChange={handleChange}
+                                    formErrors={formErrors}
+                                  ></InputControl>
+                                </div>
+                                <div className="col-lg-2 col-xl-2 col-md-4">
+                                  <AsyncSelect
+                                    placeHolder={
+                                      assetClassificationTypes.length <= 0 &&
+                                      selectedClassificationType == null
+                                        ? AppMessages.DdLLoading
+                                        : AppMessages.DdlDefaultSelect
+                                    }
+                                    noData={
+                                      assetClassificationTypes.length <= 0 &&
+                                      selectedClassificationType == null
+                                        ? AppMessages.DdLLoading
+                                        : AppMessages.NoData
+                                    }
+                                    options={assetClassificationTypes}
+                                    dataKey="Id"
+                                    dataVal="Type"
+                                    onChange={(e) =>
+                                      handleClassificationTypeChange(
+                                        e,
+                                        "ddlclassificationtype"
+                                      )
+                                    }
+                                    value={selectedClassificationType}
+                                    defualtselected={selectedClassificationType}
+                                    name="ddlclassificationtype"
+                                    lbl={formCtrlTypes.assetclassificationtype}
+                                    lblClass="mb-0"
+                                    lblText="Classification type"
+                                    className="ddlborder"
+                                    isClearable={false}
+                                    isSearchCtl={true}
+                                    formErrors={formErrors}
+                                  ></AsyncSelect>
+                                </div>
+                                <div className="col-lg-2 col-xl-2 col-md-6">
+                                  <AsyncSelect
+                                    placeHolder={
+                                      selectedAssetType == null ||
+                                      Object.keys(selectedAssetType).length ===
+                                        0
+                                        ? AppMessages.DdlDefaultSelect
+                                        : assetTypesList?.length <= 0 &&
+                                          selectedAssetType == null
+                                        ? AppMessages.DdLLoading
+                                        : AppMessages.DdlDefaultSelect
+                                    }
+                                    noData={
+                                      selectedAssetType == null ||
+                                      Object.keys(selectedAssetType).length ===
+                                        0
+                                        ? AppMessages.NoData
+                                        : assetTypesList?.length <= 0 &&
+                                          selectedAssetType == null
+                                        ? AppMessages.DdLLoading
+                                        : AppMessages.NoData
+                                    }
+                                    options={assetTypesList}
+                                    dataKey="AssetTypeId"
+                                    dataVal="AssetType"
+                                    onChange={(e) =>
+                                      handleAssetTypeChange(e, "ddlassettype")
+                                    }
+                                    value={selectedAssetType}
+                                    name="ddlassettype"
+                                    lbl={formCtrlTypes.assettype}
+                                    lblClass="mb-0"
+                                    lblText="Property type"
+                                    className="ddlborder"
+                                    isClearable={false}
+                                    isSearchCtl={true}
+                                    formErrors={formErrors}
+                                  ></AsyncSelect>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-4">
+                                  <DateControl
+                                    lblClass="mb-0"
+                                    lblText="Start date"
+                                    name="txtfromdate"
+                                    required={false}
+                                    onChange={(dt) =>
+                                      onDateChange(dt, "txtfromdate")
+                                    }
+                                    value={searchFormData.txtfromdate}
+                                    isTime={false}
+                                  ></DateControl>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-4">
+                                  <DateControl
+                                    lblClass="mb-0"
+                                    lblText="End date"
+                                    name="txttodate"
+                                    required={false}
+                                    onChange={(dt) =>
+                                      onDateChange(dt, "txttodate")
+                                    }
+                                    value={searchFormData.txttodate}
+                                    isTime={false}
+                                    objProps={{
+                                      checkVal: searchFormData.txtfromdate,
+                                      days: 7,
+                                    }}
+                                  ></DateControl>
+                                </div>
+                                <div className="col-lg-6 col-xl-4 col-md-7 grid-search-action">
+                                  <label
+                                    className="mb-0 form-error w-100"
+                                    id="search-val-err-message"
+                                  ></label>
+                                  <button
+                                    className="btn btn-primary w- 100"
+                                    value="Search"
+                                    name="btnsearch"
+                                    type="button"
+                                    onClick={onSearch}
+                                  >
+                                    Search
+                                  </button>
+                                  <button
+                                    className="btn btn-primary w- 100"
+                                    value="Show all"
+                                    name="btnshowall"
+                                    type="button"
+                                    onClick={onShowAll}
+                                  >
+                                    Show All
+                                  </button>
+                                </div>
                               </div>
-                              <div className="col-lg-2 col-xl-2 col-md-4">
-                                <AsyncSelect
-                                  placeHolder={
-                                    assetClassificationTypes.length <= 0 &&
-                                    selectedClassificationType == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlDefaultSelect
-                                  }
-                                  noData={
-                                    assetClassificationTypes.length <= 0 &&
-                                    selectedClassificationType == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.NoData
-                                  }
-                                  options={assetClassificationTypes}
-                                  dataKey="Id"
-                                  dataVal="Type"
-                                  onChange={(e) =>
-                                    handleClassificationTypeChange(
-                                      e,
-                                      "ddlclassificationtype"
-                                    )
-                                  }
-                                  value={selectedClassificationType}
-                                  defualtselected={selectedClassificationType}
-                                  name="ddlclassificationtype"
-                                  lbl={formCtrlTypes.assetclassificationtype}
-                                  lblClass="mb-0"
-                                  lblText="Classification type"
-                                  className="ddlborder"
-                                  isClearable={false}
-                                  isSearchCtl={true}
-                                  formErrors={formErrors}
-                                ></AsyncSelect>
-                              </div>
-                              <div className="col-lg-2 col-xl-2 col-md-6">
-                                <AsyncSelect
-                                  placeHolder={
-                                    selectedAssetType == null ||
-                                    Object.keys(selectedAssetType).length === 0
-                                      ? AppMessages.DdlDefaultSelect
-                                      : assetTypesList?.length <= 0 &&
-                                        selectedAssetType == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlDefaultSelect
-                                  }
-                                  noData={
-                                    selectedAssetType == null ||
-                                    Object.keys(selectedAssetType).length === 0
-                                      ? AppMessages.NoData
-                                      : assetTypesList?.length <= 0 &&
-                                        selectedAssetType == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.NoData
-                                  }
-                                  options={assetTypesList}
-                                  dataKey="AssetTypeId"
-                                  dataVal="AssetType"
-                                  onChange={(e) =>
-                                    handleAssetTypeChange(e, "ddlassettype")
-                                  }
-                                  value={selectedAssetType}
-                                  name="ddlassettype"
-                                  lbl={formCtrlTypes.assettype}
-                                  lblClass="mb-0"
-                                  lblText="Property type"
-                                  className="ddlborder"
-                                  isClearable={false}
-                                  isSearchCtl={true}
-                                  formErrors={formErrors}
-                                ></AsyncSelect>
-                              </div>
-                              <div className="col-lg-3 col-xl-2 col-md-4">
-                                <DateControl
-                                  lblClass="mb-0"
-                                  lblText="Start date"
-                                  name="txtfromdate"
-                                  required={false}
-                                  onChange={(dt) =>
-                                    onDateChange(dt, "txtfromdate")
-                                  }
-                                  value={searchFormData.txtfromdate}
-                                  isTime={false}
-                                ></DateControl>
-                              </div>
-                              <div className="col-lg-3 col-xl-2 col-md-4">
-                                <DateControl
-                                  lblClass="mb-0"
-                                  lblText="End date"
-                                  name="txttodate"
-                                  required={false}
-                                  onChange={(dt) =>
-                                    onDateChange(dt, "txttodate")
-                                  }
-                                  value={searchFormData.txttodate}
-                                  isTime={false}
-                                  objProps={{
-                                    checkVal: searchFormData.txtfromdate,
-                                    days: 7,
-                                  }}
-                                ></DateControl>
-                              </div>
-                              <div className="col-lg-6 col-xl-4 col-md-7 grid-search-action">
-                                <label
-                                  className="mb-0 form-error w-100"
-                                  id="search-val-err-message"
-                                ></label>
-                                <button
-                                  className="btn btn-primary w- 100"
-                                  value="Search"
-                                  name="btnsearch"
-                                  type="button"
-                                  onClick={onSearch}
-                                >
-                                  Search
-                                </button>
-                                <button
-                                  className="btn btn-primary w- 100"
-                                  value="Show all"
-                                  name="btnshowall"
-                                  type="button"
-                                  onClick={onShowAll}
-                                >
-                                  Show All
-                                </button>
-                              </div>
-                            </div>
-                          </form>
+                            </form>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
+                    }
+                  ></GridFiltersPanel>
                   {/*============== Search End ==============*/}
 
                   {/*============== Grid Start ==============*/}

@@ -21,6 +21,7 @@ import { axiosPost } from "../../../helpers/axiosHelper";
 import { routeNames } from "../../../routes/routes";
 import { getsessionStorageItem } from "../../../helpers/sessionStorageHelper";
 import { DataLoader } from "../../../components/common/LazyComponents";
+import GoBackPanel from "../../../components/common/GoBackPanel";
 
 const AccountAgreement = () => {
   let $ = window.$;
@@ -234,63 +235,75 @@ const AccountAgreement = () => {
   return (
     <>
       {SetPageLoaderNavLinks()}
-      <div className="full-row  bg-light">
+      <div className="full-row  bg-light content-ph">
         <div className="container">
-          <div className="row mx-auto col-lg-8 shadow">
-            <div className="bg-white xs-p-20 p-30 pb-50 border rounded">
-              <div className="row">
-                <div className="col-6">
-                  <div className="breadcrumb mb-0">
+          <div className="row">
+            <div className="col-12">
+              <div className="d-flex w-100">
+                <div className="flex-grow-1">
+                  <div className="breadcrumb my-1">
                     <div className="breadcrumb-item bc-fh">
-                      <h6 className="mb-2 down-line pb-10">Payments</h6>
+                      <h6
+                        className="mb-3 down-line pb-10 cur-pointer"
+                        onClick={navigateToPaymentsAccounts}
+                      >
+                        Payments
+                      </h6>
                     </div>
                     <div className="breadcrumb-item bc-fh ctooltip-container">
                       <span className="font-general font-500 cur-default">
-                        Create Account
+                        Account Details
                       </span>
                     </div>
                   </div>
                 </div>
-                <div className="col-6 d-flex flex-ai-t flex-jc-r text-end pt-2">
-                  <button
-                    type="button"
-                    className="btn btn-glow px-0 rounded-circle text-primary lh-1 d-flex flex-center"
-                    onClick={navigateToPaymentsAccounts}
-                  >
-                    <i className="icons font-18 icon-arrow-left-circle text-primary me-1"></i>
-                    <span className="font-general">Back</span>
-                  </button>
-                </div>
               </div>
-              <div className="row pt-20 pb-0 row-cols-1 g-4 flex-center mx-0 p-0">
-                {subAccountDetails ? (
-                  <>
-                    <div className={`flex flex-center position-absolute`}>
-                      <div className="data-loader"></div>
+              <div className="row mx-auto col-lg-8 shadow">
+                <div className="bg-white xs-p-20 px-30 py-20 pb-30 border rounded">
+                  <div className="row">
+                    <div className="d-flex w-100">
+                      <div className="flex-grow-1">
+                        <h6 className="mb-3 down-line pb-10 px-0 font-16">
+                          Account Details
+                        </h6>
+                      </div>
+                      <GoBackPanel
+                        clickAction={navigateToPaymentsAccounts}
+                        isformBack={true}
+                      />
                     </div>
-                    <iframe
-                      ref={iframeRef}
-                      src={subAccountDetails?.AgreementFormUrl}
-                      onLoad={() => {
-                        document.getElementsByClassName(
-                          "data-loader"
-                        )[0].style.display = "none";
-                      }}
-                      title="Paymnent Account Creation"
-                      width="100%"
-                      height="700px"
-                      padding="0"
-                      allowtransparency="true"
-                      className="box-shadow rounded"
-                      style={{
-                        border: "1px solid #ccc",
-                        padding: "0",
-                      }}
-                    />
-                  </>
-                ) : (
-                  <DataLoader />
-                )}
+                  </div>
+                  <div className="row pt-10 pb-0 row-cols-1 g-4 flex-center mx-0 p-0">
+                    {subAccountDetails ? (
+                      <>
+                        <div className={`flex flex-center position-absolute`}>
+                          <div className="data-loader"></div>
+                        </div>
+                        <iframe
+                          ref={iframeRef}
+                          src={subAccountDetails?.AgreementFormUrl}
+                          onLoad={() => {
+                            document.getElementsByClassName(
+                              "data-loader"
+                            )[0].style.display = "none";
+                          }}
+                          title="Paymnent Account Creation"
+                          width="100%"
+                          height="700px"
+                          padding="0"
+                          allowtransparency="true"
+                          className="box-shadow rounded"
+                          style={{
+                            border: "1px solid #ccc",
+                            padding: "0",
+                          }}
+                        />
+                      </>
+                    ) : (
+                      <DataLoader />
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

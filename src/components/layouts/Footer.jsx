@@ -7,8 +7,9 @@ import { UrlWithoutParam } from "../../utils/common";
 
 const Footer = () => {
   let location = useLocation();
-  let current = location.pathname;
-  let path = current.substring(current.lastIndexOf("/") + 1).toLowerCase();
+  let current = location.pathname.toLowerCase();
+  let path = current.split("/")[1]?.toLowerCase();
+
   let showFooter = false;
   let footerFalsePages = [
     "login",
@@ -16,6 +17,7 @@ const Footer = () => {
     "forgotpassword",
     "resetpassword",
   ];
+
   if (footerFalsePages.includes(path)) {
     showFooter = false;
   } else {

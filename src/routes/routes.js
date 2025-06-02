@@ -155,6 +155,10 @@ export const routeNames = {
     name: "ConnectionsTenants",
     path: "/User/Connections/Tenants",
   },
+  connectionssendinvite: {
+    name: "ConnectionsSendInvite",
+    path: "/User/Connections/SendInvite",
+  },
   tenantprofile: {
     name: "TenantProfile",
     path: "/User/Tenant-Profile",
@@ -236,9 +240,15 @@ export const routeNames = {
     name: "ServiceDetails",
     path: "/User/Services/ServiceDetails",
   },
-  applications: {
-    name: "Applications",
-    path: "/User/Applications/Application",
+  applications: { name: "Applications", path: "/User/Applications" },
+  application: { name: "Application", path: "/User/Applications/Application" },
+  viewapplication: {
+    name: "ViewApplication",
+    path: "/User/Applications/ViewApplication",
+  },
+  createapplication: {
+    name: "CreateApplication",
+    path: "/User/Applications/CreateApplication",
   },
   notFound: { name: "NotFound", path: "/*" },
 };
@@ -613,6 +623,13 @@ const routes = [
     isprotected: true,
   },
   {
+    path: routeNames.connectionssendinvite.path,
+    name: routeNames.connectionssendinvite.name,
+    element: lazy(() => import("../pages/User/Connections/SendInvite")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
     path: routeNames.ownerprofile.path,
     name: routeNames.ownerprofile.name,
     element: lazy(() => import("../pages/User/Owners/Profile")),
@@ -783,7 +800,28 @@ const routes = [
   {
     path: routeNames.applications.path,
     name: routeNames.applications.name,
+    element: lazy(() => import("../pages/User/Applications/Applications")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.application.path,
+    name: routeNames.application.name,
     element: lazy(() => import("../pages/User/Applications/Application")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.viewapplication.path,
+    name: routeNames.viewapplication.name,
+    element: lazy(() => import("../pages/User/Applications/ViewApplication")),
+    isexact: true,
+    isprotected: true,
+  },
+  {
+    path: routeNames.createapplication.path,
+    name: routeNames.createapplication.name,
+    element: lazy(() => import("../pages/User/Applications/CreateApplication")),
     isexact: true,
     isprotected: true,
   },

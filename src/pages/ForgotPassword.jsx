@@ -142,18 +142,18 @@ const ForgotPassword = () => {
           {/*============== Page title End ==============*/}
 
           {/*============== ForgotPassword Form Start ==============*/}
-          <div className="full-row  bg-light">
+          <div className="full-row pt-4 pb-5 bg-light">
             <div className="container mb-15">
               <div className="row">
-                <div className="col-xl-5 col-lg-6 mx-auto">
+                <div className="col-xl-4 col-lg-5 mx-auto">
                   <div className="bg-white xs-p-20 p-30 border rounded shadow">
                     <div className="form-icon-left rounded form-boder">
-                      <h4 className="mb-4 down-line pb-10">Forgot Password</h4>
+                      <h6 className="mb-4 down-line pb-10">Forgot Password</h6>
                       <div className="row row-cols-1 g-3">
                         {!showResponse ? (
                           <>
                             <form noValidate onSubmit={onSendResetLink}>
-                              <div className="col mb-15 pb-2">
+                              <div className="col mb-15 pb-3">
                                 <InputControl
                                   lblClass="mb-0 lbl-req-field"
                                   name="txtemail"
@@ -170,7 +170,7 @@ const ForgotPassword = () => {
                               </div>
                               <div className="col mb-10">
                                 <button
-                                  className="btn btn-primary box-shadow"
+                                  className="btn btn-primary btn-mini btn-glow shadow rounded"
                                   name="btnsendresetlink"
                                   id="btnsendresetlink"
                                   type="submit"
@@ -201,11 +201,11 @@ const ForgotPassword = () => {
                         ) : (
                           <div className="d-flex flex-column align-items-center justify-content-center text-center pt-0 pb-40">
                             <div className="px-20">
-                              <h3
+                              <h6
                                 className={`font-600 font-large mt-1 text-primary`}
                               >
                                 Password Reset Email Sent
-                              </h3>
+                              </h6>
                               <p className="text-primary pt-2">
                                 Please check your email for a reset link. If you
                                 don’t receive it soon, check your spam folder or
@@ -213,7 +213,7 @@ const ForgotPassword = () => {
                               </p>
                               <div className="form-action text-center mt-40">
                                 <button
-                                  className="btn btn-primary"
+                                  className="btn btn-primary btn-mini btn-glow shadow rounded"
                                   id="btnRetry"
                                   onClick={toggleShowResponse}
                                 >
@@ -221,7 +221,7 @@ const ForgotPassword = () => {
                                   Retry
                                 </button>
                                 <button
-                                  className="btn btn-primary"
+                                  className="btn btn-primary btn-mini btn-glow shadow rounded"
                                   id="btnhome"
                                   onClick={navigateToLogin}
                                 >
