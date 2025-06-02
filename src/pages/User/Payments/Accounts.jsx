@@ -31,6 +31,7 @@ import {
   deletesessionStorageItem,
 } from "../../../helpers/sessionStorageHelper";
 import { Toast } from "../../../components/common/ToastView";
+import GridFiltersPanel from "../../../components/common/GridFiltersPanel";
 
 const Accounts = () => {
   let $ = window.$;
@@ -371,34 +372,18 @@ const Accounts = () => {
   return (
     <>
       {SetPageLoaderNavLinks()}
-      <div className="full-row bg-light">
+      <div className="full-row bg-light content-ph">
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <div className="row">
-                <div className="col-md-12 col-lg-6">
-                  <div className="breadcrumb">
-                    <div className="breadcrumb-item bc-fh">
-                      <h6 className="mb-3 down-line pb-10">Payments</h6>
-                    </div>
-                    <div className="breadcrumb-item bc-fh ctooltip-container">
-                      <span className="font-general font-500 cur-default">
-                        Accounts
-                      </span>
-                    </div>
-                  </div>
+              <div className="breadcrumb my-1">
+                <div className="breadcrumb-item bc-fh">
+                  <h6 className="mb-3 down-line pb-10">Payments</h6>
                 </div>
-                <div className="col-md-12 col-lg-6 d-flex justify-content-end align-items-end pb-10">
-                  <button
-                    className="btn btn-primary btn-mini btn-glow shadow rounded"
-                    name="btncreateaccount"
-                    id="btncreateaccount"
-                    type="button"
-                    onClick={navigateToPaymentsCreateAccount}
-                  >
-                    <i className="fa fa-credit-card position-relative me-1 t-1"></i>{" "}
-                    Create Account
-                  </button>
+                <div className="breadcrumb-item bc-fh ctooltip-container">
+                  <span className="font-general font-500 cur-default">
+                    Accounts
+                  </span>
                 </div>
               </div>
               <div className="tabw100 tab-action shadow rounded bg-white">
@@ -408,114 +393,126 @@ const Accounts = () => {
                 </ul>
                 <div className="tab-element">
                   {/*============== Search Start ==============*/}
-                  <div className="woo-filter-bar full-row p-3 grid-search bo-0">
-                    <div className="container-fluid v-center">
-                      <div className="row">
-                        <div className="col px-0">
-                          <form noValidate>
-                            <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
-                              <div className="col-lg-4 col-xl-3 col-md-6">
-                                <InputControl
-                                  lblClass="mb-0"
-                                  lblText="Search by Email / Name"
-                                  name="txtkeyword"
-                                  ctlType={formCtrlTypes.searchkeyword}
-                                  value={searchFormData.txtkeyword}
-                                  onChange={handleChange}
-                                  formErrors={formErrors}
-                                ></InputControl>
+                  <GridFiltersPanel
+                    divFilterControls={
+                      <div
+                        className="container-fluid v-center"
+                        id="div-filters-controls-panel"
+                      >
+                        <div className="row">
+                          <div className="col px-0">
+                            <form noValidate>
+                              <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
+                                <div className="col-lg-4 col-xl-3 col-md-6">
+                                  <InputControl
+                                    lblClass="mb-0"
+                                    lblText="Search by Email / Name"
+                                    name="txtkeyword"
+                                    ctlType={formCtrlTypes.searchkeyword}
+                                    value={searchFormData.txtkeyword}
+                                    onChange={handleChange}
+                                    formErrors={formErrors}
+                                  ></InputControl>
+                                </div>
+                                <div className="col-lg-2 col-xl-2 col-md-4">
+                                  <AsyncSelect
+                                    placeHolder={
+                                      paymentAccountCreateStatusList.length <=
+                                        0 && searchFormData.ddlstatus == null
+                                        ? AppMessages.DdLLoading
+                                        : AppMessages.DdlDefaultSelect
+                                    }
+                                    noData={
+                                      paymentAccountCreateStatusList.length <=
+                                        0 && searchFormData.ddlstatus == null
+                                        ? AppMessages.DdLLoading
+                                        : AppMessages.DdlNoData
+                                    }
+                                    options={paymentAccountCreateStatusList}
+                                    dataKey="Id"
+                                    dataVal="Type"
+                                    onChange={(e) => ddlChange(e, "ddlstatus")}
+                                    value={searchFormData.ddlstatus}
+                                    defualtselected={searchFormData.ddlstatus}
+                                    name="ddlstatus"
+                                    lbl={formCtrlTypes.status}
+                                    lblClass="mb-0"
+                                    lblText="Status"
+                                    className="ddlborder"
+                                    isClearable={false}
+                                    isSearchCtl={true}
+                                    formErrors={formErrors}
+                                  ></AsyncSelect>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-3">
+                                  <DateControl
+                                    lblClass="mb-0"
+                                    lblText="Start date"
+                                    name="txtfromdate"
+                                    required={false}
+                                    onChange={(dt) =>
+                                      onDateChange(dt, "txtfromdate")
+                                    }
+                                    value={searchFormData.txtfromdate}
+                                    isTime={false}
+                                    formErrors={formErrors}
+                                  ></DateControl>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-3">
+                                  <DateControl
+                                    lblClass="mb-0"
+                                    lblText="End date"
+                                    name="txttodate"
+                                    required={false}
+                                    onChange={(dt) =>
+                                      onDateChange(dt, "txttodate")
+                                    }
+                                    value={searchFormData.txttodate}
+                                    isTime={false}
+                                    objProps={{
+                                      checkVal: searchFormData.txtfromdate,
+                                    }}
+                                    formErrors={formErrors}
+                                  ></DateControl>
+                                </div>
+                                <div className="col-lg-6 col-xl-3 col-md-6 grid-search-action">
+                                  <label
+                                    className="mb-0 form-error w-100"
+                                    id="search-val-err-message"
+                                  ></label>
+                                  <button
+                                    className="btn btn-primary w- 100"
+                                    value="Search"
+                                    name="btnsearch"
+                                    type="button"
+                                    onClick={onSearch}
+                                  >
+                                    Search
+                                  </button>
+                                  <button
+                                    className="btn btn-primary w- 100"
+                                    value="Show all"
+                                    name="btnshowall"
+                                    type="button"
+                                    onClick={onShowAll}
+                                  >
+                                    Show All
+                                  </button>
+                                </div>
                               </div>
-                              <div className="col-lg-2 col-xl-2 col-md-4">
-                                <AsyncSelect
-                                  placeHolder={
-                                    paymentAccountCreateStatusList.length <=
-                                      0 && searchFormData.ddlstatus == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlDefaultSelect
-                                  }
-                                  noData={
-                                    paymentAccountCreateStatusList.length <=
-                                      0 && searchFormData.ddlstatus == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlNoData
-                                  }
-                                  options={paymentAccountCreateStatusList}
-                                  dataKey="Id"
-                                  dataVal="Type"
-                                  onChange={(e) => ddlChange(e, "ddlstatus")}
-                                  value={searchFormData.ddlstatus}
-                                  defualtselected={searchFormData.ddlstatus}
-                                  name="ddlstatus"
-                                  lbl={formCtrlTypes.status}
-                                  lblClass="mb-0"
-                                  lblText="Status"
-                                  className="ddlborder"
-                                  isClearable={false}
-                                  isSearchCtl={true}
-                                  formErrors={formErrors}
-                                ></AsyncSelect>
-                              </div>
-                              <div className="col-lg-3 col-xl-2 col-md-3">
-                                <DateControl
-                                  lblClass="mb-0"
-                                  lblText="Start date"
-                                  name="txtfromdate"
-                                  required={false}
-                                  onChange={(dt) =>
-                                    onDateChange(dt, "txtfromdate")
-                                  }
-                                  value={searchFormData.txtfromdate}
-                                  isTime={false}
-                                  formErrors={formErrors}
-                                ></DateControl>
-                              </div>
-                              <div className="col-lg-3 col-xl-2 col-md-3">
-                                <DateControl
-                                  lblClass="mb-0"
-                                  lblText="End date"
-                                  name="txttodate"
-                                  required={false}
-                                  onChange={(dt) =>
-                                    onDateChange(dt, "txttodate")
-                                  }
-                                  value={searchFormData.txttodate}
-                                  isTime={false}
-                                  objProps={{
-                                    checkVal: searchFormData.txtfromdate,
-                                  }}
-                                  formErrors={formErrors}
-                                ></DateControl>
-                              </div>
-                              <div className="col-lg-6 col-xl-3 col-md-6 grid-search-action">
-                                <label
-                                  className="mb-0 form-error w-100"
-                                  id="search-val-err-message"
-                                ></label>
-                                <button
-                                  className="btn btn-primary w- 100"
-                                  value="Search"
-                                  name="btnsearch"
-                                  type="button"
-                                  onClick={onSearch}
-                                >
-                                  Search
-                                </button>
-                                <button
-                                  className="btn btn-primary w- 100"
-                                  value="Show all"
-                                  name="btnshowall"
-                                  type="button"
-                                  onClick={onShowAll}
-                                >
-                                  Show All
-                                </button>
-                              </div>
-                            </div>
-                          </form>
+                            </form>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
+                    }
+                    elements={[
+                      {
+                        label: "Create Account",
+                        icon: "fa fa-credit-card ",
+                        onClick: navigateToPaymentsCreateAccount,
+                      },
+                    ]}
+                  ></GridFiltersPanel>
                   {/*============== Search End ==============*/}
 
                   {/*============== Grid Start ==============*/}

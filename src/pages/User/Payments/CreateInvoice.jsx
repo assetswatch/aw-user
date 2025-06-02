@@ -36,6 +36,7 @@ import { useGetInvoiceItemAccountForTypesGateway } from "../../../hooks/usegetIn
 import { useGetInvoiceItemForTypesGateway } from "../../../hooks/useGetInvoiceItemForTypesGateway";
 import { useGetDdlInvoiceForItemsGateway } from "../../../hooks/useGetDdlInvoiceForItemsGateway";
 import TextAreaControl from "../../../components/common/TextAreaControl";
+import GoBackPanel from "../../../components/common/GoBackPanel";
 
 const CreateInvoice = () => {
   let $ = window.$;
@@ -576,523 +577,549 @@ const CreateInvoice = () => {
   return (
     <>
       {SetPageLoaderNavLinks()}
-      <div className="full-row  bg-light">
+      <div className="full-row  bg-light content-ph">
         <div className="container">
-          <div className="row mx-auto col-md-12 col-lg-10 shadow">
-            <div className="bg-white xs-p-20 p-30 pb-30 border rounded">
-              <div className="row">
-                <div className="col-9">
-                  <div className="breadcrumb mb-0">
+          <div className="row">
+            <div className="col-12">
+              <div className="d-flex w-100">
+                <div className="flex-grow-1">
+                  <div className="breadcrumb my-1">
                     <div className="breadcrumb-item bc-fh">
-                      <h6 className="mb-2 down-line pb-10">Invoices</h6>
+                      <h6
+                        className="mb-3 down-line pb-10 cur-pointer"
+                        onClick={navigateToInvoices}
+                      >
+                        Invoices
+                      </h6>
                     </div>
                     <div className="breadcrumb-item bc-fh ctooltip-container">
                       <span className="font-general font-500 cur-default">
-                        Create
+                        Create Invoice
                       </span>
                     </div>
                   </div>
                 </div>
-                <div className="col-3 d-flex flex-ai-t flex-jc-r text-end pt-2">
-                  <button
-                    type="button"
-                    className="btn btn-glow px-0 rounded-circle text-primary lh-1 d-flex flex-center"
-                    onClick={navigateToInvoices}
-                  >
-                    <i className="icons font-18 icon-arrow-left-circle text-primary me-1"></i>
-                    <span className="font-general">Back</span>
-                  </button>
-                </div>
               </div>
-              <div className="row pt-20 pb-0 row-cols-1 g-4 flex-center">
-                <div className="col">
-                  <form noValidate>
-                    <div className="row">
-                      <div className="col-md-4 col-lg-4 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtinvoicenumber"
-                          ctlType={formCtrlTypes.invoicenum}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtinvoicenumber}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={1}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-4 col-lg-4 mb-15">
-                        <DateControl
-                          lblClass="mb-0 lbl-req-field"
-                          lblText="Date: "
-                          name="txtbilldate"
-                          required={false}
-                          onChange={(dt) => onDateChange(dt, "txtbilldate")}
-                          value={formData.txtbilldate}
-                          isTime={false}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={2}
-                        ></DateControl>
-                      </div>
-                      <div className="col-md-4 col-lg-4 mb-15">
-                        <DateControl
-                          lblClass="mb-0 lbl-req-field"
-                          lblText="Due date: "
-                          name="txtduedate"
-                          required={false}
-                          onChange={(dt) => onDateChange(dt, "txtduedate")}
-                          value={formData.txtduedate}
-                          isTime={false}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={3}
-                        ></DateControl>
-                      </div>
-                      <div className="col-md-12 my-15">
-                        <h6 className="mb-3 down-line  pb-10">Items</h6>
-                        {/*============== Add Items Start ==============*/}
+              <div className="row mx-auto col-md-12 col-lg-10 shadow">
+                <div className="bg-white xs-p-20 px-30 py-20 pb-30 border rounded">
+                  <div className="row row-cols-1 g-4 flex-center">
+                    <div className="col">
+                      <form noValidate>
                         <div className="row">
-                          <div className="col">
-                            <div className="dashboard-panel border bg-white rounded overflow-hidden w-100 pb-10">
-                              <div className="overflow-x-scroll font-fifteen">
-                                <table className="w-100 items-list bg-transparent tbl-grid row-alt-bg grid-search">
-                                  <thead>
-                                    <tr className="bg-li-hover-color">
-                                      <th className="lh-5 w-350px">Item</th>
-                                      <th className="lh-5 w-300px">
-                                        Description
-                                      </th>
-                                      <th className="lh-5 w-120px text-right">
-                                        Quantity
-                                      </th>
-                                      <th className="lh-5 w-200px text-right">
-                                        Amount ($)
-                                      </th>
-                                      <th className="lh-5 w-200px text-right">
-                                        Total ($)
-                                      </th>
-                                      <th className="lh-5 w-130px">Action</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {items.map((item) => (
-                                      <tr key={item.id}>
-                                        {editingItemId === item.id ? (
-                                          <>
-                                            <td className="w-350px">
-                                              <div>
-                                                <AsyncSelect
-                                                  placeHolder={
-                                                    ddlInvoiceItems.length <=
-                                                      0 && editItem.item == null
-                                                      ? AppMessages.DdLLoading
-                                                      : AppMessages.DdlSelectItem
-                                                  }
-                                                  noData={
-                                                    ddlInvoiceItems.length <=
-                                                      0 && editItem.item == null
-                                                      ? AppMessages.DdLLoading
-                                                      : AppMessages.NoItems
-                                                  }
-                                                  options={ddlInvoiceItems}
-                                                  dataKey="ItemId"
-                                                  dataVal="Item"
-                                                  onChange={(e) => {
-                                                    let selectedItem =
-                                                      objInitItems();
-                                                    if (e != null) {
-                                                      selectedItem =
-                                                        ddlInvoiceItems.filter(
-                                                          (i) =>
-                                                            i.ItemId === e.value
-                                                        )?.[0];
+                          <div className="d-flex w-100">
+                            <div className="flex-grow-1">
+                              <h6 className="mb-3 down-line pb-10 px-0 font-16">
+                                Create Invoice
+                              </h6>
+                            </div>
+                            <GoBackPanel
+                              clickAction={navigateToInvoices}
+                              isformBack={true}
+                            />
+                          </div>
+                          <div className="col-md-4 col-lg-4 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtinvoicenumber"
+                              ctlType={formCtrlTypes.invoicenum}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtinvoicenumber}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={1}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-4 col-lg-4 mb-15">
+                            <DateControl
+                              lblClass="mb-0 lbl-req-field"
+                              lblText="Date: "
+                              name="txtbilldate"
+                              required={false}
+                              onChange={(dt) => onDateChange(dt, "txtbilldate")}
+                              value={formData.txtbilldate}
+                              isTime={false}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={2}
+                            ></DateControl>
+                          </div>
+                          <div className="col-md-4 col-lg-4 mb-15">
+                            <DateControl
+                              lblClass="mb-0 lbl-req-field"
+                              lblText="Due date: "
+                              name="txtduedate"
+                              required={false}
+                              onChange={(dt) => onDateChange(dt, "txtduedate")}
+                              value={formData.txtduedate}
+                              isTime={false}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={3}
+                            ></DateControl>
+                          </div>
+                          <div className="col-md-12 my-15">
+                            <h6 className="mb-3 down-line  pb-10">Items</h6>
+                            {/*============== Add Items Start ==============*/}
+                            <div className="row">
+                              <div className="col">
+                                <div className="dashboard-panel border bg-white rounded overflow-hidden w-100 pb-10">
+                                  <div className="overflow-x-scroll font-fifteen">
+                                    <table className="w-100 items-list bg-transparent tbl-grid row-alt-bg grid-search">
+                                      <thead>
+                                        <tr className="bg-li-hover-color">
+                                          <th className="lh-5 w-350px">Item</th>
+                                          <th className="lh-5 w-300px">
+                                            Description
+                                          </th>
+                                          <th className="lh-5 w-120px text-right">
+                                            Quantity
+                                          </th>
+                                          <th className="lh-5 w-200px text-right">
+                                            Amount ($)
+                                          </th>
+                                          <th className="lh-5 w-200px text-right">
+                                            Total ($)
+                                          </th>
+                                          <th className="lh-5 w-130px">
+                                            Action
+                                          </th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {items.map((item) => (
+                                          <tr key={item.id}>
+                                            {editingItemId === item.id ? (
+                                              <>
+                                                <td className="w-350px">
+                                                  <div>
+                                                    <AsyncSelect
+                                                      placeHolder={
+                                                        ddlInvoiceItems.length <=
+                                                          0 &&
+                                                        editItem.item == null
+                                                          ? AppMessages.DdLLoading
+                                                          : AppMessages.DdlSelectItem
+                                                      }
+                                                      noData={
+                                                        ddlInvoiceItems.length <=
+                                                          0 &&
+                                                        editItem.item == null
+                                                          ? AppMessages.DdLLoading
+                                                          : AppMessages.NoItems
+                                                      }
+                                                      options={ddlInvoiceItems}
+                                                      dataKey="ItemId"
+                                                      dataVal="Item"
+                                                      onChange={(e) => {
+                                                        let selectedItem =
+                                                          objInitItems();
+                                                        if (e != null) {
+                                                          selectedItem =
+                                                            ddlInvoiceItems.filter(
+                                                              (i) =>
+                                                                i.ItemId ===
+                                                                e.value
+                                                            )?.[0];
+                                                        }
+                                                        setEditItem({
+                                                          ...editItem,
+                                                          item: e,
+                                                          description:
+                                                            selectedItem.Description,
+                                                          quantity: 1,
+                                                          price:
+                                                            selectedItem.Price,
+                                                          selectedItem:
+                                                            selectedItem,
+                                                        });
+                                                      }}
+                                                      value={editItem.item}
+                                                      name="ddlitem"
+                                                      lbl={formCtrlTypes.item}
+                                                      lblClass="mb-0 lbl-req-field d-none"
+                                                      className="ddlborder py-0"
+                                                      isClearable={false}
+                                                      required={true}
+                                                      isSearchCtl={true}
+                                                      menuPortalTarget="body"
+                                                    ></AsyncSelect>
+                                                  </div>
+                                                </td>
+                                                <td className="w-300px">
+                                                  <InputControl
+                                                    lblClass="mb-0 d-none"
+                                                    name="txtdescription"
+                                                    ctlType={
+                                                      formCtrlTypes.description300
                                                     }
-                                                    setEditItem({
-                                                      ...editItem,
-                                                      item: e,
-                                                      description:
-                                                        selectedItem.Description,
-                                                      quantity: 1,
-                                                      price: selectedItem.Price,
-                                                      selectedItem:
-                                                        selectedItem,
-                                                    });
-                                                  }}
-                                                  value={editItem.item}
-                                                  name="ddlitem"
-                                                  lbl={formCtrlTypes.item}
-                                                  lblClass="mb-0 lbl-req-field d-none"
-                                                  className="ddlborder py-0"
-                                                  isClearable={false}
-                                                  required={true}
-                                                  isSearchCtl={true}
-                                                  menuPortalTarget="body"
-                                                ></AsyncSelect>
-                                              </div>
+                                                    required={false}
+                                                    onChange={(e) =>
+                                                      setEditItem({
+                                                        ...editItem,
+                                                        description:
+                                                          e.target.value,
+                                                      })
+                                                    }
+                                                    value={editItem.description}
+                                                  ></InputControl>
+                                                </td>
+                                                <td className="w-120px text-right">
+                                                  <InputControl
+                                                    lblClass="mb-0 lbl-req-field b-0 d-none"
+                                                    inputClass="b-0"
+                                                    name="txtquantity"
+                                                    ctlType={formCtrlTypes.qty}
+                                                    required={true}
+                                                    onChange={(e) =>
+                                                      setEditItem({
+                                                        ...editItem,
+                                                        quantity:
+                                                          parseInt(
+                                                            e.target.value,
+                                                            10
+                                                          ) || 0,
+                                                      })
+                                                    }
+                                                    value={editItem.quantity}
+                                                  ></InputControl>
+                                                </td>
+                                                <td className="w-200px text-right">
+                                                  <InputControl
+                                                    lblClass="mb-0 lbl-req-field b-0 d-none"
+                                                    inputClass="b-0"
+                                                    name="txtprice"
+                                                    ctlType={
+                                                      formCtrlTypes.invoiceitemprice
+                                                    }
+                                                    required={true}
+                                                    onChange={(e) =>
+                                                      setEditItem({
+                                                        ...editItem,
+                                                        price: e.target.value,
+                                                      })
+                                                    }
+                                                    value={editItem.price}
+                                                  ></InputControl>
+                                                </td>
+                                                <td className="w-200px text-right">
+                                                  {(
+                                                    editItem.quantity *
+                                                    editItem.price
+                                                  ).toFixed(2)}
+                                                </td>
+                                                <td className="w-130px">
+                                                  <button
+                                                    type="button"
+                                                    className="mr-10 btn btn-glow px-0 rounded-circle text-primary lh-1 mr-10"
+                                                    onClick={(e) =>
+                                                      handleSaveEdit(e)
+                                                    }
+                                                  >
+                                                    <i className="fa fa-check-circle font-18"></i>
+                                                  </button>
+                                                  <button
+                                                    type="button"
+                                                    className="btn btn-glow px-0 rounded-circle text-primary lh-1"
+                                                    onClick={() =>
+                                                      setEditingItemId(null)
+                                                    }
+                                                  >
+                                                    <i className="fa fa-times-circle text-danger font-18"></i>
+                                                  </button>
+                                                </td>
+                                              </>
+                                            ) : (
+                                              <>
+                                                <td className="w-350px">
+                                                  {item.item.label}
+                                                </td>
+                                                <td className="w-300px">
+                                                  {item.description}
+                                                </td>
+                                                <td className="w-120px text-right">
+                                                  {item.quantity}
+                                                </td>
+                                                <td className="w-200px text-right">
+                                                  {(item.price * 1).toFixed(2)}
+                                                </td>
+                                                <td className="w-200px text-right">
+                                                  {(
+                                                    item.quantity * item.price
+                                                  ).toFixed(2)}
+                                                </td>
+                                                <td className="w-130px">
+                                                  <button
+                                                    type="button"
+                                                    className="btn btn-glow px-0 rounded-circle text-primary lh-1 mr-10"
+                                                    onClick={(e) =>
+                                                      handleEditItem(e, item.id)
+                                                    }
+                                                  >
+                                                    <i className="fa fa-pencil font-general" />
+                                                  </button>
+                                                  <button
+                                                    type="button"
+                                                    className="btn btn-glow px-0 rounded-circle text-primary lh-1"
+                                                    onClick={(e) =>
+                                                      handleDeleteItem(
+                                                        e,
+                                                        item.id
+                                                      )
+                                                    }
+                                                  >
+                                                    <i className="fa fa-trash text-danger font-general" />
+                                                  </button>
+                                                </td>
+                                              </>
+                                            )}
+                                          </tr>
+                                        ))}
+                                        {items.length === 0 && (
+                                          <tr>
+                                            <td
+                                              colSpan={6}
+                                              className="no-data text-center py-50 font-16"
+                                            >
+                                              No items added...
                                             </td>
-                                            <td className="w-300px">
-                                              <InputControl
-                                                lblClass="mb-0 d-none"
-                                                name="txtdescription"
-                                                ctlType={
-                                                  formCtrlTypes.description300
-                                                }
-                                                required={false}
-                                                onChange={(e) =>
-                                                  setEditItem({
-                                                    ...editItem,
-                                                    description: e.target.value,
-                                                  })
-                                                }
-                                                value={editItem.description}
-                                              ></InputControl>
-                                            </td>
-                                            <td className="w-120px text-right">
-                                              <InputControl
-                                                lblClass="mb-0 lbl-req-field b-0 d-none"
-                                                inputClass="b-0"
-                                                name="txtquantity"
-                                                ctlType={formCtrlTypes.qty}
-                                                required={true}
-                                                onChange={(e) =>
-                                                  setEditItem({
-                                                    ...editItem,
-                                                    quantity:
-                                                      parseInt(
-                                                        e.target.value,
-                                                        10
-                                                      ) || 0,
-                                                  })
-                                                }
-                                                value={editItem.quantity}
-                                              ></InputControl>
-                                            </td>
-                                            <td className="w-200px text-right">
-                                              <InputControl
-                                                lblClass="mb-0 lbl-req-field b-0 d-none"
-                                                inputClass="b-0"
-                                                name="txtprice"
-                                                ctlType={
-                                                  formCtrlTypes.invoiceitemprice
-                                                }
-                                                required={true}
-                                                onChange={(e) =>
-                                                  setEditItem({
-                                                    ...editItem,
-                                                    price: e.target.value,
-                                                  })
-                                                }
-                                                value={editItem.price}
-                                              ></InputControl>
-                                            </td>
-                                            <td className="w-200px text-right">
-                                              {(
-                                                editItem.quantity *
-                                                editItem.price
-                                              ).toFixed(2)}
-                                            </td>
-                                            <td className="w-130px">
-                                              <button
-                                                type="button"
-                                                className="mr-10 btn btn-glow px-0 rounded-circle text-primary lh-1 mr-10"
-                                                onClick={(e) =>
-                                                  handleSaveEdit(e)
-                                                }
-                                              >
-                                                <i className="fa fa-check-circle font-18"></i>
-                                              </button>
-                                              <button
-                                                type="button"
-                                                className="btn btn-glow px-0 rounded-circle text-primary lh-1"
-                                                onClick={() =>
-                                                  setEditingItemId(null)
-                                                }
-                                              >
-                                                <i className="fa fa-times-circle text-danger font-18"></i>
-                                              </button>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td className="w-350px">
-                                              {item.item.label}
-                                            </td>
-                                            <td className="w-300px">
-                                              {item.description}
-                                            </td>
-                                            <td className="w-120px text-right">
-                                              {item.quantity}
-                                            </td>
-                                            <td className="w-200px text-right">
-                                              {(item.price * 1).toFixed(2)}
-                                            </td>
-                                            <td className="w-200px text-right">
-                                              {(
-                                                item.quantity * item.price
-                                              ).toFixed(2)}
-                                            </td>
-                                            <td className="w-130px">
-                                              <button
-                                                type="button"
-                                                className="btn btn-glow px-0 rounded-circle text-primary lh-1 mr-10"
-                                                onClick={(e) =>
-                                                  handleEditItem(e, item.id)
-                                                }
-                                              >
-                                                <i className="fa fa-pencil font-general" />
-                                              </button>
-                                              <button
-                                                type="button"
-                                                className="btn btn-glow px-0 rounded-circle text-primary lh-1"
-                                                onClick={(e) =>
-                                                  handleDeleteItem(e, item.id)
-                                                }
-                                              >
-                                                <i className="fa fa-trash text-danger font-general" />
-                                              </button>
-                                            </td>
-                                          </>
+                                          </tr>
                                         )}
-                                      </tr>
-                                    ))}
-                                    {items.length === 0 && (
-                                      <tr>
-                                        <td
-                                          colSpan={6}
-                                          className="no-data text-center py-50 font-16"
-                                        >
-                                          No items added...
-                                        </td>
-                                      </tr>
-                                    )}
-                                  </tbody>
-                                  <tfoot>
-                                    {items.length > 0 && (
-                                      <tr>
-                                        <td
-                                          colSpan={5}
-                                          className="text-right px-0"
-                                        >
-                                          <span className="font-500 font-small pr-20">
-                                            Total ($) : {calculateTotal()}
-                                          </span>
-                                        </td>
-                                        <td></td>
-                                      </tr>
-                                    )}
-                                    <tr className="bo-b-0 td-valign-top">
-                                      <td className="w-350px">
-                                        <AsyncSelect
-                                          placeHolder={
-                                            AppMessages.DdlSelectItem
-                                          }
-                                          // ddlInvoiceItems.length <= 0 &&
-                                          // newItem.item == null
-                                          //   ? AppMessages.DdLLoading
-                                          //   : AppMessages.DdlSelectItem
+                                      </tbody>
+                                      <tfoot>
+                                        {items.length > 0 && (
+                                          <tr>
+                                            <td
+                                              colSpan={5}
+                                              className="text-right px-0"
+                                            >
+                                              <span className="font-500 font-small pr-20">
+                                                Total ($) : {calculateTotal()}
+                                              </span>
+                                            </td>
+                                            <td></td>
+                                          </tr>
+                                        )}
+                                        <tr className="bo-b-0 td-valign-top">
+                                          <td className="w-350px">
+                                            <AsyncSelect
+                                              placeHolder={
+                                                AppMessages.DdlSelectItem
+                                              }
+                                              // ddlInvoiceItems.length <= 0 &&
+                                              // newItem.item == null
+                                              //   ? AppMessages.DdLLoading
+                                              //   : AppMessages.DdlSelectItem
 
-                                          noData={AppMessages.NoItems}
-                                          // ddlInvoiceItems.length <= 0 &&
-                                          // newItem.item == null
-                                          //   ? AppMessages.DdLLoading
-                                          //   : AppMessages.NoItems
+                                              noData={AppMessages.NoItems}
+                                              // ddlInvoiceItems.length <= 0 &&
+                                              // newItem.item == null
+                                              //   ? AppMessages.DdLLoading
+                                              //   : AppMessages.NoItems
 
-                                          options={ddlInvoiceItems}
-                                          dataKey="ItemId"
-                                          dataVal="Item"
-                                          onChange={(e) => {
-                                            let selectedItem = objInitItems();
-                                            if (e != null) {
-                                              selectedItem =
-                                                ddlInvoiceItems.filter(
-                                                  (i) => i.ItemId === e.value
-                                                )?.[0];
-                                            }
-                                            setNewItem({
-                                              ...newItem,
-                                              item: e,
-                                              description:
-                                                selectedItem.Description,
-                                              quantity: 1,
-                                              price: selectedItem.Price,
-                                              selectedItem: selectedItem,
-                                            });
-                                          }}
-                                          value={newItem.item}
-                                          name="ddlitem"
-                                          lbl={formCtrlTypes.item}
-                                          lblClass="mb-0 lbl-req-field"
-                                          className="ddlborder"
-                                          isClearable={true}
-                                          required={true}
-                                          isSearchCtl={true}
-                                          errors={addItemerrors}
-                                          formErrors={formAddItemErrors}
-                                          menuPortalTarget="body"
-                                          menuFooter={AddNewItem}
-                                        ></AsyncSelect>
-                                      </td>
-                                      <td className="w-300px">
-                                        <InputControl
-                                          lblClass="mb-0"
-                                          name="txtdescription"
-                                          ctlType={formCtrlTypes.description300}
-                                          required={false}
-                                          onChange={(e) =>
-                                            setNewItem({
-                                              ...newItem,
-                                              description: e.target.value,
-                                            })
-                                          }
-                                          value={newItem.description}
-                                        ></InputControl>
-                                      </td>
-                                      <td className="w-120px">
-                                        <InputControl
-                                          lblClass="mb-0 lbl-req-field b-0"
-                                          inputClass="b-0"
-                                          name="txtquantity"
-                                          ctlType={formCtrlTypes.qty}
-                                          required={true}
-                                          onChange={(e) =>
-                                            setNewItem({
-                                              ...newItem,
-                                              quantity:
-                                                parseInt(e.target.value, 10) ||
-                                                0,
-                                            })
-                                          }
-                                          value={newItem.quantity}
-                                        ></InputControl>
-                                      </td>
-                                      <td className="w-200px">
-                                        <InputControl
-                                          lblClass="mb-0 lbl-req-field b-0"
-                                          inputClass="b-0"
-                                          name="txtprice"
-                                          ctlType={
-                                            formCtrlTypes.invoiceitemprice
-                                          }
-                                          required={true}
-                                          onChange={(e) => {
-                                            setNewItem({
-                                              ...newItem,
-                                              price: e.target.value,
-                                            });
-                                          }}
-                                          value={newItem.price}
-                                        ></InputControl>
-                                      </td>
-                                      <td className="w-200px text-right">
-                                        <label className="mb-0 w-100"></label>
-                                        <span className="mb-0 font-small font-500">
-                                          ${calculateNewItemTotal()}
-                                        </span>
-                                      </td>
-                                      <td className="w-130px">
-                                        <label className="mb-0 w-100"></label>
-                                        <button
-                                          className="btn btn-primary btn-xs btn-glow shadow rounded"
-                                          name="btnadditem"
-                                          id="btnadditem"
-                                          type="button"
-                                          onClick={(e) => {
-                                            handleAddItem(e);
-                                          }}
-                                        >
-                                          <i className="icon icon-plus position-relative me-1 t-1"></i>
-                                          Item
-                                        </button>
-                                      </td>
-                                    </tr>
-                                  </tfoot>
-                                </table>
+                                              options={ddlInvoiceItems}
+                                              dataKey="ItemId"
+                                              dataVal="Item"
+                                              onChange={(e) => {
+                                                let selectedItem =
+                                                  objInitItems();
+                                                if (e != null) {
+                                                  selectedItem =
+                                                    ddlInvoiceItems.filter(
+                                                      (i) =>
+                                                        i.ItemId === e.value
+                                                    )?.[0];
+                                                }
+                                                setNewItem({
+                                                  ...newItem,
+                                                  item: e,
+                                                  description:
+                                                    selectedItem.Description,
+                                                  quantity: 1,
+                                                  price: selectedItem.Price,
+                                                  selectedItem: selectedItem,
+                                                });
+                                              }}
+                                              value={newItem.item}
+                                              name="ddlitem"
+                                              lbl={formCtrlTypes.item}
+                                              lblClass="mb-0 lbl-req-field"
+                                              className="ddlborder"
+                                              isClearable={true}
+                                              required={true}
+                                              isSearchCtl={true}
+                                              errors={addItemerrors}
+                                              formErrors={formAddItemErrors}
+                                              menuPortalTarget="body"
+                                              menuFooter={AddNewItem}
+                                            ></AsyncSelect>
+                                          </td>
+                                          <td className="w-300px">
+                                            <InputControl
+                                              lblClass="mb-0"
+                                              name="txtdescription"
+                                              ctlType={
+                                                formCtrlTypes.description300
+                                              }
+                                              required={false}
+                                              onChange={(e) =>
+                                                setNewItem({
+                                                  ...newItem,
+                                                  description: e.target.value,
+                                                })
+                                              }
+                                              value={newItem.description}
+                                            ></InputControl>
+                                          </td>
+                                          <td className="w-120px">
+                                            <InputControl
+                                              lblClass="mb-0 lbl-req-field b-0"
+                                              inputClass="b-0"
+                                              name="txtquantity"
+                                              ctlType={formCtrlTypes.qty}
+                                              required={true}
+                                              onChange={(e) =>
+                                                setNewItem({
+                                                  ...newItem,
+                                                  quantity:
+                                                    parseInt(
+                                                      e.target.value,
+                                                      10
+                                                    ) || 0,
+                                                })
+                                              }
+                                              value={newItem.quantity}
+                                            ></InputControl>
+                                          </td>
+                                          <td className="w-200px">
+                                            <InputControl
+                                              lblClass="mb-0 lbl-req-field b-0"
+                                              inputClass="b-0"
+                                              name="txtprice"
+                                              ctlType={
+                                                formCtrlTypes.invoiceitemprice
+                                              }
+                                              required={true}
+                                              onChange={(e) => {
+                                                setNewItem({
+                                                  ...newItem,
+                                                  price: e.target.value,
+                                                });
+                                              }}
+                                              value={newItem.price}
+                                            ></InputControl>
+                                          </td>
+                                          <td className="w-200px text-right">
+                                            <label className="mb-0 w-100"></label>
+                                            <span className="mb-0 font-small font-500">
+                                              ${calculateNewItemTotal()}
+                                            </span>
+                                          </td>
+                                          <td className="w-130px">
+                                            <label className="mb-0 w-100"></label>
+                                            <button
+                                              className="btn btn-primary btn-xs btn-glow shadow rounded"
+                                              name="btnadditem"
+                                              id="btnadditem"
+                                              type="button"
+                                              onClick={(e) => {
+                                                handleAddItem(e);
+                                              }}
+                                            >
+                                              <i className="icon icon-plus position-relative me-1 t-1"></i>
+                                              Item
+                                            </button>
+                                          </td>
+                                        </tr>
+                                      </tfoot>
+                                    </table>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            {/*============== Add Items End ==============*/}
+                          </div>
+                          <div className="col-md-12 my-15">
+                            <h6 className="mb-3 down-line  pb-10">Bill To</h6>
+                            <div className="row">
+                              <div className="col-md-6 mb-15">
+                                <AsyncSelect
+                                  placeHolder={
+                                    selectedJoinedUser == null ||
+                                    Object.keys(selectedJoinedUser).length === 0
+                                      ? AppMessages.DdlDefaultSelect
+                                      : joinedUsersData.length <= 0
+                                      ? AppMessages.DdLLoading
+                                      : AppMessages.DdlDefaultSelect
+                                  }
+                                  noData={
+                                    selectedJoinedUser == null ||
+                                    Object.keys(selectedJoinedUser).length === 0
+                                      ? AppMessages.NoUsers
+                                      : joinedUsersData.length <= 0
+                                      ? AppMessages.DdLLoading
+                                      : AppMessages.NoUsers
+                                  }
+                                  options={joinedUsersData}
+                                  onChange={(e) => {
+                                    handleJoinedUserChange(e);
+                                  }}
+                                  value={selectedJoinedUser}
+                                  name="ddljoinedusers"
+                                  lblText="Users"
+                                  lbl={formCtrlTypes.users}
+                                  lblClass="mb-0 lbl-req-field"
+                                  required={true}
+                                  errors={errors}
+                                  formErrors={formErrors}
+                                  //isMulti={true}
+                                  isRenderOptions={false}
+                                  tabIndex={1}
+                                ></AsyncSelect>
+                              </div>
+                              <div className="col-md-6 mb-15">
+                                <InputControl
+                                  lblClass="mb-0"
+                                  name="txtmessage"
+                                  ctlType={formCtrlTypes.message}
+                                  required={false}
+                                  onChange={handleChange}
+                                  value={formData.txtmessage}
+                                  errors={errors}
+                                  formErrors={formErrors}
+                                  tabIndex={2}
+                                ></InputControl>
+                              </div>
+                            </div>
+
+                            <hr className="w-100 text-primary my-20"></hr>
+                            <div className="row form-action d-flex flex-end mt-20">
+                              <div
+                                className="col-md-6 form-error"
+                                id="form-error"
+                              ></div>
+                              <div className="col-md-6">
+                                <button
+                                  className="btn btn-secondary"
+                                  id="btnCancel"
+                                  onClick={navigateToInvoices}
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  className="btn btn-primary"
+                                  id="btnPreview"
+                                  onClick={onPreview}
+                                >
+                                  Preview
+                                </button>
                               </div>
                             </div>
                           </div>
                         </div>
-                        {/*============== Add Items End ==============*/}
-                      </div>
-                      <div className="col-md-12 my-15">
-                        <h6 className="mb-3 down-line  pb-10">Bill To</h6>
-                        <div className="row">
-                          <div className="col-md-6 mb-15">
-                            <AsyncSelect
-                              placeHolder={
-                                selectedJoinedUser == null ||
-                                Object.keys(selectedJoinedUser).length === 0
-                                  ? AppMessages.DdlDefaultSelect
-                                  : joinedUsersData.length <= 0
-                                  ? AppMessages.DdLLoading
-                                  : AppMessages.DdlDefaultSelect
-                              }
-                              noData={
-                                selectedJoinedUser == null ||
-                                Object.keys(selectedJoinedUser).length === 0
-                                  ? AppMessages.NoUsers
-                                  : joinedUsersData.length <= 0
-                                  ? AppMessages.DdLLoading
-                                  : AppMessages.NoUsers
-                              }
-                              options={joinedUsersData}
-                              onChange={(e) => {
-                                handleJoinedUserChange(e);
-                              }}
-                              value={selectedJoinedUser}
-                              name="ddljoinedusers"
-                              lblText="Users"
-                              lbl={formCtrlTypes.users}
-                              lblClass="mb-0 lbl-req-field"
-                              required={true}
-                              errors={errors}
-                              formErrors={formErrors}
-                              //isMulti={true}
-                              isRenderOptions={false}
-                              tabIndex={1}
-                            ></AsyncSelect>
-                          </div>
-                          <div className="col-md-6 mb-15">
-                            <InputControl
-                              lblClass="mb-0"
-                              name="txtmessage"
-                              ctlType={formCtrlTypes.message}
-                              required={false}
-                              onChange={handleChange}
-                              value={formData.txtmessage}
-                              errors={errors}
-                              formErrors={formErrors}
-                              tabIndex={2}
-                            ></InputControl>
-                          </div>
-                        </div>
-
-                        <hr className="w-100 text-primary my-20"></hr>
-                        <div className="row form-action d-flex flex-end mt-20">
-                          <div
-                            className="col-md-6 form-error"
-                            id="form-error"
-                          ></div>
-                          <div className="col-md-6">
-                            <button
-                              className="btn btn-secondary"
-                              id="btnCancel"
-                              onClick={navigateToInvoices}
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              className="btn btn-primary"
-                              id="btnPreview"
-                              onClick={onPreview}
-                            >
-                              Preview
-                            </button>
-                          </div>
-                        </div>
-                      </div>
+                      </form>
                     </div>
-                  </form>
+                  </div>
                 </div>
               </div>
             </div>

@@ -79,6 +79,7 @@ export function SetPageLoaderNavLinks() {
         case routeNames.connectionsowners.path.toLowerCase():
         case routeNames.connectionsagents.path.toLowerCase():
         case routeNames.connectionstenants.path.toLowerCase():
+        case routeNames.connectionssendinvite.path.toLowerCase():
           activelink = "myconnections";
           break;
         case routeNames.paymentsaccounts.path.toLowerCase():
@@ -131,6 +132,8 @@ export function SetPageLoaderNavLinks() {
           activelink = "services";
           break;
         case routeNames.applications.path.toLowerCase():
+        case routeNames.createapplication.path.toLowerCase():
+        case routeNames.viewapplication.path.toLowerCase():
           activelink = "applications";
           break;
       }
@@ -822,13 +825,28 @@ export function getKeyByValue(obj, value) {
   return Object.entries(obj).find(([key, val]) => val === value)?.[0];
 }
 
-export function getCityStateCountryZipFormat(objData, isSeperator = true) {
-  const parts = [
-    objData?.City || "",
-    objData?.StateShortName || objData?.State || "",
-    objData?.CountryShortName || objData?.Country || "",
-    objData?.Zip || "",
-  ].filter(Boolean);
+export function getCityStateCountryZipFormat(
+  objData,
+  isSeperator = true,
+  customPropsNames = []
+) {
+  let parts = [];
+  if (customPropsNames.length == 0) {
+    parts = [
+      objData?.City || "",
+      objData?.StateShortName || objData?.State || "",
+      objData?.CountryShortName || objData?.Country || "",
+      objData?.Zip || "",
+    ];
+  } else {
+    parts = [
+      objData?.[customPropsNames[0]] || "",
+      objData?.[customPropsNames[1]] || objData?.[customPropsNames[2]] || "",
+      objData?.[customPropsNames[3]] || objData?.[customPropsNames[4]] || "",
+      objData?.[customPropsNames[5]] || "",
+    ];
+  }
+  parts = parts.filter(Boolean);
   const result = isSeperator ? parts.join(", ") : parts.join(" ").trim();
   return result ? `${result}.` : "";
 }

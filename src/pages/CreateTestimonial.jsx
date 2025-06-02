@@ -172,12 +172,12 @@ const CreateTestimonial = () => {
 
       {/*============== Create Testimonial form Start ==============*/}
 
-      <div className="full-row bg-light">
+      <div className="full-row pt-4 pb-5 bg-light">
         <div className="container">
           <div className="row">
             <div className="col-xl-7 col-lg-10 mx-auto">
               <div className="bg-white xs-p-20 p-30 border rounded shadow">
-                <h4 className="down-line pb-10 mb-4">Create Testimonial</h4>
+                <h6 className="down-line pb-10 mb-4">Create Testimonial</h6>
                 <form noValidate>
                   <div className="row">
                     <div className="col-md-6 mb-15">

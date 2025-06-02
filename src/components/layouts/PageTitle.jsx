@@ -6,11 +6,11 @@ const PageTitle = (titleProps) => {
     <>
       {SetPageLoaderNavLinks()}
       {/*============== Page title Start ==============*/}
-      <div className="full-row footer-default-dark bg-footer box-shadow py-28 div-page-title bo-t1-primary bo-b1-primary">
+      <div className="full-row footer-default-dark bg-footer box-shadow py-3 div-page-title bo-t2-primary bo-b2-primary">
         <div className="container">
           <div className="row">
             <div className="col">
-              <h4 className="text-white">{titleProps.title}</h4>
+              <h6 className="text-white mb-0">{titleProps.title}</h6>
               <nav aria-label="breadcrumb">
                 <ol className="breadcrumb mb-0 bg-transparent p-0">
                   {titleProps.navLinks.map((item, idx) => {

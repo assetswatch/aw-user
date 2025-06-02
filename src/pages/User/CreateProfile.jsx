@@ -28,6 +28,7 @@ import { Toast } from "../../components/common/ToastView";
 import { axiosPost } from "../../helpers/axiosHelper";
 import getuuid from "../../helpers/uuidHelper";
 import { routeNames } from "../../routes/routes";
+import GoBackPanel from "../../components/common/GoBackPanel";
 
 const CreateProfile = () => {
   let $ = window.$;
@@ -418,333 +419,360 @@ const CreateProfile = () => {
   return (
     <>
       {SetPageLoaderNavLinks()}
-      <div className="full-row  bg-light">
+      <div className="full-row  bg-light content-ph">
         <div className="container">
-          <div className="row mx-auto col-lg-8 shadow">
-            <div className="bg-white xs-p-20 p-30 pb-30 border rounded">
-              <div className="breadcrumb">
-                <div className="breadcrumb-item bc-fh">
-                  <h5 className="mb-2 down-line pb-10">
-                    Create {ProfileType} Profile
-                  </h5>
+          <div className="row">
+            <div className="col-12">
+              <div className="d-flex w-100">
+                <div className="flex-grow-1">
+                  <div className="breadcrumb my-1">
+                    <div className="breadcrumb-item bc-fh">
+                      <h6
+                        className="mb-3 down-line pb-10 cur-pointer"
+                        onClick={onCancel}
+                      >
+                        Profiles
+                      </h6>
+                    </div>
+                    <div className="breadcrumb-item bc-fh ctooltip-container">
+                      <span className="font-general font-500 cur-default">
+                        Create Profile
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="row pb-0 row-cols-1 g-4 flex-center">
-                <div className="col">
-                  <form noValidate>
-                    <div className="row">
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtfirstname"
-                          ctlType={formCtrlTypes.fname}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtfirstname}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={1}
-                          isFocus={true}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtlastname"
-                          ctlType={formCtrlTypes.lname}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtlastname}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={2}
-                        ></InputControl>
-                      </div>
-                      {getCreateProfileTypeId() ===
-                        config.userProfileTypes.Agent && (
-                        <div className="col-md-6 mb-15">
-                          <AsyncSelect
-                            placeHolder={
-                              profileCatData.length <= 0 &&
-                              selectedProfileCatId == null
-                                ? AppMessages.DdLLoading
-                                : AppMessages.DdlDefaultSelect
-                            }
-                            noData={
-                              profileCatData.length <= 0 &&
-                              selectedProfileCatId == null
-                                ? AppMessages.DdLLoading
-                                : AppMessages.DdlNoData
-                            }
-                            options={profileCatData}
-                            onChange={handleProifleCatChange}
-                            value={selectedProfileCatId}
-                            defualtselected={selectedProfileCatId}
-                            name="ddlprofilecategory"
-                            lbl={formCtrlTypes.category}
-                            lblClass="mb-0 lbl-req-field"
-                            isClearable={false}
-                            required={true}
-                            errors={errors}
-                            formErrors={formErrors}
-                            tabIndex={2}
-                          ></AsyncSelect>
-                        </div>
-                      )}
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtmobile"
-                          ctlType={formCtrlTypes.mobile}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtmobile}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={3}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0"
-                          name="txtlandline"
-                          ctlType={formCtrlTypes.landline}
-                          onChange={handleChange}
-                          value={formData.txtlandline}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={4}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0"
-                          name="txtcompanyname"
-                          ctlType={formCtrlTypes.companyname}
-                          required={false}
-                          onChange={handleChange}
-                          value={formData.txtcompanyname}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={5}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0"
-                          name="txtwebsite"
-                          ctlType={formCtrlTypes.website}
-                          required={false}
-                          onChange={handleChange}
-                          value={formData.txtwebsite}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={6}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtaddressone"
-                          ctlType={formCtrlTypes.addressone}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtaddressone}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={7}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0"
-                          name="txtaddresstwo"
-                          ctlType={formCtrlTypes.addresstwo}
-                          required={false}
-                          onChange={handleChange}
-                          value={formData.txtaddresstwo}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={8}
-                        ></InputControl>
-                      </div>
-                      {initApisLoaded && (
-                        <>
+              <div className="row mx-auto col-lg-8 shadow">
+                <div className="bg-white xs-p-20 px-30 py-20 pb-30 border rounded">
+                  <div className="row row-cols-1 g-4 flex-center">
+                    <div className="col">
+                      <form noValidate>
+                        <div className="row">
+                          <div className="d-flex w-100">
+                            <div className="flex-grow-1">
+                              <h6 className="mb-3 down-line pb-10 px-0 font-16">
+                                {ProfileType} Profile
+                              </h6>
+                            </div>
+                            <GoBackPanel
+                              clickAction={onCancel}
+                              isformBack={true}
+                            />
+                          </div>
                           <div className="col-md-6 mb-15">
-                            <AsyncSelect
-                              placeHolder={
-                                countriesData.length <= 0 &&
-                                countrySelected == null
-                                  ? AppMessages.DdLLoading
-                                  : AppMessages.DdlDefaultSelect
-                              }
-                              noData={
-                                countriesData.length <= 0 &&
-                                countrySelected == null
-                                  ? AppMessages.DdLLoading
-                                  : AppMessages.NoCountries
-                              }
-                              options={countriesData}
-                              onChange={handleCountryChange}
-                              value={countrySelected}
-                              name="ddlcountries"
-                              lbl={formCtrlTypes.country}
+                            <InputControl
                               lblClass="mb-0 lbl-req-field"
+                              name="txtfirstname"
+                              ctlType={formCtrlTypes.fname}
                               required={true}
+                              onChange={handleChange}
+                              value={formData.txtfirstname}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={1}
+                              isFocus={true}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtlastname"
+                              ctlType={formCtrlTypes.lname}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtlastname}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={2}
+                            ></InputControl>
+                          </div>
+                          {getCreateProfileTypeId() ===
+                            config.userProfileTypes.Agent && (
+                            <div className="col-md-6 mb-15">
+                              <AsyncSelect
+                                placeHolder={
+                                  profileCatData.length <= 0 &&
+                                  selectedProfileCatId == null
+                                    ? AppMessages.DdLLoading
+                                    : AppMessages.DdlDefaultSelect
+                                }
+                                noData={
+                                  profileCatData.length <= 0 &&
+                                  selectedProfileCatId == null
+                                    ? AppMessages.DdLLoading
+                                    : AppMessages.DdlNoData
+                                }
+                                options={profileCatData}
+                                onChange={handleProifleCatChange}
+                                value={selectedProfileCatId}
+                                defualtselected={selectedProfileCatId}
+                                name="ddlprofilecategory"
+                                lbl={formCtrlTypes.category}
+                                lblClass="mb-0 lbl-req-field"
+                                isClearable={false}
+                                required={true}
+                                errors={errors}
+                                formErrors={formErrors}
+                                tabIndex={2}
+                              ></AsyncSelect>
+                            </div>
+                          )}
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtmobile"
+                              ctlType={formCtrlTypes.mobile}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtmobile}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={3}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0"
+                              name="txtlandline"
+                              ctlType={formCtrlTypes.landline}
+                              onChange={handleChange}
+                              value={formData.txtlandline}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={4}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0"
+                              name="txtcompanyname"
+                              ctlType={formCtrlTypes.companyname}
+                              required={false}
+                              onChange={handleChange}
+                              value={formData.txtcompanyname}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={5}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0"
+                              name="txtwebsite"
+                              ctlType={formCtrlTypes.website}
+                              required={false}
+                              onChange={handleChange}
+                              value={formData.txtwebsite}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={6}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtaddressone"
+                              ctlType={formCtrlTypes.addressone}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtaddressone}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={7}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0"
+                              name="txtaddresstwo"
+                              ctlType={formCtrlTypes.addresstwo}
+                              required={false}
+                              onChange={handleChange}
+                              value={formData.txtaddresstwo}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={8}
+                            ></InputControl>
+                          </div>
+                          {initApisLoaded && (
+                            <>
+                              <div className="col-md-6 mb-15">
+                                <AsyncSelect
+                                  placeHolder={
+                                    countriesData.length <= 0 &&
+                                    countrySelected == null
+                                      ? AppMessages.DdLLoading
+                                      : AppMessages.DdlDefaultSelect
+                                  }
+                                  noData={
+                                    countriesData.length <= 0 &&
+                                    countrySelected == null
+                                      ? AppMessages.DdLLoading
+                                      : AppMessages.NoCountries
+                                  }
+                                  options={countriesData}
+                                  onChange={handleCountryChange}
+                                  value={countrySelected}
+                                  name="ddlcountries"
+                                  lbl={formCtrlTypes.country}
+                                  lblClass="mb-0 lbl-req-field"
+                                  required={true}
+                                  errors={errors}
+                                  formErrors={formErrors}
+                                  tabIndex={13}
+                                ></AsyncSelect>
+                              </div>
+                              <div className="col-md-6 mb-15">
+                                <AsyncSelect
+                                  placeHolder={
+                                    countrySelected == null ||
+                                    Object.keys(countrySelected).length === 0
+                                      ? AppMessages.DdlDefaultSelect
+                                      : statesData.length <= 0 &&
+                                        stateSelected == null
+                                      ? AppMessages.DdLLoading
+                                      : AppMessages.DdlDefaultSelect
+                                  }
+                                  noData={
+                                    countrySelected == null ||
+                                    Object.keys(countrySelected).length === 0
+                                      ? AppMessages.NoStates
+                                      : statesData.length <= 0 &&
+                                        stateSelected == null &&
+                                        countrySelected != null
+                                      ? AppMessages.DdLLoading
+                                      : AppMessages.NoStates
+                                  }
+                                  options={statesData}
+                                  onChange={handleStateChange}
+                                  value={stateSelected}
+                                  name="ddlstates"
+                                  lbl={formCtrlTypes.state}
+                                  lblClass="mb-0 lbl-req-field"
+                                  required={true}
+                                  errors={errors}
+                                  formErrors={formErrors}
+                                  tabIndex={14}
+                                ></AsyncSelect>
+                              </div>
+                              <div className="col-md-6 mb-15">
+                                <AsyncSelect
+                                  placeHolder={
+                                    stateSelected == null ||
+                                    Object.keys(stateSelected).length === 0
+                                      ? AppMessages.DdlDefaultSelect
+                                      : citiesData.length <= 0 &&
+                                        citySelected == null
+                                      ? AppMessages.DdLLoading
+                                      : AppMessages.DdlDefaultSelect
+                                  }
+                                  noData={
+                                    stateSelected == null ||
+                                    Object.keys(stateSelected).length === 0
+                                      ? AppMessages.NoCities
+                                      : citiesData.length <= 0 &&
+                                        citySelected == null &&
+                                        stateSelected != null
+                                      ? AppMessages.DdLLoading
+                                      : AppMessages.NoCities
+                                  }
+                                  options={citiesData}
+                                  onChange={handleCityChange}
+                                  value={citySelected}
+                                  name="ddlcities"
+                                  lbl={formCtrlTypes.city}
+                                  lblClass="mb-0 lbl-req-field"
+                                  required={true}
+                                  errors={errors}
+                                  formErrors={formErrors}
+                                  tabIndex={15}
+                                ></AsyncSelect>
+                              </div>
+                            </>
+                          )}
+                          <div className="col-md-6 mb-15">
+                            <InputControl
+                              lblClass="mb-0 lbl-req-field"
+                              name="txtzip"
+                              ctlType={formCtrlTypes.zip}
+                              required={true}
+                              onChange={handleChange}
+                              value={formData.txtzip}
+                              errors={errors}
+                              formErrors={formErrors}
+                              tabIndex={12}
+                            ></InputControl>
+                          </div>
+                          <div className="col-md-6 mb-15 d-flex flex-start">
+                            <div className="d-flex">
+                              <div className="w-100px">
+                                <img
+                                  src={formData.profilepic}
+                                  className="py-0 w-100px rounded"
+                                  alt=""
+                                />
+                              </div>
+                              <div className="w-100 pl-20 flex-direction-col flex-start">
+                                <FileControl
+                                  lblClass="mb-0 flex-grow"
+                                  name="uploadimage"
+                                  ctlType={formCtrlTypes.file}
+                                  onChange={handleFileChange}
+                                  file={file}
+                                  errors={errors}
+                                  formErrors={formErrors}
+                                  tabIndex={14}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            className={`${
+                              getCreateProfileTypeId() ===
+                              config.userProfileTypes.Agent
+                                ? "col-12"
+                                : "col-6"
+                            } mb-15`}
+                          >
+                            <TextAreaControl
+                              lblClass="mb-0"
+                              name="txtaboutme"
+                              ctlType={formCtrlTypes.aboutme}
+                              onChange={handleChange}
+                              value={formData.txtaboutme}
                               errors={errors}
                               formErrors={formErrors}
                               tabIndex={13}
-                            ></AsyncSelect>
-                          </div>
-                          <div className="col-md-6 mb-15">
-                            <AsyncSelect
-                              placeHolder={
-                                countrySelected == null ||
-                                Object.keys(countrySelected).length === 0
-                                  ? AppMessages.DdlDefaultSelect
-                                  : statesData.length <= 0 &&
-                                    stateSelected == null
-                                  ? AppMessages.DdLLoading
-                                  : AppMessages.DdlDefaultSelect
-                              }
-                              noData={
-                                countrySelected == null ||
-                                Object.keys(countrySelected).length === 0
-                                  ? AppMessages.NoStates
-                                  : statesData.length <= 0 &&
-                                    stateSelected == null &&
-                                    countrySelected != null
-                                  ? AppMessages.DdLLoading
-                                  : AppMessages.NoStates
-                              }
-                              options={statesData}
-                              onChange={handleStateChange}
-                              value={stateSelected}
-                              name="ddlstates"
-                              lbl={formCtrlTypes.state}
-                              lblClass="mb-0 lbl-req-field"
-                              required={true}
-                              errors={errors}
-                              formErrors={formErrors}
-                              tabIndex={14}
-                            ></AsyncSelect>
-                          </div>
-                          <div className="col-md-6 mb-15">
-                            <AsyncSelect
-                              placeHolder={
-                                stateSelected == null ||
-                                Object.keys(stateSelected).length === 0
-                                  ? AppMessages.DdlDefaultSelect
-                                  : citiesData.length <= 0 &&
-                                    citySelected == null
-                                  ? AppMessages.DdLLoading
-                                  : AppMessages.DdlDefaultSelect
-                              }
-                              noData={
-                                stateSelected == null ||
-                                Object.keys(stateSelected).length === 0
-                                  ? AppMessages.NoCities
-                                  : citiesData.length <= 0 &&
-                                    citySelected == null &&
-                                    stateSelected != null
-                                  ? AppMessages.DdLLoading
-                                  : AppMessages.NoCities
-                              }
-                              options={citiesData}
-                              onChange={handleCityChange}
-                              value={citySelected}
-                              name="ddlcities"
-                              lbl={formCtrlTypes.city}
-                              lblClass="mb-0 lbl-req-field"
-                              required={true}
-                              errors={errors}
-                              formErrors={formErrors}
-                              tabIndex={15}
-                            ></AsyncSelect>
-                          </div>
-                        </>
-                      )}
-                      <div className="col-md-6 mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtzip"
-                          ctlType={formCtrlTypes.zip}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtzip}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={12}
-                        ></InputControl>
-                      </div>
-                      <div className="col-md-6 mb-15 d-flex flex-start">
-                        <div className="d-flex">
-                          <div className="w-100px">
-                            <img
-                              src={formData.profilepic}
-                              className="py-0 w-100px rounded"
-                              alt=""
-                            />
-                          </div>
-                          <div className="w-100 pl-20 flex-direction-col flex-start">
-                            <FileControl
-                              lblClass="mb-0 flex-grow"
-                              name="uploadimage"
-                              ctlType={formCtrlTypes.file}
-                              onChange={handleFileChange}
-                              file={file}
-                              errors={errors}
-                              formErrors={formErrors}
-                              tabIndex={14}
-                            />
+                              rows={3}
+                            ></TextAreaControl>
                           </div>
                         </div>
-                      </div>
-                      <div
-                        className={`${
-                          getCreateProfileTypeId() ===
-                          config.userProfileTypes.Agent
-                            ? "col-12"
-                            : "col-6"
-                        } mb-15`}
-                      >
-                        <TextAreaControl
-                          lblClass="mb-0"
-                          name="txtaboutme"
-                          ctlType={formCtrlTypes.aboutme}
-                          onChange={handleChange}
-                          value={formData.txtaboutme}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={13}
-                          rows={3}
-                        ></TextAreaControl>
-                      </div>
-                    </div>
-                  </form>
-                  <hr className="w-100 text-primary my-20"></hr>
+                      </form>
+                      <hr className="w-100 text-primary my-20"></hr>
 
-                  <div className="container-fluid">
-                    <div className="row form-action flex-center">
-                      <div
-                        className="col-md-6 px-0 form-error"
-                        id="form-error"
-                      ></div>
-                      <div className="col-md-6 px-0">
-                        <button
-                          className="btn btn-secondary"
-                          id="btnCancel"
-                          onClick={onCancel}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          className="btn btn-primary"
-                          id="btnCreate"
-                          onClick={onCreate}
-                        >
-                          Create
-                        </button>
+                      <div className="container-fluid">
+                        <div className="row form-action flex-center">
+                          <div
+                            className="col-md-6 px-0 form-error"
+                            id="form-error"
+                          ></div>
+                          <div className="col-md-6 px-0">
+                            <button
+                              className="btn btn-secondary"
+                              id="btnCancel"
+                              onClick={onCancel}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              className="btn btn-primary"
+                              id="btnCreate"
+                              onClick={onCreate}
+                            >
+                              Create
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

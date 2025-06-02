@@ -13,7 +13,7 @@ const TermsCondition = () => {
       ></PageTitle>
       {/*============== Page title End ==============*/}
 
-      <div className="full-row">
+      <div className="full-row pt-4 pb-5 ">
         <div className="container">
           <div>
             <p>

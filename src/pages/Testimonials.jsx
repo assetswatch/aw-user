@@ -151,7 +151,7 @@ const Testimonials = () => {
       {/*============== Page title End ==============*/}
 
       {/*============== Testimonials Start ==============*/}
-      <div className="full-row pt-5 pb-5 bg-light mb-20">
+      <div className="full-row pt-4 pb-5 bg-light mb-20">
         <div className="container">
           {testimonialsList.length > 0 && (
             <div className="row">

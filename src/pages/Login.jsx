@@ -216,13 +216,13 @@ const Login = () => {
       {/*============== Page title End ==============*/}
 
       {/*============== Login Form Start ==============*/}
-      <div className="full-row  bg-light">
+      <div className="full-row pt-4 pb-5 bg-light">
         <div className="container">
           <div className="row">
-            <div className="col-xl-5 col-lg-6 mx-auto">
+            <div className="col-xl-4 col-lg-5 mx-auto">
               <div className="bg-white xs-p-20 p-30 border rounded shadow">
                 <div className="form-icon-left rounded form-boder">
-                  <h4 className="mb-4 down-line pb-10">User Login</h4>
+                  <h6 className="mb-4 down-line pb-10">User Login</h6>
                   <div className="row row-cols-1 g-3">
                     <form noValidate onSubmit={onLogin}>
                       <div className="col mb-15">
@@ -271,7 +271,7 @@ const Login = () => {
                       </div>
                       <div className="col mb-10">
                         <button
-                          className="btn btn-primary box-shadow"
+                          className="btn btn-primary btn-mini btn-glow shadow rounded"
                           name="btnlogin"
                           id="btnlogin"
                           type="submit"

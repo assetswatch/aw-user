@@ -203,13 +203,13 @@ const ResetPassword = () => {
       {/*============== Page title End ==============*/}
 
       {/*============== ResetPassword Form Start ==============*/}
-      <div className="full-row  bg-light">
+      <div className="full-row pt-4 pb-5 bg-light">
         <div className="container">
           <div className="row">
-            <div className="col-xl-5 col-lg-6 mx-auto">
+            <div className="col-xl-4 col-lg-5 mx-auto">
               <div className="bg-white xs-p-20 p-30 border rounded shadow">
                 <div className="form-icon-left rounded form-boder">
-                  <h4 className="mb-4 down-line pb-10">Reset Password</h4>
+                  <h6 className="mb-4 down-line pb-10">Reset Password</h6>
                   <div className="row row-cols-1 g-3">
                     <form noValidate onSubmit={onReset}>
                       <div className="col mb-15">
@@ -226,7 +226,7 @@ const ResetPassword = () => {
                           ctlicon={<i className="fa fa-lock"></i>}
                         ></InputControl>
                       </div>
-                      <div className="col mb-20 pb-1">
+                      <div className="col mb-20 pb-2">
                         <InputControl
                           lblClass="mb-0 lbl-req-field"
                           name="txtconfirmpassword"
@@ -244,7 +244,7 @@ const ResetPassword = () => {
                       </div>
                       <div className="col mb-10">
                         <button
-                          className="btn btn-primary box-shadow"
+                          className="btn btn-primary btn-mini btn-glow shadow rounded"
                           name="btnresetpwd"
                           id="btnresetpwd"
                           type="submit"

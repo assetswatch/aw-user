@@ -53,6 +53,7 @@ import {
   generateInvoiceDownloadPDF,
   checkUserBranding,
 } from "../../../utils/pdfhelper";
+import GridFiltersPanel from "../../../components/common/GridFiltersPanel";
 
 const Invoices = () => {
   let $ = window.$;
@@ -670,6 +671,7 @@ const Invoices = () => {
             isconditionalshow: (row) => {
               return (
                 row?.original?.PaymentStatus != 1 &&
+                row.original.InvoiceDirection == config.directionTypes.Sent &&
                 row?.original?.SentProfiles?.length > 0
               );
             },
@@ -682,8 +684,11 @@ const Invoices = () => {
             icssclass: "pr-10 pl-2px",
             isconditionalshow: (row) => {
               return (
-                row?.original?.PaymentStatus == 1 ||
-                row?.original?.PaymentStatus == 2
+                // row?.original?.PaymentStatus ==
+                //   config.paymentStatusTypes.Processed ||
+                row?.original?.PaymentStatus ==
+                  config.paymentStatusTypes.PartiallyPaid ||
+                row?.original?.PaymentStatus == config.paymentStatusTypes.Paid
               );
             },
           },
@@ -1381,44 +1386,18 @@ const Invoices = () => {
   return (
     <>
       {SetPageLoaderNavLinks()}
-      <div className="full-row bg-light">
+      <div className="full-row bg-light content-ph">
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <div className="row">
-                <div className="col-md-12 col-lg-6">
-                  <div className="breadcrumb">
-                    <div className="breadcrumb-item bc-fh">
-                      <h6 className="mb-3 down-line pb-10">Payments</h6>
-                    </div>
-                    <div className="breadcrumb-item bc-fh ctooltip-container">
-                      <span className="font-general font-500 cur-default">
-                        Invoices
-                      </span>
-                    </div>
-                  </div>
+              <div className="breadcrumb my-1">
+                <div className="breadcrumb-item bc-fh">
+                  <h6 className="mb-3 down-line pb-10">Payments</h6>
                 </div>
-                <div className="col-md-12 col-lg-6 d-flex justify-content-end align-items-end pb-10">
-                  <button
-                    className="btn btn-primary btn-mini btn-glow shadow rounded mr-10"
-                    name="btnitems"
-                    id="btnitems"
-                    type="button"
-                    onClick={navigateToInvoiceItems}
-                  >
-                    <i className="fa fa-file-invoice position-relative me-2 t-1"></i>{" "}
-                    Items
-                  </button>
-                  <button
-                    className="btn btn-primary btn-mini btn-glow shadow rounded"
-                    name="btnitems"
-                    id="btnitems"
-                    type="button"
-                    onClick={navigateToGenerateInvoice}
-                  >
-                    <i className="icons icon-plus position-relative me-2 t-2"></i>{" "}
-                    Generate Invoice
-                  </button>
+                <div className="breadcrumb-item bc-fh ctooltip-container">
+                  <span className="font-general font-500 cur-default">
+                    Invoices
+                  </span>
                 </div>
               </div>
               <div className="tabw100 tab-action shadow rounded bg-white">
@@ -1428,83 +1407,100 @@ const Invoices = () => {
                 </ul>
                 <div className="tab-element">
                   {/*============== Search Start ==============*/}
-                  <div className="woo-filter-bar full-row p-3 grid-search bo-0">
-                    <div className="container-fluid v-center">
-                      <div className="row">
-                        <div className="col px-0">
-                          <form noValidate>
-                            <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
-                              <div className="col-lg-3 col-xl-3 col-md-4">
-                                <InputControl
-                                  lblClass="mb-0"
-                                  lblText="Search by Invoice #"
-                                  name="txtkeyword"
-                                  ctlType={formCtrlTypes.searchkeyword}
-                                  value={searchFormData.txtkeyword}
-                                  onChange={handleChange}
-                                  formErrors={formErrors}
-                                ></InputControl>
+                  <GridFiltersPanel
+                    divFilterControls={
+                      <div
+                        className="container-fluid v-center"
+                        id="div-filters-controls-panel"
+                      >
+                        <div className="row">
+                          <div className="col px-0">
+                            <form noValidate>
+                              <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
+                                <div className="col-lg-3 col-xl-3 col-md-4">
+                                  <InputControl
+                                    lblClass="mb-0"
+                                    lblText="Search by Invoice #"
+                                    name="txtkeyword"
+                                    ctlType={formCtrlTypes.searchkeyword}
+                                    value={searchFormData.txtkeyword}
+                                    onChange={handleChange}
+                                    formErrors={formErrors}
+                                  ></InputControl>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-4">
+                                  <DateControl
+                                    lblClass="mb-0"
+                                    lblText="Start date"
+                                    name="txtfromdate"
+                                    required={false}
+                                    onChange={(dt) =>
+                                      onDateChange(dt, "txtfromdate")
+                                    }
+                                    value={searchFormData.txtfromdate}
+                                    isTime={false}
+                                  ></DateControl>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-4">
+                                  <DateControl
+                                    lblClass="mb-0"
+                                    lblText="End date"
+                                    name="txttodate"
+                                    required={false}
+                                    onChange={(dt) =>
+                                      onDateChange(dt, "txttodate")
+                                    }
+                                    value={searchFormData.txttodate}
+                                    isTime={false}
+                                    objProps={{
+                                      checkVal: searchFormData.txtfromdate,
+                                      days: 7,
+                                    }}
+                                  ></DateControl>
+                                </div>
+                                <div className="col-lg-3 col-xl-3 col-md-6 grid-search-action">
+                                  <label
+                                    className="mb-0 form-error w-100"
+                                    id="search-val-err-message"
+                                  ></label>
+                                  <button
+                                    className="btn btn-primary w- 100"
+                                    value="Search"
+                                    name="btnsearch"
+                                    type="button"
+                                    onClick={onSearch}
+                                  >
+                                    Search
+                                  </button>
+                                  <button
+                                    className="btn btn-primary w- 100"
+                                    value="Show all"
+                                    name="btnshowall"
+                                    type="button"
+                                    onClick={onShowAll}
+                                  >
+                                    Show All
+                                  </button>
+                                </div>
                               </div>
-                              <div className="col-lg-3 col-xl-2 col-md-4">
-                                <DateControl
-                                  lblClass="mb-0"
-                                  lblText="Start date"
-                                  name="txtfromdate"
-                                  required={false}
-                                  onChange={(dt) =>
-                                    onDateChange(dt, "txtfromdate")
-                                  }
-                                  value={searchFormData.txtfromdate}
-                                  isTime={false}
-                                ></DateControl>
-                              </div>
-                              <div className="col-lg-3 col-xl-2 col-md-4">
-                                <DateControl
-                                  lblClass="mb-0"
-                                  lblText="End date"
-                                  name="txttodate"
-                                  required={false}
-                                  onChange={(dt) =>
-                                    onDateChange(dt, "txttodate")
-                                  }
-                                  value={searchFormData.txttodate}
-                                  isTime={false}
-                                  objProps={{
-                                    checkVal: searchFormData.txtfromdate,
-                                    days: 7,
-                                  }}
-                                ></DateControl>
-                              </div>
-                              <div className="col-lg-3 col-xl-3 col-md-6 grid-search-action">
-                                <label
-                                  className="mb-0 form-error w-100"
-                                  id="search-val-err-message"
-                                ></label>
-                                <button
-                                  className="btn btn-primary w- 100"
-                                  value="Search"
-                                  name="btnsearch"
-                                  type="button"
-                                  onClick={onSearch}
-                                >
-                                  Search
-                                </button>
-                                <button
-                                  className="btn btn-primary w- 100"
-                                  value="Show all"
-                                  name="btnshowall"
-                                  type="button"
-                                  onClick={onShowAll}
-                                >
-                                  Show All
-                                </button>
-                              </div>
-                            </div>
-                          </form>
+                            </form>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
+                    }
+                    elements={[
+                      {
+                        label: "Items",
+                        icon: "fa fa-file-invoice ",
+                        onClick: navigateToInvoiceItems,
+                      },
+                      {
+                        label: "Generate Invoice",
+                        icon: "icons icon-plus ",
+                        onClick: navigateToGenerateInvoice,
+                      },
+                    ]}
+                  ></GridFiltersPanel>
                   {/*============== Search End ==============*/}
 
                   {/*============== Grid Start ==============*/}

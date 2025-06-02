@@ -773,7 +773,7 @@ const Checkout = () => {
         ]}
       ></PageTitle>
       {/*============== Page title End ==============*/}
-      <div className="full-row bg-light">
+      <div className="full-row pt-4 pb-5 bg-light">
         <div className="container">
           <div className="row">
             <input name="txtdummyfocus" className="lh-0 h-0 p-0 bo-0"></input>
@@ -1299,14 +1299,14 @@ const Checkout = () => {
                                 ></div>
                                 <div className="col-md-6 px-0">
                                   <button
-                                    className="btn btn-secondary"
+                                    className="btn btn-secondary btn-mini btn-glow shadow rounded"
                                     id="btnCancel"
                                     onClick={navigateToInvoices}
                                   >
                                     Cancel
                                   </button>
                                   <button
-                                    className="btn btn-primary"
+                                    className="btn btn-primary btn-mini btn-glow shadow rounded"
                                     id="btnReviewandConfirm"
                                     onClick={onReviewandConfirm}
                                   >

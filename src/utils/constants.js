@@ -97,6 +97,7 @@ export const SessionStorageKeys = {
   ViewInvoiceId: "viid",
   PreviewInvoiceId: "pviid",
   CheckoutInvoiceId: "ciid",
+  ViewApplicationId: "vappid",
 };
 /*Session storage keys*/
 
@@ -296,6 +297,12 @@ export const AppMessages = {
   MarkasPaidConfirmationMessage:
     "Invoice #{invoicenumber} will be marked as paid. This action cannot be undone.",
   NoTestimonials: "No testimonials found...",
+  NoApplications: "No applications found...",
+  DeleteApplicationConfirmationMessage:
+    "You want to delete the application#: {applicationnumber}.",
+  DeleteApplicationSuccess: "Application deleted successfully...",
+  SendApplicationModalTitle: "Send Application",
+  UnsendApplicationToUserMessage: "You want to unsend application for {name}.",
 };
 /*Common App messages*/
 
@@ -439,6 +446,7 @@ export const ValidationMessages = {
   MaxFileSizeReached: "Maximum file size reached.",
   MaxFileLimitReaced: "Maximum files limit reached.",
   UploadValidFiles: "Some files were rejected. Please upload valid files.",
+  ApplicationTypeReq: "Application type can not be empty.",
 };
 
 /*Api Urls*/
@@ -569,5 +577,13 @@ export let ApiUrls = {
   getDocumentSharedUsers: `documents/v1/GetDocumentSharedUsers`,
   removeSharedDocumentAccess: `documents/v1/RemoveSharedDocumentAccess`,
   unshareDocument: `documents/v1/UnshareDocument`,
+  getBgvPackages: `applications/v1/GetBgvPackages`,
+  getBgvApplicationTypes: `applications/v1/GetBgvApplicationTypes`,
+  getApplications: `applications/v1/GetApplications`,
+  deleteApplication: `applications/v1/DeleteApplication`,
+  sendApplication: `applications/v1/SendApplication`,
+  unSendApplication: `applications/v1/UnSendApplication`,
+  createApplication: `applications/v1/CreateApplication`,
+  getApplicationDetails: `applications/v1/GetApplicationDetails`,
 };
 /*Api Urls*/

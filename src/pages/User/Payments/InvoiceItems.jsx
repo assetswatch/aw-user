@@ -31,6 +31,7 @@ import { addSessionStorageItem } from "../../../helpers/sessionStorageHelper";
 import { Toast } from "../../../components/common/ToastView";
 import { useGetInvoiceItemAccountForTypesGateway } from "../../../hooks/usegetInvoiceItemAccountForTypesGateway";
 import { useGetInvoiceItemForTypesGateway } from "../../../hooks/useGetInvoiceItemForTypesGateway";
+import GridFiltersPanel from "../../../components/common/GridFiltersPanel";
 
 const InvoiceItems = () => {
   let $ = window.$;
@@ -383,54 +384,25 @@ const InvoiceItems = () => {
   return (
     <>
       {SetPageLoaderNavLinks()}
-      <div className="full-row bg-light">
+      <div className="full-row bg-light content-ph">
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <div className="row">
-                <div className="col-md-12 col-lg-6">
-                  <div className="breadcrumb">
-                    <div className="breadcrumb-item bc-fh">
-                      <h6 className="mb-3 down-line pb-10">Payments</h6>
-                    </div>
-                    <div className="breadcrumb-item bc-fh ctooltip-container">
-                      <span className="font-general font-500 cur-default">
-                        <a
-                          className="text-general"
-                          onClick={navigateToInvoices}
-                        >
-                          Invoices
-                        </a>
-                      </span>
-                    </div>
-                    <div className="breadcrumb-item bc-fh ctooltip-container">
-                      <span className="font-general font-500 cur-default">
-                        Items
-                      </span>
-                    </div>
-                  </div>
+              <div className="breadcrumb my-1">
+                <div className="breadcrumb-item bc-fh">
+                  <h6 className="mb-3 down-line pb-10">Payments</h6>
                 </div>
-                <div className="col-md-12 col-lg-6 d-flex justify-content-end align-items-end pb-10">
-                  <button
-                    className="btn btn-primary btn-mini btn-glow shadow rounded mr-10"
-                    name="btnitems"
-                    id="btnitems"
-                    type="button"
-                    onClick={navigateToInvoices}
-                  >
-                    <i className="fa fa-file-invoice position-relative me-2 t-1"></i>{" "}
-                    Invoices
-                  </button>
-                  <button
-                    className="btn btn-primary btn-mini btn-glow shadow rounded"
-                    name="btnitems"
-                    id="btnitems"
-                    type="button"
-                    onClick={navigateToCreateInvoiceItem}
-                  >
-                    <i className="icons icon-plus position-relative me-2 t-2"></i>{" "}
-                    New Item
-                  </button>
+                <div className="breadcrumb-item bc-fh ctooltip-container">
+                  <span className="font-general font-500 cur-default">
+                    <a className="text-general" onClick={navigateToInvoices}>
+                      Invoices
+                    </a>
+                  </span>
+                </div>
+                <div className="breadcrumb-item bc-fh ctooltip-container">
+                  <span className="font-general font-500 cur-default">
+                    Items
+                  </span>
                 </div>
               </div>
               <div className="tabw100 tab-action shadow rounded bg-white">
@@ -443,146 +415,165 @@ const InvoiceItems = () => {
                 </ul>
                 <div className="tab-element">
                   {/*============== Search Start ==============*/}
-                  <div className="woo-filter-bar full-row p-3 grid-search bo-0">
-                    <div className="container-fluid v-center">
-                      <div className="row">
-                        <div className="col px-0">
-                          <form noValidate>
-                            <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
-                              <div className="col-lg-4 col-xl-2 col-md-6">
-                                <InputControl
-                                  lblClass="mb-0"
-                                  lblText="Search"
-                                  name="txtkeyword"
-                                  ctlType={formCtrlTypes.searchkeyword}
-                                  value={searchFormData.txtkeyword}
-                                  onChange={handleChange}
-                                  formErrors={formErrors}
-                                ></InputControl>
+                  <GridFiltersPanel
+                    divFilterControls={
+                      <div
+                        className="container-fluid v-center"
+                        id="div-filters-controls-panel"
+                      >
+                        <div className="row">
+                          <div className="col px-0">
+                            <form noValidate>
+                              <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
+                                <div className="col-lg-4 col-xl-2 col-md-6">
+                                  <InputControl
+                                    lblClass="mb-0"
+                                    lblText="Search"
+                                    name="txtkeyword"
+                                    ctlType={formCtrlTypes.searchkeyword}
+                                    value={searchFormData.txtkeyword}
+                                    onChange={handleChange}
+                                    formErrors={formErrors}
+                                  ></InputControl>
+                                </div>
+                                <div className="col-lg-4 col-xl-2 col-md-6">
+                                  <AsyncSelect
+                                    placeHolder={
+                                      invoiceItemForTypesList.length <= 0 &&
+                                      searchFormData.ddlitemfortype == null
+                                        ? AppMessages.DdLLoading
+                                        : AppMessages.DdlDefaultSelect
+                                    }
+                                    noData={
+                                      invoiceItemForTypesList.length <= 0 &&
+                                      searchFormData.ddlitemfortype == null
+                                        ? AppMessages.DdLLoading
+                                        : AppMessages.DdlNoData
+                                    }
+                                    options={invoiceItemForTypesList}
+                                    dataKey="ItemForTypeId"
+                                    dataVal="ItemForType"
+                                    onChange={(e) =>
+                                      ddlChange(e, "ddlitemfortype")
+                                    }
+                                    value={searchFormData.ddlitemfortype}
+                                    name="ddlitemfortype"
+                                    lbl={formCtrlTypes.itemfortype}
+                                    lblClass="mb-0 lbl-req-field"
+                                    className="ddlborder"
+                                    isClearable={true}
+                                    required={false}
+                                    isSearchCtl={true}
+                                    formErrors={formErrors}
+                                  ></AsyncSelect>
+                                </div>
+                                <div className="col-lg-4 col-xl-2 col-md-6">
+                                  <AsyncSelect
+                                    placeHolder={
+                                      invoiceItemAccountForTypesList.length <=
+                                        0 &&
+                                      searchFormData.ddlitemfortype == null
+                                        ? AppMessages.DdLLoading
+                                        : AppMessages.DdlDefaultSelect
+                                    }
+                                    noData={
+                                      invoiceItemAccountForTypesList.length <=
+                                        0 &&
+                                      searchFormData.ddlitemfortype == null
+                                        ? AppMessages.DdLLoading
+                                        : AppMessages.DdlNoData
+                                    }
+                                    options={invoiceItemAccountForTypesList}
+                                    dataKey="AccountForTypeId"
+                                    dataVal="AccountForType"
+                                    onChange={(e) =>
+                                      ddlChange(e, "ddlaccountfortype")
+                                    }
+                                    value={searchFormData.ddlaccountfortype}
+                                    name="ddlaccountfortype"
+                                    lbl={formCtrlTypes.accountfortype}
+                                    lblClass="mb-0 lbl-req-field"
+                                    className="ddlborder"
+                                    isClearable={true}
+                                    required={false}
+                                    isSearchCtl={true}
+                                    formErrors={formErrors}
+                                  ></AsyncSelect>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-3">
+                                  <DateControl
+                                    lblClass="mb-0"
+                                    lblText="Start date"
+                                    name="txtfromdate"
+                                    required={false}
+                                    onChange={(dt) =>
+                                      onDateChange(dt, "txtfromdate")
+                                    }
+                                    value={searchFormData.txtfromdate}
+                                    isTime={false}
+                                    formErrors={formErrors}
+                                  ></DateControl>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-3">
+                                  <DateControl
+                                    lblClass="mb-0"
+                                    lblText="End date"
+                                    name="txttodate"
+                                    required={false}
+                                    onChange={(dt) =>
+                                      onDateChange(dt, "txttodate")
+                                    }
+                                    value={searchFormData.txttodate}
+                                    isTime={false}
+                                    objProps={{
+                                      checkVal: searchFormData.txtfromdate,
+                                    }}
+                                    formErrors={formErrors}
+                                  ></DateControl>
+                                </div>
+                                <div className="col-lg-6 col-xl-3 col-md-6 grid-search-action">
+                                  <label
+                                    className="mb-0 form-error w-100"
+                                    id="search-val-err-message"
+                                  ></label>
+                                  <button
+                                    className="btn btn-primary w- 100"
+                                    value="Search"
+                                    name="btnsearch"
+                                    type="button"
+                                    onClick={onSearch}
+                                  >
+                                    Search
+                                  </button>
+                                  <button
+                                    className="btn btn-primary w- 100"
+                                    value="Show all"
+                                    name="btnshowall"
+                                    type="button"
+                                    onClick={onShowAll}
+                                  >
+                                    Show All
+                                  </button>
+                                </div>
                               </div>
-                              <div className="col-lg-4 col-xl-2 col-md-6">
-                                <AsyncSelect
-                                  placeHolder={
-                                    invoiceItemForTypesList.length <= 0 &&
-                                    searchFormData.ddlitemfortype == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlDefaultSelect
-                                  }
-                                  noData={
-                                    invoiceItemForTypesList.length <= 0 &&
-                                    searchFormData.ddlitemfortype == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlNoData
-                                  }
-                                  options={invoiceItemForTypesList}
-                                  dataKey="ItemForTypeId"
-                                  dataVal="ItemForType"
-                                  onChange={(e) =>
-                                    ddlChange(e, "ddlitemfortype")
-                                  }
-                                  value={searchFormData.ddlitemfortype}
-                                  name="ddlitemfortype"
-                                  lbl={formCtrlTypes.itemfortype}
-                                  lblClass="mb-0 lbl-req-field"
-                                  className="ddlborder"
-                                  isClearable={true}
-                                  required={false}
-                                  isSearchCtl={true}
-                                  formErrors={formErrors}
-                                ></AsyncSelect>
-                              </div>
-                              <div className="col-lg-4 col-xl-2 col-md-6">
-                                <AsyncSelect
-                                  placeHolder={
-                                    invoiceItemAccountForTypesList.length <=
-                                      0 && searchFormData.ddlitemfortype == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlDefaultSelect
-                                  }
-                                  noData={
-                                    invoiceItemAccountForTypesList.length <=
-                                      0 && searchFormData.ddlitemfortype == null
-                                      ? AppMessages.DdLLoading
-                                      : AppMessages.DdlNoData
-                                  }
-                                  options={invoiceItemAccountForTypesList}
-                                  dataKey="AccountForTypeId"
-                                  dataVal="AccountForType"
-                                  onChange={(e) =>
-                                    ddlChange(e, "ddlaccountfortype")
-                                  }
-                                  value={searchFormData.ddlaccountfortype}
-                                  name="ddlaccountfortype"
-                                  lbl={formCtrlTypes.accountfortype}
-                                  lblClass="mb-0 lbl-req-field"
-                                  className="ddlborder"
-                                  isClearable={true}
-                                  required={false}
-                                  isSearchCtl={true}
-                                  formErrors={formErrors}
-                                ></AsyncSelect>
-                              </div>
-                              <div className="col-lg-3 col-xl-2 col-md-3">
-                                <DateControl
-                                  lblClass="mb-0"
-                                  lblText="Start date"
-                                  name="txtfromdate"
-                                  required={false}
-                                  onChange={(dt) =>
-                                    onDateChange(dt, "txtfromdate")
-                                  }
-                                  value={searchFormData.txtfromdate}
-                                  isTime={false}
-                                  formErrors={formErrors}
-                                ></DateControl>
-                              </div>
-                              <div className="col-lg-3 col-xl-2 col-md-3">
-                                <DateControl
-                                  lblClass="mb-0"
-                                  lblText="End date"
-                                  name="txttodate"
-                                  required={false}
-                                  onChange={(dt) =>
-                                    onDateChange(dt, "txttodate")
-                                  }
-                                  value={searchFormData.txttodate}
-                                  isTime={false}
-                                  objProps={{
-                                    checkVal: searchFormData.txtfromdate,
-                                  }}
-                                  formErrors={formErrors}
-                                ></DateControl>
-                              </div>
-                              <div className="col-lg-6 col-xl-3 col-md-6 grid-search-action">
-                                <label
-                                  className="mb-0 form-error w-100"
-                                  id="search-val-err-message"
-                                ></label>
-                                <button
-                                  className="btn btn-primary w- 100"
-                                  value="Search"
-                                  name="btnsearch"
-                                  type="button"
-                                  onClick={onSearch}
-                                >
-                                  Search
-                                </button>
-                                <button
-                                  className="btn btn-primary w- 100"
-                                  value="Show all"
-                                  name="btnshowall"
-                                  type="button"
-                                  onClick={onShowAll}
-                                >
-                                  Show All
-                                </button>
-                              </div>
-                            </div>
-                          </form>
+                            </form>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
+                    }
+                    elements={[
+                      {
+                        label: "Invoices",
+                        icon: "fa fa-file-invoice ",
+                        onClick: navigateToInvoices,
+                      },
+                      {
+                        label: "New Item",
+                        icon: "icons icon-plus ",
+                        onClick: navigateToCreateInvoiceItem,
+                      },
+                    ]}
+                  ></GridFiltersPanel>
                   {/*============== Search End ==============*/}
 
                   {/*============== Grid Start ==============*/}

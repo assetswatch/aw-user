@@ -21,15 +21,15 @@ const Plans = () => {
 
       {/*============== Pricing Table Content Start ==============*/}
 
-      <div className="full-row bg-light">
+      <div className="full-row pt-4 pb-5 bg-light">
         <div className="container">
           <div className="row">
             <div className="col-lg-5 col-md-12">
               <div className="text-secondary mb-5">
                 <span className="tagline-2 text-primary">Pricing Plans</span>
-                <h3 className="text-secondary mb-4">
+                <h4 className="text-secondary mb-4">
                   Choose the All-inclusive Packages Best Suited to You.
-                </h3>
+                </h4>
               </div>
             </div>
           </div>

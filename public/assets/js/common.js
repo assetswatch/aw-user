@@ -38,9 +38,10 @@
   // Put slider space for nav not in mini screen
   if (document.querySelector(".nav-on-top") !== null) {
     var get_height = jQuery(".nav-on-top").height();
-    // if (get_height > 0 && $window.width() > 991) {
-    //   jQuery(".nav-on-top").next().css("margin-top", get_height);
-    // }
+    // jQuery(".nav-on-top").next().css("margin-top", get_height);
+    if (get_height > 0 && $window.width() > 991) {
+      jQuery(".nav-on-top").next().css("margin-top", get_height);
+    }
     $window.on("resize", function () {
       $header.removeClass("fixed-top");
       var get_height = jQuery(".nav-on-top").height();

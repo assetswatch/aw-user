@@ -25,12 +25,12 @@ const FoldersBreadCrumb = React.memo(
 
     return (
       <>
-        <div className="breadcrumb w-400px">
+        <div className="breadcrumb w-400px my-1">
           <>
             {folders && folders?.length > 0 ? (
               <>
                 {folders?.length >= 2 ? (
-                  <div className="breadcrumb-item bc-fh dropdown">
+                  <div className="breadcrumb-item bc-fh dropdown mb-3 pb-8">
                     <a
                       className="flex flex-center w-30px h-30px br-100"
                       data-bs-toggle="collapse"

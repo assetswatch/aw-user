@@ -44,6 +44,7 @@ import { useProfileTypesGateway } from "../../../hooks/useProfileTypesGateway";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 import TextAreaControl from "../../../components/common/TextAreaControl";
 import PdfViewer from "../../../components/common/PdfViewer";
+import GridFiltersPanel from "../../../components/common/GridFiltersPanel";
 
 const MyDocuments = () => {
   let $ = window.$;
@@ -1191,86 +1192,47 @@ const MyDocuments = () => {
   return (
     <div key={reloadKey}>
       {SetPageLoaderNavLinks()}
-      <div className="full-row bg-light">
+      <div className="full-row bg-light content-ph">
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <div className="row">
-                <div className="col-6">
-                  <FoldersBreadCrumb
-                    folders={foldersHierarchyData}
-                    currentFolderId={folderid}
-                    title="My Documents"
-                    onAddFolder={onAdd}
-                    onAddFile={onFileUpload}
-                    onFolderHierarchyFolderClick={onFolderHierarchyFolderClick}
-                  ></FoldersBreadCrumb>
-                </div>
-                <div className="col-6 d-flex justify-content-end align-items-end pb-10">
-                  <div className="dropdown">
-                    <div
-                      className="btn btn-primary btn-mini btn-glow shadow rounded"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#dropdownMenuButton"
-                      aria-controls="dropdownMenuButton"
-                      aria-expanded="false"
-                    >
-                      <i className="icons icon-plus position-relative me-2 t-2"></i>{" "}
-                      New
-                    </div>
-                    <ul
-                      className={`ddmenu arrow collapse in bg-white py-0 px-0 lh-1 shadow rounded text-primary`}
-                      id="dropdownMenuButton"
-                    >
-                      <li>
-                        <a className="dropdown-item" onClick={onAdd}>
-                          <i className="mdi mdi-folder-plus font-22 position-relative me-1 t-4"></i>{" "}
-                          New Folder
-                        </a>
-                      </li>
-                      <li>
-                        <a className="dropdown-item" onClick={onFileUpload}>
-                          <i className="fa fa-file-arrow-up font-18 position-relative me-2 t-1 pl-5"></i>{" "}
-                          File Upload
-                        </a>
-                      </li>
-                      {/* <div className="dropdown-divider" />
-                      <li>
-                        <a className="dropdown-item">
-                          <i className="mdi mdi-folder-upload font-22 position-relative me-1 t-3"></i>{" "}
-                          Folder Upload
-                        </a>
-                      </li> */}
-                    </ul>
-                  </div>
-                </div>
-              </div>
+              <FoldersBreadCrumb
+                folders={foldersHierarchyData}
+                currentFolderId={folderid}
+                title="My Documents"
+                onAddFolder={onAdd}
+                onAddFile={onFileUpload}
+                onFolderHierarchyFolderClick={onFolderHierarchyFolderClick}
+              ></FoldersBreadCrumb>
               <div className="tabw100 tab-action shadow rounded bg-white">
                 <ul className="nav-tab-line list-color-secondary d-table mb-0 d-flex box-shadow">
                   <li className="active">My Documents</li>
                   <li onClick={navigateToSharedDocuments}>Shared Documents</li>
                 </ul>
-              </div>
-              <div className="tab-element">
-                {/*============== Search Start ==============*/}
-                <div className="woo-filter-bar full-row px-3 py-4 box-shadow grid-search rounded">
-                  <div className="container-fluid v-center">
-                    <div className="row">
-                      <div className="col px-0">
-                        <form noValidate>
-                          <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
-                            <div className="col-lg-4 col-xl-3 col-md-4">
-                              <InputControl
-                                lblClass="mb-0"
-                                lblText="Search Name"
-                                name="txtkeyword"
-                                ctlType={formCtrlTypes.searchkeyword}
-                                value={searchFormData.txtkeyword}
-                                onChange={handleChange}
-                                formErrors={formErrors}
-                              ></InputControl>
-                            </div>
-                            {/* <div className="col-lg-3 col-xl-2 col-md-4">
+                <div className="tab-element">
+                  {/*============== Search Start ==============*/}
+                  <GridFiltersPanel
+                    divFilterControls={
+                      <div
+                        className="container-fluid v-center"
+                        id="div-filters-controls-panel"
+                      >
+                        <div className="row">
+                          <div className="col px-0">
+                            <form noValidate>
+                              <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
+                                <div className="col-lg-4 col-xl-3 col-md-4">
+                                  <InputControl
+                                    lblClass="mb-0"
+                                    lblText="Search Name"
+                                    name="txtkeyword"
+                                    ctlType={formCtrlTypes.searchkeyword}
+                                    value={searchFormData.txtkeyword}
+                                    onChange={handleChange}
+                                    formErrors={formErrors}
+                                  ></InputControl>
+                                </div>
+                                {/* <div className="col-lg-3 col-xl-2 col-md-4">
                     <AsyncSelect
                       placeHolder={
                         documentTypesList.length <= 0 &&
@@ -1299,91 +1261,139 @@ const MyDocuments = () => {
                       formErrors={formErrors}
                     ></AsyncSelect>
                   </div> */}
-                            <div className="col-lg-3 col-xl-2 col-md-4">
-                              <DateControl
-                                lblClass="mb-0"
-                                lblText="Start date"
-                                name="txtfromdate"
-                                required={false}
-                                onChange={(dt) =>
-                                  onDateChange(dt, "txtfromdate")
-                                }
-                                value={searchFormData.txtfromdate}
-                                isTime={false}
-                              ></DateControl>
-                            </div>
-                            <div className="col-lg-3 col-xl-2 col-md-4">
-                              <DateControl
-                                lblClass="mb-0"
-                                lblText="End date"
-                                name="txttodate"
-                                required={false}
-                                onChange={(dt) => onDateChange(dt, "txttodate")}
-                                value={searchFormData.txttodate}
-                                isTime={false}
-                                objProps={{
-                                  checkVal: searchFormData.txtfromdate,
-                                }}
-                              ></DateControl>
-                            </div>
-                            <div className="col-lg-6 col-xl-5 col-md-7 grid-search-action">
-                              <label
-                                className="mb-0 form-error w-100"
-                                id="search-val-err-message"
-                              ></label>
-                              <button
-                                className="btn btn-primary w- 100"
-                                value="Search"
-                                name="btnsearch"
-                                type="button"
-                                onClick={onSearch}
-                              >
-                                Search
-                              </button>
-                              <button
-                                className="btn btn-primary w- 100"
-                                value="Show all"
-                                name="btnshowall"
-                                type="button"
-                                onClick={onShowAll}
-                              >
-                                Show All
-                              </button>
-                            </div>
+                                <div className="col-lg-3 col-xl-2 col-md-4">
+                                  <DateControl
+                                    lblClass="mb-0"
+                                    lblText="Start date"
+                                    name="txtfromdate"
+                                    required={false}
+                                    onChange={(dt) =>
+                                      onDateChange(dt, "txtfromdate")
+                                    }
+                                    value={searchFormData.txtfromdate}
+                                    isTime={false}
+                                  ></DateControl>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-4">
+                                  <DateControl
+                                    lblClass="mb-0"
+                                    lblText="End date"
+                                    name="txttodate"
+                                    required={false}
+                                    onChange={(dt) =>
+                                      onDateChange(dt, "txttodate")
+                                    }
+                                    value={searchFormData.txttodate}
+                                    isTime={false}
+                                    objProps={{
+                                      checkVal: searchFormData.txtfromdate,
+                                    }}
+                                  ></DateControl>
+                                </div>
+                                <div className="col-lg-6 col-xl-5 col-md-7 grid-search-action">
+                                  <label
+                                    className="mb-0 form-error w-100"
+                                    id="search-val-err-message"
+                                  ></label>
+                                  <button
+                                    className="btn btn-primary w- 100"
+                                    value="Search"
+                                    name="btnsearch"
+                                    type="button"
+                                    onClick={onSearch}
+                                  >
+                                    Search
+                                  </button>
+                                  <button
+                                    className="btn btn-primary w- 100"
+                                    value="Show all"
+                                    name="btnshowall"
+                                    type="button"
+                                    onClick={onShowAll}
+                                  >
+                                    Show All
+                                  </button>
+                                </div>
+                              </div>
+                            </form>
                           </div>
-                        </form>
+                        </div>
+                      </div>
+                    }
+                    elementsContent={
+                      <>
+                        <li
+                          className="mixitup-control mixitup-control-active shadow mx-10 mb-20 px-15 font-small font-400 bg-primary text-white btn-glow dropdown"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#dropdownMenuButton"
+                          aria-controls="dropdownMenuButton"
+                          aria-expanded="false"
+                        >
+                          <i className="icons icon-plus position-relative pe-1 t-1"></i>{" "}
+                          New Document
+                          <ul
+                            className={`ddmenu arrow collapse in bg-white py-0 px-0 lh-1 shadow rounded text-primary`}
+                            id="dropdownMenuButton"
+                          >
+                            <li>
+                              <a
+                                className="dropdown-item text-left"
+                                onClick={onAdd}
+                              >
+                                <i className="mdi mdi-folder-plus font-22 position-relative me-1 t-4"></i>{" "}
+                                New Folder
+                              </a>
+                            </li>
+                            <li>
+                              <a
+                                className="dropdown-item text-left"
+                                onClick={onFileUpload}
+                              >
+                                <i className="fa fa-file-arrow-up font-18 position-relative me-2 t-1 pl-5"></i>{" "}
+                                File Upload
+                              </a>
+                            </li>
+                            {/* <div className="dropdown-divider" />
+                      <li>
+                        <a className="dropdown-item">
+                          <i className="mdi mdi-folder-upload font-22 position-relative me-1 t-3"></i>{" "}
+                          Folder Upload
+                        </a>
+                      </li> */}
+                          </ul>
+                        </li>
+                      </>
+                    }
+                  ></GridFiltersPanel>
+                  {/*============== Search End ==============*/}
+
+                  {/*============== Grid Start ==============*/}
+                  <div className="row rounded">
+                    <div className="col">
+                      <div className="dashboard-panel border bg-white rounded overflow-hidden w-100 box-shadow">
+                        <Grid
+                          columns={columns}
+                          data={documentsData}
+                          loading={isDataLoading}
+                          fetchData={fetchData}
+                          pageCount={pageCount}
+                          totalInfo={{
+                            text: "Total Documents",
+                            count: totalCount,
+                          }}
+                          noData={AppMessages.NoDocuments}
+                          getSubRows={(row) => {
+                            return row.Documents || [];
+                          }}
+                          onRowDoubleClick={onGridDoubleClick}
+                          rowHover={true}
+                          trClass="cur-pointer"
+                        />
                       </div>
                     </div>
                   </div>
+                  {/*============== Grid End ==============*/}
                 </div>
-                {/*============== Search End ==============*/}
-
-                {/*============== Grid Start ==============*/}
-                <div className="row rounded">
-                  <div className="col">
-                    <div className="dashboard-panel border bg-white rounded overflow-hidden w-100 box-shadow">
-                      <Grid
-                        columns={columns}
-                        data={documentsData}
-                        loading={isDataLoading}
-                        fetchData={fetchData}
-                        pageCount={pageCount}
-                        totalInfo={{
-                          text: "Total Documents",
-                          count: totalCount,
-                        }}
-                        noData={AppMessages.NoDocuments}
-                        getSubRows={(row) => {
-                          return row.Documents || [];
-                        }}
-                        onRowDoubleClick={onGridDoubleClick}
-                        rowHover={true}
-                        trClass="cur-pointer"
-                      />
-                    </div>
-                  </div>
-                </div>
-                {/*============== Grid End ==============*/}
               </div>
             </div>
           </div>

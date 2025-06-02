@@ -35,6 +35,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 import PdfViewer from "../../../components/common/PdfViewer";
 import { useDocSharedTypesGateway } from "../../../hooks/useDocSharedTypesGateway";
+import GridFiltersPanel from "../../../components/common/GridFiltersPanel";
 
 const MyDocuments = () => {
   let $ = window.$;
@@ -609,156 +610,161 @@ const MyDocuments = () => {
   return (
     <div key={reloadKey}>
       {SetPageLoaderNavLinks()}
-      <div className="full-row bg-light">
+      <div className="full-row bg-light content-ph">
         <div className="container">
           <div className="row">
             <div className="col-12">
-              <div className="row">
-                <div className="col-8">
-                  <div className="breadcrumb">
-                    <h6 className="mb-3 down-line pb-10">Shared Documents</h6>
-                  </div>
-                </div>
+              <div className="breadcrumb my-1">
+                <h6 className="mb-3 down-line pb-10">Shared Documents</h6>
               </div>
               <div className="tabw100 tab-action shadow rounded bg-white">
                 <ul className="nav-tab-line list-color-secondary d-table mb-0 d-flex box-shadow">
                   <li onClick={navigateToMyDocuments}>My Documents</li>
                   <li className="active">Shared Documents</li>
                 </ul>
-              </div>
-              <div className="tab-element">
-                {/*============== Search Start ==============*/}
-                <div className="woo-filter-bar full-row px-3 py-4 box-shadow grid-search rounded">
-                  <div className="container-fluid v-center">
-                    <div className="row">
-                      <div className="col px-0">
-                        <form noValidate>
-                          <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
-                            <div className="col-lg-3 col-xl-3 col-md-4">
-                              <InputControl
-                                lblClass="mb-0"
-                                lblText="Search Name"
-                                name="txtkeyword"
-                                ctlType={formCtrlTypes.searchkeyword}
-                                value={searchFormData.txtkeyword}
-                                onChange={handleChange}
-                                formErrors={formErrors}
-                              ></InputControl>
-                            </div>
-                            <div className="col-lg-3 col-xl-2 col-md-4">
-                              <AsyncSelect
-                                placeHolder={
-                                  docSharedTypes.length <= 0 &&
-                                  searchFormData.ddlsharedtype == null
-                                    ? AppMessages.DdLLoading
-                                    : AppMessages.DdlDefaultSelect
-                                }
-                                noData={
-                                  docSharedTypes.length <= 0 &&
-                                  searchFormData.ddlsharedtype == null
-                                    ? AppMessages.DdLLoading
-                                    : AppMessages.DdlNoData
-                                }
-                                options={docSharedTypes}
-                                dataKey="Id"
-                                dataVal="Type"
-                                onChange={(e) => ddlChange(e, "ddlsharedtype")}
-                                value={searchFormData.ddlsharedtype}
-                                name="ddlsharedtype"
-                                lbl={formCtrlTypes.sharedtype}
-                                lblClass="mb-0"
-                                lblText="Share type"
-                                className="ddlborder"
-                                isClearable={false}
-                                isSearchCtl={true}
-                                formErrors={formErrors}
-                              ></AsyncSelect>
-                            </div>
-                            <div className="col-lg-3 col-xl-2 col-md-4">
-                              <DateControl
-                                lblClass="mb-0"
-                                lblText="Start date"
-                                name="txtfromdate"
-                                required={false}
-                                onChange={(dt) =>
-                                  onDateChange(dt, "txtfromdate")
-                                }
-                                value={searchFormData.txtfromdate}
-                                isTime={false}
-                              ></DateControl>
-                            </div>
-                            <div className="col-lg-3 col-xl-2 col-md-4">
-                              <DateControl
-                                lblClass="mb-0"
-                                lblText="End date"
-                                name="txttodate"
-                                required={false}
-                                onChange={(dt) => onDateChange(dt, "txttodate")}
-                                value={searchFormData.txttodate}
-                                isTime={false}
-                                objProps={{
-                                  checkVal: searchFormData.txtfromdate,
-                                }}
-                              ></DateControl>
-                            </div>
-                            <div className="col-lg-4 col-xl-3 col-md-6 grid-search-action">
-                              <label
-                                className="mb-0 form-error w-100"
-                                id="search-val-err-message"
-                              ></label>
-                              <button
-                                className="btn btn-primary w- 100"
-                                value="Search"
-                                name="btnsearch"
-                                type="button"
-                                onClick={onSearch}
-                              >
-                                Search
-                              </button>
-                              <button
-                                className="btn btn-primary w- 100"
-                                value="Show all"
-                                name="btnshowall"
-                                type="button"
-                                onClick={onShowAll}
-                              >
-                                Show All
-                              </button>
-                            </div>
+                <div className="tab-element">
+                  {/*============== Search Start ==============*/}
+                  <GridFiltersPanel
+                    divFilterControls={
+                      <div
+                        className="container-fluid v-center"
+                        id="div-filters-controls-panel"
+                      >
+                        <div className="row">
+                          <div className="col px-0">
+                            <form noValidate>
+                              <div className="row row-cols-lg- 6 row-cols-md- 4 row-cols- 1 g-3 div-search">
+                                <div className="col-lg-3 col-xl-3 col-md-4">
+                                  <InputControl
+                                    lblClass="mb-0"
+                                    lblText="Search Name"
+                                    name="txtkeyword"
+                                    ctlType={formCtrlTypes.searchkeyword}
+                                    value={searchFormData.txtkeyword}
+                                    onChange={handleChange}
+                                    formErrors={formErrors}
+                                  ></InputControl>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-4">
+                                  <AsyncSelect
+                                    placeHolder={
+                                      docSharedTypes.length <= 0 &&
+                                      searchFormData.ddlsharedtype == null
+                                        ? AppMessages.DdLLoading
+                                        : AppMessages.DdlDefaultSelect
+                                    }
+                                    noData={
+                                      docSharedTypes.length <= 0 &&
+                                      searchFormData.ddlsharedtype == null
+                                        ? AppMessages.DdLLoading
+                                        : AppMessages.DdlNoData
+                                    }
+                                    options={docSharedTypes}
+                                    dataKey="Id"
+                                    dataVal="Type"
+                                    onChange={(e) =>
+                                      ddlChange(e, "ddlsharedtype")
+                                    }
+                                    value={searchFormData.ddlsharedtype}
+                                    name="ddlsharedtype"
+                                    lbl={formCtrlTypes.sharedtype}
+                                    lblClass="mb-0"
+                                    lblText="Share type"
+                                    className="ddlborder"
+                                    isClearable={false}
+                                    isSearchCtl={true}
+                                    formErrors={formErrors}
+                                  ></AsyncSelect>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-4">
+                                  <DateControl
+                                    lblClass="mb-0"
+                                    lblText="Start date"
+                                    name="txtfromdate"
+                                    required={false}
+                                    onChange={(dt) =>
+                                      onDateChange(dt, "txtfromdate")
+                                    }
+                                    value={searchFormData.txtfromdate}
+                                    isTime={false}
+                                  ></DateControl>
+                                </div>
+                                <div className="col-lg-3 col-xl-2 col-md-4">
+                                  <DateControl
+                                    lblClass="mb-0"
+                                    lblText="End date"
+                                    name="txttodate"
+                                    required={false}
+                                    onChange={(dt) =>
+                                      onDateChange(dt, "txttodate")
+                                    }
+                                    value={searchFormData.txttodate}
+                                    isTime={false}
+                                    objProps={{
+                                      checkVal: searchFormData.txtfromdate,
+                                    }}
+                                  ></DateControl>
+                                </div>
+                                <div className="col-lg-4 col-xl-3 col-md-6 grid-search-action">
+                                  <label
+                                    className="mb-0 form-error w-100"
+                                    id="search-val-err-message"
+                                  ></label>
+                                  <button
+                                    className="btn btn-primary w- 100"
+                                    value="Search"
+                                    name="btnsearch"
+                                    type="button"
+                                    onClick={onSearch}
+                                  >
+                                    Search
+                                  </button>
+                                  <button
+                                    className="btn btn-primary w- 100"
+                                    value="Show all"
+                                    name="btnshowall"
+                                    type="button"
+                                    onClick={onShowAll}
+                                  >
+                                    Show All
+                                  </button>
+                                </div>
+                              </div>
+                            </form>
                           </div>
-                        </form>
+                        </div>
+                      </div>
+                    }
+                  ></GridFiltersPanel>
+                  {/*============== Search End ==============*/}
+
+                  {/*============== Grid Start ==============*/}
+                  <div className="row rounded">
+                    <div className="col">
+                      <div className="dashboard-panel border bg-white rounded overflow-hidden w-100 box-shadow">
+                        <Grid
+                          columns={columns}
+                          data={documentsData}
+                          loading={isDataLoading}
+                          fetchData={fetchData}
+                          pageCount={pageCount}
+                          totalInfo={{
+                            text: "Total Documents",
+                            count: totalCount,
+                          }}
+                          noData={AppMessages.NoDocuments}
+                          getSubRows={(row) => {
+                            return row.Documents || [];
+                          }}
+                          onRowDoubleClick={onGridDoubleClick}
+                          rowHover={true}
+                          trClass="cur-pointer"
+                        />
                       </div>
                     </div>
                   </div>
+                  {/*============== Grid End ==============*/}
                 </div>
-                {/*============== Search End ==============*/}
-
-                {/*============== Grid Start ==============*/}
-                <div className="row rounded">
-                  <div className="col">
-                    <div className="dashboard-panel border bg-white rounded overflow-hidden w-100 box-shadow">
-                      <Grid
-                        columns={columns}
-                        data={documentsData}
-                        loading={isDataLoading}
-                        fetchData={fetchData}
-                        pageCount={pageCount}
-                        totalInfo={{
-                          text: "Total Documents",
-                          count: totalCount,
-                        }}
-                        noData={AppMessages.NoDocuments}
-                        getSubRows={(row) => {
-                          return row.Documents || [];
-                        }}
-                        onRowDoubleClick={onGridDoubleClick}
-                        rowHover={true}
-                        trClass="cur-pointer"
-                      />
-                    </div>
-                  </div>
-                </div>
-                {/*============== Grid End ==============*/}
               </div>
             </div>
           </div>

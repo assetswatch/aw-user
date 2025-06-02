@@ -410,17 +410,17 @@ const Register = () => {
       {/*============== Page title End ==============*/}
 
       {/*============== Register Form Start ==============*/}
-      <div className="full-row  bg-light">
+      <div className="full-row pt-4 pb-5 bg-light">
         <div className="container">
           <div className="row">
             <div className="col-xl-8 col-lg-10 mx-auto">
               <div className="bg-white xs-p-20 p-30 border rounded shadow">
                 <div className="form-icon-left rounded form-boder">
-                  <h4 className="mb-4 down-line pb-10">Create New Account</h4>
+                  <h6 className="mb-4 down-line pb-10">Create New Account</h6>
                   <form noValidate onSubmit={register}>
                     <div className="row">
-                      <div className="col-md-12 mb-20 mt-10">
-                        <h5 className="down-line pb-10">Login Information</h5>
+                      <div className="col-md-12 mb-20">
+                        <h6 className="down-line pb-10">Login Information</h6>
                       </div>
                       <div className="row mb-15" tabIndex={0}>
                         {initApisLoaded &&
@@ -541,7 +541,7 @@ const Register = () => {
                         ></InputControl>
                       </div>
                       <div className="col-md-12 mb-20 mt-20">
-                        <h5 className="down-line pb-10">Contact Information</h5>
+                        <h6 className="down-line pb-10">Contact Information</h6>
                       </div>
                       <div className="col-md-6 mb-15">
                         <InputControl
@@ -780,7 +780,7 @@ const Register = () => {
                       </div>
                       <div className="col-md-12 mb-20">
                         <button
-                          className="btn btn-primary box-shadow"
+                          className="btn btn-primary btn-mini btn-glow shadow rounded"
                           name="btnregister"
                           id="btnregister"
                           type="submit"

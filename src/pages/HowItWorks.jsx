@@ -19,13 +19,13 @@ const HowItWorks = () => {
       ></PageTitle>
       {/*============== Page title End ==============*/}
       {/*============== Start ==============*/}
-      <div className="full-row bg-gray">
+      <div className="full-row pt-4 pb-5 bg-gray">
         <div className="container">
           <div className="row">
             <div className="col-lg-12 mb-5">
-              <h3 className="mb-4 text-center w-50 w-sm-100 mx-auto down-line pb-10">
+              <h4 className="mb-4 text-center w-50 w-sm-100 mx-auto down-line pb-10">
                 Our Motivation
-              </h3>
+              </h4>
               <span className="text-secondary w-75 d-table text-center w-sm-100 mx-auto pb-4">
                 We are making a transparent platform or bridge between Owner,
                 Agent, and Tenant. Easy and hassle-free property management
@@ -41,9 +41,9 @@ const HowItWorks = () => {
           </div>
           <div className="row">
             <div className="col-lg-12 mb-5">
-              <h3 className="mb-4 text-center w-50 w-sm-100 mx-auto down-line pb-10">
+              <h4 className="mb-4 text-center w-50 w-sm-100 mx-auto down-line pb-10">
                 Quick Overview of AssetsWatch
-              </h3>
+              </h4>
               <span className="text-secondary w-75 d-table text-center w-sm-100 mx-auto pb-4">
                 Have a quick overview of the application to understand more.
               </span>

@@ -22,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import PdfViewer from "../../../components/common/PdfViewer";
 import DataLoader from "../../../components/common/DataLoader";
 import { generateInvoicePDF } from "../../../utils/pdfhelper";
+import GoBackPanel from "../../../components/common/GoBackPanel";
 
 const ViewReceipt = () => {
   let $ = window.$;
@@ -130,76 +131,107 @@ const ViewReceipt = () => {
   return (
     <>
       {SetPageLoaderNavLinks()}
-      <div className="full-row  bg-light">
+      <div className="full-row  bg-light content-ph">
         <div className="container">
-          <div className="row mx-auto col-md-12 col-lg-10 shadow">
-            <div className="bg-white xs-p-20 p-30 pb-30 border rounded">
-              <div className="row">
-                <div className="col-md-6 mb-15">
-                  <h6 className="mb-2 down-line pb-10">
-                    Invoice#: {invoiceDetails?.InvoiceNumber}
-                  </h6>
-                </div>
-                <div className="col-md-6 mb-15 text-md-end">
-                  {" "}
-                  <span className="font-500 font-general">
-                    Received On : {recieverUserDetails[0]?.SentDateDisplay}
-                  </span>
-                </div>
-                <div className="col-md-4 col-lg-4 col-xl-4 mb-15">
-                  <span className="font-500 font-general">
-                    Total Due : {invoiceDetails?.TotalAmountDisplay}
-                  </span>
-                </div>
-                <div className="col-md-4 col-lg-4 col-xl-4 mb-15 text-md-center">
-                  {" "}
-                  <span className="font-500 font-general">
-                    Date On : {invoiceDetails?.BillDateDisplay}
-                  </span>
-                </div>
-                <div className="col-md-4 col-lg-4 col-xl-4 mb-15 text-md-end">
-                  <span className="font-500 font-general">
-                    Due On : {invoiceDetails?.DueDateDisplay}
-                  </span>
-                </div>
-              </div>
-              <div className="container-fluid">
-                <div className="row">
-                  <div className="col px-0">
-                    {fileUrl ? (
-                      <div className="min-h-300">
-                        <PdfViewer
-                          file={fileUrl}
-                          cssclass="mt-10"
-                          pageWidth={config.pdfViewerWidth.PageWidth}
-                        ></PdfViewer>
-                      </div>
-                    ) : (
-                      <DataLoader />
-                    )}
-                    {!checkEmptyVal(invoiceDetails.Message) && (
-                      <span className="font-500 font-general">
-                        Message : {invoiceDetails?.Message}
+          <div className="row">
+            <div className="col-12">
+              <div className="d-flex w-100">
+                <div className="flex-grow-1">
+                  <div className="breadcrumb my-1">
+                    <div className="breadcrumb-item bc-fh">
+                      <h6
+                        className="mb-3 down-line pb-10 cur-pointer"
+                        onClick={navigateToInvoices}
+                      >
+                        Invoices
+                      </h6>
+                    </div>
+                    <div className="breadcrumb-item bc-fh ctooltip-container">
+                      <span className="font-general font-500 cur-default">
+                        View Receipt
                       </span>
-                    )}
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="container-fluid">
-                <hr className="text-primary my-20 row"></hr>
-                <div className="row form-action flex-center">
-                  <div
-                    className="col-md-6 px-0 form-error"
-                    id="form-error"
-                  ></div>
-                  <div className="col-md-6 px-0">
-                    <button
-                      className="btn btn-secondary"
-                      id="btnCancel"
-                      onClick={onCancel}
-                    >
-                      Back
-                    </button>
+              <div className="row mx-auto col-md-12 col-lg-10 shadow">
+                <div className="bg-white xs-p-20 px-30 py-20 pb-30 border rounded">
+                  <div className="row">
+                    <div className="d-flex w-100">
+                      <div className="flex-grow-1">
+                        <h6 className="mb-3 down-line pb-10 px-0 font-16">
+                          Invoice#: {invoiceDetails?.InvoiceNumber}
+                        </h6>
+                      </div>
+                      <GoBackPanel
+                        clickAction={navigateToInvoices}
+                        isformBack={true}
+                      />
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-md-6 mb-15 text-md-end">
+                      {" "}
+                      <span className="font-500 font-general">
+                        Received On : {recieverUserDetails[0]?.SentDateDisplay}
+                      </span>
+                    </div>
+                    <div className="col-md-4 col-lg-4 col-xl-4 mb-15">
+                      <span className="font-500 font-general">
+                        Total Due : {invoiceDetails?.TotalAmountDisplay}
+                      </span>
+                    </div>
+                    <div className="col-md-4 col-lg-4 col-xl-4 mb-15 text-md-center">
+                      {" "}
+                      <span className="font-500 font-general">
+                        Date On : {invoiceDetails?.BillDateDisplay}
+                      </span>
+                    </div>
+                    <div className="col-md-4 col-lg-4 col-xl-4 mb-15 text-md-end">
+                      <span className="font-500 font-general">
+                        Due On : {invoiceDetails?.DueDateDisplay}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="container-fluid">
+                    <div className="row">
+                      <div className="col px-0">
+                        {fileUrl ? (
+                          <div className="min-h-300">
+                            <PdfViewer
+                              file={fileUrl}
+                              cssclass="mt-10"
+                              pageWidth={config.pdfViewerWidth.PageWidth}
+                            ></PdfViewer>
+                          </div>
+                        ) : (
+                          <DataLoader />
+                        )}
+                        {!checkEmptyVal(invoiceDetails.Message) && (
+                          <span className="font-500 font-general">
+                            Message : {invoiceDetails?.Message}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="container-fluid">
+                    <hr className="text-primary my-20 row"></hr>
+                    <div className="row form-action flex-center">
+                      <div
+                        className="col-md-6 px-0 form-error"
+                        id="form-error"
+                      ></div>
+                      <div className="col-md-6 px-0">
+                        <button
+                          className="btn btn-secondary"
+                          id="btnCancel"
+                          onClick={onCancel}
+                        >
+                          Back
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

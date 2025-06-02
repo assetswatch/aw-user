@@ -26,6 +26,7 @@ import PdfViewer from "../../../components/common/PdfViewer";
 import DataLoader from "../../../components/common/DataLoader";
 import { ModalView } from "../../../components/common/LazyComponents";
 import { generateInvoicePDF } from "../../../utils/pdfhelper";
+import GoBackPanel from "../../../components/common/GoBackPanel";
 
 const ViewInvoice = () => {
   let $ = window.$;
@@ -254,108 +255,142 @@ const ViewInvoice = () => {
   return (
     <>
       {SetPageLoaderNavLinks()}
-      <div className="full-row  bg-light">
+      <div className="full-row  bg-light content-ph">
         <div className="container">
-          <div className="row mx-auto col-md-12 col-lg-10 shadow">
-            <div className="bg-white xs-p-20 p-30 pb-30 border rounded">
-              <div className="row">
-                <div className="col-md-4 col-lg-4 col-xl-4 mb-15">
-                  <h6 className="mb-2 down-line pb-10">
-                    Invoice#: {invoiceDetails?.InvoiceNumber}
-                  </h6>
-                </div>
-                <div className="col-md-4 col-lg-4 col-xl-4 mb-15 text-md-center">
-                  <span className="font-500 font-general">
-                    Date On : {invoiceDetails?.BillDateDisplay}
-                  </span>
-                </div>
-                <div className="col-md-4 col-lg-4 col-xl-4 mb-15 text-md-end">
-                  <span className="font-500 font-general">
-                    Due On : {invoiceDetails?.DueDateDisplay}
-                  </span>
+          <div className="row">
+            <div className="col-12">
+              <div className="d-flex w-100">
+                <div className="flex-grow-1">
+                  <div className="breadcrumb my-1">
+                    <div className="breadcrumb-item bc-fh">
+                      <h6
+                        className="mb-3 down-line pb-10 cur-pointer"
+                        onClick={navigateToInvoices}
+                      >
+                        Invoices
+                      </h6>
+                    </div>
+                    <div className="breadcrumb-item bc-fh ctooltip-container">
+                      <span className="font-general font-500 cur-default">
+                        Preview Invoice
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="container-fluid">
-                <div className="row">
-                  <div className="col px-0">
-                    {fileUrl ? (
-                      <div className="min-h-300">
-                        <PdfViewer
-                          file={fileUrl}
-                          cssclass="mt-10"
-                          pageWidth={config.pdfViewerWidth.PageWidth}
-                        ></PdfViewer>
+              <div className="row mx-auto col-md-12 col-lg-10 shadow">
+                <div className="bg-white xs-p-20 px-30 py-20 pb-30 border rounded">
+                  <div className="row">
+                    <div className="d-flex w-100">
+                      <div className="flex-grow-1">
+                        <h6 className="mb-3 down-line pb-10 px-0 font-16">
+                          Invoice#: {invoiceDetails?.InvoiceNumber}
+                        </h6>
                       </div>
-                    ) : (
-                      <DataLoader />
-                    )}
+                      <GoBackPanel
+                        clickAction={navigateToInvoices}
+                        isformBack={true}
+                      />
+                    </div>
                   </div>
-                  <div className="row mt-10 px-0 mx-0 flex fl ex-center">
-                    <div className="col-md-6 px-0 col-lg-6 col-xl-6 mb-15">
-                      <div className="font-500 font-general d-flex lh-1 v-center">
-                        Bill To :
-                        <div className="d-flex px-1 lh-1">
-                          <img
-                            alt=""
-                            src={invoiceDetails?.BillToUser?.PicPath}
-                            className="rounded img-border-white w-40px mx-1"
-                          />
-                        </div>
-                        <div className="pt-1 px-0">
-                          <div className="te xt-secondary">
-                            {checkEmptyVal(
-                              invoiceDetails?.BillToUser?.CompanyName
-                            )
-                              ? invoiceDetails?.BillToUser?.FirstName +
-                                " " +
-                                invoiceDetails?.BillToUser?.LastName
-                              : invoiceDetails?.BillToUser?.CompanyName}
-                            <div className="mt-0 pt-1 small text-light font-small font-400">
-                              {invoiceDetails?.BillToUser?.ProfileType}
+                  <div className="row">
+                    <div className="col-md-4 col-lg-4 col-xl-4 mb-15">
+                      <span className="font-500 font-general">
+                        Date On : {invoiceDetails?.BillDateDisplay}
+                      </span>
+                    </div>
+                    <div className="col-md-4 col-lg-4 col-xl-4 mb-15 text-md-end">
+                      <span className="font-500 font-general">
+                        Due On : {invoiceDetails?.DueDateDisplay}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="container-fluid">
+                    <div className="row">
+                      <div className="col px-0">
+                        {fileUrl ? (
+                          <div className="min-h-300">
+                            <PdfViewer
+                              file={fileUrl}
+                              cssclass="mt-10"
+                              pageWidth={config.pdfViewerWidth.PageWidth}
+                            ></PdfViewer>
+                          </div>
+                        ) : (
+                          <DataLoader />
+                        )}
+                      </div>
+                      <div className="row mt-10 px-0 mx-0 flex fl ex-center">
+                        <div className="col-md-6 px-0 col-lg-6 col-xl-6 mb-15">
+                          <div className="font-500 font-general d-flex lh-1 v-center">
+                            Bill To :
+                            <div className="d-flex px-1 lh-1">
+                              <img
+                                alt=""
+                                src={invoiceDetails?.BillToUser?.PicPath}
+                                className="rounded img-border-white w-40px mx-1"
+                              />
+                            </div>
+                            <div className="pt-1 px-0">
+                              <div className="te xt-secondary">
+                                {checkEmptyVal(
+                                  invoiceDetails?.BillToUser?.CompanyName
+                                )
+                                  ? invoiceDetails?.BillToUser?.FirstName +
+                                    " " +
+                                    invoiceDetails?.BillToUser?.LastName
+                                  : invoiceDetails?.BillToUser?.CompanyName}
+                                <div className="mt-0 pt-1 small text-light font-small font-400">
+                                  {invoiceDetails?.BillToUser?.ProfileType}
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
+                        {!checkEmptyVal(invoiceDetails.Message) && (
+                          <div className="col-md-6 px-0 col-lg-6 col-xl-6 mb-15 text-md-end pt-10">
+                            <span className="font-500 font-general">
+                              Message : {invoiceDetails?.Message}
+                            </span>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                    {!checkEmptyVal(invoiceDetails.Message) && (
-                      <div className="col-md-6 px-0 col-lg-6 col-xl-6 mb-15 text-md-end pt-10">
-                        <span className="font-500 font-general">
-                          Message : {invoiceDetails?.Message}
-                        </span>
+                      <hr className="w-100 text-primary mb-20 px-0 mx-0 mt-10"></hr>
+                      <div className="row form-action d-flex flex-center px-0 mx-0 my-15">
+                        <div
+                          className="col-md-6 form-error"
+                          id="form-error"
+                        ></div>
+                        <div className="col-md-6  px-0">
+                          <button
+                            className="btn btn-secondary"
+                            id="btncancel"
+                            onClick={(e) => {
+                              onCancel(e);
+                            }}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            className="btn btn-primary"
+                            id="btnsave"
+                            onClick={(e) => {
+                              onSendInvoice(e, 0);
+                            }}
+                          >
+                            Save
+                          </button>
+                          <button
+                            className="btn btn-primary"
+                            id="btnsend"
+                            onClick={(e) => {
+                              onSendInvoice(e, 1);
+                            }}
+                          >
+                            Save & Send
+                          </button>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                  <hr className="w-100 text-primary mb-20 px-0 mx-0 mt-10"></hr>
-                  <div className="row form-action d-flex flex-center px-0 mx-0 my-15">
-                    <div className="col-md-6 form-error" id="form-error"></div>
-                    <div className="col-md-6  px-0">
-                      <button
-                        className="btn btn-secondary"
-                        id="btncancel"
-                        onClick={(e) => {
-                          onCancel(e);
-                        }}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        className="btn btn-primary"
-                        id="btnsave"
-                        onClick={(e) => {
-                          onSendInvoice(e, 0);
-                        }}
-                      >
-                        Save
-                      </button>
-                      <button
-                        className="btn btn-primary"
-                        id="btnsend"
-                        onClick={(e) => {
-                          onSendInvoice(e, 1);
-                        }}
-                      >
-                        Save & Send
-                      </button>
                     </div>
                   </div>
                 </div>

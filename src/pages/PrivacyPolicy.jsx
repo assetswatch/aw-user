@@ -13,7 +13,7 @@ const PrivacyPolicy = () => {
       ></PageTitle>
       {/*============== Page title End ==============*/}
 
-      <div className="full-row">
+      <div className="full-row pt-4 pb-5">
         <div className="container">
           <div className="p-0">
             <h6 className="text-primary">

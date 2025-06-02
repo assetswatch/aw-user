@@ -328,7 +328,7 @@ const Home = () => {
           className="overflow-hidden"
           style={{
             width: 1200,
-            height: 660,
+            height: 600,
             margin: "0 auto",
             marginBottom: 0,
           }}
@@ -386,9 +386,9 @@ const Home = () => {
           <div className="row mb-4 align-items-center">
             <div className="col-md-8">
               <div className="me-auto">
-                <h3 className="d-table mb-1 down-line pb-10">
+                <h4 className="d-table mb-1 down-line pb-10">
                   Recent Properties
-                </h3>
+                </h4>
                 <span className="d-table sub-ti tle text-primary sup">
                   Be the First to See Our Latest Properties!
                 </span>
@@ -601,9 +601,9 @@ const Home = () => {
         <div className="container">
           <div className="row">
             <div className="col">
-              <h3 className="main-title w-50 mx-auto mb-4 text-center w-sm-100 base-line">
+              <h4 className="main-title w-50 mx-auto mb-4 text-center w-sm-100 base-line">
                 What are you looking for?
-              </h3>
+              </h4>
             </div>
           </div>
           <div className="row row-cols-xl-4 row-cols-sm-2 row-cols-1 gy-5">
@@ -714,9 +714,9 @@ const Home = () => {
           <div className="row mb-4 align-items-center">
             <div className="col-md-8">
               <div className="me-auto">
-                <h3 className="d-table mb-4 down-line pb-10">
+                <h4 className="d-table mb-4 down-line pb-10">
                   Our Listed Property Agents
-                </h3>
+                </h4>
                 <span className="d-table sub-title text-primary">
                   Our listed property agetns.
                 </span>
@@ -908,9 +908,9 @@ const Home = () => {
         <div className="container">
           <div className="row">
             <div className="col-lg-12 mb-5">
-              <h3 className="mb-4 text-center text-primary w-50 w-sm-100 mx-auto down-line pb-10">
+              <h4 className="mb-4 text-center text-primary w-50 w-sm-100 mx-auto down-line pb-10">
                 Partners
-              </h3>
+              </h4>
               <span className="text-secondary w-75 d-table text-center w-sm-100 mx-auto pb-4">
                 Our platform integrates seamlessly with best-in-class
                 third-party providers to streamline your operations. From secure
@@ -1017,12 +1017,12 @@ const Home = () => {
           <div className="container-fluid">
             <div className="row">
               <div className="col mb-3">
-                <h3 className="mb-3 text-center text-primary w-50 w-sm-100 mx-auto">
+                <h4 className="mb-3 text-center text-primary w-50 w-sm-100 mx-auto">
                   Testimonials
-                </h3>
-                <h4 className="down-line pb-15 w-50 mx-auto mb-3 text-center w-sm-100">
-                  What Client Says About Us
                 </h4>
+                <h5 className="down-line pb-15 w-50 mx-auto mb-3 text-center w-sm-100">
+                  What Client Says About Us
+                </h5>
               </div>
             </div>
             <div className="row justify-content-center">

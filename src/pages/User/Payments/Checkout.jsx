@@ -30,6 +30,7 @@ import {
   getsessionStorageItem,
 } from "../../../helpers/sessionStorageHelper";
 import { Toast } from "../../../components/common/ToastView";
+import GoBackPanel from "../../../components/common/GoBackPanel";
 
 const Checkout = () => {
   let $ = window.$;
@@ -706,158 +707,662 @@ const Checkout = () => {
   return (
     <>
       {SetPageLoaderNavLinks()}
-      <div className="full-row bg-light">
+      <div className="full-row bg-light content-ph">
         <div className="container">
           <div className="row">
-            <input name="txtdummyfocus" className="lh-0 h-0 p-0 bo-0"></input>
-            <div className="mx-auto col-md-12 col-xl-10">
-              {checkObjNullorEmpty(paymentResponse) ? (
-                <>
-                  <div className="row">
-                    <div className="col-6">
-                      <div className="breadcrumb mb-0">
-                        <div className="breadcrumb-item bc-fh">
-                          <h6 className="mb-3 down-line pb-10">Invoices</h6>
-                        </div>
-                        <div className="breadcrumb-item bc-fh ctooltip-container">
-                          <label className="font-general font-500 cur-default">
-                            Checkout
-                          </label>
-                        </div>
-                      </div>
+            <div className="col-12">
+              <div className="d-flex w-100">
+                <div className="flex-grow-1">
+                  <div className="breadcrumb my-1">
+                    <div className="breadcrumb-item bc-fh">
+                      <h6
+                        className="mb-3 down-line pb-10 cur-pointer"
+                        onClick={navigateToInvoices}
+                      >
+                        Invoices
+                      </h6>
                     </div>
-                    <div className="col-6 d-flex justify-content-end align-items-end pb-10"></div>
+                    <div className="breadcrumb-item bc-fh ctooltip-container">
+                      <span className="font-general font-500 cur-default">
+                        Checkout
+                      </span>
+                    </div>
                   </div>
-                  {!showPaymentSummary ? (
-                    <div className="row">
-                      <div className="col-xl-4 col-lg-4 order-1 order-lg-2">
-                        <div className="widget bg-white box-shadow rounded px-0 mb-20">
-                          <h6 className="mb-3 down-line pb-10 px-20 down-line-mx20">
-                            Payment Summary
-                          </h6>
-                          {!checkObjNullorEmpty(invoiceDetails) && (
-                            <div className="px-20">
-                              <div className="post-content pb-0">
-                                <div className="row listing-location mb-2 font-general font-500">
-                                  <span className="col text-left">
-                                    Invoice#: {invoiceDetails.InvoiceNumber}
-                                  </span>
-                                </div>
-                                <div className="row listing-location mb-2 font-general font-500">
-                                  <span className="col text-left">Amount</span>
-                                  <span className="col text-right">
-                                    {!showEditAmount ? (
+                </div>
+                <GoBackPanel clickAction={navigateToInvoices} />
+                <input
+                  name="txtdummyfocus"
+                  className="lh-0 h-0 p-0 bo-0 w-0"
+                ></input>
+              </div>
+              <div className="mx-auto col-12">
+                {checkObjNullorEmpty(paymentResponse) ? (
+                  <>
+                    {!showPaymentSummary ? (
+                      <div className="row">
+                        <div className="col-xl-4 col-lg-4 order-1 order-lg-2">
+                          <div className="widget bg-white box-shadow rounded px-0 mb-20">
+                            <h6 className="mb-3 down-line pb-10 px-20 down-line-mx20">
+                              Payment Summary
+                            </h6>
+                            {!checkObjNullorEmpty(invoiceDetails) && (
+                              <div className="px-20">
+                                <div className="post-content pb-0">
+                                  <div className="row listing-location mb-2 font-general font-500">
+                                    <span className="col text-left">
+                                      Invoice#: {invoiceDetails.InvoiceNumber}
+                                    </span>
+                                  </div>
+                                  <div className="row listing-location mb-2 font-general font-500">
+                                    <span className="col text-left">
+                                      Amount
+                                    </span>
+                                    <span className="col text-right">
+                                      {!showEditAmount ? (
+                                        <>
+                                          <i
+                                            className="fa fa-pen font-small text-primary px-2 cur-pointer"
+                                            onClick={(e) => toggleEditAmount(e)}
+                                          />
+                                          {!checkObjNullorEmpty(amountFormData)
+                                            ? amountFormData.TotalAmountDisplay
+                                            : invoiceDetails.PayableAmountDisplay}
+                                        </>
+                                      ) : (
+                                        <div className="d-flex grid-search">
+                                          <InputControl
+                                            lblClass="mb-0 lbl-req-field d-none"
+                                            name="txtprice"
+                                            ctlType={formCtrlTypes.amount}
+                                            required={true}
+                                            onChange={handleAmountInputChange}
+                                            value={amountFormData.TotalAmount}
+                                            inputClass="w-120px px-2 py-0 h-30px"
+                                          ></InputControl>
+                                          <i
+                                            className="fa fa-check-circle d-flex flex-center font-general text-primary px-2 cur-pointer"
+                                            onClick={(e) => onAmountChange(e)}
+                                          />
+                                          <i
+                                            className="fa fa-times-circle d-flex flex-center font-general text-error px-0 cur-pointer"
+                                            onClick={(e) =>
+                                              onCancelAmountChange(e)
+                                            }
+                                          />
+                                        </div>
+                                      )}
+                                    </span>
+                                  </div>
+                                  <div className="row listing-location mb-2 font-general font-500">
+                                    {checkObjNullorEmpty(amountFormData) ? (
                                       <>
-                                        <i
-                                          className="fa fa-pen font-small text-primary px-2 cur-pointer"
-                                          onClick={(e) => toggleEditAmount(e)}
-                                        />
-                                        {!checkObjNullorEmpty(amountFormData)
-                                          ? amountFormData.TotalAmountDisplay
-                                          : invoiceDetails.PayableAmountDisplay}
+                                        <span className="col text-left">
+                                          {selectedPaymentType.toLowerCase() ==
+                                          "creditcard" ? (
+                                            <>
+                                              CC Charges (
+                                              {
+                                                // invoiceDetails.TaxDetails
+                                                //   ?.ChargesPercentageDisplay
+                                                amountFormData?.ChargesPercentageDisplay
+                                              }
+                                              )
+                                            </>
+                                          ) : (
+                                            <>Fee</>
+                                          )}
+                                        </span>
+                                        <span className="col text-right">
+                                          {
+                                            invoiceDetails.TaxDetails
+                                              ?.ChargesAmountDisplay
+                                          }
+                                        </span>
                                       </>
                                     ) : (
-                                      <div className="d-flex grid-search">
-                                        <InputControl
-                                          lblClass="mb-0 lbl-req-field d-none"
-                                          name="txtprice"
-                                          ctlType={formCtrlTypes.amount}
-                                          required={true}
-                                          onChange={handleAmountInputChange}
-                                          value={amountFormData.TotalAmount}
-                                          inputClass="w-120px px-2 py-0 h-30px"
-                                        ></InputControl>
-                                        <i
-                                          className="fa fa-check-circle d-flex flex-center font-general text-primary px-2 cur-pointer"
-                                          onClick={(e) => onAmountChange(e)}
-                                        />
-                                        <i
-                                          className="fa fa-times-circle d-flex flex-center font-general text-error px-0 cur-pointer"
-                                          onClick={(e) =>
-                                            onCancelAmountChange(e)
-                                          }
-                                        />
-                                      </div>
+                                      <>
+                                        <span className="col text-left">
+                                          {selectedPaymentType.toLowerCase() ==
+                                          "creditcard" ? (
+                                            <>
+                                              CC Charges (
+                                              {
+                                                // invoiceDetails.TaxDetails
+                                                //   ?.ChargesPercentageDisplay
+                                                amountFormData?.ChargesPercentageDisplay
+                                              }
+                                              )
+                                            </>
+                                          ) : (
+                                            <>Fee</>
+                                          )}
+                                        </span>
+                                        <span className="col text-right">
+                                          {amountFormData?.ChargesAmountDisplay}
+                                        </span>
+                                      </>
                                     )}
-                                  </span>
+                                  </div>
+                                  <div className="row listing-location mb-2 font-general font-500">
+                                    <span className="col text-left">Tax</span>
+                                    <span className="col text-right">
+                                      {checkObjNullorEmpty(amountFormData)
+                                        ? invoiceDetails.TaxDetails?.TaxDisplay
+                                        : amountFormData?.TaxDisplay}
+                                    </span>
+                                  </div>
+                                  <hr className="w-100 text-primary my-10"></hr>
+                                  <div className="row listing-location mb-2 text-primary font-general font-500">
+                                    <span className="col text-left">
+                                      Total Amount
+                                    </span>
+                                    <span className="col text-right">
+                                      {checkObjNullorEmpty(amountFormData)
+                                        ? invoiceDetails.TaxDetails
+                                            ?.TotalPaymentAmountDisplay
+                                        : amountFormData?.TotalPaymentAmountDisplay}
+                                    </span>
+                                  </div>
                                 </div>
-                                <div className="row listing-location mb-2 font-general font-500">
-                                  {checkObjNullorEmpty(amountFormData) ? (
-                                    <>
-                                      <span className="col text-left">
-                                        {selectedPaymentType.toLowerCase() ==
-                                        "creditcard" ? (
-                                          <>
-                                            CC Charges (
-                                            {
-                                              // invoiceDetails.TaxDetails
-                                              //   ?.ChargesPercentageDisplay
-                                              amountFormData?.ChargesPercentageDisplay
-                                            }
-                                            )
-                                          </>
-                                        ) : (
-                                          <>Fee</>
-                                        )}
-                                      </span>
-                                      <span className="col text-right">
-                                        {
-                                          invoiceDetails.TaxDetails
-                                            ?.ChargesAmountDisplay
-                                        }
-                                      </span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <span className="col text-left">
-                                        {selectedPaymentType.toLowerCase() ==
-                                        "creditcard" ? (
-                                          <>
-                                            CC Charges (
-                                            {
-                                              // invoiceDetails.TaxDetails
-                                              //   ?.ChargesPercentageDisplay
-                                              amountFormData?.ChargesPercentageDisplay
-                                            }
-                                            )
-                                          </>
-                                        ) : (
-                                          <>Fee</>
-                                        )}
-                                      </span>
-                                      <span className="col text-right">
-                                        {amountFormData?.ChargesAmountDisplay}
-                                      </span>
-                                    </>
-                                  )}
-                                </div>
-                                <div className="row listing-location mb-2 font-general font-500">
-                                  <span className="col text-left">Tax</span>
-                                  <span className="col text-right">
-                                    {checkObjNullorEmpty(amountFormData)
-                                      ? invoiceDetails.TaxDetails?.TaxDisplay
-                                      : amountFormData?.TaxDisplay}
-                                  </span>
-                                </div>
-                                <hr className="w-100 text-primary my-10"></hr>
-                                <div className="row listing-location mb-2 text-primary font-general font-500">
-                                  <span className="col text-left">
-                                    Total Amount
-                                  </span>
-                                  <span className="col text-right">
-                                    {checkObjNullorEmpty(amountFormData)
-                                      ? invoiceDetails.TaxDetails
-                                          ?.TotalPaymentAmountDisplay
-                                      : amountFormData?.TotalPaymentAmountDisplay}
-                                  </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="col-xl-8 col-lg-8 order-2 order-lg-1">
+                          <form noValidate>
+                            {/*============== Carddetails Start ==============*/}
+                            <div className="full-row px-3 py-4 bg-white box-shadow rounded">
+                              <div className="container-fluid">
+                                <div className="row">
+                                  <div className="col px-0">
+                                    <h6 className="mb-3 down-line  pb-10">
+                                      Payment Type
+                                    </h6>
+                                    <div className="row my-20">
+                                      {paymentTypes.map((pt, idx) => {
+                                        return (
+                                          <div
+                                            className="col-6 text-left"
+                                            key={"ptkey-" + idx}
+                                          >
+                                            <div
+                                              className={`custom-check-box-2  text-left`}
+                                            >
+                                              <input
+                                                className="d-none"
+                                                type="radio"
+                                                value={pt.PaymentTypeId}
+                                                checked={
+                                                  selectedPaymentType ==
+                                                  pt.PaymentTypeId
+                                                }
+                                                id={"pt-" + pt.PaymentTypeId}
+                                                name="rblpaymenttype"
+                                                onChange={(e) => {
+                                                  handlePaymentTypeChange(e);
+                                                }}
+                                              />
+                                              <label
+                                                htmlFor={
+                                                  "pt-" + pt.PaymentTypeId
+                                                }
+                                                className="radio-lbl"
+                                              >
+                                                {pt.PaymentType}
+                                              </label>
+                                            </div>
+                                          </div>
+                                        );
+                                      })}
+                                      {errors?.[`rblpaymenttype`] && (
+                                        <div className="err-invalid">
+                                          {errors?.[`rblpaymenttype`]}
+                                        </div>
+                                      )}
+                                    </div>
+                                    {selectedPaymentType.toLowerCase() ==
+                                    "creditcard" ? (
+                                      <>
+                                        <h6 className="mb-3 down-line  pb-10">
+                                          Card Details
+                                        </h6>
+                                        <div className="row">
+                                          <div className="col-md-6 mb-15">
+                                            <InputControl
+                                              lblClass="mb-0 lbl-req-field"
+                                              name="txtcardnumber"
+                                              ctlType={formCtrlTypes.cardnumber}
+                                              isFocus={true}
+                                              required={true}
+                                              onChange={handleChange}
+                                              value={formData.txtcardnumber}
+                                              errors={errors}
+                                              formErrors={formErrors}
+                                              tabIndex={2}
+                                            ></InputControl>
+                                          </div>
+                                          <div className="col-md-4 mb-15">
+                                            <InputControl
+                                              lblClass="mb-0 lbl-req-field"
+                                              name="txtcardexpiry"
+                                              ctlType={
+                                                formCtrlTypes.cardexpirydate
+                                              }
+                                              required={true}
+                                              onChange={handleChange}
+                                              value={formData.txtcardexpiry}
+                                              errors={errors}
+                                              formErrors={formErrors}
+                                              tabIndex={3}
+                                            ></InputControl>
+                                          </div>
+                                          <div className="col-md-2 mb-15">
+                                            <InputControl
+                                              lblClass="mb-0 lbl-req-field"
+                                              name="txtcvv"
+                                              ctlType={formCtrlTypes.cvv}
+                                              required={true}
+                                              onChange={handleChange}
+                                              value={formData.txtcvv}
+                                              errors={errors}
+                                              formErrors={formErrors}
+                                              tabIndex={4}
+                                            ></InputControl>
+                                          </div>
+                                        </div>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <h6 className="mb-3 down-line  pb-10">
+                                          Account Details
+                                        </h6>
+                                        <div className="row">
+                                          <div className="col-md-4 mb-15">
+                                            <InputControl
+                                              lblClass="mb-0 lbl-req-field"
+                                              name="txtaccountnumber"
+                                              ctlType={formCtrlTypes.accountnum}
+                                              isFocus={true}
+                                              required={true}
+                                              onChange={handleChange}
+                                              value={formData.txtaccountnumber}
+                                              errors={errors}
+                                              formErrors={formErrors}
+                                              tabIndex={2}
+                                            ></InputControl>
+                                          </div>
+                                          <div className="col-md-4 mb-15">
+                                            <InputControl
+                                              lblClass="mb-0 lbl-req-field"
+                                              name="txtroutingnumber"
+                                              ctlType={formCtrlTypes.routingnum}
+                                              required={true}
+                                              onChange={handleChange}
+                                              value={formData.txtroutingnumber}
+                                              errors={errors}
+                                              formErrors={formErrors}
+                                              tabIndex={3}
+                                            ></InputControl>
+                                          </div>
+                                          <div className="col-md-4 mb-15">
+                                            <AsyncSelect
+                                              placeHolder={
+                                                AppMessages.DdlDefaultSelect
+                                              }
+                                              noData={AppMessages.NoData}
+                                              options={accountTypes}
+                                              onChange={handleAccountTypeChange}
+                                              value={accountTypeSelected.Id}
+                                              defualtselected={
+                                                accountTypeSelected.Id
+                                              }
+                                              name="ddlaccounttypes"
+                                              lbl={formCtrlTypes.accounttype}
+                                              lblClass="mb-0 lbl-req-field"
+                                              required={true}
+                                              isClearable={false}
+                                              isSearchable={false}
+                                              errors={errors}
+                                              formErrors={formErrors}
+                                              tabIndex={4}
+                                            ></AsyncSelect>
+                                          </div>
+                                        </div>
+                                      </>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          )}
+                            {/*============== Carddetails End ==============*/}
+
+                            {/*============== Contactdetails Start ==============*/}
+                            <div className="full-row px-3 py-4 mt-20 bg-white box-shadow rounded">
+                              <div className="container-fluid">
+                                <div className="row">
+                                  <div className="col px-0">
+                                    <h6 className="mb-3 down-line  pb-10">
+                                      Billing Details
+                                    </h6>
+                                    <div className="row">
+                                      <div className="col-md-6 mb-15">
+                                        <InputControl
+                                          lblClass="mb-0 lbl-req-field"
+                                          name="txtfirstname"
+                                          ctlType={formCtrlTypes.fname}
+                                          required={true}
+                                          onChange={handleChange}
+                                          value={formData.txtfirstname}
+                                          errors={errors}
+                                          formErrors={formErrors}
+                                          tabIndex={5}
+                                        ></InputControl>
+                                      </div>
+                                      <div className="col-md-6 mb-15">
+                                        <InputControl
+                                          lblClass="mb-0 lbl-req-field"
+                                          name="txtlastname"
+                                          ctlType={formCtrlTypes.lname}
+                                          required={true}
+                                          onChange={handleChange}
+                                          value={formData.txtlastname}
+                                          errors={errors}
+                                          formErrors={formErrors}
+                                          tabIndex={6}
+                                        ></InputControl>
+                                      </div>
+                                      <div className="col-md-12 mb-15">
+                                        <InputControl
+                                          lblClass="mb-0 lbl-req-field"
+                                          name="txtemail"
+                                          ctlType={formCtrlTypes.email}
+                                          required={true}
+                                          onChange={handleChange}
+                                          value={formData.txtemail}
+                                          errors={errors}
+                                          formErrors={formErrors}
+                                          tabIndex={7}
+                                        ></InputControl>
+                                      </div>
+                                      <div className="col-md-6 mb-15">
+                                        <InputControl
+                                          lblClass="mb-0 lbl-req-field"
+                                          name="txtaddressone"
+                                          ctlType={formCtrlTypes.addressone}
+                                          required={true}
+                                          onChange={handleChange}
+                                          value={formData.txtaddressone}
+                                          errors={errors}
+                                          formErrors={formErrors}
+                                          tabIndex={8}
+                                        ></InputControl>
+                                      </div>
+                                      <div className="col-md-6 mb-15">
+                                        <InputControl
+                                          lblClass="mb-0"
+                                          name="txtaddresstwo"
+                                          ctlType={formCtrlTypes.addresstwo}
+                                          onChange={handleChange}
+                                          value={formData.txtaddresstwo}
+                                          errors={errors}
+                                          formErrors={formErrors}
+                                          tabIndex={9}
+                                        ></InputControl>
+                                      </div>
+                                      {initApisLoaded && (
+                                        <>
+                                          <div className="col-md-6 mb-15">
+                                            <AsyncSelect
+                                              placeHolder={
+                                                countriesData.length <= 0 &&
+                                                countrySelected == null
+                                                  ? AppMessages.DdLLoading
+                                                  : AppMessages.DdlDefaultSelect
+                                              }
+                                              noData={
+                                                countriesData.length <= 0 &&
+                                                countrySelected == null
+                                                  ? AppMessages.DdLLoading
+                                                  : AppMessages.NoCountries
+                                              }
+                                              options={countriesData}
+                                              extraOptions={{
+                                                key: "shortname",
+                                                dataVal: "ShortName",
+                                              }}
+                                              onChange={handleCountryChange}
+                                              value={countrySelected}
+                                              name="ddlcountries"
+                                              lbl={formCtrlTypes.country}
+                                              lblClass="mb-0 lbl-req-field"
+                                              required={true}
+                                              errors={errors}
+                                              formErrors={formErrors}
+                                              tabIndex={10}
+                                            ></AsyncSelect>
+                                          </div>
+                                          <div className="col-md-6 mb-15">
+                                            <AsyncSelect
+                                              placeHolder={
+                                                countrySelected == null ||
+                                                Object.keys(countrySelected)
+                                                  .length === 0
+                                                  ? AppMessages.DdlDefaultSelect
+                                                  : statesData.length <= 0 &&
+                                                    stateSelected == null
+                                                  ? AppMessages.DdLLoading
+                                                  : AppMessages.DdlDefaultSelect
+                                              }
+                                              noData={
+                                                countrySelected == null ||
+                                                Object.keys(countrySelected)
+                                                  .length === 0
+                                                  ? AppMessages.NoStates
+                                                  : statesData.length <= 0 &&
+                                                    stateSelected == null &&
+                                                    countrySelected != null
+                                                  ? AppMessages.DdLLoading
+                                                  : AppMessages.NoStates
+                                              }
+                                              options={statesData}
+                                              extraOptions={{
+                                                key: "shortname",
+                                                dataVal: "ShortName",
+                                              }}
+                                              onChange={handleStateChange}
+                                              value={stateSelected}
+                                              name="ddlstates"
+                                              lbl={formCtrlTypes.state}
+                                              lblClass="mb-0 lbl-req-field"
+                                              required={true}
+                                              errors={errors}
+                                              formErrors={formErrors}
+                                              tabIndex={11}
+                                            ></AsyncSelect>
+                                          </div>
+                                          <div className="col-md-6 mb-15">
+                                            <AsyncSelect
+                                              placeHolder={
+                                                stateSelected == null ||
+                                                Object.keys(stateSelected)
+                                                  .length === 0
+                                                  ? AppMessages.DdlDefaultSelect
+                                                  : citiesData.length <= 0 &&
+                                                    citySelected == null
+                                                  ? AppMessages.DdLLoading
+                                                  : AppMessages.DdlDefaultSelect
+                                              }
+                                              noData={
+                                                stateSelected == null ||
+                                                Object.keys(stateSelected)
+                                                  .length === 0
+                                                  ? AppMessages.NoCities
+                                                  : citiesData.length <= 0 &&
+                                                    citySelected == null &&
+                                                    stateSelected != null
+                                                  ? AppMessages.DdLLoading
+                                                  : AppMessages.NoCities
+                                              }
+                                              options={citiesData}
+                                              onChange={handleCityChange}
+                                              value={citySelected}
+                                              name="ddlcities"
+                                              lbl={formCtrlTypes.city}
+                                              lblClass="mb-0 lbl-req-field"
+                                              required={true}
+                                              errors={errors}
+                                              formErrors={formErrors}
+                                              tabIndex={12}
+                                            ></AsyncSelect>
+                                          </div>
+                                        </>
+                                      )}
+                                      <div className="col-md-6 mb-15">
+                                        <InputControl
+                                          lblClass="mb-0 lbl-req-field"
+                                          name="txtzip"
+                                          ctlType={formCtrlTypes.zip}
+                                          required={true}
+                                          onChange={handleChange}
+                                          value={formData.txtzip}
+                                          errors={errors}
+                                          formErrors={formErrors}
+                                          tabIndex={13}
+                                        ></InputControl>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            {/*============== Contactdetails End ==============*/}
+
+                            <div className="full-row px-3 py-4 mt-20 bg-white box-shadow rounded">
+                              <div className="container-fluid">
+                                <div className="row form-action flex-center">
+                                  <div
+                                    className="col-md-6 px-0 form-error"
+                                    id="form-error"
+                                  ></div>
+                                  <div className="col-md-6 px-0">
+                                    <button
+                                      className="btn btn-secondary"
+                                      id="btnCancel"
+                                      onClick={navigateToInvoices}
+                                    >
+                                      Cancel
+                                    </button>
+                                    <button
+                                      className="btn btn-primary"
+                                      id="btnReviewandConfirm"
+                                      onClick={onReviewandConfirm}
+                                    >
+                                      Review & Confirm
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </form>
                         </div>
                       </div>
-                      <div className="col-xl-8 col-lg-8 order-2 order-lg-1">
-                        <form noValidate>
+                    ) : (
+                      <div className="row">
+                        <div className="col-xl-4 col-lg-4 order-1 order-lg-2">
+                          <div className="widget bg-white box-shadow rounded px-0 mb-20">
+                            <h6 className="mb-3 down-line pb-10 px-20 down-line-mx20">
+                              Payment Summary
+                            </h6>
+                            {!checkObjNullorEmpty(invoiceDetails) && (
+                              <div className="px-20">
+                                <div className="post-content pb-0">
+                                  <div className="row listing-location mb-2 font-general font-500">
+                                    <span className="col text-left">
+                                      Invoice#: {invoiceDetails.InvoiceNumber}
+                                    </span>
+                                  </div>
+                                  <div className="row listing-location mb-2 font-general font-500">
+                                    <span className="col text-left">
+                                      Amount
+                                    </span>
+                                    <span className="col text-right">
+                                      {!checkObjNullorEmpty(amountFormData)
+                                        ? amountFormData.TotalAmountDisplay
+                                        : invoiceDetails.PayableAmountDisplay}
+                                    </span>
+                                  </div>
+                                  <div className="row listing-location mb-2 font-general font-500">
+                                    {checkObjNullorEmpty(amountFormData) ? (
+                                      <>
+                                        <span className="col text-left">
+                                          {selectedPaymentType.toLowerCase() ==
+                                          "creditcard" ? (
+                                            <>
+                                              CC Charges (
+                                              {
+                                                amountFormData?.ChargesPercentageDisplay
+                                              }
+                                              )
+                                            </>
+                                          ) : (
+                                            <>Fee</>
+                                          )}
+                                        </span>
+                                        <span className="col text-right">
+                                          {
+                                            invoiceDetails.TaxDetails
+                                              ?.ChargesAmountDisplay
+                                          }
+                                        </span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <span className="col text-left">
+                                          {selectedPaymentType.toLowerCase() ==
+                                          "creditcard" ? (
+                                            <>
+                                              CC Charges (
+                                              {
+                                                amountFormData?.ChargesPercentageDisplay
+                                              }
+                                              )
+                                            </>
+                                          ) : (
+                                            <>Fee</>
+                                          )}
+                                        </span>
+                                        <span className="col text-right">
+                                          {amountFormData?.ChargesAmountDisplay}
+                                        </span>
+                                      </>
+                                    )}
+                                  </div>
+                                  <div className="row listing-location mb-2 font-general font-500">
+                                    <span className="col text-left">Tax</span>
+                                    <span className="col text-right">
+                                      {checkObjNullorEmpty(amountFormData)
+                                        ? invoiceDetails.TaxDetails?.TaxDisplay
+                                        : amountFormData?.TaxDisplay}
+                                    </span>
+                                  </div>
+                                  <hr className="w-100 text-primary my-10"></hr>
+                                  <div className="row listing-location mb-2 text-primary font-general font-500">
+                                    <span className="col text-left">
+                                      Total Amount
+                                    </span>
+                                    <span className="col text-right">
+                                      {checkObjNullorEmpty(amountFormData)
+                                        ? invoiceDetails.TaxDetails
+                                            ?.TotalPaymentAmountDisplay
+                                        : amountFormData?.TotalPaymentAmountDisplay}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="col-xl-8 col-lg-8 order-2 order-lg-1">
                           {/*============== Carddetails Start ==============*/}
                           <div className="full-row px-3 py-4 bg-white box-shadow rounded">
                             <div className="container-fluid">
@@ -866,45 +1371,11 @@ const Checkout = () => {
                                   <h6 className="mb-3 down-line  pb-10">
                                     Payment Type
                                   </h6>
-                                  <div className="row my-20">
-                                    {paymentTypes.map((pt, idx) => {
-                                      return (
-                                        <div
-                                          className="col-6 text-left"
-                                          key={"ptkey-" + idx}
-                                        >
-                                          <div
-                                            className={`custom-check-box-2  text-left`}
-                                          >
-                                            <input
-                                              className="d-none"
-                                              type="radio"
-                                              value={pt.PaymentTypeId}
-                                              checked={
-                                                selectedPaymentType ==
-                                                pt.PaymentTypeId
-                                              }
-                                              id={"pt-" + pt.PaymentTypeId}
-                                              name="rblpaymenttype"
-                                              onChange={(e) => {
-                                                handlePaymentTypeChange(e);
-                                              }}
-                                            />
-                                            <label
-                                              htmlFor={"pt-" + pt.PaymentTypeId}
-                                              className="radio-lbl"
-                                            >
-                                              {pt.PaymentType}
-                                            </label>
-                                          </div>
-                                        </div>
-                                      );
-                                    })}
-                                    {errors?.[`rblpaymenttype`] && (
-                                      <div className="err-invalid">
-                                        {errors?.[`rblpaymenttype`]}
-                                      </div>
-                                    )}
+                                  <div className="row my-20 form-view">
+                                    <div className="col-md-6 mb-15">
+                                      <span>Payment Method : </span>
+                                      <span>{selectedPaymentType}</span>
+                                    </div>
                                   </div>
                                   {selectedPaymentType.toLowerCase() ==
                                   "creditcard" ? (
@@ -912,48 +1383,42 @@ const Checkout = () => {
                                       <h6 className="mb-3 down-line  pb-10">
                                         Card Details
                                       </h6>
-                                      <div className="row">
+                                      <div className="row form-view">
                                         <div className="col-md-6 mb-15">
-                                          <InputControl
-                                            lblClass="mb-0 lbl-req-field"
-                                            name="txtcardnumber"
-                                            ctlType={formCtrlTypes.cardnumber}
-                                            isFocus={true}
-                                            required={true}
-                                            onChange={handleChange}
-                                            value={formData.txtcardnumber}
-                                            errors={errors}
-                                            formErrors={formErrors}
-                                            tabIndex={2}
-                                          ></InputControl>
+                                          <span>Card Number : </span>
+                                          <span>
+                                            {maskNumber(formData.txtcardnumber)}
+                                          </span>
+                                          <i
+                                            className={maskunmaskcss}
+                                            id="mask-cardnumber"
+                                            onClick={(e) => {
+                                              toggleMaskedValue(
+                                                e,
+                                                formData.txtcardnumber
+                                              );
+                                            }}
+                                          ></i>
+                                        </div>
+                                        <div className="col-md-6 mb-15 text-md-end">
+                                          <span>Card Expiry (MM/YYYY) : </span>
+                                          <span>{formData.txtcardexpiry}</span>
                                         </div>
                                         <div className="col-md-4 mb-15">
-                                          <InputControl
-                                            lblClass="mb-0 lbl-req-field"
-                                            name="txtcardexpiry"
-                                            ctlType={
-                                              formCtrlTypes.cardexpirydate
-                                            }
-                                            required={true}
-                                            onChange={handleChange}
-                                            value={formData.txtcardexpiry}
-                                            errors={errors}
-                                            formErrors={formErrors}
-                                            tabIndex={3}
-                                          ></InputControl>
-                                        </div>
-                                        <div className="col-md-2 mb-15">
-                                          <InputControl
-                                            lblClass="mb-0 lbl-req-field"
-                                            name="txtcvv"
-                                            ctlType={formCtrlTypes.cvv}
-                                            required={true}
-                                            onChange={handleChange}
-                                            value={formData.txtcvv}
-                                            errors={errors}
-                                            formErrors={formErrors}
-                                            tabIndex={4}
-                                          ></InputControl>
+                                          <span>CVV : </span>
+                                          <span>
+                                            {maskNumber(formData.txtcvv, -1)}
+                                          </span>
+                                          <i
+                                            className={maskunmaskcss}
+                                            id="mask-cvv"
+                                            onClick={(e) => {
+                                              toggleMaskedValue(
+                                                e,
+                                                formData.txtcvv
+                                              );
+                                            }}
+                                          ></i>
                                         </div>
                                       </div>
                                     </>
@@ -962,56 +1427,48 @@ const Checkout = () => {
                                       <h6 className="mb-3 down-line  pb-10">
                                         Account Details
                                       </h6>
-                                      <div className="row">
-                                        <div className="col-md-4 mb-15">
-                                          <InputControl
-                                            lblClass="mb-0 lbl-req-field"
-                                            name="txtaccountnumber"
-                                            ctlType={formCtrlTypes.accountnum}
-                                            isFocus={true}
-                                            required={true}
-                                            onChange={handleChange}
-                                            value={formData.txtaccountnumber}
-                                            errors={errors}
-                                            formErrors={formErrors}
-                                            tabIndex={2}
-                                          ></InputControl>
+                                      <div className="row form-view">
+                                        <div className="col-md-6 mb-15">
+                                          <span>Account Number : </span>
+                                          <span>
+                                            {maskNumber(
+                                              formData.txtaccountnumber
+                                            )}
+                                          </span>
+                                          <i
+                                            className={maskunmaskcss}
+                                            id="mask-accnumber"
+                                            onClick={(e) => {
+                                              toggleMaskedValue(
+                                                e,
+                                                formData.txtaccountnumber
+                                              );
+                                            }}
+                                          ></i>
                                         </div>
-                                        <div className="col-md-4 mb-15">
-                                          <InputControl
-                                            lblClass="mb-0 lbl-req-field"
-                                            name="txtroutingnumber"
-                                            ctlType={formCtrlTypes.routingnum}
-                                            required={true}
-                                            onChange={handleChange}
-                                            value={formData.txtroutingnumber}
-                                            errors={errors}
-                                            formErrors={formErrors}
-                                            tabIndex={3}
-                                          ></InputControl>
+                                        <div className="col-md-6 mb-15 text-md-end">
+                                          <span>Routing Number : </span>
+                                          <span>
+                                            {maskNumber(
+                                              formData.txtroutingnumber
+                                            )}
+                                          </span>
+                                          <i
+                                            className={maskunmaskcss}
+                                            id="mask-routingnumber"
+                                            onClick={(e) => {
+                                              toggleMaskedValue(
+                                                e,
+                                                formData.txtroutingnumber
+                                              );
+                                            }}
+                                          ></i>
                                         </div>
-                                        <div className="col-md-4 mb-15">
-                                          <AsyncSelect
-                                            placeHolder={
-                                              AppMessages.DdlDefaultSelect
-                                            }
-                                            noData={AppMessages.NoData}
-                                            options={accountTypes}
-                                            onChange={handleAccountTypeChange}
-                                            value={accountTypeSelected.Id}
-                                            defualtselected={
-                                              accountTypeSelected.Id
-                                            }
-                                            name="ddlaccounttypes"
-                                            lbl={formCtrlTypes.accounttype}
-                                            lblClass="mb-0 lbl-req-field"
-                                            required={true}
-                                            isClearable={false}
-                                            isSearchable={false}
-                                            errors={errors}
-                                            formErrors={formErrors}
-                                            tabIndex={4}
-                                          ></AsyncSelect>
+                                        <div className="col-md-6 mb-15">
+                                          <span>Account Type : </span>
+                                          <span>
+                                            {accountTypeSelected.Text}
+                                          </span>
                                         </div>
                                       </div>
                                     </>
@@ -1030,191 +1487,46 @@ const Checkout = () => {
                                   <h6 className="mb-3 down-line  pb-10">
                                     Billing Details
                                   </h6>
-                                  <div className="row">
+                                  <div className="row form-view">
                                     <div className="col-md-6 mb-15">
-                                      <InputControl
-                                        lblClass="mb-0 lbl-req-field"
-                                        name="txtfirstname"
-                                        ctlType={formCtrlTypes.fname}
-                                        required={true}
-                                        onChange={handleChange}
-                                        value={formData.txtfirstname}
-                                        errors={errors}
-                                        formErrors={formErrors}
-                                        tabIndex={5}
-                                      ></InputControl>
+                                      <span>First Name : </span>
+                                      <span>{formData.txtfirstname}</span>
+                                    </div>
+                                    <div className="col-md-6 mb-15 text-md-end">
+                                      <span>Last Name : </span>
+                                      <span>{formData.txtlastname}</span>
                                     </div>
                                     <div className="col-md-6 mb-15">
-                                      <InputControl
-                                        lblClass="mb-0 lbl-req-field"
-                                        name="txtlastname"
-                                        ctlType={formCtrlTypes.lname}
-                                        required={true}
-                                        onChange={handleChange}
-                                        value={formData.txtlastname}
-                                        errors={errors}
-                                        formErrors={formErrors}
-                                        tabIndex={6}
-                                      ></InputControl>
+                                      <span>Email : </span>
+                                      <span>{formData.txtemail}</span>
                                     </div>
-                                    <div className="col-md-12 mb-15">
-                                      <InputControl
-                                        lblClass="mb-0 lbl-req-field"
-                                        name="txtemail"
-                                        ctlType={formCtrlTypes.email}
-                                        required={true}
-                                        onChange={handleChange}
-                                        value={formData.txtemail}
-                                        errors={errors}
-                                        formErrors={formErrors}
-                                        tabIndex={7}
-                                      ></InputControl>
+                                    <div className="col-md-6 mb-15 text-md-end">
+                                      <span>Address One : </span>
+                                      <span>{formData.txtaddressone}</span>
                                     </div>
                                     <div className="col-md-6 mb-15">
-                                      <InputControl
-                                        lblClass="mb-0 lbl-req-field"
-                                        name="txtaddressone"
-                                        ctlType={formCtrlTypes.addressone}
-                                        required={true}
-                                        onChange={handleChange}
-                                        value={formData.txtaddressone}
-                                        errors={errors}
-                                        formErrors={formErrors}
-                                        tabIndex={8}
-                                      ></InputControl>
+                                      <span>Address Two : </span>
+                                      <span>
+                                        {checkEmptyVal(formData.txtaddresstwo)
+                                          ? "---"
+                                          : formData.txtaddresstwo}
+                                      </span>
+                                    </div>
+                                    <div className="col-md-6 mb-15 text-md-end">
+                                      <span>Country : </span>
+                                      <span>{countrySelected?.label}</span>
                                     </div>
                                     <div className="col-md-6 mb-15">
-                                      <InputControl
-                                        lblClass="mb-0"
-                                        name="txtaddresstwo"
-                                        ctlType={formCtrlTypes.addresstwo}
-                                        onChange={handleChange}
-                                        value={formData.txtaddresstwo}
-                                        errors={errors}
-                                        formErrors={formErrors}
-                                        tabIndex={9}
-                                      ></InputControl>
+                                      <span>State : </span>
+                                      <span>{stateSelected?.label}</span>
                                     </div>
-                                    {initApisLoaded && (
-                                      <>
-                                        <div className="col-md-6 mb-15">
-                                          <AsyncSelect
-                                            placeHolder={
-                                              countriesData.length <= 0 &&
-                                              countrySelected == null
-                                                ? AppMessages.DdLLoading
-                                                : AppMessages.DdlDefaultSelect
-                                            }
-                                            noData={
-                                              countriesData.length <= 0 &&
-                                              countrySelected == null
-                                                ? AppMessages.DdLLoading
-                                                : AppMessages.NoCountries
-                                            }
-                                            options={countriesData}
-                                            extraOptions={{
-                                              key: "shortname",
-                                              dataVal: "ShortName",
-                                            }}
-                                            onChange={handleCountryChange}
-                                            value={countrySelected}
-                                            name="ddlcountries"
-                                            lbl={formCtrlTypes.country}
-                                            lblClass="mb-0 lbl-req-field"
-                                            required={true}
-                                            errors={errors}
-                                            formErrors={formErrors}
-                                            tabIndex={10}
-                                          ></AsyncSelect>
-                                        </div>
-                                        <div className="col-md-6 mb-15">
-                                          <AsyncSelect
-                                            placeHolder={
-                                              countrySelected == null ||
-                                              Object.keys(countrySelected)
-                                                .length === 0
-                                                ? AppMessages.DdlDefaultSelect
-                                                : statesData.length <= 0 &&
-                                                  stateSelected == null
-                                                ? AppMessages.DdLLoading
-                                                : AppMessages.DdlDefaultSelect
-                                            }
-                                            noData={
-                                              countrySelected == null ||
-                                              Object.keys(countrySelected)
-                                                .length === 0
-                                                ? AppMessages.NoStates
-                                                : statesData.length <= 0 &&
-                                                  stateSelected == null &&
-                                                  countrySelected != null
-                                                ? AppMessages.DdLLoading
-                                                : AppMessages.NoStates
-                                            }
-                                            options={statesData}
-                                            extraOptions={{
-                                              key: "shortname",
-                                              dataVal: "ShortName",
-                                            }}
-                                            onChange={handleStateChange}
-                                            value={stateSelected}
-                                            name="ddlstates"
-                                            lbl={formCtrlTypes.state}
-                                            lblClass="mb-0 lbl-req-field"
-                                            required={true}
-                                            errors={errors}
-                                            formErrors={formErrors}
-                                            tabIndex={11}
-                                          ></AsyncSelect>
-                                        </div>
-                                        <div className="col-md-6 mb-15">
-                                          <AsyncSelect
-                                            placeHolder={
-                                              stateSelected == null ||
-                                              Object.keys(stateSelected)
-                                                .length === 0
-                                                ? AppMessages.DdlDefaultSelect
-                                                : citiesData.length <= 0 &&
-                                                  citySelected == null
-                                                ? AppMessages.DdLLoading
-                                                : AppMessages.DdlDefaultSelect
-                                            }
-                                            noData={
-                                              stateSelected == null ||
-                                              Object.keys(stateSelected)
-                                                .length === 0
-                                                ? AppMessages.NoCities
-                                                : citiesData.length <= 0 &&
-                                                  citySelected == null &&
-                                                  stateSelected != null
-                                                ? AppMessages.DdLLoading
-                                                : AppMessages.NoCities
-                                            }
-                                            options={citiesData}
-                                            onChange={handleCityChange}
-                                            value={citySelected}
-                                            name="ddlcities"
-                                            lbl={formCtrlTypes.city}
-                                            lblClass="mb-0 lbl-req-field"
-                                            required={true}
-                                            errors={errors}
-                                            formErrors={formErrors}
-                                            tabIndex={12}
-                                          ></AsyncSelect>
-                                        </div>
-                                      </>
-                                    )}
+                                    <div className="col-md-6 mb-15 text-md-end">
+                                      <span>City : </span>
+                                      <span>{citySelected?.label}</span>
+                                    </div>
                                     <div className="col-md-6 mb-15">
-                                      <InputControl
-                                        lblClass="mb-0 lbl-req-field"
-                                        name="txtzip"
-                                        ctlType={formCtrlTypes.zip}
-                                        required={true}
-                                        onChange={handleChange}
-                                        value={formData.txtzip}
-                                        errors={errors}
-                                        formErrors={formErrors}
-                                        tabIndex={13}
-                                      ></InputControl>
+                                      <span>Zip : </span>
+                                      <span>{formData.txtzip}</span>
                                     </div>
                                   </div>
                                 </div>
@@ -1233,398 +1545,105 @@ const Checkout = () => {
                                 <div className="col-md-6 px-0">
                                   <button
                                     className="btn btn-secondary"
-                                    id="btnCancel"
-                                    onClick={navigateToInvoices}
+                                    id="btnCancelPay"
+                                    onClick={toggleShowPaymentSummary}
                                   >
-                                    Cancel
+                                    Edit
                                   </button>
                                   <button
                                     className="btn btn-primary"
-                                    id="btnReviewandConfirm"
-                                    onClick={onReviewandConfirm}
+                                    id="btnpay"
+                                    onClick={onPay}
                                   >
-                                    Review & Confirm
+                                    Confirm & Pay
                                   </button>
                                 </div>
                               </div>
                             </div>
                           </div>
-                        </form>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="row">
-                      <div className="col-xl-4 col-lg-4 order-1 order-lg-2">
-                        <div className="widget bg-white box-shadow rounded px-0 mb-20">
-                          <h6 className="mb-3 down-line pb-10 px-20 down-line-mx20">
-                            Payment Summary
-                          </h6>
-                          {!checkObjNullorEmpty(invoiceDetails) && (
-                            <div className="px-20">
-                              <div className="post-content pb-0">
-                                <div className="row listing-location mb-2 font-general font-500">
-                                  <span className="col text-left">
-                                    Invoice#: {invoiceDetails.InvoiceNumber}
-                                  </span>
-                                </div>
-                                <div className="row listing-location mb-2 font-general font-500">
-                                  <span className="col text-left">Amount</span>
-                                  <span className="col text-right">
-                                    {!checkObjNullorEmpty(amountFormData)
-                                      ? amountFormData.TotalAmountDisplay
-                                      : invoiceDetails.PayableAmountDisplay}
-                                  </span>
-                                </div>
-                                <div className="row listing-location mb-2 font-general font-500">
-                                  {checkObjNullorEmpty(amountFormData) ? (
-                                    <>
-                                      <span className="col text-left">
-                                        {selectedPaymentType.toLowerCase() ==
-                                        "creditcard" ? (
-                                          <>
-                                            CC Charges (
-                                            {
-                                              amountFormData?.ChargesPercentageDisplay
-                                            }
-                                            )
-                                          </>
-                                        ) : (
-                                          <>Fee</>
-                                        )}
-                                      </span>
-                                      <span className="col text-right">
-                                        {
-                                          invoiceDetails.TaxDetails
-                                            ?.ChargesAmountDisplay
-                                        }
-                                      </span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <span className="col text-left">
-                                        {selectedPaymentType.toLowerCase() ==
-                                        "creditcard" ? (
-                                          <>
-                                            CC Charges (
-                                            {
-                                              amountFormData?.ChargesPercentageDisplay
-                                            }
-                                            )
-                                          </>
-                                        ) : (
-                                          <>Fee</>
-                                        )}
-                                      </span>
-                                      <span className="col text-right">
-                                        {amountFormData?.ChargesAmountDisplay}
-                                      </span>
-                                    </>
-                                  )}
-                                </div>
-                                <div className="row listing-location mb-2 font-general font-500">
-                                  <span className="col text-left">Tax</span>
-                                  <span className="col text-right">
-                                    {checkObjNullorEmpty(amountFormData)
-                                      ? invoiceDetails.TaxDetails?.TaxDisplay
-                                      : amountFormData?.TaxDisplay}
-                                  </span>
-                                </div>
-                                <hr className="w-100 text-primary my-10"></hr>
-                                <div className="row listing-location mb-2 text-primary font-general font-500">
-                                  <span className="col text-left">
-                                    Total Amount
-                                  </span>
-                                  <span className="col text-right">
-                                    {checkObjNullorEmpty(amountFormData)
-                                      ? invoiceDetails.TaxDetails
-                                          ?.TotalPaymentAmountDisplay
-                                      : amountFormData?.TotalPaymentAmountDisplay}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          )}
                         </div>
                       </div>
-                      <div className="col-xl-8 col-lg-8 order-2 order-lg-1">
-                        {/*============== Carddetails Start ==============*/}
-                        <div className="full-row px-3 py-4 bg-white box-shadow rounded">
-                          <div className="container-fluid">
-                            <div className="row">
-                              <div className="col px-0">
-                                <h6 className="mb-3 down-line  pb-10">
-                                  Payment Type
-                                </h6>
-                                <div className="row my-20 form-view">
-                                  <div className="col-md-6 mb-15">
-                                    <span>Payment Method : </span>
-                                    <span>{selectedPaymentType}</span>
-                                  </div>
-                                </div>
-                                {selectedPaymentType.toLowerCase() ==
-                                "creditcard" ? (
-                                  <>
-                                    <h6 className="mb-3 down-line  pb-10">
-                                      Card Details
-                                    </h6>
-                                    <div className="row form-view">
-                                      <div className="col-md-6 mb-15">
-                                        <span>Card Number : </span>
-                                        <span>
-                                          {maskNumber(formData.txtcardnumber)}
-                                        </span>
-                                        <i
-                                          className={maskunmaskcss}
-                                          id="mask-cardnumber"
-                                          onClick={(e) => {
-                                            toggleMaskedValue(
-                                              e,
-                                              formData.txtcardnumber
-                                            );
-                                          }}
-                                        ></i>
-                                      </div>
-                                      <div className="col-md-6 mb-15 text-md-end">
-                                        <span>Card Expiry (MM/YYYY) : </span>
-                                        <span>{formData.txtcardexpiry}</span>
-                                      </div>
-                                      <div className="col-md-4 mb-15">
-                                        <span>CVV : </span>
-                                        <span>
-                                          {maskNumber(formData.txtcvv, -1)}
-                                        </span>
-                                        <i
-                                          className={maskunmaskcss}
-                                          id="mask-cvv"
-                                          onClick={(e) => {
-                                            toggleMaskedValue(
-                                              e,
-                                              formData.txtcvv
-                                            );
-                                          }}
-                                        ></i>
-                                      </div>
-                                    </div>
-                                  </>
-                                ) : (
-                                  <>
-                                    <h6 className="mb-3 down-line  pb-10">
-                                      Account Details
-                                    </h6>
-                                    <div className="row form-view">
-                                      <div className="col-md-6 mb-15">
-                                        <span>Account Number : </span>
-                                        <span>
-                                          {maskNumber(
-                                            formData.txtaccountnumber
-                                          )}
-                                        </span>
-                                        <i
-                                          className={maskunmaskcss}
-                                          id="mask-accnumber"
-                                          onClick={(e) => {
-                                            toggleMaskedValue(
-                                              e,
-                                              formData.txtaccountnumber
-                                            );
-                                          }}
-                                        ></i>
-                                      </div>
-                                      <div className="col-md-6 mb-15 text-md-end">
-                                        <span>Routing Number : </span>
-                                        <span>
-                                          {maskNumber(
-                                            formData.txtroutingnumber
-                                          )}
-                                        </span>
-                                        <i
-                                          className={maskunmaskcss}
-                                          id="mask-routingnumber"
-                                          onClick={(e) => {
-                                            toggleMaskedValue(
-                                              e,
-                                              formData.txtroutingnumber
-                                            );
-                                          }}
-                                        ></i>
-                                      </div>
-                                      <div className="col-md-6 mb-15">
-                                        <span>Account Type : </span>
-                                        <span>{accountTypeSelected.Text}</span>
-                                      </div>
-                                    </div>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        {/*============== Carddetails End ==============*/}
-
-                        {/*============== Contactdetails Start ==============*/}
-                        <div className="full-row px-3 py-4 mt-20 bg-white box-shadow rounded">
-                          <div className="container-fluid">
-                            <div className="row">
-                              <div className="col px-0">
-                                <h6 className="mb-3 down-line  pb-10">
-                                  Billing Details
-                                </h6>
-                                <div className="row form-view">
-                                  <div className="col-md-6 mb-15">
-                                    <span>First Name : </span>
-                                    <span>{formData.txtfirstname}</span>
-                                  </div>
-                                  <div className="col-md-6 mb-15 text-md-end">
-                                    <span>Last Name : </span>
-                                    <span>{formData.txtlastname}</span>
-                                  </div>
-                                  <div className="col-md-6 mb-15">
-                                    <span>Email : </span>
-                                    <span>{formData.txtemail}</span>
-                                  </div>
-                                  <div className="col-md-6 mb-15 text-md-end">
-                                    <span>Address One : </span>
-                                    <span>{formData.txtaddressone}</span>
-                                  </div>
-                                  <div className="col-md-6 mb-15">
-                                    <span>Address Two : </span>
-                                    <span>
-                                      {checkEmptyVal(formData.txtaddresstwo)
-                                        ? "---"
-                                        : formData.txtaddresstwo}
-                                    </span>
-                                  </div>
-                                  <div className="col-md-6 mb-15 text-md-end">
-                                    <span>Country : </span>
-                                    <span>{countrySelected?.label}</span>
-                                  </div>
-                                  <div className="col-md-6 mb-15">
-                                    <span>State : </span>
-                                    <span>{stateSelected?.label}</span>
-                                  </div>
-                                  <div className="col-md-6 mb-15 text-md-end">
-                                    <span>City : </span>
-                                    <span>{citySelected?.label}</span>
-                                  </div>
-                                  <div className="col-md-6 mb-15">
-                                    <span>Zip : </span>
-                                    <span>{formData.txtzip}</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        {/*============== Contactdetails End ==============*/}
-
-                        <div className="full-row px-3 py-4 mt-20 bg-white box-shadow rounded">
-                          <div className="container-fluid">
-                            <div className="row form-action flex-center">
-                              <div
-                                className="col-md-6 px-0 form-error"
-                                id="form-error"
-                              ></div>
-                              <div className="col-md-6 px-0">
-                                <button
-                                  className="btn btn-secondary"
-                                  id="btnCancelPay"
-                                  onClick={toggleShowPaymentSummary}
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  className="btn btn-primary"
-                                  id="btnpay"
-                                  onClick={onPay}
-                                >
-                                  Confirm & Pay
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                    )}
+                  </>
+                ) : paymentResponse?.StatusCode == 200 &&
+                  paymentResponse?.Data?.Id > 0 ? (
+                  <div className="widget bg-white box-shadow rounded px-0 mb-20 mx-auto col-lg-8">
+                    <h6 className="mb-3 down-line pb-10 px-20 down-line-mx20">
+                      Payment Success
+                    </h6>
+                    <div className="d-flex flex-column align-items-center justify-content-center text-center pt-20 pb-60">
+                      <div className="px-20">
+                        <i className="icon icon-check font-size-80 font-500 text-primary"></i>
                       </div>
-                    </div>
-                  )}
-                </>
-              ) : paymentResponse?.StatusCode == 200 &&
-                paymentResponse?.Data?.Id > 0 ? (
-                <div className="widget bg-white box-shadow rounded px-0 mb-20 mx-auto col-lg-8">
-                  <h6 className="mb-3 down-line pb-10 px-20 down-line-mx20">
-                    Payment Success
-                  </h6>
-                  <div className="d-flex flex-column align-items-center justify-content-center text-center pt-20 pb-60">
-                    <div className="px-20">
-                      <i className="icon icon-check font-size-80 font-500 text-primary"></i>
-                    </div>
-                    <div className="px-20">
-                      <h3
-                        className={`font-400 font-extra-large mt-3 text-primary`}
-                      >
-                        Payment Successful
-                      </h3>
-                      <p className="text-primary">
-                        {checkEmptyVal(paymentResponse?.Data?.Message)
-                          ? "Thank you for the payment, Payment has been processed succesfully..."
-                          : paymentResponse?.Data?.Message}
-                      </p>
-                      <p className="text-primary">
-                        Payment Ref Number:{" "}
-                        {paymentResponse?.Data?.PaymentRefNumber}
-                      </p>
-                      <div className="form-action text-center mt-4">
-                        <button
-                          className="btn btn-primary"
-                          id="btninvoices"
-                          onClick={navigateToInvoices}
+                      <div className="px-20">
+                        <h3
+                          className={`font-400 font-extra-large mt-3 text-primary`}
                         >
-                          Back to Invoices
-                        </button>
+                          Payment Successful
+                        </h3>
+                        <p className="text-primary">
+                          {checkEmptyVal(paymentResponse?.Data?.Message)
+                            ? "Thank you for the payment, Payment has been processed succesfully..."
+                            : paymentResponse?.Data?.Message}
+                        </p>
+                        <p className="text-primary">
+                          Payment Ref Number:{" "}
+                          {paymentResponse?.Data?.PaymentRefNumber}
+                        </p>
+                        <div className="form-action text-center mt-4">
+                          <button
+                            className="btn btn-primary"
+                            id="btninvoices"
+                            onClick={navigateToInvoices}
+                          >
+                            Back to Invoices
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ) : (
-                <div className="widget bg-white box-shadow rounded px-0 mb-20 mx-auto col-lg-8">
-                  <h6 className="mb-3 down-line pb-10 px-20 down-line-mx20">
-                    Payment Failed
-                  </h6>
-                  <div className="d-flex flex-column align-items-center justify-content-center text-center pt-20 pb-60">
-                    <div className="px-20">
-                      <i className="icon icon-close font-size-80 font-500 text-error"></i>
-                    </div>
-                    <div className="px-20">
-                      <h3
-                        className={`font-400 font-extra-large mt-3 text-error`}
-                      >
-                        Payment Failed
-                      </h3>
-                      <p className="text-error">
-                        Error:{" "}
-                        {checkEmptyVal(paymentResponse?.Data?.Message)
-                          ? "Sorry! Something went wrong with your transaction."
-                          : paymentResponse?.Data?.Message}
-                      </p>
-                      <div className="form-action text-center mt-4">
-                        <button
-                          className="btn btn-primary"
-                          id="btnRetrypayment"
-                          onClick={retryPayment}
+                ) : (
+                  <div className="widget bg-white box-shadow rounded px-0 mb-20 mx-auto col-lg-8">
+                    <h6 className="mb-3 down-line pb-10 px-20 down-line-mx20">
+                      Payment Failed
+                    </h6>
+                    <div className="d-flex flex-column align-items-center justify-content-center text-center pt-20 pb-60">
+                      <div className="px-20">
+                        <i className="icon icon-close font-size-80 font-500 text-error"></i>
+                      </div>
+                      <div className="px-20">
+                        <h3
+                          className={`font-400 font-extra-large mt-3 text-error`}
                         >
-                          Retry Payment
-                        </button>
-                        <button
-                          className="btn btn-primary"
-                          id="btninvoices"
-                          onClick={navigateToInvoices}
-                        >
-                          Back to Invoices
-                        </button>
+                          Payment Failed
+                        </h3>
+                        <p className="text-error">
+                          Error:{" "}
+                          {checkEmptyVal(paymentResponse?.Data?.Message)
+                            ? "Sorry! Something went wrong with your transaction."
+                            : paymentResponse?.Data?.Message}
+                        </p>
+                        <div className="form-action text-center mt-4">
+                          <button
+                            className="btn btn-primary"
+                            id="btnRetrypayment"
+                            onClick={retryPayment}
+                          >
+                            Retry Payment
+                          </button>
+                          <button
+                            className="btn btn-primary"
+                            id="btninvoices"
+                            onClick={navigateToInvoices}
+                          >
+                            Back to Invoices
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>

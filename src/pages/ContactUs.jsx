@@ -197,7 +197,7 @@ const ContactUs = () => {
       {/*============== Page title End ==============*/}
 
       {/*============== Contact form Start ==============*/}
-      <div className="full-row pt-5 pb-5 bg-light">
+      <div className="full-row pt-4 pb-5 bg-light">
         <div className="container">
           <div className="row">
             <div className="col-md-5 order-md-2">
@@ -359,7 +359,7 @@ const ContactUs = () => {
                   </div>
                   <div className="col-md-12">
                     <button
-                      className="btn btn-primary box-shadow"
+                      className="btn btn-primary btn-mini btn-glow shadow rounded"
                       name="btnsendmessage"
                       id="btnsendmessage"
                       type="submit"
