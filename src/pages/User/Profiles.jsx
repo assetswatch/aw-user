@@ -7,6 +7,7 @@ import {
   GetCookieValues,
   getPagesPathByLoggedinUserProfile,
   SetPageLoaderNavLinks,
+  setProfileDescText,
 } from "../../utils/common";
 import { AppMessages, UserCookie } from "../../utils/constants";
 import { useAuth } from "../../contexts/AuthContext";
@@ -68,18 +69,6 @@ const Profiles = () => {
         pelem.getAttribute("profile-type")
       )
     );
-  };
-
-  const setProfileText = (profileTypeId) => {
-    if (profileTypeId == config.userProfileTypes.Owner) {
-      return " Manages property and invites agents or tenants.";
-    } else if (profileTypeId == config.userProfileTypes.Agent) {
-      return " Handles daily operations and tenant relations.";
-    } else if (profileTypeId == config.userProfileTypes.Tenant) {
-      return " Occupies and manages leased properties.";
-    } else {
-      return "";
-    }
   };
 
   return (
@@ -158,7 +147,9 @@ const Profiles = () => {
                                               <a>{p.ProfileType}</a>
                                             </span>
                                             <p className="transation font-small font-500 lh-22">
-                                              {setProfileText(p.ProfileTypeId)}
+                                              {setProfileDescText(
+                                                p.ProfileTypeId
+                                              )}
                                             </p>
                                           </div>
                                         </div>
@@ -200,7 +191,7 @@ const Profiles = () => {
                                               <a>{p[0].ProfileType}</a>
                                             </span>
                                             <p className="transation font-small font-500 lh-22">
-                                              {setProfileText(
+                                              {setProfileDescText(
                                                 p[0].ProfileTypeId
                                               )}
                                             </p>
@@ -227,7 +218,9 @@ const Profiles = () => {
                                               <a>{pt.ProfileType}</a>
                                             </span>
                                             <p className="transation font-small font-500 lh-22">
-                                              {setProfileText(pt.ProfileTypeId)}
+                                              {setProfileDescText(
+                                                pt.ProfileTypeId
+                                              )}
                                             </p>
                                           </div>
                                         </div>
