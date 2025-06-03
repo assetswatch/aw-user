@@ -599,7 +599,10 @@ a.hover-bg-primary:hover,
   font-size: 26px;
   line-height: 40px;
 }
-
+.font-1dot8rem {
+  font-size: 1.8rem;
+  line-height: 40px;
+}
 .font-size-45 {
   font-size: 45px;
   line-height: 45px;

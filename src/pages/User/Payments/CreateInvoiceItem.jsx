@@ -184,7 +184,7 @@ const CreateInvoiceItem = () => {
                       <h6 className="mb-3 down-line pb-10">Invoices</h6>
                     </div>
                     <div className="breadcrumb-item bc-fh ctooltip-container">
-                      <span className="font-general font-500 cur-default">
+                      <span className="font-general font-500 cur-pointer">
                         <a
                           className="text-general"
                           onClick={navigateToInvoiceItems}
@@ -196,7 +196,7 @@ const CreateInvoiceItem = () => {
                   </div>
                 </div>
               </div>
-              <div className="row mx-auto col-lg-6 shadow">
+              <div className="row mx-auto col-lg-8 col-xl-7 shadow">
                 <div className="bg-white xs-p-20 px-30 py-20 pb-30 border rounded">
                   <div className="row row-cols-1 g-4 flex-center">
                     <div className="col">

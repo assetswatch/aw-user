@@ -260,6 +260,10 @@ export const Regex = {
     max: length1000,
     required: ValidationMessages.AboutmeReq,
   },
+  aboutcompany: {
+    max: length1000,
+    required: ValidationMessages.AboutcompanyReq,
+  },
   searchkeyword: {
     max: length50,
     required: ValidationMessages.SearchKeywordReq,
@@ -651,7 +655,7 @@ export const formCtrlTypes = {
     },
   },
   mobile: {
-    lbl: "Mobile number:",
+    lbl: "Primary phone:",
     input: {
       type: "text",
       min: length10,
@@ -666,7 +670,7 @@ export const formCtrlTypes = {
     },
   },
   landline: {
-    lbl: "Landline number:",
+    lbl: "Secondary phone:",
     input: {
       type: "text",
       min: length10,
@@ -874,6 +878,13 @@ export const formCtrlTypes = {
   },
   aboutme: {
     lbl: "About me:",
+    input: {
+      type: "text",
+      max: length1000,
+    },
+  },
+  aboutcompany: {
+    lbl: "About Company:",
     input: {
       type: "text",
       max: length1000,

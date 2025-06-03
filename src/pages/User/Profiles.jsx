@@ -105,14 +105,14 @@ const Profiles = () => {
                   </div>
                 </div>
               </div>
-              <div className="row mx-auto col-md-8 col-xl-8 shadow">
+              <div className="row mx-auto col-md-12 col-xl-8 shadow">
                 <div className="bg-white xs-p-20 px-30 py-20 pb-30 border rounded">
                   <div className="breadcrumb mb-0">
                     <div className="breadcrumb-item bc-fh">
                       <h6 className="mb-2 down-line pb-10">Select Profile</h6>
                     </div>
                   </div>
-                  <div className="row row-cols-lg-3 pt-20 pb-10 row-cols-1 g-4 flex-center">
+                  <div className="row row-cols-lg-3 row-cols-md-3 pt-20 pb-10 row-cols-1 g-4 flex-center">
                     {isDataLoading && (
                       <div className="pb-100">
                         <DataLoader />
@@ -157,7 +157,7 @@ const Profiles = () => {
                                             <span className="transation font-500 text-primary">
                                               <a>{p.ProfileType}</a>
                                             </span>
-                                            <p className="transation font-general font-500">
+                                            <p className="transation font-small font-500 lh-22">
                                               {setProfileText(p.ProfileTypeId)}
                                             </p>
                                           </div>
@@ -199,7 +199,7 @@ const Profiles = () => {
                                             <span className="transation font-500 text-primary">
                                               <a>{p[0].ProfileType}</a>
                                             </span>
-                                            <p className="transation font-general font-500">
+                                            <p className="transation font-small font-500 lh-22">
                                               {setProfileText(
                                                 p[0].ProfileTypeId
                                               )}
@@ -226,7 +226,7 @@ const Profiles = () => {
                                             <span className="transation font-500 text-primary">
                                               <a>{pt.ProfileType}</a>
                                             </span>
-                                            <p className="transation font-general font-500">
+                                            <p className="transation font-small font-500 lh-22">
                                               {setProfileText(pt.ProfileTypeId)}
                                             </p>
                                           </div>

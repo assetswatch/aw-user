@@ -729,7 +729,9 @@ const Checkout = () => {
                     </div>
                   </div>
                 </div>
-                <GoBackPanel clickAction={navigateToInvoices} />
+                {checkObjNullorEmpty(paymentResponse) && (
+                  <GoBackPanel clickAction={navigateToInvoices} />
+                )}
                 <input
                   name="txtdummyfocus"
                   className="lh-0 h-0 p-0 bo-0 w-0"

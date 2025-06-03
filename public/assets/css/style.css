@@ -1625,7 +1625,61 @@ Header Style Start
   overflow-y: auto; /* Enable vertical scrolling if needed */
   z-index: 1000; /* Stay above other content */
 }
+.st-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.st-card {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  color: #000;
+  transition: background-color 0.2s ease;
+}
 
+.st-card:hover {
+  background-color: var(--theme-li-hover-bg-color);
+}
+
+.st-card .icon {
+  width: 34px;
+  /* height: 40px; */
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+  color: var(--theme-primary-color);
+  align-items: start;
+}
+.st-card .card-content {
+  flex-grow: 1;
+}
+.st-card .card-text {
+  flex-grow: 1;
+}
+
+.st-card .card-title {
+  font-family: var(--theme-highlight-font);
+  color: var(--text-light-dark-color);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0px;
+}
+
+.st-card .card-description {
+  font-size: 0.9rem;
+  color: var(--text-light-dark-color);
+}
+
+.st-card .arrow {
+  font-size: 20px;
+  padding-right: 0.8rem;
+  padding-left: 1rem;
+  color: var(--theme-primary-color);
+}
 /* .navbar-nav .dropdown-menu {
   position: absolute !important;
 } */
