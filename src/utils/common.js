@@ -850,3 +850,15 @@ export function getCityStateCountryZipFormat(
   const result = isSeperator ? parts.join(", ") : parts.join(" ").trim();
   return result ? `${result}.` : "";
 }
+
+export function setProfileDescText(profileTypeId) {
+  if (profileTypeId == config.userProfileTypes.Owner) {
+    return " Manages property and invites agents or tenants.";
+  } else if (profileTypeId == config.userProfileTypes.Agent) {
+    return " Handles daily operations and tenant relations.";
+  } else if (profileTypeId == config.userProfileTypes.Tenant) {
+    return " Occupies and manages leased properties.";
+  } else {
+    return "";
+  }
+}

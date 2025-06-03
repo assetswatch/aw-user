@@ -1,4 +1,8 @@
-export default function GoBackPanel({ clickAction, isformBack = false }) {
+export default function GoBackPanel({
+  clickAction,
+  isformBack = false,
+  backText = "Back",
+}) {
   return (
     <>
       {isformBack ? (
@@ -18,7 +22,7 @@ export default function GoBackPanel({ clickAction, isformBack = false }) {
               onClick={clickAction}
             >
               <i className="icons font-18 icon-arrow-left-circle text-primary me-1"></i>
-              <span className="font-general">Back</span>
+              <span className="font-general">{backText}</span>
             </button>
           </div>
         </>
@@ -42,7 +46,7 @@ export default function GoBackPanel({ clickAction, isformBack = false }) {
               onClick={clickAction}
             >
               <i className="icons icon-arrow-left-circle position-relative me-1 t-2"></i>{" "}
-              Back
+              {backText}
             </button>
           </div>
         </>

@@ -11,6 +11,10 @@
     "Agent": 2,
     "Tenant": 3
   },
+  "userProfileAccountTypes": {
+    "Personal": 1,
+    "Business": 2
+  },
   "UserBrandingTypes": {
     "Default_Branding": 0,
     "No_Branding": 1,

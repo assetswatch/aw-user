@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useCallback, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import config from "../../../config.json";
 import { useAuth } from "../../../contexts/AuthContext";
 import {
@@ -29,11 +29,10 @@ import InputControl from "../../../components/common/InputControl";
 import { useUserProfileAccountTypesGateway } from "../../../hooks/useUserProfileAccountTypesGateway";
 import AsyncSelect from "../../../components/common/AsyncSelect";
 
-const SendInvite = () => {
+const AddMember = () => {
   let $ = window.$;
 
   const navigate = useNavigate();
-  const location = useLocation();
 
   const { loggedinUser } = useAuth();
 
@@ -48,21 +47,6 @@ const SendInvite = () => {
   let profiletypeid = parseInt(
     GetUserCookieValues(UserCookie.ProfileTypeId, loggedinUser)
   );
-
-  const queryParams = new URLSearchParams(location.search);
-  const parampt = queryParams.get("p");
-  let paramptid = 0;
-  const profileTypekey = Object.keys(config.userProfileTypes).find(
-    (key) => key.toLowerCase() === parampt?.toLowerCase()
-  );
-
-  useEffect(() => {
-    if (profileTypekey) {
-      paramptid = config.userProfileTypes[profileTypekey];
-    } else {
-      navigate(getConnectionsUrl());
-    }
-  }, []);
 
   let { profileAccountTypes } = useUserProfileAccountTypesGateway();
 
@@ -89,7 +73,7 @@ const SendInvite = () => {
     let objParams = {
       AccountId: accountid,
       ProfileId: profileid,
-      ProfileTypeId: parseInt(paramptid),
+      ProfileTypeId: parseInt(0),
       Keyword: searchValue,
     };
 
@@ -204,7 +188,7 @@ const SendInvite = () => {
       let objBodyParams = {
         InviterId: profileid,
         InviteeId: parseInt(setSelectDefaultVal(selectedUsersProfile)),
-        ConnectionForProfileTypeId: parseInt(paramptid),
+        ConnectionForProfileTypeId: parseInt(0),
         Email: inputProfileValue.trim(),
         Message: sendInvitationFormData.txtmessage,
       };
@@ -219,7 +203,7 @@ const SendInvite = () => {
             if (objResponse.Data.Id > 0) {
               if (objResponse.Data.Status === 200) {
                 Toast.success(objResponse.Data.Message);
-                navigateToConnections();
+                navigateToBusinessMembers();
               } else {
                 Toast.info(objResponse.Data.Message);
               }
@@ -250,18 +234,26 @@ const SendInvite = () => {
     }
   };
 
-  function getConnectionsUrl() {
-    let ptid = paramptid || profiletypeid;
-    return ptid == config.userProfileTypes.Owner
-      ? routeNames.connectionsowners.path
-      : ptid == config.userProfileTypes.Agent
-      ? routeNames.connectionsagents.path
-      : routeNames.connectionstenants.path;
-  }
+  const onSave = (e) => {
+    const form = e.currentTarget;
+    e.preventDefault();
+    e.stopPropagation();
 
-  const navigateToConnections = (e) => {
-    e?.preventDefault();
-    navigate(getConnectionsUrl());
+    apiReqResLoader("btnSave", "Saving...", API_ACTION_STATUS.START);
+    navigateToBusiness();
+    apiReqResLoader("btnSave", "Save", API_ACTION_STATUS.COMPLETED);
+  };
+
+  const navigateToSettings = () => {
+    navigate(routeNames.settings.path);
+  };
+
+  const navigateToBusiness = () => {
+    navigate(routeNames.businesses.path);
+  };
+
+  const navigateToBusinessMembers = () => {
+    navigate(routeNames.businessmembers.path);
   };
 
   return (
@@ -275,21 +267,24 @@ const SendInvite = () => {
                 <div className="flex-grow-1">
                   <div className="breadcrumb my-1">
                     <div className="breadcrumb-item bc-fh">
-                      <h6 className="mb-3 down-line pb-10">Connections</h6>
+                      <h6
+                        className="mb-3 down-line pb-10 cur-pointer"
+                        onClick={navigateToBusiness}
+                      >
+                        Business
+                      </h6>
                     </div>
                     <div className="breadcrumb-item bc-fh ctooltip-container">
-                      <span className="font-general font-500 cur-pointer">
-                        <a
-                          className="text-general"
-                          onClick={navigateToConnections}
-                        >
-                          {`${profileTypekey}s`}
-                        </a>
+                      <span
+                        className="font-general font-500 cur-pointer"
+                        onClick={navigateToBusinessMembers}
+                      >
+                        Members
                       </span>
                     </div>
                     <div className="breadcrumb-item bc-fh ctooltip-container">
                       <span className="font-general font-500 cur-default">
-                        Send Invitation
+                        Add Member
                       </span>
                     </div>
                   </div>
@@ -304,11 +299,11 @@ const SendInvite = () => {
                           <div className="d-flex w-100">
                             <div className="flex-grow-1">
                               <h6 className="mb-3 down-line pb-10 px-0 font-16">
-                                Send Invitation
+                                Add Member
                               </h6>
                             </div>
                             <GoBackPanel
-                              clickAction={navigateToConnections}
+                              clickAction={navigateToBusinessMembers}
                               isformBack={true}
                             />
                           </div>
@@ -334,7 +329,7 @@ const SendInvite = () => {
                               inputValue={inputProfileValue}
                               value={selectedUsersProfile}
                               name="ddlusersprofiles"
-                              lblText={`${profileTypekey}s`}
+                              lblText={`Users: `}
                               lblClass="mb-0 lbl-req-field"
                               required={true}
                               errors={sendInvitationErrors}
@@ -444,7 +439,7 @@ const SendInvite = () => {
                           <button
                             className="btn btn-secondary"
                             id="btnCancel"
-                            onClick={navigateToConnections}
+                            onClick={navigateToBusinessMembers}
                           >
                             Cancel
                           </button>
@@ -469,4 +464,4 @@ const SendInvite = () => {
   );
 };
 
-export default SendInvite;
+export default AddMember;

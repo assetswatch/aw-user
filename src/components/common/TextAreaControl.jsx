@@ -40,6 +40,12 @@ const TextAreaControl = ({
         formErrors[name] = rex.required;
       }
       break;
+    case formCtrlTypes.aboutcompany:
+      rex = Regex.aboutcompany;
+      if (required && checkEmptyVal(value)) {
+        formErrors[name] = rex.required;
+      }
+      break;
     case formCtrlTypes.testimonial:
       rex = Regex.testimonial;
       if (required && checkEmptyVal(value)) {

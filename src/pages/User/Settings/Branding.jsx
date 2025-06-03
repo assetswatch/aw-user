@@ -25,6 +25,7 @@ import LazyImage from "../../../components/common/LazyImage";
 import InputControl from "../../../components/common/InputControl";
 import { formCtrlTypes } from "../../../utils/formvalidation";
 import FileControl from "../../../components/common/FileControl";
+import GoBackPanel from "../../../components/common/GoBackPanel";
 
 const Settings = () => {
   let $ = window.$;
@@ -321,41 +322,49 @@ const Settings = () => {
     <>
       {SetPageLoaderNavLinks()}
       {SetAccordion()}
-      <div className="full-row  bg-light">
+      <div className="full-row  bg-light content-ph">
         <div className="container">
-          <div className="row mx-auto col-lg-8 col-xl-7 col-md-10 shadow">
-            <div className="bg-white xs-p-20 p-30 pb-30 border rounded">
-              <div className="row">
-                <div className="col-9">
-                  <div className="breadcrumb mb-0">
-                    <div className="breadcrumb-item bc-fh">
-                      <h6 className="mb-2 down-line pb-10">Settings</h6>
-                    </div>
-                    <div className="breadcrumb-item bc-fh ctooltip-container">
-                      <span className="font-general font-500 cur-default">
-                        Branding
-                      </span>
-                    </div>
-                  </div>
+          <div className="d-flex w-100">
+            <div className="flex-grow-1">
+              <div className="breadcrumb my-1">
+                <div className="breadcrumb-item bc-fh">
+                  <h6
+                    className="mb-3 down-line pb-10 cur-pointer"
+                    onClick={navigateToSettings}
+                  >
+                    Settings
+                  </h6>
                 </div>
-                <div className="col-3 d-flex flex-ai-t flex-jc-r text-end pt-2">
-                  <button
-                    type="button"
-                    className="btn btn-glow px-0 rounded-circle text-primary lh-1 d-flex flex-center"
-                    onClick={
+                <div className="breadcrumb-item bc-fh ctooltip-container">
+                  <span className="font-general font-500 cur-default">
+                    Manage Branding
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="row mx-auto col-lg-8 col-xl-6 col-md-10 shadow">
+            <div className="bg-white xs-p-20 px-30 py-20 pb-30 border rounded">
+              <div className="row">
+                <div className="d-flex w-100">
+                  <div className="flex-grow-1">
+                    <h6 className="mb-3 down-line pb-10 px-0 font-16">
+                      Manage Branding
+                    </h6>
+                  </div>
+                  <GoBackPanel
+                    clickAction={
                       !showEditBrandingInfo
                         ? navigateToSettings
                         : brandingDetails?.Id > 0
                         ? toggleBrandingInfo
                         : navigateToSettings
                     }
-                  >
-                    <i className="icons font-18 icon-arrow-left-circle text-primary me-1"></i>
-                    <span className="font-general">Back</span>
-                  </button>
+                    isformBack={true}
+                  />
                 </div>
               </div>
-              <div className="row pt-20 pb-0 row-cols-1 g-4 flex-center">
+              <div className="row pb-0 row-cols-1 g-4 flex-center">
                 {!showEditBrandingInfo && brandingDetails?.Id > 0 ? (
                   <div className="col">
                     <div className="row form-view" id="divViewBrandingInfo">
@@ -460,8 +469,8 @@ const Settings = () => {
                                         idx == 0
                                           ? "text-left"
                                           : idx == BrandingTypes.length - 1
-                                          ? "text-right"
-                                          : "text-center"
+                                          ? "text-lg-end"
+                                          : "text-lg-center"
                                       }`}
                                     >
                                       <input
