@@ -57,7 +57,7 @@ const HowItWorks = () => {
                   className="accordion text-primary d-block cursor-pointer"
                   onClick={() => togglePanel(1)}
                 >
-                  How to register?
+                  How to Sign Up?
                 </span>
                 <div
                   className="panel"
@@ -69,7 +69,7 @@ const HowItWorks = () => {
                 >
                   <div className="p-3">
                     <span className="mb-d-table sub-title full-row footer-default-dark bg-footer text-white font-400 p-3">
-                      How to register as an Owner?
+                      How to Sign Up as an Owner?
                     </span>
                     <div>
                       <img
@@ -78,7 +78,7 @@ const HowItWorks = () => {
                       />
                     </div>
                     <span className="mb-d-table sub-title full-row footer-default-dark bg-footer text-white font-400 p-3">
-                      How to register as an Agent?
+                      How to Sign Up as an Agent?
                     </span>
                     <div>
                       <img
@@ -87,7 +87,7 @@ const HowItWorks = () => {
                       />
                     </div>
                     <span className="mb-d-table sub-title full-row footer-default-dark bg-footer text-white font-400 p-3">
-                      How to register as an Tenant?
+                      How to Sign Up as an Tenant?
                     </span>
                     <div>
                       <img

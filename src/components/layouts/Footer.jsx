@@ -12,8 +12,8 @@ const Footer = () => {
 
   let showFooter = false;
   let footerFalsePages = [
-    "login",
-    "register",
+    "signin",
+    "signup",
     "forgotpassword",
     "resetpassword",
   ];
@@ -36,7 +36,7 @@ const Footer = () => {
               <div className="row row-cols-lg-4 row-cols-md-2 row-cols-1">
                 <div className="col">
                   <div className="footer-widget mb-4">
-                    <div className="footer-logo mb-3">
+                    <div className="footer-logo mb-1">
                       <a href="#">
                         <img src="/assets/images/logo-white.png" />
                       </a>
@@ -48,7 +48,7 @@ const Footer = () => {
                       agents United States wide.
                     </p>
                   </div>
-                  <div className="footer-widget med ia-widget mb-4 media-widget-round-white-primary-shadow">
+                  <div className="footer-widget med ia-widget mb-1 media-widget-round-white-primary-shadow">
                     <a
                       href="https://www.facebook.com/assetswatch/"
                       target="_blank"
@@ -80,11 +80,11 @@ const Footer = () => {
                   </div>
                 </div>
                 <div className="col">
-                  <div className="footer-widget contact-widget mb-4">
-                    <h3 className="widget-title down-line mb-4">
+                  <div className="footer-widget contact-widget mb-3">
+                    <h3 className="widget-title down-line mb-3">
                       Contact Info
                     </h3>
-                    <ul className="pt-1 text-white">
+                    <ul className="pt-0 text-white">
                       <li>
                         <i
                           className="fa fa-map-marker-alt"
@@ -104,9 +104,9 @@ const Footer = () => {
                   </div>
                 </div>
                 <div className="col">
-                  <div className="footer-widget footer-nav mb-4">
-                    <h3 className="widget-title down-line mb-4">Quick Links</h3>
-                    <ul>
+                  <div className="footer-widget footer-nav mb-3">
+                    <h3 className="widget-title down-line mb-3">Quick Links</h3>
+                    <ul className="pt-0">
                       <li>
                         <Link to={routeNames.properties.path}>Properties</Link>
                       </li>
@@ -118,17 +118,17 @@ const Footer = () => {
                           <li>
                             <Link
                               className="nav-link d-inline"
-                              to={UrlWithoutParam(routeNames.login)}
+                              to={UrlWithoutParam(routeNames.signin)}
                             >
-                              Login
+                              Sign In
                             </Link>
                           </li>
                           <li>
                             <Link
                               className="nav-link d-inline"
-                              to={UrlWithoutParam(routeNames.register)}
+                              to={UrlWithoutParam(routeNames.signup)}
                             >
-                              Register
+                              Sign Up
                             </Link>
                           </li>
                         </>
@@ -142,9 +142,9 @@ const Footer = () => {
                   </div>
                 </div>
                 <div className="col">
-                  <div className="footer-widget footer-nav mb-4">
-                    <h4 className="widget-title down-line mb-4">Other Links</h4>
-                    <ul>
+                  <div className="footer-widget footer-nav mb-3">
+                    <h4 className="widget-title down-line mb-3">Other Links</h4>
+                    <ul className="pt-0">
                       <li>
                         <Link to={routeNames.aboutUs.path}>About Us</Link>
                       </li>
@@ -175,7 +175,7 @@ const Footer = () => {
           {/* ============== Footer Section End ============== */}
         </>
       )}
-      <FooterCopyRight isBorder={showFooter} />
+      <FooterCopyRight isBorder={showFooter} css="text-center" />
     </>
   );
 };

@@ -593,7 +593,7 @@ export const formCtrlTypes = {
     },
   },
   email: {
-    lbl: "Email Id:",
+    lbl: "Email address:",
     input: {
       type: "text",
       max: length100,

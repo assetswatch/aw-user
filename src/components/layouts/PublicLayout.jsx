@@ -36,7 +36,7 @@ const PublicLayout = ({ children }) => {
       {checkEmptyVal(isprotectedRoute) ? (
         <Footer />
       ) : (
-        <FooterCopyRight isBorder={false} />
+        <FooterCopyRight isBorder={false} css="text-center" />
       )}
 
       <ToastView />

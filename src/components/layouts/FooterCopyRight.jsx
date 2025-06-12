@@ -18,19 +18,20 @@ const FooterCopyRight = (footerProps) => {
         <div
           className={` ${
             footerProps.isBorder == true
-              ? `bg-footer copyright-border`
-              : "bg-light bo-t1-lihover"
-          }  text-default py-2`}
+              ? `bg-footer copyr ight-border`
+              : "bg-light"
+          }  text-default p y-2`}
         >
           <div
-            className={`pt-2 ${
+            className={`py-2 ${
               footerProps.isBorder == true
                 ? "container"
-                : "container-fluid box-shadow-top"
+                : "container-fluid box-shadow-top bo-t1-gray"
             }`}
+            style={{ height: "40px" }}
           >
             <div className="row">
-              <div className="col text-center">
+              <div className={`col ${footerProps?.css}`}>
                 <span
                   className={`${
                     footerProps.isBorder == true

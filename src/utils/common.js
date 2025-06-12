@@ -166,11 +166,16 @@ export function SetPageLoaderNavLinks() {
         case "contactus":
           path = "contactus";
           break;
-        case "login":
+        case "signin":
         case "forgotpassword":
           path = "login";
           break;
-        case "register":
+        case "signup":
+        case "accountinfo":
+        case "accounttype":
+        case "profiletype":
+        case "businessinfo":
+        case "services":
           path = "register";
           break;
         case "properties":
@@ -808,11 +813,11 @@ export function maskNumber(number, maskcount = 4) {
 export function UrlWithoutParam(page) {
   let url = page.path;
   switch (page.path.toLowerCase()) {
-    case routeNames.register.path.toLowerCase():
-      url = routeNames.register.path.replace("/:id", "");
+    case routeNames.signup.path.toLowerCase():
+      url = routeNames.signup.path.replace("/:id", "");
       break;
-    case routeNames.login.path.toLowerCase():
-      url = routeNames.login.path.replace("/:id", "");
+    case routeNames.signin.path.toLowerCase():
+      url = routeNames.signin.path.replace("/:id", "");
       break;
     default:
       url = page.path;
@@ -858,6 +863,16 @@ export function setProfileDescText(profileTypeId) {
     return " Handles daily operations and tenant relations.";
   } else if (profileTypeId == config.userProfileTypes.Tenant) {
     return " Occupies and manages leased properties.";
+  } else {
+    return "";
+  }
+}
+
+export function setUserAccountTypeDescText(profileTypeId) {
+  if (profileTypeId == config.userProfileAccountTypes.Personal) {
+    return " For individuals managing own properties, renting a home, or searching to buy or lease.";
+  } else if (profileTypeId == config.userProfileAccountTypes.Business) {
+    return " For real estate professionals managing properties, clients, and listings.";
   } else {
     return "";
   }

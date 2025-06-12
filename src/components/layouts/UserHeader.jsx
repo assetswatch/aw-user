@@ -415,7 +415,7 @@ const UserHeader = () => {
                     // style={{ width: "10px" }}
                   >
                     <ul className="navbar-nav ms-auto">
-                      <li className="nav-item mr-0 position-relative">
+                      <li className="nav-item mr-0 position -relative">
                         <span
                           className="nav-link icon-wrapper icon-wrapper-alt rounded-circle shadow bscollapsemenu"
                           data-bs-toggle="collapse"

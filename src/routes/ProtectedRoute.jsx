@@ -8,7 +8,7 @@ const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
 
   if (isAuthenticated() === false) {
-    return <Navigate to={UrlWithoutParam(routeNames.register)} replace />;
+    return <Navigate to={UrlWithoutParam(routeNames.signup)} replace />;
   }
 
   return children;

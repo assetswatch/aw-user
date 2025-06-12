@@ -76,10 +76,14 @@ const UserProfileMenu = (styleprops) => {
   return (
     <>
       <li
-        className={`nav-item user-info-nav-item position-relative ${styleprops?.style?.className}`}
+        className={`nav-item user-info-nav-item ${
+          styleprops?.style?.className === "publiclayout"
+            ? " position-relative"
+            : "pl-5"
+        } ${styleprops?.style?.className}`}
       >
         <div
-          className="nav-link user-option no-after-cnt"
+          className="nav-link user-option no-after-cnt pt-0"
           data-bs-toggle="collapse"
           data-bs-target="#collpase-widget-userinfo-menu"
           aria-controls="collpase-widget-userinfo-menu"
@@ -95,14 +99,18 @@ const UserProfileMenu = (styleprops) => {
             }
             <div className="pt-1 user-info-name">
               <div>{GetCookieValues(UserCookie.Name)}</div>
-              <div className="mt-1 small text-light">
+              <div className="mt -1 small text-light">
                 {GetCookieValues(UserCookie.ProfileType)}
               </div>
             </div>
           </div>
         </div>
         <ul
-          className={`dropdown-menu-arrow collapse in user-info-ddmenu bg-white position-absolute py-0 px-0 lh-1 shadow rounded`}
+          className={`dropdown-menu-arrow collapse in user-info-ddmenu bg-white position-absolute${
+            styleprops?.style?.className === "publiclayout"
+              ? " publiclayout"
+              : ""
+          } py-0 px-0 lh-1 shadow rounded`}
           id="collpase-widget-userinfo-menu"
           style={{ zIndex: styleprops?.style?.zIndex }}
         >

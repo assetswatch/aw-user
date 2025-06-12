@@ -8,6 +8,7 @@ import {
   getPagesPathByLoggedinUserProfile,
   apiReqResLoader,
   UrlWithoutParam,
+  SetPageLoaderNavLinks,
 } from "../utils/common";
 import {
   UserCookie,
@@ -21,6 +22,7 @@ import config from "../config.json";
 import moment from "moment";
 import { axiosPost } from "../helpers/axiosHelper";
 import { Toast } from "../components/common/ToastView";
+import SigninLeftPanel from "../components/common/SigninLeftPanel";
 
 const ForgotPassword = () => {
   let $ = window.$;
@@ -119,7 +121,7 @@ const ForgotPassword = () => {
   // };
 
   const navigateToLogin = () => {
-    navigate(UrlWithoutParam(routeNames.login));
+    navigate(UrlWithoutParam(routeNames.signin));
   };
 
   return (
@@ -134,111 +136,95 @@ const ForgotPassword = () => {
         />
       ) : (
         <>
-          {/*============== Page title Start ==============*/}
-          <PageTitle
-            title="Forgot Password"
-            navLinks={[{ title: "Home", url: routeNames.home.path }]}
-          ></PageTitle>
-          {/*============== Page title End ==============*/}
+          {SetPageLoaderNavLinks()}
+          <div className="container-fluid login-wrapper row p-0 m-0">
+            <SigninLeftPanel></SigninLeftPanel>
 
-          {/*============== ForgotPassword Form Start ==============*/}
-          <div className="full-row pt-4 pb-5 bg-light">
-            <div className="container mb-15">
-              <div className="row">
-                <div className="col-xl-4 col-lg-5 mx-auto">
-                  <div className="bg-white xs-p-20 p-30 border rounded shadow">
-                    <div className="form-icon-left rounded form-boder">
-                      <h6 className="mb-4 down-line pb-10">Forgot Password</h6>
-                      <div className="row row-cols-1 g-3">
-                        {!showResponse ? (
-                          <>
-                            <form noValidate onSubmit={onSendResetLink}>
-                              <div className="col mb-15 pb-3">
-                                <InputControl
-                                  lblClass="mb-0 lbl-req-field"
-                                  name="txtemail"
-                                  ctlType={formCtrlTypes.email}
-                                  isFocus={true}
-                                  required={true}
-                                  onChange={handleChange}
-                                  value={formData.txtemail}
-                                  errors={errors}
-                                  formErrors={formErrors}
-                                  tabIndex={1}
-                                  ctlicon={<i className="fa fa-envelope"></i>}
-                                ></InputControl>
-                              </div>
-                              <div className="col mb-10">
-                                <button
-                                  className="btn btn-primary btn-mini btn-glow shadow rounded"
-                                  name="btnsendresetlink"
-                                  id="btnsendresetlink"
-                                  type="submit"
-                                >
-                                  Send Reset Link
-                                </button>
-                              </div>
-                              <div
-                                className="form-error text-left"
-                                id="err-message"
-                              ></div>
-                            </form>
-                            <div className="col d-flex flex-sb pb-40">
-                              <Link
-                                to={UrlWithoutParam(routeNames.login)}
-                                className="text-dark"
-                              >
-                                <u>I already have account.</u>
-                              </Link>
-                              <Link
-                                to={UrlWithoutParam(routeNames.register)}
-                                className="text-dark"
-                              >
-                                <u>Don't have account?</u>
-                              </Link>
-                            </div>
-                          </>
-                        ) : (
-                          <div className="d-flex flex-column align-items-center justify-content-center text-center pt-0 pb-40">
-                            <div className="px-20">
-                              <h6
-                                className={`font-600 font-large mt-1 text-primary`}
-                              >
-                                Password Reset Email Sent
-                              </h6>
-                              <p className="text-primary pt-2">
-                                Please check your email for a reset link. If you
-                                don’t receive it soon, check your spam folder or
-                                try again.
-                              </p>
-                              <div className="form-action text-center mt-40">
-                                <button
-                                  className="btn btn-primary btn-mini btn-glow shadow rounded"
-                                  id="btnRetry"
-                                  onClick={toggleShowResponse}
-                                >
-                                  <i className="icon icon-refresh px-0 t-2 position-relative"></i>{" "}
-                                  Retry
-                                </button>
-                                <button
-                                  className="btn btn-primary btn-mini btn-glow shadow rounded"
-                                  id="btnhome"
-                                  onClick={navigateToLogin}
-                                >
-                                  Login
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        )}
+            <div className="col-md-6 d-flex align-items-center justify-content-center bg-white box-shadow">
+              {!showResponse ? (
+                <div className="form-section">
+                  <h6 className="mb-3 down-line pb-2">Forgot your password?</h6>
+                  <form noValidate onSubmit={onSendResetLink}>
+                    <div className="col mb-2">
+                      <InputControl
+                        lblClass="mb-0 lbl-req-field"
+                        name="txtemail"
+                        ctlType={formCtrlTypes.email}
+                        isFocus={true}
+                        required={true}
+                        onChange={handleChange}
+                        value={formData.txtemail}
+                        errors={errors}
+                        formErrors={formErrors}
+                        tabIndex={1}
+                        ctlicon={<i className="fa fa-envelope"></i>}
+                      ></InputControl>
+                      <Link
+                        to={UrlWithoutParam(routeNames.signin)}
+                        className="d-flex align-items-end justify-content-end font-500 font-small"
+                      >
+                        Back to Sign In
+                      </Link>
+                    </div>
+                    <div className="col mb-2 mt-3">
+                      <button
+                        className="btn btn-primary w-100 rounded"
+                        name="btnsendresetlink"
+                        id="btnsendresetlink"
+                        type="submit"
+                      >
+                        Request Password Reset
+                      </button>
+                      <div
+                        className="form-error col d-flex justify-content-center align-items-center pt-2 pb-1"
+                        id="err-message"
+                      ></div>
+                      <div className="col d-flex justify-content-center align-items-center pt-2 pb-0">
+                        <Link
+                          to={UrlWithoutParam(routeNames.signup)}
+                          className="text-dark font-400 font-general"
+                        >
+                          Doesn't have an account?{" "}
+                          <span className="font-500 font-general text-primary">
+                            Sign Up
+                          </span>
+                        </Link>
                       </div>
                     </div>
+                  </form>
+                </div>
+              ) : (
+                <div className="form-section max-w-600px">
+                  <h6 className="mb-3 down-line pb-2">
+                    Password Reset Email Sent
+                  </h6>
+                  <p className="font-general font-500 pt-2">
+                    A secure link to reset your password has been sent to your
+                    registered email. If it doesn't arrive within a few minutes,
+                    check your spam folder or resend the email.
+                  </p>
+                  <div className="form-action mt-30 d-flex flex-cneter">
+                    <button
+                      className="btn btn-primary btn-mini rounded px-15"
+                      id="btnRetry"
+                      onClick={toggleShowResponse}
+                    >
+                      <i className="icon icon-envelope t-2 position-relative me-1"></i>{" "}
+                      Resend Email
+                    </button>
+                    <button
+                      className="btn btn-primary btn-mini rounded mx-md-4"
+                      id="btnhome"
+                      onClick={navigateToLogin}
+                    >
+                      <i className="icon icon-lock t-1 position-relative me-1"></i>{" "}
+                      Sign In
+                    </button>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
-          {/*============== ForgotPassword Form End ==============*/}
         </>
       )}
     </>

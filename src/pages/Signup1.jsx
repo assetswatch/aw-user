@@ -436,7 +436,7 @@ const Register = () => {
                   <div className="bg-white xs-p-20 px-30 py-30 pb-30 border rounded">
                     <div className="breadcrumb mb-0">
                       <div className="breadcrumb-item bc-fh">
-                        <h6 className="mb-2 down-line pb-10">Select Profile</h6>
+                        <h6 className="mb-2 down-line pb-10">Choose Profile</h6>
                       </div>
                     </div>
                     <div className="row row-cols-lg-3 row-cols-md-3 pt-20 pb-50 row-cols-1 g-4 f lex-center">
@@ -926,7 +926,7 @@ const Register = () => {
                             id="btnregister"
                             type="submit"
                           >
-                            Register
+                            Sign Up
                           </button>
                         </div>
                         <div
@@ -935,7 +935,7 @@ const Register = () => {
                         ></div>
                         <div className="col">
                           <Link
-                            to={UrlWithoutParam(routeNames.login)}
+                            to={UrlWithoutParam(routeNames.signin)}
                             className="text-dark d-table py-1"
                           >
                             <u>I already have account.</u>

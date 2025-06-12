@@ -8,6 +8,7 @@ import {
   apiReqResLoader,
   checkEmptyVal,
   checkObjNullorEmpty,
+  SetPageLoaderNavLinks,
   UrlWithoutParam,
 } from "../utils/common";
 import { API_ACTION_STATUS, ApiUrls, AppMessages } from "../utils/constants";
@@ -17,6 +18,7 @@ import config from "../config.json";
 import moment from "moment";
 import { axiosPost } from "../helpers/axiosHelper";
 import { Toast } from "../components/common/ToastView";
+import SigninLeftPanel from "../components/common/SigninLeftPanel";
 
 const ResetPassword = () => {
   let $ = window.$;
@@ -186,7 +188,7 @@ const ResetPassword = () => {
   };
 
   const navigateToLogin = () => {
-    navigate(UrlWithoutParam(routeNames.login), { replace: true });
+    navigate(UrlWithoutParam(routeNames.signin), { replace: true });
   };
 
   const navigateToForgotPassword = () => {
@@ -195,92 +197,73 @@ const ResetPassword = () => {
 
   return (
     <>
-      {/*============== Page title Start ==============*/}
-      <PageTitle
-        title="Reset Password"
-        navLinks={[{ title: "Home", url: routeNames.home.path }]}
-      ></PageTitle>
-      {/*============== Page title End ==============*/}
+      {SetPageLoaderNavLinks()}
+      <div className="container-fluid login-wrapper row p-0 m-0">
+        <SigninLeftPanel></SigninLeftPanel>
 
-      {/*============== ResetPassword Form Start ==============*/}
-      <div className="full-row pt-4 pb-5 bg-light">
-        <div className="container">
-          <div className="row">
-            <div className="col-xl-4 col-lg-5 mx-auto">
-              <div className="bg-white xs-p-20 p-30 border rounded shadow">
-                <div className="form-icon-left rounded form-boder">
-                  <h6 className="mb-4 down-line pb-10">Reset Password</h6>
-                  <div className="row row-cols-1 g-3">
-                    <form noValidate onSubmit={onReset}>
-                      <div className="col mb-15">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtpassword"
-                          ctlType={formCtrlTypes.pwd}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtpassword}
-                          errors={errors}
-                          formErrors={formErrors}
-                          tabIndex={1}
-                          ctlicon={<i className="fa fa-lock"></i>}
-                        ></InputControl>
-                      </div>
-                      <div className="col mb-20 pb-2">
-                        <InputControl
-                          lblClass="mb-0 lbl-req-field"
-                          name="txtconfirmpassword"
-                          ctlType={formCtrlTypes.confirmpwd}
-                          required={true}
-                          onChange={handleChange}
-                          value={formData.txtconfirmpassword}
-                          pwdVal={formData.txtpassword}
-                          errors={errors}
-                          formErrors={formErrors}
-                          objProps={{ pwdVal: formData.txtpassword }}
-                          tabIndex={2}
-                          ctlicon={<i className="fa fa-lock"></i>}
-                        ></InputControl>
-                      </div>
-                      <div className="col mb-10">
-                        <button
-                          className="btn btn-primary btn-mini btn-glow shadow rounded"
-                          name="btnresetpwd"
-                          id="btnresetpwd"
-                          type="submit"
-                        >
-                          Reset Password
-                        </button>
-                      </div>
-                      <div
-                        className="form-error text-left"
-                        id="err-message"
-                      ></div>
-                    </form>
-                    <div className="col d-flex flex-sb pb-20">
-                      <Link
-                        to={UrlWithoutParam(routeNames.login)}
-                        replace={true}
-                        className="text-dark"
-                      >
-                        <u>I already have account.</u>
-                      </Link>
-                      <Link
-                        to={UrlWithoutParam(routeNames.register)}
-                        replace={true}
-                        className="text-dark"
-                      >
-                        <u>Don't have account?</u>
-                      </Link>
-                    </div>
-                  </div>
+        <div className="col-md-6 d-flex align-items-center justify-content-center bg-white box-shadow">
+          <div className="form-section">
+            <h6 className="mb-3 down-line pb-2">Reset Your Password</h6>
+            <form noValidate onSubmit={onReset}>
+              <div className="col mb-2">
+                <InputControl
+                  lblClass="mb-0 lbl-req-field"
+                  name="txtpassword"
+                  ctlType={formCtrlTypes.pwd}
+                  required={true}
+                  onChange={handleChange}
+                  value={formData.txtpassword}
+                  errors={errors}
+                  formErrors={formErrors}
+                  tabIndex={1}
+                  ctlicon={<i className="fa fa-lock"></i>}
+                ></InputControl>
+              </div>
+              <div className="col mb-4">
+                <InputControl
+                  lblClass="mb-0 lbl-req-field"
+                  name="txtconfirmpassword"
+                  ctlType={formCtrlTypes.confirmpwd}
+                  required={true}
+                  onChange={handleChange}
+                  value={formData.txtconfirmpassword}
+                  pwdVal={formData.txtpassword}
+                  errors={errors}
+                  formErrors={formErrors}
+                  objProps={{ pwdVal: formData.txtpassword }}
+                  tabIndex={2}
+                  ctlicon={<i className="fa fa-lock"></i>}
+                ></InputControl>
+              </div>
+              <div className="col mb-2">
+                <button
+                  className="btn btn-primary w-100 rounded"
+                  name="btnresetpwd"
+                  id="btnresetpwd"
+                  type="submit"
+                >
+                  Reset Password
+                </button>
+                <div
+                  className="form-error col d-flex justify-content-center align-items-center pt-2 pb-1"
+                  id="err-message"
+                ></div>
+                <div className="col d-flex justify-content-center align-items-center pt-2 pb-0">
+                  <Link
+                    to={UrlWithoutParam(routeNames.signin)}
+                    className="text-dark font-400 font-general"
+                  >
+                    Know your password?{" "}
+                    <span className="font-500 font-general text-primary">
+                      Sign In
+                    </span>
+                  </Link>
                 </div>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </div>
-      {/*============== ResetPassword Form End ==============*/}
     </>
   );
 };

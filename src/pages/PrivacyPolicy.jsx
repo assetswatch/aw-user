@@ -65,7 +65,7 @@ const PrivacyPolicy = () => {
                 Other information relevant to customer surveys and/or offers
               </li>
               <li>IP address, device type, and web browser</li>
-              <li>Time and date of login and use</li>
+              <li>Time and date of signin and use</li>
             </ul>
 
             <h6 className="text-primary">
